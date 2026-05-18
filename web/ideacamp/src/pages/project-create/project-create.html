@@ -1,0 +1,34 @@
+<app-wizard-layout>
+
+  <div sidebar>
+    <app-stepper [currentStep]="currentStep"></app-stepper>
+  </div>
+
+  @if (currentStep === 0) {
+    <app-project-general-form
+      (next)="nextStep()">
+    </app-project-general-form>
+  }
+  @if (currentStep === 1){
+    <app-project-settings-form
+      (back)="previousStep()"
+      (next)="nextStep()">
+    </app-project-settings-form>
+  }
+
+  @if (currentStep === 2){
+    <app-project-members-form
+      (back)="previousStep()"
+      (next)="nextStep()">
+    </app-project-members-form>
+  }
+
+  @if (currentStep === 3) {
+    <app-project-finish-form
+      (back)="previousStep()"
+      (finish)="finishStep()">
+    </app-project-finish-form>
+  }
+
+
+</app-wizard-layout>
