@@ -20,6 +20,9 @@ export class ProjectCreate {
 
   currentStep = 0;
 
+  /** 'projectData' is used to store already collected project data across all wizard steps.
+   * 'Partial' must be used, because the project data is filled in step by step
+   */
   projectData: Partial<ProjectCreateData> = {};
 
 
@@ -34,22 +37,25 @@ export class ProjectCreate {
     }
   }
 
+  /** Saves the validated general-form data and goes to the next wizard step.*/
   saveGeneralFormAndContinue(data: ProjectGeneralData){
     this.projectData = {...this.projectData, ...data};
     this.nextStep();
   }
 
+  /** Saves the validated settings-form data and goes to the next wizard step.*/
   saveSettingsFormAndContinue(data: ProjectSettingsData){
     this.projectData = {...this.projectData, ...data};
     this.nextStep();
   }
 
+  /** Saves the validated settings-form data and goes back to the previous wizard step.*/
   saveSettingsFormAndBack(data: ProjectSettingsData){
     this.projectData = {...this.projectData, ...data};
     this.previousStep();
 
   }
-
+  /** Validates the collected project data before creating the project.*/
   finishProjectCreation(){
     const res = projectCreateSchema.safeParse(this.projectData);
     if(!res.success){
