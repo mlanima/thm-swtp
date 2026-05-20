@@ -13,6 +13,12 @@ type GeneralFormFields = 'name' | 'description';
   imports: [FormsModule],
   templateUrl: './project-general-form.html',
 })
+
+/** First step of the project creation wizard.
+ * Gathers general project information and validates input
+ * with the {@link projectGeneralSchema}.
+ */
+
 export class ProjectGeneralForm implements OnChanges {
   @Input() initialFormData?: Partial<ProjectGeneralData>;
   @Output() next = new EventEmitter<ProjectGeneralData>();

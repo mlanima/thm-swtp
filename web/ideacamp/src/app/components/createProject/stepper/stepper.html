@@ -6,8 +6,6 @@
 
 
       <div class="flex flex-col items-center">
-
-        <!-- Set different styling for current users step-->
         <div
           class="flex h-8 w-8 items-center justify-center rounded-full border text-sm font-semibold"
 
@@ -22,7 +20,6 @@
           [class.text-slate-700]="i > currentStep">
 
           {{ i + 1 }}
-
         </div>
 
         @if (i < steps.length - 1) {

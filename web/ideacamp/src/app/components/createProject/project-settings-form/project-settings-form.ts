@@ -12,6 +12,12 @@ type SettingsFormFields = 'projectUrl' | 'isPrivateProject';
   imports: [FormsModule],
   templateUrl: './project-settings-form.html',
 })
+
+/** Second step of the project creation wizard.
+ * Gathers the project setting information and validates input
+ * with the {@link projectSettingsSchema}
+ */
+
 export class ProjectSettingsForm implements OnChanges {
   @Input() initialFormData?: Partial<ProjectSettingsData>;
   @Output() next = new EventEmitter<ProjectSettingsData>();

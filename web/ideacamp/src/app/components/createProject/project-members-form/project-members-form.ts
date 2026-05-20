@@ -5,6 +5,8 @@ import {Component, EventEmitter, Output} from '@angular/core';
   imports: [],
   templateUrl: './project-members-form.html',
 })
+
+/** Third step of the project creation wizard.*/
 export class ProjectMembersForm {
   @Output() next = new EventEmitter<void>();
   @Output() back = new EventEmitter<void>();
