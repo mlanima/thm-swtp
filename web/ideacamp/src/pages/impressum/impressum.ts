@@ -6,8 +6,7 @@ import { RouterModule } from '@angular/router';
   selector: 'app-impressum',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  templateUrl: './impressum.html',
-  styleUrl: './impressum.css',
+  templateUrl: './impressum.html'
 })
 export class Impressum {
   readonly currentYear = new Date().getFullYear();
