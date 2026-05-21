@@ -74,6 +74,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -85,10 +86,23 @@ public class SecurityConfig {
 
         return http.build();
     }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of("http://localhost:4200"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
 }
 ```
 
 - **Stateless** — keine Sessions, kein CSRF
+- **CORS** — erlaubt Requests von `localhost:4200` (Angular Dev-Server); für Produktion durch die echte Frontend-Domain ersetzen
 - `/api/public/**` — ohne Token erreichbar
 - Alles andere — gültiger JWT erforderlich
 
@@ -166,31 +180,83 @@ curl http://localhost:8080/api/hello -H "Authorization: Bearer ***
 
 ---
 
-## Frontend (Angular) — Ausblick
+## Frontend (Angular)
 
-> Implementierung folgt im selben Branch.
+### Setup
 
-Angular übernimmt den **Authorization Code Flow**:
+```bash
+ng new frontend --routing=true --style=css --ssr=false --skip-git=true
+cd frontend
+npm install angular-oauth2-oidc
+```
 
-1. User klickt "Login" → Redirect zu Keycloak
-2. User gibt Credentials auf der Keycloak-Seite ein
-3. Keycloak redirectet zurück mit Auth Code
-4. Angular tauscht Code gegen Token
-5. Token wird bei jedem API-Request als `Authorization: Bearer` Header mitgeschickt
-
-Empfohlene Library: [`angular-oauth2-oidc`](https://github.com/manfredsteyer/angular-oauth2-oidc)
-
-Keycloak-Config im Frontend:
+### `app.config.ts`
 
 ```typescript
-const authConfig: AuthConfig = {
-  issuer: 'https://auth.swtp-ss26.de/realms/swtp',
-  redirectUri: window.location.origin,
-  clientId: 'swtp-frontend',
-  responseType: 'code',
-  scope: 'openid profile email',
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideRouter(routes),
+    provideHttpClient(),
+    provideOAuthClient(),
+  ]
 };
 ```
+
+### `AuthService`
+
+```typescript
+@Injectable({ providedIn: 'root' })
+export class AuthService {
+
+  isLoggedIn = signal(false);
+
+  constructor(private oauthService: OAuthService) {
+    this.oauthService.configure({
+      issuer: 'https://auth.swtp-ss26.de/realms/swtp',
+      redirectUri: window.location.origin,
+      clientId: 'swtp-frontend',
+      responseType: 'code',
+      scope: 'openid profile email',
+    });
+
+    this.oauthService.loadDiscoveryDocumentAndTryLogin().then(() => {
+      this.isLoggedIn.set(this.oauthService.hasValidAccessToken());
+    });
+
+    // OAuthService-Events laufen außerhalb von Angulars Zone —
+    // Signal statt getter nötig damit Change Detection greift
+    this.oauthService.events.subscribe(() => {
+      this.isLoggedIn.set(this.oauthService.hasValidAccessToken());
+    });
+  }
+
+  login(): void { this.oauthService.initCodeFlow(); }
+  logout(): void { this.oauthService.logOut(); }
+
+  get username(): string {
+    const claims = this.oauthService.getIdentityClaims() as Record<string, string>;
+    return claims?.['preferred_username'] ?? '';
+  }
+
+  get accessToken(): string {
+    return this.oauthService.getAccessToken();
+  }
+}
+```
+
+> **Wichtig:** `isLoggedIn` muss ein Signal sein, kein getter. Die OAuth-Library arbeitet außerhalb von Angulars Zone — ein normaler getter löst keine Change Detection aus, der Status würde erst beim nächsten User-Interaction aktualisiert.
+
+### Token an Backend schicken
+
+```typescript
+callSecuredApi(): void {
+  const headers = new HttpHeaders({ Authorization: `Bearer ${this.auth.accessToken}` });
+  this.http.get<object>('http://localhost:8080/api/hello', { headers })
+    .subscribe(res => this.apiResponse.set(JSON.stringify(res, null, 2)));
+}
+```
+
+> API-Responses ebenfalls als Signal (`signal('')`) speichern, nicht als plain property — aus demselben Grund.
 
 ---
 
