@@ -4,12 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3b22c7ce-2561-4e1d-9009-e945c54cca5d" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/web/ideacamp/src/app/app.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/ideacamp/src/app/app.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/ideacamp/src/app/app.routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/ideacamp/src/app/app.routes.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/ideacamp/src/components/temp1" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/ideacamp/src/pages/temp1" beforeDir="false" />
-    </list>
+    <list default="true" id="3b22c7ce-2561-4e1d-9009-e945c54cca5d" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -64,7 +59,7 @@
       <updated>1779374806993</updated>
       <workItem from="1779374808156" duration="396000" />
       <workItem from="1779375221431" duration="557000" />
-      <workItem from="1779375796907" duration="1768000" />
+      <workItem from="1779375796907" duration="1916000" />
     </task>
     <servers />
   </component>
