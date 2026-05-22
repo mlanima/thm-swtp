@@ -4,7 +4,10 @@ import de.thm.swtp.api.config.KeycloakJwtConverter;
 import de.thm.swtp.api.config.SecurityConfig;
 import de.thm.swtp.api.userprofile.controller.UserProfileController;
 import de.thm.swtp.api.userprofile.dto.UserProfileResponse;
+import de.thm.swtp.api.userprofile.entity.UserProfile;
+import de.thm.swtp.api.userprofile.mapper.UserProfileMapper;
 import de.thm.swtp.api.userprofile.service.UserProfileService;
+import de.thm.swtp.api.users.entity.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -37,12 +40,20 @@ class UserProfileControllerTest {
     @MockitoBean
     private UserProfileService userProfileService;
 
+    @MockitoBean
+    private UserProfileMapper userProfileMapper;
+
     private static final String USER_ID = "kc-uuid-123";
     private static final String BASE_URL = "/api/users/" + USER_ID + "/profile";
 
-    private UserProfileResponse sampleResponse() {
-        return UserProfileResponse.builder()
-                .userId(USER_ID)
+    private UserProfile sampleProfile() {
+        User user = User.builder()
+                .keycloakId(USER_ID)
+                .username("testuser")
+                .email("test@example.com")
+                .build();
+        return UserProfile.builder()
+                .user(user)
                 .about("I love coding")
                 .experience("3 years Java")
                 .build();
@@ -50,7 +61,12 @@ class UserProfileControllerTest {
 
     @Test
     void getProfile_authenticated_returnsOk() throws Exception {
-        when(userProfileService.getProfile(USER_ID)).thenReturn(sampleResponse());
+        UserProfile profile = sampleProfile();
+        UserProfileResponse response = UserProfileResponse.builder()
+                .userId(USER_ID).about("I love coding").experience("3 years Java").build();
+
+        when(userProfileService.getProfile(USER_ID)).thenReturn(profile);
+        when(userProfileMapper.toResponse(profile)).thenReturn(response);
 
         mockMvc.perform(get(BASE_URL).with(jwt()))
                 .andExpect(status().isOk())
@@ -76,13 +92,16 @@ class UserProfileControllerTest {
 
     @Test
     void updateProfile_authenticated_returnsOk() throws Exception {
-        UserProfileResponse updated = UserProfileResponse.builder()
-                .userId(USER_ID)
+        UserProfile updated = UserProfile.builder()
+                .user(User.builder().keycloakId(USER_ID).username("testuser").email("test@example.com").build())
                 .about("Updated bio")
                 .experience("5 years Java")
                 .build();
+        UserProfileResponse response = UserProfileResponse.builder()
+                .userId(USER_ID).about("Updated bio").experience("5 years Java").build();
 
-        when(userProfileService.updateProfile(eq(USER_ID), any())).thenReturn(updated);
+        when(userProfileService.updateProfile(eq(USER_ID), any(), any())).thenReturn(updated);
+        when(userProfileMapper.toResponse(updated)).thenReturn(response);
 
         mockMvc.perform(put(BASE_URL)
                         .with(jwt())
@@ -95,7 +114,7 @@ class UserProfileControllerTest {
 
     @Test
     void updateProfile_unknownUser_returns404() throws Exception {
-        when(userProfileService.updateProfile(eq(USER_ID), any()))
+        when(userProfileService.updateProfile(eq(USER_ID), any(), any()))
                 .thenThrow(new ResponseStatusException(NOT_FOUND, "User not found"));
 
         mockMvc.perform(put(BASE_URL)

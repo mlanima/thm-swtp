@@ -1,7 +1,5 @@
 package de.thm.swtp.api.userprofile.service;
 
-import de.thm.swtp.api.userprofile.dto.UserProfileRequest;
-import de.thm.swtp.api.userprofile.dto.UserProfileResponse;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import de.thm.swtp.api.users.entity.User;
@@ -20,21 +18,20 @@ public class UserProfileService {
     private final UserProfileRepository userProfileRepository;
 
     @Transactional(readOnly = true)
-    public UserProfileResponse getProfile(String userId) {
+    public UserProfile getProfile(String userId) {
         User user = findUserOrThrow(userId);
-        UserProfile profile = findProfileOrThrow(user);
-        return toResponse(profile);
+        return findProfileOrThrow(user);
     }
 
     @Transactional
-    public UserProfileResponse updateProfile(String userId, UserProfileRequest request) {
+    public UserProfile updateProfile(String userId, String about, String experience) {
         User user = findUserOrThrow(userId);
         UserProfile profile = findProfileOrThrow(user);
 
-        profile.setAbout(request.about());
-        profile.setExperience(request.experience());
+        profile.setAbout(about);
+        profile.setExperience(experience);
 
-        return toResponse(userProfileRepository.save(profile));
+        return userProfileRepository.save(profile);
     }
 
     @Transactional
@@ -52,13 +49,5 @@ public class UserProfileService {
     private UserProfile findProfileOrThrow(User user) {
         return userProfileRepository.findByUser(user)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profile not found"));
-    }
-
-    private UserProfileResponse toResponse(UserProfile profile) {
-        return UserProfileResponse.builder()
-                .userId(profile.getUser().getKeycloakId())
-                .about(profile.getAbout())
-                .experience(profile.getExperience())
-                .build();
     }
 }
