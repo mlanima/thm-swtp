@@ -5,8 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3b22c7ce-2561-4e1d-9009-e945c54cca5d" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/ideacamp/src/app/pages/search-project/search-project.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/ideacamp/src/app/pages/search-project/search-project.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/ideacamp/src/app/components/sidebar/sidebar.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/ideacamp/src/app/components/project-sidebar/project-sidebar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/ideacamp/src/app/components/sidebar/sidebar.spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/ideacamp/src/app/components/sidebar/sidebar.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/ideacamp/src/app/components/project-sidebar/project-sidebar.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/ideacamp/src/app/pages/project-site/project-site.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/ideacamp/src/app/pages/project-site/project-site.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,13 +32,12 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;feature/project-search&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;10-projektseite-layout-styling&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pathVariables&quot;,
     &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\danie\\AppData\\Local\\Programs\\IntelliJ IDEA Ultimate\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
@@ -64,12 +65,7 @@
       <workItem from="1779374808156" duration="396000" />
       <workItem from="1779375221431" duration="557000" />
       <workItem from="1779375796907" duration="1916000" />
-      <workItem from="1779545659071" duration="948000" />
-      <workItem from="1779546665297" duration="6480000" />
-      <workItem from="1779557341251" duration="888000" />
-      <workItem from="1779559575443" duration="1267000" />
-      <workItem from="1779561802900" duration="367000" />
-      <workItem from="1779563134808" duration="305000" />
+      <workItem from="1779545659071" duration="424000" />
     </task>
     <servers />
   </component>
