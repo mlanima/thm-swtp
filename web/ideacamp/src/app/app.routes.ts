@@ -1,9 +1,9 @@
 import { Routes } from '@angular/router';
-import { SearchProject } from './pages/search-project/search-project';
+import { SearchProject } from './feature/project-search/search-project';
 import {UserProfile} from './feature/user-profile/pages/user-profile/user-profile';
 import {Impressum} from './feature/legal-notice/pages/impressum';
 import {ContactRequests} from './feature/contact-request/pages/contact-requests/contact-requests';
-import { ProjectSite } from './pages/project-site/project-site';
+import { ProjectSite } from './feature/project-site/project-site';
 
 export const routes: Routes = [
   {path: 'profile', component: UserProfile},
