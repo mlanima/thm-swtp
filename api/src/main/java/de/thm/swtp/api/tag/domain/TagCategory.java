@@ -1,5 +1,5 @@
 package de.thm.swtp.api.tag.domain;
-/** Categorizes of a tag.
+/** Categories of a tag.
  * Used to group tags of projects and users.
  */
 public enum TagCategory {
