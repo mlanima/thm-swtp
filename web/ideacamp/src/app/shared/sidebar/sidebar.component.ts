@@ -1,6 +1,7 @@
 import { Component, effect, inject, signal } from '@angular/core';
 import { SidebarService } from './sidebar.service';
 import { MenuLinkComponent } from './menu-link/menu-link.component';
+import { AuthService } from '../../feature/auth/auth.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -10,6 +11,7 @@ import { MenuLinkComponent } from './menu-link/menu-link.component';
 })
 export class SidebarComponent {
   sidebarService = inject(SidebarService);
+  auth = inject(AuthService);
   isRendered = signal(false);
   isClosing = signal(false);
 
@@ -29,6 +31,11 @@ export class SidebarComponent {
 
   requestClose() {
     this.sidebarService.close();
+  }
+
+  logout() {
+    this.requestClose();
+    this.auth.logout();
   }
 
   onPanelAnimationEnd() {
