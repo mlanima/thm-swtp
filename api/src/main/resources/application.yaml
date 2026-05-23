@@ -16,4 +16,4 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: https://auth.just-ship-it.de/realms/swtp
+          issuer-uri: https://auth.swtp-ss26.de/realms/swtp

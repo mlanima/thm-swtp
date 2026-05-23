@@ -1,11 +1,11 @@
 # API
 
-Spring Boot REST API für IdeaCamp.
+Spring Boot REST API, gesichert via Keycloak JWT.
 
 ## Voraussetzungen
 
 - Java 25
-- Maven (oder `./mvnw`)
+- Keycloak läuft auf `https://auth.swtp-ss26.de`, Realm `swtp` angelegt
 
 ## Starten
 
@@ -13,12 +13,15 @@ Spring Boot REST API für IdeaCamp.
 ./mvnw spring-boot:run
 ```
 
-Läuft momentan mit 'ner lokalen SQLite (nicht dauerhaft) auf `http://localhost:8080`.
+Läuft auf `http://localhost:8080`.
 
-## Testen
+## Endpoints
 
-```bash
-curl http://localhost:8080
-```
+| Endpoint | Auth | Beschreibung |
+|---|---|---|
+| `GET /api/public/hello` | — | Öffentlich |
+| `GET /api/hello` | JWT required | Gibt Username, UUID und Rollen zurück |
 
-Erwartete Antwort: `401 Unauthorized` — Security ist aktiv, API läuft.
+## Konfiguration
+
+`src/main/resources/application.yaml` — Keycloak `issuer-uri` und SQLite-Pfad bei Bedarf anpassen.
