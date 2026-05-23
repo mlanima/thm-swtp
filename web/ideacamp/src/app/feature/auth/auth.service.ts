@@ -5,12 +5,26 @@ import { OAuthService, AuthConfig } from 'angular-oauth2-oidc';
 import { environment } from '../../enviroments/enviroment.dev';
 import { User } from '../../shared/types/user.type';
 
+/**
+ * Central authentication service for Keycloak/OIDC integration.
+ *
+ * Responsibilities:
+ * - configure OAuth client for code flow
+ * - bootstrap login state from discovery document + callback URL
+ * - expose reactive auth state for UI components
+ * - start login/logout flows
+ */
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
+  /** True when a valid access token is present. */
   readonly isLoggedIn: WritableSignal<boolean> = signal(false);
+
+  /** Minimal authenticated user representation for UI components. */
   readonly user: WritableSignal<User | null> = signal(null);
+
+  /** Convenience signal for showing the current username in the UI. */
   readonly username = signal('');
   private readonly platformId = inject(PLATFORM_ID);
   private readonly appRef = inject(ApplicationRef);
@@ -46,6 +60,10 @@ export class AuthService {
       });
   }
 
+  /**
+   * Loads discovery document and attempts to restore login from callback/storage.
+   * Returns the same promise while initialization is already running.
+   */
   private startAuthBootstrap(): Promise<void> {
     if (this.initPromise) {
       return this.initPromise;
@@ -73,6 +91,12 @@ export class AuthService {
     }
   }
 
+  /**
+   * Starts Keycloak/OIDC login via authorization code flow.
+   *
+   * The method waits for auth bootstrap and includes a timeout fallback,
+   * then redirects directly to the auth endpoint if initCodeFlow fails.
+   */
   login(): void {
     if (!isPlatformBrowser(this.platformId)) {
       return;
@@ -104,6 +128,7 @@ export class AuthService {
     init.finally(startOnce);
   }
 
+  /** Fallback redirect to the Keycloak authorization endpoint. */
   private redirectToKeycloakLogin(): void {
     const issuer = ((environment as any).issuer ?? '').replace(/\/$/, '');
     const clientId = (environment as any).clientId ?? '';
@@ -116,12 +141,14 @@ export class AuthService {
       `&scope=${encodeURIComponent(scope)}`;
   }
 
+  /** Triggers OIDC logout and lets Keycloak redirect back to post logout URI. */
   logout(): void {
     this.oauthService.logOut();
   }
 
   // Registration flow removed from the SPA. Registration should be handled directly in Keycloak or via a dedicated registration route.
 
+  /** Returns current access token for API calls (or null when not authenticated). */
   getAccessToken(): string | null {
     return this.oauthService.getAccessToken() ?? null;
   }
