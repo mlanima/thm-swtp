@@ -1,6 +1,6 @@
 /** Stores the needed contact request data which is displayed on the frontend.*/
 export type ContactRequestStatus = 'Open' | 'Accepted' | 'Rejected';
-export type ContactRequest = {
+export interface ContactRequest {
   id: string;
   senderId : string,
   senderName: string;

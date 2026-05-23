@@ -9,8 +9,8 @@ import {ContactRequest} from '../contact-request.model'
 export class ContactRequestBox {
   @Input({required: true}) request!: ContactRequest;
 
-  @Output() accept = new EventEmitter<String>();
-  @Output() reject = new EventEmitter<String>();
+  @Output() accept = new EventEmitter<string>();
+  @Output() reject = new EventEmitter<string>();
 
 
   get switchStatusStyle(){
