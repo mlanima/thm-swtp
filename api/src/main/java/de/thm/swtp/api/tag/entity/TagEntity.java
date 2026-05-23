@@ -35,4 +35,6 @@ public class TagEntity {
     @Column(nullable = false, length = 30)
     private TagCategory category;
 
+    // Relation for project and userprofile should be added in the ProjectEntity & UserprofileEntity
+    // Bi-directional relations only needed when we want to get all projects or profiles with the requested tag. Currently not needed.
 }

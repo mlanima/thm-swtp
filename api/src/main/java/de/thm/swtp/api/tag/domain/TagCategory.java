@@ -23,5 +23,4 @@ public enum TagCategory {
 
     /** Development tool, e.g. Git */
     TOOL,
-
 }
