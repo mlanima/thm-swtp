@@ -1,5 +1,6 @@
 package de.thm.swtp.api.userprofile;
 
+import de.thm.swtp.api.config.GlobalExceptionHandler;
 import de.thm.swtp.api.config.KeycloakJwtConverter;
 import de.thm.swtp.api.config.SecurityConfig;
 import de.thm.swtp.api.userprofile.controller.UserProfileController;
@@ -7,7 +8,9 @@ import de.thm.swtp.api.userprofile.dto.UserProfileResponse;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.mapper.UserProfileMapper;
 import de.thm.swtp.api.userprofile.service.UserProfileService;
+import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.users.entity.User;
+import de.thm.swtp.api.users.exception.UserNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -16,19 +19,17 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.server.ResponseStatusException;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(UserProfileController.class)
-@Import({SecurityConfig.class, KeycloakJwtConverter.class})
+@Import({SecurityConfig.class, KeycloakJwtConverter.class, GlobalExceptionHandler.class})
 @TestPropertySource(properties = {
         "spring.security.oauth2.resourceserver.jwt.jwk-set-uri=https://example.com"
 })
@@ -84,7 +85,7 @@ class UserProfileControllerTest {
     @Test
     void getProfile_unknownUser_returns404() throws Exception {
         when(userProfileService.getProfile(USER_ID))
-                .thenThrow(new ResponseStatusException(NOT_FOUND, "User not found"));
+                .thenThrow(new UserNotFoundException(USER_ID));
 
         mockMvc.perform(get(BASE_URL).with(jwt()))
                 .andExpect(status().isNotFound());
@@ -115,7 +116,7 @@ class UserProfileControllerTest {
     @Test
     void updateProfile_unknownUser_returns404() throws Exception {
         when(userProfileService.updateProfile(eq(USER_ID), any(), any()))
-                .thenThrow(new ResponseStatusException(NOT_FOUND, "User not found"));
+                .thenThrow(new UserNotFoundException(USER_ID));
 
         mockMvc.perform(put(BASE_URL)
                         .with(jwt())
@@ -132,7 +133,7 @@ class UserProfileControllerTest {
 
     @Test
     void deleteProfile_unknownUser_returns404() throws Exception {
-        doThrow(new ResponseStatusException(NOT_FOUND, "User not found"))
+        doThrow(new UserProfileNotFoundException(USER_ID))
                 .when(userProfileService).deleteProfile(USER_ID);
 
         mockMvc.perform(delete(BASE_URL).with(jwt()))
