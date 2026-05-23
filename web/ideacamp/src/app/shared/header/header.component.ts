@@ -11,6 +11,7 @@ import { SidebarService } from '../sidebar/sidebar.service';
     LogoComponent,
     // FeatureComponent,
     AuthPanelComponent,
+    FeatureComponent,
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css',

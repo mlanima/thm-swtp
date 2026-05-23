@@ -8,6 +8,10 @@
 
 .sidebar-backdrop {
   animation: sidebar-backdrop-in 260ms ease-out;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.3);
 }
 
 .sidebar-backdrop-closing {

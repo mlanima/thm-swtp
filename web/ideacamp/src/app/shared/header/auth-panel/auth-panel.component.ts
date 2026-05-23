@@ -11,11 +11,11 @@ import { NgOptimizedImage } from '@angular/common';
 export class AuthPanelComponent {
   user = input.required<User>();
 
-  get username() {
+  get username(): string {
     return this.user().username;
   }
 
-  get imageUrl() {
+  get imageUrl(): string | null {
     return null;
   }
 }
