@@ -15,5 +15,5 @@ export class ProjectFinishForm {
   @Input() projectData : Partial<ProjectCreateData> = {};
 
   @Output() back = new EventEmitter<void>();
-  @Output() finish = new EventEmitter<void>();
+  @Output() finished = new EventEmitter<void>();
 }

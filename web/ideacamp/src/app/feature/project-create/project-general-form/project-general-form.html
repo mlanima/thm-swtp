@@ -1,11 +1,12 @@
 <form class="space-y-5">
 
   <div>
-    <label class="mb-1 block text-sm font-medium text-gray-700">
+    <label for="project-name" class="mb-1 block text-sm font-medium text-gray-700">
       Project name
     </label>
 
     <input
+      id="project-name"
       type="text"
       name = "name"
       [(ngModel)]="formData.name"
@@ -24,11 +25,12 @@
   </div>
 
   <div>
-    <label class="mb-1 block text-sm font-medium text-gray-700">
+    <label for="project-description" class="mb-1 block text-sm font-medium text-gray-700">
       Description
     </label>
 
     <textarea
+      id="project-description"
       rows="4"
       name="description"
       [(ngModel)]="formData.description"
