@@ -1,14 +1,14 @@
 import { Component } from '@angular/core';
 import {z} from 'zod';
-import {WizardLayout} from '../../components/createProject/wizard-layout/wizard-layout';
-import {Stepper} from '../../components/createProject/stepper/stepper';
+import {WizardLayout} from './wizard-layout/wizard-layout';
+import {Stepper} from './stepper/stepper';
 
-import {ProjectGeneralForm} from '../../components/createProject/project-general-form/project-general-form';
-import {ProjectSettingsForm} from '../../components/createProject/project-settings-form/project-settings-form';
-import {ProjectMembersForm} from '../../components/createProject/project-members-form/project-members-form';
-import {ProjectFinishForm} from '../../components/createProject/project-finish-form/project-finish-form';
+import {ProjectGeneralForm} from './project-general-form/project-general-form';
+import {ProjectSettingsForm} from './project-settings-form/project-settings-form';
+import {ProjectMembersForm} from './project-members-form/project-members-form';
+import {ProjectFinishForm} from './project-finish-form/project-finish-form';
 
-import {ProjectGeneralData, ProjectSettingsData, ProjectCreateData, projectCreateSchema} from '../../components/createProject/schemas/project-create.schema';
+import {ProjectGeneralData, ProjectSettingsData, ProjectCreateData, projectCreateSchema} from './schemas/project-create.schema';
 
 @Component({
   selector: 'app-project-create',

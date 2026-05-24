@@ -52,13 +52,7 @@ export class ProjectSettingsForm implements OnChanges {
   }
 
   goBack(){
-    const res = projectSettingsSchema.safeParse(this.formData);
-    if(!res.success){
-      this.errors = mapZodErrors<SettingsFormFields>(res.error);
-      return;
-    }
-    this.errors = {};
-    this.back.emit(res.data);
+    this.back.emit(this.formData);
   }
 
 }
