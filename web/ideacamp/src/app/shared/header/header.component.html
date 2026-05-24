@@ -25,14 +25,12 @@
 
     <div class="flex justify-end flex-1">
       @if (isAuthenticated()) {
-        <app-auth-panel [user]="user!"/>
+        <app-auth-panel [user]="{ username: auth.username() }"/>
       } @else {
         <div class="flex gap-1 items-center">
-          <button class="flex gap-2 items-center border border-white hover:border-black transition duration-300 px-4 py-2 rounded-xl">
-            Sign in
-          </button>
-          <button class="bg-green-400 py-2 px-4 rounded-xl flex gap-2 items-center hover:bg-green-500 transition duration-300">
-            Sign Up
+          <button (click)="auth.login()" class="group flex gap-2 items-center border border-black px-4 py-2 rounded-xl text-black transition-colors duration-300 ease-out hover:bg-black hover:shadow-lg hover:text-white">
+            Login
+            <i class="pi pi-sign-in transition-transform duration-300 ease-out group-hover:translate-x-1"></i>
           </button>
         </div>
       }

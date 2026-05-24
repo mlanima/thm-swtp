@@ -13,6 +13,19 @@ describe('ContactRequestBox', () => {
 
     fixture = TestBed.createComponent(ContactRequestBox);
     component = fixture.componentInstance;
+    // Provide a minimal input so the template can render during the test.
+    component.request = {
+      id: 'r1',
+      senderId: 's1',
+      senderName: 'Alice',
+      projectId: 'p1',
+      projectName: 'Project X',
+      message: 'Hello',
+      status: 'Open',
+      date: '2026-01-01',
+    };
+
+    fixture.detectChanges();
     await fixture.whenStable();
   });
 

@@ -1,9 +1,22 @@
 import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+import { Subject } from 'rxjs';
+import { OAuthService } from 'angular-oauth2-oidc';
+
 import { App } from './app';
 
 describe('App', () => {
+  const events$ = new Subject<void>();
+  const oauthServiceMock = {
+    events: events$.asObservable(),
+  };
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
+      providers: [
+        provideRouter([]),
+        { provide: OAuthService, useValue: oauthServiceMock },
+      ],
       imports: [App],
     }).compileComponents();
   });
