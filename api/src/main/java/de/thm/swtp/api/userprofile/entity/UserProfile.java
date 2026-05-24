@@ -27,7 +27,7 @@ public class UserProfile {
     @Column(unique = true, nullable = false)
     private String username;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true)
     private String email;
 
     @Column(columnDefinition = "TEXT")
