@@ -1,25 +1,27 @@
-package de.thm.swtp.api.project;
+package de.thm.swtp.api.profile;
 
 import de.thm.swtp.api.tag.Tag;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Set;
 
 @Entity
-@Table(name = "projects")
+@Table(name = "profiles")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Project {
+public class Profile {
     @Id
-    private String id;
+    String keycloakId;
 
-    @Getter
     @ManyToMany
-    private Set<Tag> tags;
+    Set<Tag> tags;
 }
