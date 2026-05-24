@@ -1,7 +1,6 @@
 package de.thm.swtp.api.tag.service;
 
 import de.thm.swtp.api.tag.domain.Tag;
-import de.thm.swtp.api.tag.domain.TagCategory;
 import de.thm.swtp.api.tag.mapper.TagMapper;
 import de.thm.swtp.api.tag.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,10 +24,10 @@ public class TagService {
                 .toList();
     }
 
-    /** Returns a list of all tags filtered by the given category.*/
+    /** Returns a list of all tags filtered by the given name. Name must match.*/
     @Transactional(readOnly = true)
-    public List<Tag> getTagsByCategory(TagCategory category){
-        return tagRepository.findByCategory(category)
+    public List<Tag> getTagsByCategory(String name){
+        return tagRepository.findByName(name)
                 .stream()
                 .map(TagMapper::toDomain)
                 .toList();

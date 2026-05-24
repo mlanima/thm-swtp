@@ -11,7 +11,6 @@ public class TagMapper {
         return Tag.builder()
                 .id(entity.getId())
                 .name(entity.getName())
-                .category(entity.getCategory())
                 .build();
     }
 }

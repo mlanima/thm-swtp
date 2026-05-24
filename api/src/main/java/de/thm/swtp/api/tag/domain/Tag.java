@@ -11,8 +11,6 @@ import java.util.UUID;
 @Builder
 @Value
 public class Tag {
-
     UUID id;
     String name;
-    TagCategory category;
 }
