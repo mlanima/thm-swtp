@@ -3,7 +3,7 @@ package de.thm.swtp.api.userprofile.controller;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProfileAccessDeniedException;
 import de.thm.swtp.api.userprofile.dto.UserProfileRequest;
 import de.thm.swtp.api.userprofile.dto.UserProfileResponse;
-import de.thm.swtp.api.userprofile.entity.UserProfile;
+import de.thm.swtp.api.userprofile.mapper.UserProfileMapper;
 import de.thm.swtp.api.userprofile.service.UserProfileService;
 import lombok.RequiredArgsConstructor;
 
@@ -18,18 +18,19 @@ import org.springframework.web.bind.annotation.*;
 public class UserProfileController {
 
     private final UserProfileService userProfileService;
+    private final UserProfileMapper userProfileMapper;
 
     @PostMapping("/api/users/me")
     public UserProfileResponse syncProfile(@AuthenticationPrincipal Jwt jwt) {
         UUID keycloakId = UUID.fromString(jwt.getSubject());
         String username = jwt.getClaimAsString("preferred_username");
         String email = jwt.getClaimAsString("email");
-        return toResponse(userProfileService.getOrCreateProfile(keycloakId, username, email));
+        return userProfileMapper.toResponse(userProfileService.getOrCreateProfile(keycloakId, username, email));
     }
 
     @GetMapping("/api/users/{username}/profile")
     public UserProfileResponse getProfile(@PathVariable String username) {
-        return toResponse(userProfileService.getProfile(username));
+        return userProfileMapper.toResponse(userProfileService.getProfile(username));
     }
 
     @PutMapping("/api/users/{username}/profile")
@@ -38,7 +39,7 @@ public class UserProfileController {
             @AuthenticationPrincipal Jwt jwt,
             @RequestBody UserProfileRequest request) {
         verifyOwnership(username, jwt);
-        return toResponse(userProfileService.updateProfile(username, request.title(), request.location(), request.about(), request.experience()));
+        return userProfileMapper.toResponse(userProfileService.updateProfile(username, request.title(), request.location(), request.about(), request.experience()));
     }
 
     @DeleteMapping("/api/users/{username}/profile")
@@ -54,16 +55,4 @@ public class UserProfileController {
         }
     }
 
-    private UserProfileResponse toResponse(UserProfile profile) {
-        return UserProfileResponse.builder()
-                .keycloakId(profile.getKeycloakId())
-                .username(profile.getUsername())
-                .email(profile.getEmail())
-                .title(profile.getTitle())
-                .location(profile.getLocation())
-                .followers(profile.getFollowers())
-                .about(profile.getAbout())
-                .experience(profile.getExperience())
-                .build();
-    }
 }
