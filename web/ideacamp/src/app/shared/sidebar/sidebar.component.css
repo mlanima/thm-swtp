@@ -1,0 +1,60 @@
+.sidebar-panel {
+  animation: sidebar-slide-in 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sidebar-panel-closing {
+  animation: sidebar-slide-out 220ms cubic-bezier(0.4, 0, 1, 1);
+}
+
+.sidebar-backdrop {
+  animation: sidebar-backdrop-in 260ms ease-out;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+.sidebar-backdrop-closing {
+  animation: sidebar-backdrop-out 220ms ease-in;
+}
+
+@keyframes sidebar-slide-in {
+  from {
+    transform: translateX(-100%);
+    opacity: 0.7;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes sidebar-slide-out {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100%);
+    opacity: 0.7;
+  }
+}
+
+@keyframes sidebar-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes sidebar-backdrop-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
