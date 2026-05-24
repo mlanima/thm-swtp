@@ -18,11 +18,8 @@ import java.util.UUID;
 public class UserProfile {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
-
-    @Column(unique = true, nullable = false)
-    private String keycloakId;
+    @Column(nullable = false)
+    private UUID keycloakId;
 
     @Column(unique = true, nullable = false)
     private String username;

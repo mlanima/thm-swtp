@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class UserProfileService {
@@ -19,8 +21,8 @@ public class UserProfileService {
     }
 
     @Transactional
-    public UserProfile getOrCreateProfile(String keycloakId, String username, String email) {
-        return userProfileRepository.findByKeycloakId(keycloakId)
+    public UserProfile getOrCreateProfile(UUID keycloakId, String username, String email) {
+        return userProfileRepository.findById(keycloakId)
                 .map(existing -> {
                     existing.setUsername(username);
                     existing.setEmail(email);

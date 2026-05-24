@@ -2,9 +2,11 @@ package de.thm.swtp.api.userprofile.dto;
 
 import lombok.Builder;
 
+import java.util.UUID;
+
 @Builder
 public record UserProfileResponse(
-        String keycloakId,
+        UUID keycloakId,
         String username,
         String email,
         String title,

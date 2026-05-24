@@ -6,6 +6,8 @@ import de.thm.swtp.api.userprofile.dto.UserProfileResponse;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.service.UserProfileService;
 import lombok.RequiredArgsConstructor;
+
+import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -19,7 +21,7 @@ public class UserProfileController {
 
     @PostMapping("/api/users/me")
     public UserProfileResponse syncProfile(@AuthenticationPrincipal Jwt jwt) {
-        String keycloakId = jwt.getSubject();
+        UUID keycloakId = UUID.fromString(jwt.getSubject());
         String username = jwt.getClaimAsString("preferred_username");
         String email = jwt.getClaimAsString("email");
         return toResponse(userProfileService.getOrCreateProfile(keycloakId, username, email));
