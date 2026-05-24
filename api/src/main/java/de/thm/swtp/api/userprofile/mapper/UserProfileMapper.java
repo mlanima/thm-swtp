@@ -9,7 +9,9 @@ public class UserProfileMapper {
 
     public UserProfileResponse toResponse(UserProfile profile) {
         return UserProfileResponse.builder()
-                .userId(profile.getUser().getKeycloakId())
+                .keycloakId(profile.getKeycloakId())
+                .username(profile.getUsername())
+                .email(profile.getEmail())
                 .about(profile.getAbout())
                 .experience(profile.getExperience())
                 .build();
