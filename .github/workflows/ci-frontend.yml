@@ -6,8 +6,8 @@ on:
     paths: ['web/ideacamp/**']
 
 jobs:
-  lint-frontend:
-    name: ESLint (Angular)
+  ci-frontend:
+    name: CI (Angular)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -27,23 +27,8 @@ jobs:
       - name: Run ESLint
         run: npm run lint
 
-  build-frontend:
-    name: Build (Angular)
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: web/ideacamp
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'npm'
-          cache-dependency-path: web/ideacamp/package-lock.json
-
-      - name: Install dependencies
-        run: npm ci
+      - name: Run tests
+        run: npm test
 
       - name: Build
         run: npm run build
