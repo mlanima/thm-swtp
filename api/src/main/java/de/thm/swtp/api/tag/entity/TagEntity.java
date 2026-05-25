@@ -15,7 +15,7 @@ import java.util.UUID;
  */
 @Entity
 @Table(name="tags",
-        uniqueConstraints = {@UniqueConstraint(name = "tag_name",columnNames = {"name"})},
+        uniqueConstraints = {@UniqueConstraint(name = "tag_name", columnNames = {"name"})},
         indexes = {@Index(name="idx_tag_name", columnList = "name")})
 @Getter
 @Setter
@@ -30,7 +30,7 @@ public class TagEntity {
     private UUID id;
 
     /** Name of the tag.*/
-    @Column(nullable = false,length = 30)
+    @Column(nullable = false, length = 30)
     private String name;
 
 

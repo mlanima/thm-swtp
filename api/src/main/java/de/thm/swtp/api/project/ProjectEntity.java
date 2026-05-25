@@ -42,12 +42,12 @@ public class ProjectEntity {
 
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "owner_keycloak_id",nullable = false)
+    @JoinColumn(name = "owner_keycloak_id", nullable = false)
     private UserProfile owner;
 
 
     @ManyToMany
-    @JoinTable(name = "project_members", joinColumns = @JoinColumn(name = "project_id"),inverseJoinColumns = @JoinColumn(name = "user_profile_keycloak_id"))
+    @JoinTable(name = "project_members", joinColumns = @JoinColumn(name = "project_id"), inverseJoinColumns = @JoinColumn(name = "user_profile_keycloak_id"))
     private List<UserProfile> members = new ArrayList<>();
 
 

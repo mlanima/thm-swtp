@@ -38,7 +38,7 @@ public class TagService {
      */
     @Transactional(readOnly = true)
     public List<Tag> searchForTags(String search){
-        if(search == null || search.isEmpty()) return getTags();
+        if(search == null || search.isEmpty()) {return getTags();}
 
         return tagRepository.findByNameContainingIgnoreCase(search.trim())
                 .stream()
