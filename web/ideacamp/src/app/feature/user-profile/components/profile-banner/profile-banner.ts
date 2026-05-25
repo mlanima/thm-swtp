@@ -1,7 +1,8 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { LocationIcon } from '../../../../shared/icons/location-icon/location-icon';
 import { FollowersIcon } from '../../../../shared/icons/followers-icon/followers-icon';
 import { UserProfileModel } from '../../../../models/user-profile.model';
+import { EditButton } from '../../../../shared/edit-button/edit-button';
 
 /** Displays the profile banner of the user
  *
@@ -11,7 +12,7 @@ import { UserProfileModel } from '../../../../models/user-profile.model';
 @Component({
   selector: 'app-profile-banner',
   standalone: true,
-  imports: [LocationIcon, FollowersIcon],
+  imports: [LocationIcon, FollowersIcon, EditButton],
   templateUrl: './profile-banner.html',
 })
 export class ProfileBanner {
@@ -22,10 +23,15 @@ export class ProfileBanner {
    */
   @Input({ required: true }) profile!: UserProfileModel;
 
+  /** Emits when the edit button inside the banner is clicked */
+  @Output() edit = new EventEmitter<void>();
+
   /**
    * First uppercase letter of the username
    *
-   * Used as a fallback avatar representation. Returns '?' when no username is available.
+   * Used as a fallback avatar representation
+   *
+   * @returns '?' when no username is available
    */
   get initials(): string {
     const username = this.profile?.username?.trim();
