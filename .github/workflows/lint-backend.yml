@@ -1,31 +1,11 @@
-name: Lint
+name: Lint Backend
 
 on:
   pull_request:
     branches: [main, developer]
+    paths: ['api/**']
 
 jobs:
-  lint-frontend:
-    name: ESLint (Angular)
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: web/ideacamp
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: web/ideacamp/package-lock.json
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run ESLint
-        run: npm run lint
-
   lint-backend:
     name: Checkstyle (Spring Boot)
     runs-on: ubuntu-latest
