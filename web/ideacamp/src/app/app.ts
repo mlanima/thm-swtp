@@ -1,5 +1,5 @@
 import { Component, signal } from '@angular/core';
-const x: broken = 'wtf';
+export const x: broken = 'wtf';
 import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from './shared/header/header.component';
 import { SidebarComponent } from './shared/sidebar/sidebar.component';

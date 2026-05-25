@@ -9,8 +9,5 @@ public class ProjectService {
 
     private final ProjectRepository projectRepository;
 
-    public void broken() {
-        WTF x = new WTF();
-    }
 
 }
