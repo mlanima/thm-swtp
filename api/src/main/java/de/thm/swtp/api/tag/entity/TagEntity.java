@@ -1,8 +1,12 @@
 package de.thm.swtp.api.tag.entity;
 
+import de.thm.swtp.api.project.ProjectEntity;
+import de.thm.swtp.api.userprofile.entity.UserProfile;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /** JPA entity representing a tag in the database.
@@ -30,6 +34,9 @@ public class TagEntity {
     private String name;
 
 
-    // Relation for project and userprofile should be added in the ProjectEntity & UserprofileEntity
-    // Bi-directional relations only needed when we want to get all projects or profiles with the requested tag. Currently not needed.
+    @ManyToMany(mappedBy = "tags")
+    private List<ProjectEntity> projects = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "tags")
+    private List<UserProfile> userProfiles = new ArrayList<>();
 }

@@ -14,4 +14,10 @@ public interface TagRepository extends JpaRepository<TagEntity, UUID> {
 
     /** Returns a list of all tags whose name partially matches the given value. The search is case-insensitive. */
     List<TagEntity> findByNameContainingIgnoreCase(String name);
+
+    /** Returns a list of all distinct tags from a project.*/
+    List<TagEntity> findDistinctByProjectsIsNotEmpty();
+
+    /** Returns a list of all distinct tags from a user-profile.*/
+    List<TagEntity> findDistinctByUserProfilesIsNotEmpty();
 }

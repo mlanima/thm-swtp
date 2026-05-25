@@ -45,4 +45,20 @@ public class TagService {
                 .map(TagMapper::toDomain)
                 .toList();
     }
+
+    @Transactional(readOnly = true)
+    public List<Tag> getProjectTags(){
+        return tagRepository.findDistinctByProjectsIsNotEmpty()
+                .stream()
+                .map(TagMapper::toDomain)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Tag> getUserProfileTags(){
+        return tagRepository.findDistinctByUserProfilesIsNotEmpty()
+                .stream()
+                .map(TagMapper::toDomain)
+                .toList();
+    }
 }
