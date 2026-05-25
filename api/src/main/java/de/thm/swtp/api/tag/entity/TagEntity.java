@@ -34,9 +34,11 @@ public class TagEntity {
     private String name;
 
 
+    /** List of all projects, where the tag is used.*/
     @ManyToMany(mappedBy = "tags")
     private List<ProjectEntity> projects = new ArrayList<>();
 
+    /** List of all user profiles, where the tag is used.*/
     @ManyToMany(mappedBy = "tags")
     private List<UserProfile> userProfiles = new ArrayList<>();
 }

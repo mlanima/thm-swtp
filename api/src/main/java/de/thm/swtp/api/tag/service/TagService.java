@@ -46,6 +46,7 @@ public class TagService {
                 .toList();
     }
 
+    /** Returns a list of tags belonging to a project.*/
     @Transactional(readOnly = true)
     public List<Tag> getProjectTags(){
         return tagRepository.findDistinctByProjectsIsNotEmpty()
@@ -54,6 +55,7 @@ public class TagService {
                 .toList();
     }
 
+    /** Returns a list of tags belonging to a user profile.*/
     @Transactional(readOnly = true)
     public List<Tag> getUserProfileTags(){
         return tagRepository.findDistinctByUserProfilesIsNotEmpty()
