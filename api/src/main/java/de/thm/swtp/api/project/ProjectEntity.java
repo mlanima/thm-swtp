@@ -40,7 +40,7 @@ public class ProjectEntity {
 
     // Misses Join to TagEntity for project-tags. ManyToMany should work.
 
-    @Column(nullable = false,updatable = false)
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @Column(nullable = false)
