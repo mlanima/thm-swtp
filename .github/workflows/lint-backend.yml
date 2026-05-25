@@ -2,7 +2,7 @@ name: Lint Backend
 
 on:
   pull_request:
-    branches: [main, developer]
+    branches: [main, developer, feature/cicd-improvements-test]
     paths: ['api/**']
 
 jobs:
@@ -23,3 +23,21 @@ jobs:
 
       - name: Run Checkstyle
         run: ./mvnw checkstyle:check --no-transfer-progress
+
+  build-backend:
+    name: Build (Spring Boot)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Build
+        run: ./mvnw package -DskipTests --no-transfer-progress
