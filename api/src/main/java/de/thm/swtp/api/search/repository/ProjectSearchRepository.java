@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.UUID;
 
-public interface SearchRepository extends JpaRepository<ProjectEntity, UUID> {
+public interface ProjectSearchRepository extends JpaRepository<ProjectEntity, UUID> {
 
     List<ProjectEntity> findByNameContainingIgnoreCase(String name);
 }
