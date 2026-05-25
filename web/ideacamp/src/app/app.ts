@@ -1,5 +1,4 @@
 import { Component, signal } from '@angular/core';
-const unused_var = 'nope';
 import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from './shared/header/header.component';
 import { SidebarComponent } from './shared/sidebar/sidebar.component';
