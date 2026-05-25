@@ -1,7 +1,7 @@
 package de.thm.swtp.api.project;
 
 
-import de.thm.swtp.api.tag.entity.TagEntity;
+import de.thm.swtp.api.tag.entity.Tag;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -22,7 +22,7 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProjectEntity {
+public class Project {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -54,7 +54,7 @@ public class ProjectEntity {
     // Misses Join to TagEntity for project-tags. ManyToMany should work.
     @ManyToMany
     @JoinTable(name = "project_tags", joinColumns = @JoinColumn(name = "project_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
-    private List<TagEntity> tags = new ArrayList<>();
+    private List<Tag> tags = new ArrayList<>();
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

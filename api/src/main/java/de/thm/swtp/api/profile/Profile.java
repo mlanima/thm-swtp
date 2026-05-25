@@ -1,6 +1,6 @@
 package de.thm.swtp.api.profile;
 
-import de.thm.swtp.api.tag.Tag;
+import de.thm.swtp.api.tag.entity.Tag;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;

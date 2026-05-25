@@ -1,6 +1,6 @@
 package de.thm.swtp.api.userprofile.entity;
 
-import de.thm.swtp.api.tag.entity.TagEntity;
+import de.thm.swtp.api.tag.entity.Tag;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -54,5 +54,5 @@ public class UserProfile {
 
     @ManyToMany
     @JoinTable(name = "user_profile_tags", joinColumns = @JoinColumn(name = "user_profile_keycloak_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
-    private List<TagEntity> tags = new ArrayList<>();
+    private List<Tag> tags = new ArrayList<>();
 }

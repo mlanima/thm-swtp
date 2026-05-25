@@ -1,5 +1,6 @@
 package de.thm.swtp.api.tag;
 
+import de.thm.swtp.api.tag.entity.Tag;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

@@ -1,7 +1,7 @@
 package de.thm.swtp.api.tag.profile;
 
-import de.thm.swtp.api.tag.Tag;
 import de.thm.swtp.api.tag.dto.AddProfileTagRequest;
+import de.thm.swtp.api.tag.entity.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,7 +19,7 @@ public class ProfileTagController {
 
     @PostMapping
     public ResponseEntity<Tag> addTag(@PathVariable String profileId,
-                                       @RequestBody AddProfileTagRequest request) {
+                                      @RequestBody AddProfileTagRequest request) {
         return ResponseEntity.ok(profileTagService.addTagToProfile(profileId, request));
     }
 }

@@ -1,6 +1,6 @@
 package de.thm.swtp.api.projectInvitation.entity;
 
-import de.thm.swtp.api.project.ProjectEntity;
+import de.thm.swtp.api.project.Project;
 import de.thm.swtp.api.projectInvitation.domain.ProjectInviteStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -28,7 +28,7 @@ public class ProjectInviteEntity {
     /** The project where the invitation came from. */
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name="project_id", nullable=false)
-    private ProjectEntity project;
+    private Project project;
 
     // TODO: Relation between user<->invitation missing, needs to be implemented here when UserEntity is created.
     // manyToOne?
