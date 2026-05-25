@@ -1,0 +1,10 @@
+<div class="flex flex-wrap gap-3">
+  @for(tag of tags; track tag.color){
+  <span
+    class="px-5 py-3 rounded-full text-base font-bold font-sans w-fit"
+    [ngClass]="tag.color"
+  >
+    {{ tag.label }}
+  </span>
+  }
+</div>

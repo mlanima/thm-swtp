@@ -1,0 +1,59 @@
+@if (isRendered()) {
+  <div class="fixed inset-0 z-50">
+    <button type="button" aria-label="Close sidebar" class="sidebar-backdrop absolute inset-0" [class.sidebar-backdrop-closing]="isClosing()" (click)="requestClose()"></button>
+
+    <aside class="sidebar-panel absolute left-0 top-0 flex h-full w-80 flex-col border-r border-zinc-700 bg-zinc-800 text-zinc-200 shadow-2xl" [class.sidebar-panel-closing]="isClosing()" (animationend)="onPanelAnimationEnd()">
+      <!--Logo-->
+      <div class="border-b border-zinc-700 px-6 pb-5 pt-6">
+        <div class="flex items-center justify-between text-sm text-zinc-400">
+          <div class="flex items-center gap-2 text-lg font-semibold leading-none">
+            <span class="text-lime-400">THM</span>
+            <span class="text-zinc-500">|</span>
+            <span class="text-zinc-100">IdeaCamp</span>
+          </div>
+          <button type="button" class="rounded p-1 text-zinc-400 transition hover:bg-zinc-700 hover:text-zinc-200" (click)="requestClose()">
+            <i class="pi pi-times text-sm"></i>
+          </button>
+        </div>
+      </div>
+
+      <menu class="flex-1 overflow-y-auto px-6 py-6">
+        <p class="text-xs font-semibold uppercase tracking-wider text-zinc-400">Menu</p>
+
+        <!--TODO: Connect to pages, delete unused-->
+        <div class="mt-4 space-y-1">
+          <app-menu-link>
+            <i class="pi pi-compass text-sm text-zinc-400"></i>
+            <span>Explore</span>
+          </app-menu-link>
+
+          <app-menu-link>
+            <i class="pi pi-users text-sm text-zinc-400"></i>
+            <span>Kontakten</span>
+          </app-menu-link>
+
+          <app-menu-link>
+            <i class="pi pi-folder text-sm text-zinc-400"></i>
+            <span>Meine Projekte</span>
+          </app-menu-link>
+        </div>
+
+        <!--TODO: Recent Projects-->
+        <!--<app-recent/>-->
+
+      </menu>
+
+      <footer class="space-y-2 border-t border-zinc-700 px-6 py-5">
+        <app-menu-link>
+          <i class="pi pi-cog text-md text-zinc-400"></i>
+          <span>Einstellungen</span>
+        </app-menu-link>
+
+        <app-menu-link (click)="logout()">
+          <i class="pi pi-sign-out text-sm text-red-400"></i>
+          <span>Logout</span>
+        </app-menu-link>
+      </footer>
+    </aside>
+  </div>
+}

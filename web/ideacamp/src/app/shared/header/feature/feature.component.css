@@ -1,0 +1,13 @@
+/* Minimal CSS; primary styling is done with Tailwind utility classes in the template. */
+:host a {
+  text-decoration: none;
+  color: inherit;
+  display: inline-flex;
+  align-items: center;
+}
+
+:host a:focus {
+  outline: 2px solid rgba(59,130,246,0.4); /* subtle focus ring */
+  outline-offset: 2px;
+}
+

@@ -1,0 +1,43 @@
+<header class="flex justify-center border-b border-gray-300 py-2">
+  <div class="flex justify-between container items-center">
+
+    <div class="flex flex-1 gap-4 items-center">
+      @if (isAuthenticated()) {
+        <button (click)="sidebarService.open()">
+          <i class="pi pi-bars text-xl text-black"> </i>
+        </button>
+      }
+
+      <app-logo/>
+    </div>
+
+<!--    Add Features with app-feature component-->
+    <nav>
+      <app-feature>
+        <i class="pi pi-home text-md"></i>
+        Home
+      </app-feature>
+      <app-feature>
+        <i class="pi pi-compass text-md"></i>
+        Explore
+      </app-feature>
+    </nav>
+
+    <div class="flex justify-end flex-1">
+      @if (isAuthenticated()) {
+        <app-auth-panel [user]="{ username: auth.username() }"/>
+      } @else {
+        <div class="flex gap-1 items-center">
+          <button (click)="auth.login()" class="group flex gap-2 items-center border border-black px-4 py-2 rounded-xl text-black transition-colors duration-300 ease-out hover:bg-black hover:shadow-lg hover:text-white">
+            Login
+            <i class="pi pi-sign-in transition-transform duration-300 ease-out group-hover:translate-x-1"></i>
+          </button>
+        </div>
+      }
+
+    </div>
+
+  </div>
+
+
+</header>
