@@ -228,4 +228,9 @@ export class AuthService {
     const oauthService = this.oauthService as OAuthServiceBridge;
     return oauthService.getAccessToken?.() ?? null;
   }
+
+  isAuthenticated():boolean{
+    const oauthService = this.oauthService as OAuthServiceBridge;
+    return oauthService.hasValidAccessToken?.() ?? false;
+  }
 }

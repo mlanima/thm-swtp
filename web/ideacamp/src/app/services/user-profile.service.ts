@@ -4,6 +4,8 @@ import { Observable } from 'rxjs';
 import { UserProfileModel } from '../models/user-profile.model';
 import { environment } from '../enviroments/enviroment.dev';
 
+export type UpdateUserProfileRequest = Pick<UserProfileModel, 'title' | 'location' | 'about' | 'experience'>;
+
 /**
  * Provides HTTP access to user profile endpoints
  *
@@ -44,5 +46,16 @@ export class UserProfileService {
    */
   getProfile(username: string): Observable<UserProfileModel> {
     return this.http.get<UserProfileModel>(`${this.apiUrl}/${username}/profile`);
+  }
+
+  /**
+   * Updates the editable profile fields of the given user
+   *
+   * @param username Username of the profile owner
+   * @param profile Updated profile fields that should be persisted
+   * @returns An observable that emits the updated user profile
+   */
+  updateProfile(username: string, profile: UpdateUserProfileRequest): Observable<UserProfileModel> {
+    return this.http.put<UserProfileModel>(`${this.apiUrl}/${username}/profile`, profile);
   }
 }
