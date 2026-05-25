@@ -6,8 +6,8 @@ on:
     paths: ['api/**']
 
 jobs:
-  ci-backend:
-    name: CI (Spring Boot)
+  lint-backend:
+    name: Checkstyle (Spring Boot)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -24,8 +24,38 @@ jobs:
       - name: Run Checkstyle
         run: ./mvnw checkstyle:check --no-transfer-progress
 
+  test-backend:
+    name: Test (Spring Boot)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'maven'
+
       - name: Run tests
         run: ./mvnw test --no-transfer-progress
+
+  build-backend:
+    name: Build (Spring Boot)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'maven'
 
       - name: Build
         run: ./mvnw package -DskipTests --no-transfer-progress
