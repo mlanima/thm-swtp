@@ -15,6 +15,7 @@ db/*.db
 .sts4-cache
 
 ### IntelliJ IDEA ###
+.ai
 .idea
 *.iws
 *.iml
