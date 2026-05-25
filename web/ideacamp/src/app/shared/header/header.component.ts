@@ -1,9 +1,10 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { LogoComponent } from './logo/logo.component';
 import { FeatureComponent } from './feature/feature.component';
 import { AuthPanelComponent } from './auth-panel/auth-panel.component';
-import { User } from '../types/user.type';
 import { SidebarService } from '../sidebar/sidebar.service';
+import { AuthService } from '../../feature/auth/auth.service';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-header',
@@ -12,18 +13,14 @@ import { SidebarService } from '../sidebar/sidebar.service';
     // FeatureComponent,
     AuthPanelComponent,
     FeatureComponent,
+    RouterLink
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css',
 })
 export class HeaderComponent {
   sidebarService = inject(SidebarService);
-  private _user = signal<User | null>(null);
+  auth = inject(AuthService);
 
-  isAuthenticated = () => this.user !== null;
-
-  get user(): User | null {
-    return { username: 'test' };
-    return this._user();
-  }
+  isAuthenticated = () => this.auth.isLoggedIn();
 }
