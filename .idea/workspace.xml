@@ -4,11 +4,29 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3b22c7ce-2561-4e1d-9009-e945c54cca5d" name="Changes" comment="" />
+    <list default="true" id="3b22c7ce-2561-4e1d-9009-e945c54cca5d" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/ideacamp/src/app/app.routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/ideacamp/src/app/app.routes.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/ideacamp/src/app/feature/auth/auth.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/ideacamp/src/app/feature/auth/auth.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/ideacamp/src/app/feature/user-profile/components/profile-banner/profile-banner.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/ideacamp/src/app/feature/user-profile/components/profile-banner/profile-banner.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/ideacamp/src/app/feature/user-profile/components/profile-banner/profile-banner.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/ideacamp/src/app/feature/user-profile/components/profile-banner/profile-banner.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/ideacamp/src/app/feature/user-profile/components/profile-information/profile-information.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/ideacamp/src/app/feature/user-profile/components/profile-information/profile-information.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/ideacamp/src/app/feature/user-profile/pages/user-profile/user-profile.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/ideacamp/src/app/feature/user-profile/pages/user-profile/user-profile.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/ideacamp/src/app/feature/user-profile/pages/user-profile/user-profile.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/ideacamp/src/app/feature/user-profile/pages/user-profile/user-profile.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/ideacamp/src/app/shared/header/header.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/ideacamp/src/app/shared/header/header.component.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/ideacamp/src/app/shared/header/header.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/web/ideacamp/src/app/shared/header/header.component.ts" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="TypeScript File" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
@@ -32,7 +50,7 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;dev/navigation-auth-connection&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;dev/userprofile-backend-integration&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -74,6 +92,8 @@
       <workItem from="1779563134808" duration="501000" />
       <workItem from="1779627359481" duration="5188000" />
       <workItem from="1779636714933" duration="617000" />
+      <workItem from="1779714832320" duration="2830000" />
+      <workItem from="1779717698884" duration="3797000" />
     </task>
     <servers />
   </component>

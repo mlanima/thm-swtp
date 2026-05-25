@@ -1,4 +1,4 @@
-import { Injectable, signal, WritableSignal, inject, PLATFORM_ID, ApplicationRef } from '@angular/core';
+import { Injectable, signal, WritableSignal, inject, PLATFORM_ID, ApplicationRef, NgZone } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { filter, take } from 'rxjs';
 import { OAuthService, AuthConfig } from 'angular-oauth2-oidc';
@@ -41,6 +41,8 @@ export class AuthService {
   readonly username = signal('');
   private readonly platformId = inject(PLATFORM_ID);
   private readonly appRef = inject(ApplicationRef);
+  private readonly ngZone = inject(NgZone);
+  private updateStateTimer: ReturnType<typeof setTimeout> | null = null;
   // Resolve OAuthService inside the constructor so TestBed providers/mocks are
   // available when the service is instantiated in tests.
   private oauthService!: OAuthService;
@@ -79,7 +81,7 @@ export class AuthService {
     const events = oauthService.events;
     if (events && typeof events.subscribe === 'function') {
       // events might be an Observable — subscribe to keep UI signals in sync.
-      events.subscribe(() => this.updateState());
+      events.subscribe(() => void this.updateStateAfterTick());
     }
 
     // Start discovery only after initial stabilization to avoid hydration timeout warnings.
@@ -103,31 +105,60 @@ export class AuthService {
     // instance, resolve immediately and update state to avoid hanging tests.
     const oauthService = this.oauthService as OAuthServiceBridge;
     if (typeof oauthService.loadDiscoveryDocumentAndTryLogin !== 'function') {
-      this.initPromise = Promise.resolve().then(() => this.updateState());
+      this.initPromise = this.updateStateAfterTick();
       return this.initPromise;
     }
 
     this.initPromise = oauthService.loadDiscoveryDocumentAndTryLogin()
-      .then(() => this.updateState())
-      .catch(() => this.updateState());
+      .then(() => this.updateStateAfterTick())
+      .catch(() => this.updateStateAfterTick());
 
     return this.initPromise!;
+  }
+
+  private updateStateAfterTick(): Promise<void> {
+    return new Promise((resolve) => {
+      if (this.updateStateTimer) {
+        clearTimeout(this.updateStateTimer);
+      }
+
+      this.ngZone.runOutsideAngular(() => {
+        this.updateStateTimer = setTimeout(() => {
+          this.ngZone.run(() => {
+            this.updateState();
+            resolve();
+          });
+        }, 50);
+      });
+    });
   }
 
   private updateState(): void {
     const oauthService = this.oauthService as OAuthServiceBridge;
     const hasToken = oauthService.hasValidAccessToken?.() ?? false;
-    this.isLoggedIn.set(hasToken);
+
+    if (this.isLoggedIn() !== hasToken) {
+      this.isLoggedIn.set(hasToken);
+    }
 
     if (hasToken) {
       const claims = oauthService.getIdentityClaims?.() as Record<string, unknown> | null;
       const preferred = claims?.['preferred_username'];
       const username = typeof preferred === 'string' ? preferred : '';
-      this.username.set(username);
-      this.user.set({ username });
+      if (this.username() !== username) {
+        this.username.set(username);
+      }
+      const currentUser = this.user();
+      if (currentUser?.username !== username) {
+        this.user.set({ username });
+      }
     } else {
-      this.username.set('');
-      this.user.set(null);
+      if (this.username() !== '') {
+        this.username.set('');
+      }
+      if (this.user() !== null) {
+        this.user.set(null);
+      }
     }
   }
 

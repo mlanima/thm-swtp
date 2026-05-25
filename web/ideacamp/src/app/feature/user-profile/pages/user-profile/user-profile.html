@@ -1,15 +1,39 @@
 <div class="min-h-screen bg-slate-100 px-8 py-10">
   <main class="mx-auto flex max-w-5xl flex-col gap-10">
-    <app-profile-banner></app-profile-banner>
 
-    <app-profile-information
-      title="About"
-      [text]="aboutText">
-    </app-profile-information>
+    @if (profileState$ | async; as state) {
 
-    <app-profile-information
-      title="Experience"
-      [text]="experienceText">
-    </app-profile-information>
+      @if (state.isLoading) {
+        <section class="rounded-xl bg-white p-6 shadow-lg">
+          <p class="text-sm text-slate-600">
+            Profile loading...
+          </p>
+        </section>
+      } @else if (state.errorMessage) {
+        <section class="rounded-xl border border-red-200 bg-red-50 p-6 shadow-lg">
+          <h2 class="text-lg font-bold text-red-700">
+            Error
+          </h2>
+
+          <p class="mt-2 text-sm text-red-600">
+            {{ state.errorMessage }}
+          </p>
+        </section>
+      } @else if (state.profile; as profile) {
+        <app-profile-banner [profile]="profile"></app-profile-banner>
+
+        <app-profile-information
+          title="About"
+          [text]="profile.about || 'No description.'">
+        </app-profile-information>
+
+        <app-profile-information
+          title="Experience"
+          [text]="profile.experience || 'No experience.'">
+        </app-profile-information>
+      }
+
+    }
+
   </main>
 </div>
