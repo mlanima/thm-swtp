@@ -14,6 +14,7 @@ public class UserSearchService {
 
     private final UserSearchRepository userSearchRepository;
 
+    // TODO: no pagination, it returns all matches at once.
     @Transactional(readOnly = true)
     public List<UserSearchResult> searchUsers(String query) {
         return userSearchRepository.findByUsernameContainingIgnoreCase(query)

@@ -8,5 +8,6 @@ import java.util.UUID;
 
 public interface ProjectSearchRepository extends JpaRepository<ProjectEntity, UUID> {
 
+    // TODO: also filter by isPrivateProject = false to exclude private projects from search results
     List<ProjectEntity> findByNameContainingIgnoreCase(String name);
 }
