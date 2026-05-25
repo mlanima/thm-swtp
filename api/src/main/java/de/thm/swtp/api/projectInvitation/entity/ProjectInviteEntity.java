@@ -27,7 +27,7 @@ public class ProjectInviteEntity {
 
     /** The project where the invitation came from. */
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name="project_id",nullable=false)
+    @JoinColumn(name="project_id", nullable=false)
     private ProjectEntity project;
 
     // TODO: Relation between user<->invitation missing, needs to be implemented here when UserEntity is created.
