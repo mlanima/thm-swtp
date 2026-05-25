@@ -3,7 +3,7 @@ package de.thm.swtp.api.tag.entity;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ public class TagEntity {
     private UUID id;
 
     /** Name of the tag.*/
-    @NotEmpty
+    @NotBlank
     @Column(nullable = false, length = 30)
     private String name;
 
