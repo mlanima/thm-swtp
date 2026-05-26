@@ -117,10 +117,12 @@ export class AuthService {
   }
 
   async waitUntilAuthReady(): Promise<void> {
-    if(!isPlatformBrowser(this.platformId)) {
+    if (!isPlatformBrowser(this.platformId)) {
       return;
     }
     await this.startAuthBootstrap();
+  }
+
   private updateStateAfterTick(): Promise<void> {
     return new Promise((resolve) => {
       if (this.updateStateTimer) {
