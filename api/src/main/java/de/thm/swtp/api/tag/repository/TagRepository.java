@@ -4,13 +4,13 @@ import de.thm.swtp.api.tag.entity.TagEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
-import java.util.UUID;
+import java.util.Optional;
 
 /** Repository for {@link TagEntity}.*/
-public interface TagRepository extends JpaRepository<TagEntity, UUID> {
+public interface TagRepository extends JpaRepository<TagEntity, String> {
 
-    /** Returns a list of all tags having the given name.*/
-    List<TagEntity> findByName(String name);
+    /** Returns a list of all tags having the given name. Case-insensitive.*/
+    Optional<TagEntity> findByNameIgnoreCase(String name);
 
     /** Returns a list of all tags whose name partially matches the given value. The search is case-insensitive. */
     List<TagEntity> findByNameContainingIgnoreCase(String name);
