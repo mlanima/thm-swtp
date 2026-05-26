@@ -19,3 +19,4 @@ export class App {
     this.isSidebarOpen.update((value) => !value);
   }
 }
+
