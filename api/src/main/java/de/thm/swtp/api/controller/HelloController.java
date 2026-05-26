@@ -16,7 +16,7 @@ public class HelloController {
 
     @GetMapping("/public/hello")
     public Map<String, String> publicHello() {
-        return Map.of("message", "Hello, World!"); // random comment.
+        return Map.of("message", "Hello, World!");
     }
 
     @GetMapping("/hello")
@@ -30,4 +30,3 @@ public class HelloController {
         );
     }
 }
-
