@@ -10,8 +10,8 @@
     <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
       <div
         class="flex items-center rounded-lg border bg-white px-4 py-3 transition"
-        [class.border-red-400]="errorMessage"
-        [class.border-slate-200]="!errorMessage"
+        [class.border-red-400]="errorMessage()"
+        [class.border-slate-200]="!errorMessage()"
       >
         <svg class="mr-3 h-5 w-5 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-4.35-4.35m0 0A7.5 7.5 0 1 0 6 6a7.5 7.5 0 0 0 10.65 10.65Z" />
@@ -25,8 +25,8 @@
         />
       </div>
 
-      @if (errorMessage) {
-        <p class="mt-2 text-sm text-red-500">{{ errorMessage }}</p>
+      @if (errorMessage()) {
+        <p class="mt-2 text-sm text-red-500">{{ errorMessage() }}</p>
       }
     </div>
 
@@ -35,36 +35,36 @@
       <button
         (click)="setTab('projects')"
         class="px-4 py-3 text-sm font-medium transition"
-        [class.border-b-2]="activeTab === 'projects'"
-        [class.border-green-500]="activeTab === 'projects'"
-        [class.text-green-600]="activeTab === 'projects'"
-        [class.text-slate-500]="activeTab !== 'projects'"
+        [class.border-b-2]="activeTab() === 'projects'"
+        [class.border-green-500]="activeTab() === 'projects'"
+        [class.text-green-600]="activeTab() === 'projects'"
+        [class.text-slate-500]="activeTab() !== 'projects'"
       >
-        Projects @if (projects.length > 0) { ({{ projects.length }}) }
+        Projects @if (projects().length > 0) { ({{ projects().length }}) }
       </button>
 
       <button
         (click)="setTab('users')"
         class="px-4 py-3 text-sm font-medium transition"
-        [class.border-b-2]="activeTab === 'users'"
-        [class.border-green-500]="activeTab === 'users'"
-        [class.text-green-600]="activeTab === 'users'"
-        [class.text-slate-500]="activeTab !== 'users'"
+        [class.border-b-2]="activeTab() === 'users'"
+        [class.border-green-500]="activeTab() === 'users'"
+        [class.text-green-600]="activeTab() === 'users'"
+        [class.text-slate-500]="activeTab() !== 'users'"
       >
-        Users @if (users.length > 0) { ({{ users.length }}) }
+        Users @if (users().length > 0) { ({{ users().length }}) }
       </button>
     </div>
 
     <!-- Loading -->
-    @if (isLoading) {
+    @if (isLoading()) {
       <div class="mt-8 flex justify-center">
         <p class="text-sm text-slate-400">Searching...</p>
       </div>
     }
 
     <!-- No results -->
-    @if (!isLoading && searchTerm.trim() !== '' && !errorMessage) {
-      @if (activeTab === 'projects' && projects.length === 0) {
+    @if (!isLoading() && searchTerm.trim() !== '' && !errorMessage()) {
+      @if (activeTab() === 'projects' && projects().length === 0) {
         <div class="mt-8 flex flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white px-6 py-16 text-center shadow-sm">
           <svg class="mx-auto h-56 w-56" viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M52 74C65 48 96 38 128 41C163 44 192 61 196 94C199 130 174 160 139 170C104 180 62 172 42 145C22 118 31 99 52 74Z" fill="#F1F5F9" />
@@ -80,7 +80,7 @@
         </div>
       }
 
-      @if (activeTab === 'users' && users.length === 0) {
+      @if (activeTab() === 'users' && users().length === 0) {
         <div class="mt-8 flex flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white px-6 py-16 text-center shadow-sm">
           <svg class="mx-auto h-56 w-56" viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M52 74C65 48 96 38 128 41C163 44 192 61 196 94C199 130 174 160 139 170C104 180 62 172 42 145C22 118 31 99 52 74Z" fill="#F1F5F9" />
@@ -98,18 +98,18 @@
     }
 
     <!-- Results -->
-    @if (!isLoading && !errorMessage) {
-      @if (activeTab === 'projects' && projects.length > 0) {
+    @if (!isLoading() && !errorMessage()) {
+      @if (activeTab() === 'projects' && projects().length > 0) {
         <div class="mt-6 space-y-4">
-          @for (project of projects; track project.id) {
+          @for (project of projects(); track project.id) {
             <app-project-result-card [project]="project" />
           }
         </div>
       }
 
-      @if (activeTab === 'users' && users.length > 0) {
+      @if (activeTab() === 'users' && users().length > 0) {
         <div class="mt-6 space-y-4">
-          @for (user of users; track user.keycloakId) {
+          @for (user of users(); track user.keycloakId) {
             <app-user-result-card [user]="user" />
           }
         </div>
