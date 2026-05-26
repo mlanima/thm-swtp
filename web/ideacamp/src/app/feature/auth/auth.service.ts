@@ -114,7 +114,7 @@ export class AuthService {
     return this.initPromise!;
   }
 
-  async waitUntilAuthReady(): Promise<void>{
+  async waitUntilAuthReady(): Promise<void> {
     if(!isPlatformBrowser(this.platformId)) {
       return;
     }
