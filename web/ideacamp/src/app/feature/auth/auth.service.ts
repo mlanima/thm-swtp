@@ -114,6 +114,13 @@ export class AuthService {
     return this.initPromise!;
   }
 
+  async waitUntilAuthReady(): Promise<void>{
+    if(!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+    await this.startAuthBootstrap();
+  }
+
   private updateState(): void {
     const oauthService = this.oauthService as OAuthServiceBridge;
     const hasToken = oauthService.hasValidAccessToken?.() ?? false;
@@ -196,5 +203,11 @@ export class AuthService {
   getAccessToken(): string | null {
     const oauthService = this.oauthService as OAuthServiceBridge;
     return oauthService.getAccessToken?.() ?? null;
+  }
+
+  /** Returns true if a valid access token exists. */
+  isAuthenticated(): boolean {
+    const oauthService = this.oauthService as OAuthServiceBridge;
+    return oauthService.hasValidAccessToken?.() ?? false;
   }
 }
