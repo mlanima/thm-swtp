@@ -60,7 +60,7 @@ public class ProjectTagService {
     private void checkProjectTagPermission(Project project, UUID currentUserId){
         UUID ownerId = project.getOwner().getKeycloakId();
 
-        if(!ownerId.equals(currentUserId)){
+        if (!ownerId.equals(currentUserId)){
             throw new TagAccessDeniedException("Only the project owner is allowed to change tags assigned to the project.");
         }
     }

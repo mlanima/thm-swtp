@@ -33,7 +33,7 @@ public class ProjectTagController {
     @PostMapping
     public TagResponse addTagToProject(@PathVariable UUID projectId, @Valid @RequestBody CreateTagRequest request, @AuthenticationPrincipal Jwt jwt) {
         UUID currentUserId = UUID.fromString(jwt.getSubject());
-        return TagResponse.toResponse(projectTagService.addTagToProject(projectId,request.name(),currentUserId));
+        return TagResponse.toResponse(projectTagService.addTagToProject(projectId, request.name(), currentUserId));
     }
 
 }
