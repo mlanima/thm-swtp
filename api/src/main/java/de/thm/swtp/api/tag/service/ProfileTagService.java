@@ -9,10 +9,8 @@ import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
@@ -27,7 +25,7 @@ public class ProfileTagService {
 
     /** Returns a list of all tags assigned to the user profile. */
     @Transactional(readOnly = true)
-    public List<Tag> getUserProfileTags(UUID userId, String username){
+    public List<Tag> getUserProfileTags(UUID userId){
         UserProfile userProfile = userProfileRepository.findById(userId)
                 .orElseThrow(() -> new UserProfileNotFoundException(userId.toString()));
 

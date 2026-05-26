@@ -1,38 +1,39 @@
 package de.thm.swtp.api.tag.controller;
 
-import de.thm.swtp.api.project.Project;
-import de.thm.swtp.api.project.ProjectRepository;
-import de.thm.swtp.api.tag.entity.TagEntity;
+import de.thm.swtp.api.tag.dto.CreateTagRequest;
+import de.thm.swtp.api.tag.dto.TagResponse;
 import de.thm.swtp.api.tag.service.ProjectTagService;
-import de.thm.swtp.api.tool.OwnershipVerifier;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/projects/{projectId}/tags")
+@RequestMapping("/api/v1/projects/{projectId}/tags")
 @RequiredArgsConstructor
 public class ProjectTagController {
 
     private final ProjectTagService projectTagService;
-    private final ProjectRepository projectRepository;
 
-    @PostMapping
-    public ResponseEntity<TagEntity> addTag(@PathVariable UUID projectId,
-                                            @AuthenticationPrincipal Jwt jwt,
-                                            @RequestBody AddProjectTagRequest request) {
 
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow();
-
-        OwnershipVerifier.verify(project.getOwner().getUsername(), jwt);
-
-        return ResponseEntity.ok(
-                projectTagService.addTagToProject(projectId, request)
-        );
+    /** Returns a list of all tags assigned to a project.*/
+    @GetMapping
+    public List<TagResponse> getProjectTags(@PathVariable UUID projectId) {
+        return projectTagService.getProjectTags(projectId)
+                .stream()
+                .map(TagResponse::toResponse)
+                .toList();
     }
+
+    /** Adds a tag to given project. Only the project owner is allowed to add tags.*/
+    @PostMapping
+    public TagResponse addTagToProject(@PathVariable UUID projectId, @Valid @RequestBody CreateTagRequest request, @AuthenticationPrincipal Jwt jwt) {
+        UUID currentUserId = UUID.fromString(jwt.getSubject());
+        return TagResponse.toResponse(projectTagService.addTagToProject(projectId,request.name(),currentUserId));
+    }
+
 }

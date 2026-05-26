@@ -1,34 +1,37 @@
 package de.thm.swtp.api.tag.controller;
 
-import de.thm.swtp.api.tag.entity.TagEntity;
+import de.thm.swtp.api.tag.dto.CreateTagRequest;
+import de.thm.swtp.api.tag.dto.TagResponse;
 import de.thm.swtp.api.tag.service.ProfileTagService;
-import de.thm.swtp.api.tool.OwnershipVerifier;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
 
 @RestController
-@RequestMapping("/profiles/{username}/tags")
+@RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 public class ProfileTagController {
 
     private final ProfileTagService profileTagService;
 
-    @PostMapping
-    public ResponseEntity<TagEntity> addTag(@PathVariable String username,
-                                            @AuthenticationPrincipal Jwt jwt,
-                                            @RequestBody AddProfileTagRequest request) {
+    /** Returns a list of all tags assigned to the given user profile.*/
+    @GetMapping("/{userId}/profile/tags")
+    public List<TagResponse> getProfileTags(@PathVariable UUID userId){
+        return profileTagService.getUserProfileTags(userId)
+                .stream()
+                .map(TagResponse::toResponse)
+                .toList();
+    }
 
-        OwnershipVerifier.verify(username, jwt);
-
-        return ResponseEntity.ok(
-                profileTagService.addTagToProfile(username, request)
-        );
+    /** Adds a tag to the currently authenticated users profile.*/
+    @PostMapping("/me/profile/tags")
+    public TagResponse addTagToProfile(@Valid @RequestBody CreateTagRequest request, @AuthenticationPrincipal Jwt jwt){
+        UUID currentUserId = UUID.fromString(jwt.getSubject());
+        return TagResponse.toResponse(profileTagService.addTagToProfile(currentUserId, request.name()));
     }
 }
