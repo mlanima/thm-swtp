@@ -2,12 +2,17 @@ package de.thm.swtp.api.projectInvitation.service;
 
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
+import de.thm.swtp.api.project.exception.ProjectNotFoundException;
 import de.thm.swtp.api.projectInvitation.domain.ProjectInvite;
 import de.thm.swtp.api.projectInvitation.domain.ProjectInviteStatus;
 import de.thm.swtp.api.projectInvitation.entity.ProjectInviteEntity;
+import de.thm.swtp.api.projectInvitation.exception.InvalidProjectInviteException;
+import de.thm.swtp.api.projectInvitation.exception.ProjectInviteAccessDeniedException;
+import de.thm.swtp.api.projectInvitation.exception.ProjectInviteNotFoundException;
 import de.thm.swtp.api.projectInvitation.mapper.ProjectInviteMapper;
 import de.thm.swtp.api.projectInvitation.repository.ProjectInviteRepository;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
+import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -29,19 +34,15 @@ public class ProjectInviteService {
     public ProjectInvite createProjectInvite(UUID projectId, UUID invitedUserId, String message, UUID senderId) {
 
         ProjectEntity projectEntity = projectRepository.findById(projectId)
-                .orElseThrow(() -> new IllegalArgumentException("Project not found."));
+                .orElseThrow(() -> new ProjectNotFoundException(projectId));
 
         UserProfile invitedUserEntity = userProfileRepository.findById(invitedUserId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found."));
+                .orElseThrow(() -> new UserProfileNotFoundException(invitedUserId.toString()));
 
-        checkInviteCreation(projectEntity,invitedUserId,senderId);
+        checkValidInviteCreation(projectEntity,invitedUserId,senderId);
         checkNoPendingInviteExists(projectId,invitedUserId);
 
-        ProjectInviteEntity projectInviteEntity = new ProjectInviteEntity();
-        projectInviteEntity.setProject(projectEntity);
-        projectInviteEntity.setInvitedUser(invitedUserEntity);
-        projectInviteEntity.setMessage(message);
-        projectInviteEntity.setStatus(ProjectInviteStatus.PENDING);
+        ProjectInviteEntity projectInviteEntity = createPendingInvite(projectEntity,invitedUserEntity,message);
 
         ProjectInviteEntity saved = projectInviteRepository.save(projectInviteEntity);
         return ProjectInviteMapper.toDomain(saved);
@@ -60,7 +61,7 @@ public class ProjectInviteService {
     @Transactional
     public ProjectInvite updateInviteStatus(UUID inviteId, ProjectInviteStatus newStatus, UUID currentUserId) {
         ProjectInviteEntity inviteEntity = projectInviteRepository.findById(inviteId)
-                .orElseThrow(() -> new IllegalArgumentException("Invite not found."));
+                .orElseThrow(() -> new ProjectInviteNotFoundException(inviteId));
         ProjectInvite invite = ProjectInviteMapper.toDomain(inviteEntity);
 
         checkInviteStatus(invite,newStatus,currentUserId);
@@ -73,14 +74,14 @@ public class ProjectInviteService {
 
 
 
-    private void checkInviteCreation(ProjectEntity projectEntity, UUID invitedUserId, UUID senderId) {
+    private void checkValidInviteCreation(ProjectEntity projectEntity, UUID invitedUserId, UUID senderId) {
         UUID ownerId = projectEntity.getOwner().getKeycloakId();
 
         if (!ownerId.equals(senderId)) {
-            throw new IllegalArgumentException("Only project owner is allowed to create invitations.");
+            throw new ProjectInviteAccessDeniedException("Only the project owner is allowed to create invitations.");
         }
         if (invitedUserId.equals(senderId)) {
-            throw new IllegalArgumentException("Project owner cannot invite himself to the project.");
+            throw new InvalidProjectInviteException("The project owner cannot invite himself to the project.");
         }
     }
 
@@ -89,23 +90,32 @@ public class ProjectInviteService {
                 .findByProjectIdAndInvitedUserKeycloakIdAndStatus(projectId,invitedUserId, ProjectInviteStatus.PENDING)
                 .isPresent();
         if (pendingInviteExists) {
-            throw new IllegalArgumentException("User already has a pending invitation for this project.");
+            throw new InvalidProjectInviteException("User already has a pending invitation for this project.");
         }
     }
 
     private void checkInviteStatus(ProjectInvite invite, ProjectInviteStatus newStatus, UUID currentUserId) {
         if (!invite.getInvitedUserId().equals(currentUserId)) {
-            throw new IllegalArgumentException("Only the invited user can update the invitation status.");
+            throw new ProjectInviteAccessDeniedException("Only the invited user can update the invitation status.");
         }
         if (invite.getStatus() != ProjectInviteStatus.PENDING) {
-            throw new IllegalArgumentException("Only invitations that are pending can be updated.");
+            throw new InvalidProjectInviteException("Only invitations that are pending can be updated.");
         }
-        if (!isFinalInviteStatus(newStatus) || newStatus == null){
-            throw new IllegalArgumentException("Invalid invitation status.");
+        if (newStatus == null || !isFinalInviteStatus(newStatus)){
+            throw new InvalidProjectInviteException("Invalid invitation status.");
         }
     }
 
     private boolean isFinalInviteStatus(ProjectInviteStatus status){
         return status == ProjectInviteStatus.ACCEPTED || status == ProjectInviteStatus.REJECTED;
+    }
+
+    private ProjectInviteEntity createPendingInvite(ProjectEntity projectEntity, UserProfile invitedUserEntity, String message){
+        ProjectInviteEntity invite = new ProjectInviteEntity();
+        invite.setProject(projectEntity);
+        invite.setInvitedUser(invitedUserEntity);
+        invite.setMessage(message);
+        invite.setStatus(ProjectInviteStatus.PENDING);
+        return invite;
     }
 }
