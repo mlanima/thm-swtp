@@ -12,9 +12,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Table(name = "projects")
@@ -22,7 +20,7 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProjectEntity {
+public class Project {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -53,8 +51,8 @@ public class ProjectEntity {
 
     // Misses Join to TagEntity for project-tags. ManyToMany should work.
     @ManyToMany
-    @JoinTable(name = "project_tags", joinColumns = @JoinColumn(name = "project_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
-    private List<TagEntity> tags = new ArrayList<>();
+    @JoinTable(name = "project_tags", joinColumns = @JoinColumn(name = "project_id"), inverseJoinColumns = @JoinColumn(name = "tag_name"))
+    private Set<TagEntity> tags = new HashSet<>();
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

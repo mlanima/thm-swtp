@@ -7,9 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Table(name = "user_profiles")
@@ -53,6 +51,6 @@ public class UserProfile {
     private LocalDateTime updatedAt;
 
     @ManyToMany
-    @JoinTable(name = "user_profile_tags", joinColumns = @JoinColumn(name = "user_profile_keycloak_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
-    private List<TagEntity> tags = new ArrayList<>();
+    @JoinTable(name = "user_profile_tags", joinColumns = @JoinColumn(name = "user_profile_keycloak_id"), inverseJoinColumns = @JoinColumn(name = "tag_name"))
+    private Set<TagEntity> tags = new HashSet<>();
 }
