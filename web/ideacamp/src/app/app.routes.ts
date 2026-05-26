@@ -4,14 +4,18 @@ import {UserProfile} from './feature/user-profile/pages/user-profile/user-profil
 import {Impressum} from './feature/legal-notice/pages/impressum';
 import {ContactRequests} from './feature/contact-request/pages/contact-requests/contact-requests';
 import { ProjectSite } from './feature/project-site/project-site';
+import { ProjectCreate } from './feature/project-create/project-create';
 import { SuccessComponent } from './feature/auth/success/success.component';
+import {authGuard} from './feature/auth/auth.guard'
+
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'impressum', pathMatch: 'full' },
-  { path: 'success', component: SuccessComponent },
-  {path: 'profile', component: UserProfile },
-  {path: 'impressum',component: Impressum },
-  {path:'contact-requests', component: ContactRequests },
-  {path: 'searchProject', component: SearchProject },
-  {path: 'project',component: ProjectSite }
+  {path: '', redirectTo: 'impressum', pathMatch: 'full' },
+  {path: 'success', component: SuccessComponent},
+  {path: 'impressum',component: Impressum},
+  {path: 'profile', component: UserProfile, canActivate: [authGuard]},
+  {path:'contact-requests', component: ContactRequests, canActivate: [authGuard]},
+  {path: 'searchProject', component: SearchProject, canActivate: [authGuard]},
+  {path: 'project',component: ProjectSite, canActivate: [authGuard]},
+  {path: 'createProject', component: ProjectCreate, canActivate: [authGuard]}
 ];

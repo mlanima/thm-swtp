@@ -1,0 +1,31 @@
+<div class="min-h-screen bg-gray-50">
+
+
+  <header class="h-16 border-b border-gray-200 bg-white shadow-sm">
+    <ng-content select="[header]"></ng-content>
+  </header>
+
+
+  <main class="px-8 py-12">
+
+    <h1 class="mb-10 text-center text-3xl font-bold text-slate-800">
+      Create new project
+    </h1>
+
+    <div class="mx-auto flex max-w-5xl items-start justify-center gap-8">
+
+
+      <aside class="w-60 rounded-xl bg-white p-6 shadow-md">
+        <ng-content select="[sidebar]"></ng-content>
+      </aside>
+
+
+      <section class="w-155 rounded-xl bg-white p-8 shadow-md">
+        <ng-content></ng-content>
+      </section>
+
+    </div>
+
+  </main>
+
+</div>
