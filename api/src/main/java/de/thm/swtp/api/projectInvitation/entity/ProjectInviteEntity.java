@@ -2,6 +2,7 @@ package de.thm.swtp.api.projectInvitation.entity;
 
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.projectInvitation.domain.ProjectInviteStatus;
+import de.thm.swtp.api.userprofile.entity.UserProfile;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,8 +31,10 @@ public class ProjectInviteEntity {
     @JoinColumn(name="project_id", nullable=false)
     private ProjectEntity project;
 
-    // TODO: Relation between user<->invitation missing, needs to be implemented here when UserEntity is created.
-    // manyToOne?
+    /** The User profile that receives the invitation.*/
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name="invited_user_id", nullable=false)
+    private UserProfile invitedUser;
 
     /** Optional message from the project-owner to the invited user. */
     @Column(length = 500)
@@ -39,7 +42,7 @@ public class ProjectInviteEntity {
 
     /** Timestamp of when the invite was sent.*/
     @Column(nullable = false, updatable = false)
-    private LocalDateTime sendDate;
+    private LocalDateTime createdAt;
 
     /** Current status of the invite.*/
     @Enumerated(EnumType.STRING)

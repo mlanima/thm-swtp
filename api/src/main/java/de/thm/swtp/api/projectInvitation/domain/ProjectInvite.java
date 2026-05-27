@@ -22,8 +22,8 @@ public class ProjectInvite {
     /** Message the Project-Owner can define to the invited user.*/
     String message;
 
-    /** Timestamp of when the invitation was sent.*/
-    LocalDateTime sendDate;
+    /** Timestamp of when the invitation was created.*/
+    LocalDateTime createdAt;
 
     /** Current status of the invitation.*/
     ProjectInviteStatus status;

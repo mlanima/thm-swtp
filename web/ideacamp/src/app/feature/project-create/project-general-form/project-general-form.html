@@ -1,0 +1,60 @@
+<form class="space-y-5">
+
+  <div>
+    <label for="project-name" class="mb-1 block text-sm font-medium text-gray-700">
+      Project name
+    </label>
+
+    <input
+      id="project-name"
+      type="text"
+      name = "name"
+      [(ngModel)]="formData.name"
+      placeholder="Enter project name..."
+      class="w-full rounded-lg border px-3 py-2 outline-none"
+      [class.border-red-500]="errors.name"
+      [class.border-gray-300]="!errors.name"
+      [class.focus:border-lime-500]="!errors.name"
+    >
+
+    @if(errors.name){
+      <p class="mt-1 text-sm text-red-600">
+        {{errors.name}}
+      </p>
+    }
+  </div>
+
+  <div>
+    <label for="project-description" class="mb-1 block text-sm font-medium text-gray-700">
+      Description
+    </label>
+
+    <textarea
+      id="project-description"
+      rows="4"
+      name="description"
+      [(ngModel)]="formData.description"
+      placeholder="Describe your project"
+      class="w-full rounded-lg border px-3 py-2 outline-none"
+      [class.border-red-500]="errors.description"
+      [class.border-gray-300]="!errors.description"
+      [class.focus:border-lime-500]="!errors.description"
+    ></textarea>
+
+    @if(errors.description){
+      <p class="mt-1 text-sm text-red-600">
+        {{errors.description}}
+      </p>
+    }
+  </div>
+
+  <div class="flex justify-end pt-4">
+    <button
+      type="button"
+      (click)="submit()"
+      class="rounded-lg bg-lime-500 px-5 py-2 text-sm font-medium text-white hover:bg-lime-600">
+      Next
+    </button>
+  </div>
+
+</form>

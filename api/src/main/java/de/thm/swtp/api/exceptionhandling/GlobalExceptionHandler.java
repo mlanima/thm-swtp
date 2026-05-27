@@ -1,6 +1,10 @@
 package de.thm.swtp.api.exceptionhandling;
 
 import de.thm.swtp.api.exceptionhandling.exceptions.ProfileAccessDeniedException;
+import de.thm.swtp.api.projectInvitation.exception.InvalidProjectInviteException;
+import de.thm.swtp.api.projectInvitation.exception.ProjectInviteAccessDeniedException;
+import de.thm.swtp.api.projectInvitation.exception.ProjectInviteNotFoundException;
+import de.thm.swtp.api.tag.exception.TagAccessDeniedException;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.project.exception.*;
 import org.springframework.http.HttpStatus;
@@ -26,7 +30,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ExceptionProjectResponse.class)
     public ResponseEntity<ErrorResponse> handleProjectAlreadyExists(ExceptionProjectResponse ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(ErrorResponse.of(409,"Conflict",ex.getMessage()));
+                .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
     }
 
     @ExceptionHandler(ExceptionOwnerNotFound.class)
@@ -61,6 +65,30 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ExceptionProjectEditNotAllowed.class)
     public ResponseEntity<ErrorResponse> handleProjectEditNotAllowed(ExceptionProjectEditNotAllowed ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ErrorResponse.of(403, "Forbidden", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ProjectInviteNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleProjectInviteNotFound(ProjectInviteNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ProjectInviteAccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleProjectInviteAccessDenied(ProjectInviteAccessDeniedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ErrorResponse.of(403, "Forbidden", ex.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidProjectInviteException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidProjectInvite(InvalidProjectInviteException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
+    }
+
+    @ExceptionHandler(TagAccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleTagAccessDenied(TagAccessDeniedException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(ErrorResponse.of(403, "Forbidden", ex.getMessage()));
     }
