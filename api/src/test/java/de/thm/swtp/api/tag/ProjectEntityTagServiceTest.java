@@ -1,6 +1,6 @@
 package de.thm.swtp.api.tag;
 
-import de.thm.swtp.api.project.Project;
+import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
 import de.thm.swtp.api.project.exception.ProjectNotFoundException;
 import de.thm.swtp.api.tag.domain.Tag;
@@ -23,7 +23,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-class ProjectTagServiceTest {
+class ProjectEntityTagServiceTest {
 
     private TagRepository tagRepository;
     private ProjectRepository projectRepository;
@@ -33,7 +33,7 @@ class ProjectTagServiceTest {
     private UUID ownerId;
     private UUID otherUserId;
 
-    private Project project;
+    private ProjectEntity projectEntity;
     private UserProfile owner;
 
     @BeforeEach
@@ -50,18 +50,18 @@ class ProjectTagServiceTest {
         owner = new UserProfile();
         owner.setKeycloakId(ownerId);
 
-        project = new Project();
-        project.setId(projectId);
-        project.setOwner(owner);
-        project.setTags(new HashSet<>());
+        projectEntity = new ProjectEntity();
+        projectEntity.setId(projectId);
+        projectEntity.setOwner(owner);
+        projectEntity.setTags(new HashSet<>());
     }
 
     @Test
     void getProjectTags_shouldReturnProjectTags() {
-        project.getTags().add(new TagEntity("Java"));
-        project.getTags().add(new TagEntity("Angular"));
+        projectEntity.getTags().add(new TagEntity("Java"));
+        projectEntity.getTags().add(new TagEntity("Angular"));
 
-        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(projectEntity));
 
         List<Tag> result = projectTagService.getProjectTags(projectId);
 
@@ -82,14 +82,14 @@ class ProjectTagServiceTest {
 
     @Test
     void addTagToProject_shouldCreateAndAssignTag_whenTagDoesNotExistAndUserIsOwner() {
-        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(projectEntity));
         when(tagRepository.findByNameIgnoreCase("Spring")).thenReturn(Optional.empty());
         when(tagRepository.save(any(TagEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         Tag result = projectTagService.addTagToProject(projectId, "Spring", ownerId);
 
         assertThat(result.getName()).isEqualTo("Spring");
-        assertThat(project.getTags())
+        assertThat(projectEntity.getTags())
                 .extracting(TagEntity::getName)
                 .containsExactly("Spring");
 
@@ -102,27 +102,27 @@ class ProjectTagServiceTest {
     void addTagToProject_shouldUseExistingTag_whenTagAlreadyExistsAndUserIsOwner() {
         TagEntity existingTag = new TagEntity("Java");
 
-        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(projectEntity));
         when(tagRepository.findByNameIgnoreCase("Java")).thenReturn(Optional.of(existingTag));
 
         Tag result = projectTagService.addTagToProject(projectId, "Java", ownerId);
 
         assertThat(result.getName()).isEqualTo("Java");
-        assertThat(project.getTags()).contains(existingTag);
+        assertThat(projectEntity.getTags()).contains(existingTag);
 
         verify(tagRepository, never()).save(any());
     }
 
     @Test
     void addTagToProject_shouldTrimTagName_whenCreatingTag() {
-        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(projectEntity));
         when(tagRepository.findByNameIgnoreCase("Spring")).thenReturn(Optional.empty());
         when(tagRepository.save(any(TagEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         Tag result = projectTagService.addTagToProject(projectId, "  Spring  ", ownerId);
 
         assertThat(result.getName()).isEqualTo("Spring");
-        assertThat(project.getTags())
+        assertThat(projectEntity.getTags())
                 .extracting(TagEntity::getName)
                 .containsExactly("Spring");
     }
@@ -140,7 +140,7 @@ class ProjectTagServiceTest {
 
     @Test
     void addTagToProject_shouldThrow_whenCurrentUserIsNotProjectOwner() {
-        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(projectEntity));
 
         assertThatThrownBy(() -> projectTagService.addTagToProject(projectId, "Spring", otherUserId))
                 .isInstanceOf(TagAccessDeniedException.class)
@@ -152,40 +152,40 @@ class ProjectTagServiceTest {
     @Test
     void removeTagFromProject_shouldRemoveTag_whenTagExistsAndUserIsOwner() {
         TagEntity tag = new TagEntity("Angular");
-        project.getTags().add(tag);
+        projectEntity.getTags().add(tag);
 
-        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(projectEntity));
         when(tagRepository.findByNameIgnoreCase("Angular")).thenReturn(Optional.of(tag));
 
         projectTagService.removeTagFromProject(projectId, "Angular", ownerId);
 
-        assertThat(project.getTags()).doesNotContain(tag);
+        assertThat(projectEntity.getTags()).doesNotContain(tag);
         verify(tagRepository, never()).delete(any());
     }
 
     @Test
     void removeTagFromProject_shouldTrimTagName_whenRemovingTag() {
         TagEntity tag = new TagEntity("Angular");
-        project.getTags().add(tag);
+        projectEntity.getTags().add(tag);
 
-        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(projectEntity));
         when(tagRepository.findByNameIgnoreCase("Angular")).thenReturn(Optional.of(tag));
 
         projectTagService.removeTagFromProject(projectId, "  Angular  ", ownerId);
 
-        assertThat(project.getTags()).doesNotContain(tag);
+        assertThat(projectEntity.getTags()).doesNotContain(tag);
         verify(tagRepository).findByNameIgnoreCase("Angular");
         verify(tagRepository, never()).delete(any());
     }
 
     @Test
     void removeTagFromProject_shouldDoNothing_whenTagDoesNotExistAndUserIsOwner() {
-        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(projectEntity));
         when(tagRepository.findByNameIgnoreCase("Angular")).thenReturn(Optional.empty());
 
         projectTagService.removeTagFromProject(projectId, "Angular", ownerId);
 
-        assertThat(project.getTags()).isEmpty();
+        assertThat(projectEntity.getTags()).isEmpty();
         verify(tagRepository, never()).delete(any());
     }
 
@@ -204,15 +204,15 @@ class ProjectTagServiceTest {
     @Test
     void removeTagFromProject_shouldThrow_whenCurrentUserIsNotProjectOwner() {
         TagEntity tag = new TagEntity("Angular");
-        project.getTags().add(tag);
+        projectEntity.getTags().add(tag);
 
-        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(projectEntity));
 
         assertThatThrownBy(() -> projectTagService.removeTagFromProject(projectId, "Angular", otherUserId))
                 .isInstanceOf(TagAccessDeniedException.class)
                 .hasMessage("Only the project owner is allowed to change tags assigned to the project.");
 
-        assertThat(project.getTags()).contains(tag);
+        assertThat(projectEntity.getTags()).contains(tag);
         verify(tagRepository, never()).findByNameIgnoreCase(any());
         verify(tagRepository, never()).delete(any());
     }

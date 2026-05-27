@@ -1,6 +1,6 @@
 package de.thm.swtp.api.tag.entity;
 
-import de.thm.swtp.api.project.Project;
+import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import jakarta.persistence.*;
 import lombok.*;
@@ -27,7 +27,7 @@ public class TagEntity {
 
     /** List of all projects, where the tag is used.*/
     @ManyToMany(mappedBy = "tags")
-    private Set<Project> projects;
+    private Set<ProjectEntity> projectEntities;
 
     /** List of all user profiles, where the tag is used.*/
     @ManyToMany(mappedBy = "tags")

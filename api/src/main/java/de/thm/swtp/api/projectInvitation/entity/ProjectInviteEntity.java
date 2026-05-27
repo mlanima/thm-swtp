@@ -1,6 +1,6 @@
 package de.thm.swtp.api.projectInvitation.entity;
 
-import de.thm.swtp.api.project.Project;
+import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.projectInvitation.domain.ProjectInviteStatus;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import jakarta.persistence.*;
@@ -29,7 +29,7 @@ public class ProjectInviteEntity {
     /** The project where the invitation came from. */
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name="project_id", nullable=false)
-    private Project project;
+    private ProjectEntity projectEntity;
 
     /** The User profile that receives the invitation.*/
     @ManyToOne(optional = false, fetch = FetchType.LAZY)

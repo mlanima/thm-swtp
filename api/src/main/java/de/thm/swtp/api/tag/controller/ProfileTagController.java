@@ -41,6 +41,5 @@ public class ProfileTagController {
     public void removeTagFromProfile(@PathVariable String tagName, @AuthenticationPrincipal Jwt jwt) {
         UUID currentUserId = UUID.fromString(jwt.getSubject());
         profileTagService.removeTagFromProfile(currentUserId, tagName);
-        return ResponseEntity.noContent().build();
     }
 }

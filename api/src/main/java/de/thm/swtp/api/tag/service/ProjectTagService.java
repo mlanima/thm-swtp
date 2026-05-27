@@ -1,6 +1,6 @@
 package de.thm.swtp.api.tag.service;
 
-import de.thm.swtp.api.project.Project;
+import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
 import de.thm.swtp.api.project.exception.ProjectNotFoundException;
 import de.thm.swtp.api.tag.domain.Tag;
@@ -26,7 +26,7 @@ public class ProjectTagService {
     /** Returns a list of all tags assigned to the given project. */
     @Transactional(readOnly = true)
     public List<Tag> getProjectTags(UUID projectId) {
-        Project projectEntity = projectRepository.findById(projectId)
+        ProjectEntity projectEntity = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException(projectId));
 
         return projectEntity.getTags()
@@ -38,13 +38,13 @@ public class ProjectTagService {
     /** Assigns a tag to the given project. If the tag does not exist, then it will be created and then assigned. */
     @Transactional
     public Tag addTagToProject(UUID projectId, String tagName, UUID currentUserId) {
-        Project project = projectRepository.findById(projectId)
+        ProjectEntity projectEntity = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException(projectId));
 
-        checkProjectTagPermission(project, currentUserId);
+        checkProjectTagPermission(projectEntity, currentUserId);
 
         TagEntity tagEntity = getOrCreateTag(tagName);
-        project.getTags().add(tagEntity);
+        projectEntity.getTags().add(tagEntity);
 
         return TagMapper.toDomain(tagEntity);
     }
@@ -52,13 +52,13 @@ public class ProjectTagService {
     /** Removes a tag from the given project. Only the project owner is allowed to remove tags. */
     @Transactional
     public void removeTagFromProject(UUID projectId, String tagName, UUID currentUserId) {
-        Project project = projectRepository.findById(projectId)
+        ProjectEntity projectEntity = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException(projectId));
 
-        checkProjectTagPermission(project, currentUserId);
+        checkProjectTagPermission(projectEntity, currentUserId);
 
         tagRepository.findByNameIgnoreCase(tagName.trim())
-                .ifPresent(tag -> project.getTags().remove(tag));
+                .ifPresent(tag -> projectEntity.getTags().remove(tag));
     }
 
     private TagEntity getOrCreateTag(String tagName) {
@@ -68,8 +68,8 @@ public class ProjectTagService {
                 .orElseGet(() -> tagRepository.save(new TagEntity(cleaned)));
     }
 
-    private void checkProjectTagPermission(Project project, UUID currentUserId){
-        UUID ownerId = project.getOwner().getKeycloakId();
+    private void checkProjectTagPermission(ProjectEntity projectEntity, UUID currentUserId){
+        UUID ownerId = projectEntity.getOwner().getKeycloakId();
 
         if (!ownerId.equals(currentUserId)){
             throw new TagAccessDeniedException("Only the project owner is allowed to change tags assigned to the project.");
