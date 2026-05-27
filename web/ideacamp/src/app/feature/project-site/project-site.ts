@@ -81,6 +81,8 @@ export class ProjectSite  implements OnInit {
       .updateProject(proj.id, {
         name: this.editName(),
         description: this.editDescription(),
+        projectUrl: proj.projectUrl,
+        isPrivateProject: proj.isPrivateProject,
       })
       .subscribe({
         next: (updated) => {

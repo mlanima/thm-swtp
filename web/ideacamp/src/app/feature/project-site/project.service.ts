@@ -3,11 +3,21 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../enviroments/enviroment.dev';
 import {ProjectResponse} from '../../models/project.model';
-import { ProjectCreateData } from '../project-create/schemas/project-create.schema';
+
+export interface CreateProjectRequest {
+  name: string;
+  description?: string | null;
+  projectUrl: string;
+  isPrivateProject: boolean;
+  memberIds: string[];
+  tagIds: string[];
+}
 
 export interface UpdateProjectRequest {
   name: string;
   description: string;
+  projectUrl: string;
+  isPrivateProject: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -15,7 +25,7 @@ export class ProjectService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/projects`;
 
-  createProject(data: ProjectCreateData & { memberIds: string [] }): Observable<ProjectResponse> {
+  createProject(data: CreateProjectRequest): Observable<ProjectResponse> {
     return this.http.post<ProjectResponse>(this.baseUrl, data);
   }
 
