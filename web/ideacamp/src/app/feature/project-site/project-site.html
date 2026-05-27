@@ -86,11 +86,11 @@
             <app-info-card [project]="project()!" />
           }
         </div>
-
-        <app-open-position-card />
+<!--        TODO: not implemented yet-->
+<!--        <app-open-position-card />-->
       </section>
 
-      <app-sidebar />
+      <app-sidebar [projectId]="project()!.id" [isOwner]="isOwner" />
     </main>
   }
 

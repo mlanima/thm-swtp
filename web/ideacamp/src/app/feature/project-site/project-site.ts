@@ -6,7 +6,6 @@ import {ProjectService} from './project.service';
 import {ProjectResponse } from '../../models/project.model';
 import { ProjectHeader } from './components/project-header/project-header';
 import { InfoCard } from './components/info-card/info-card';
-import { OpenPositionCard } from './components/open-position-card/open-position-card';
 import { ProjectSidebar } from './components/project-sidebar/project-sidebar';
 import {AuthService} from '../auth/auth.service';
 
@@ -14,7 +13,7 @@ import {AuthService} from '../auth/auth.service';
 @Component({
   selector: 'app-project-site',
   standalone: true,
-  imports: [ProjectHeader, InfoCard, OpenPositionCard, ProjectSidebar, FormsModule, CommonModule],
+  imports: [ProjectHeader, InfoCard, ProjectSidebar, FormsModule, CommonModule],
   templateUrl: './project-site.html',
 })
 export class ProjectSite  implements OnInit {

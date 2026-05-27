@@ -1,11 +1,10 @@
 import { Component, Input } from '@angular/core';
 import { ProjectResponse } from '../../../../models/project.model';
-import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-project-header',
   standalone: true,
-  imports: [RouterLink],
+  imports: [],
   templateUrl: './project-header.html'
 })
 export class ProjectHeader {
