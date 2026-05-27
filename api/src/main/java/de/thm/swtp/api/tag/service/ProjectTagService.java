@@ -38,13 +38,13 @@ public class ProjectTagService {
     /** Assigns a tag to the given project. If the tag does not exist, then it will be created and then assigned. */
     @Transactional
     public Tag addTagToProject(UUID projectId, String tagName, UUID currentUserId) {
-        ProjectEntity projectEntity = projectRepository.findById(projectId)
+        ProjectEntity project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException(projectId));
 
-        checkProjectTagPermission(projectEntity, currentUserId);
+        checkProjectTagPermission(project, currentUserId);
 
         TagEntity tagEntity = getOrCreateTag(tagName);
-        projectEntity.getTags().add(tagEntity);
+        project.getTags().add(tagEntity);
 
         return TagMapper.toDomain(tagEntity);
     }
@@ -68,8 +68,8 @@ public class ProjectTagService {
                 .orElseGet(() -> tagRepository.save(new TagEntity(cleaned)));
     }
 
-    private void checkProjectTagPermission(ProjectEntity projectEntity, UUID currentUserId){
-        UUID ownerId = projectEntity.getOwner().getKeycloakId();
+    private void checkProjectTagPermission(ProjectEntity project, UUID currentUserId){
+        UUID ownerId = project.getOwner().getKeycloakId();
 
         if (!ownerId.equals(currentUserId)){
             throw new TagAccessDeniedException("Only the project owner is allowed to change tags assigned to the project.");
