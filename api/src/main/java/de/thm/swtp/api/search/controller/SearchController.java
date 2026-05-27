@@ -1,7 +1,9 @@
 package de.thm.swtp.api.search.controller;
 
 import de.thm.swtp.api.search.dto.ProjectSearchResult;
-import de.thm.swtp.api.search.service.SearchService;
+import de.thm.swtp.api.search.dto.UserSearchResult;
+import de.thm.swtp.api.search.service.ProjectSearchService;
+import de.thm.swtp.api.search.service.UserSearchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,10 +17,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SearchController {
 
-    private final SearchService searchService;
+    private final ProjectSearchService projectSearchService;
+    private final UserSearchService userSearchService;
 
     @GetMapping("/projects")
     public List<ProjectSearchResult> searchProjects(@RequestParam String q) {
-        return searchService.searchProjects(q);
+        return projectSearchService.searchProjects(q);
+    }
+
+    @GetMapping("/users")
+    public List<UserSearchResult> searchUsers(@RequestParam String q) {
+        return userSearchService.searchUsers(q);
     }
 }

@@ -1,14 +1,14 @@
 package de.thm.swtp.api.project;
 
-
+import de.thm.swtp.api.tag.entity.TagEntity;
+import de.thm.swtp.api.userprofile.entity.UserProfile;
 import jakarta.persistence.*;
 import lombok.*;
-import de.thm.swtp.api.userprofile.entity.UserProfile;
-import java.util.*;
-import org.hibernate.annotations.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.util.*;
 
 @Entity(name = "projects")
 @Table(name = "projects")
@@ -29,31 +29,37 @@ public class ProjectEntity {
     @Column(length = 500)
     private String description;
 
-    @Column(name="project_url", nullable = false, length = 30)
+    @Column(name = "project_url", nullable = false, length = 30)
     private String projectUrl;
 
-    @Column(name="is_private", nullable = false)
+    @Column(name = "is_private", nullable = false)
     @Builder.Default
-    private boolean isPrivateProject=false;
+    private boolean isPrivateProject = false;
 
     @Column(name = "delete_at")
     private LocalDateTime deletedAt;
 
-    @ManyToOne
-    @JoinColumn(name = "owner_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "owner_keycloak_id", nullable = false)
     private UserProfile owner;
 
     @ManyToMany
     @JoinTable(
             name = "project_members",
             joinColumns = @JoinColumn(name = "project_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
+            inverseJoinColumns = @JoinColumn(name = "user_profile_keycloak_id")
     )
-
     @Builder.Default
-    private Set<UserProfile> members = new HashSet<>();
+    private List<UserProfile> members = new ArrayList<>();
 
     // Misses Join to TagEntity for project-tags. ManyToMany should work.
+    @ManyToMany
+    @JoinTable(
+            name = "project_tags",
+            joinColumns = @JoinColumn(name = "project_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_name")
+    )
+    private Set<TagEntity> tags = new HashSet<>();
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
@@ -62,5 +68,4 @@ public class ProjectEntity {
     @UpdateTimestamp
     @Column(nullable = false)
     private LocalDateTime updatedAt;
-
 }

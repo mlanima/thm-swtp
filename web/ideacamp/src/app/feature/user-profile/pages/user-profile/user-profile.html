@@ -1,15 +1,209 @@
 <div class="min-h-screen bg-slate-100 px-8 py-10">
   <main class="mx-auto flex max-w-5xl flex-col gap-10">
-    <app-profile-banner></app-profile-banner>
 
-    <app-profile-information
-      title="About"
-      [text]="aboutText">
-    </app-profile-information>
+    @if (profileState(); as state) {
 
-    <app-profile-information
-      title="Experience"
-      [text]="experienceText">
-    </app-profile-information>
+      @if (state.isLoading) {
+        <section class="rounded-xl bg-white p-6 shadow-lg">
+          <p class="text-sm text-slate-600">
+            Profile loading...
+          </p>
+        </section>
+      } @else if (state.errorMessage) {
+        <section class="rounded-xl border border-red-200 bg-red-50 p-6 shadow-lg">
+          <h2 class="text-lg font-bold text-red-700">
+            Error
+          </h2>
+
+          <p class="mt-2 text-sm text-red-600">
+            {{ state.errorMessage }}
+          </p>
+        </section>
+      } @else if (state.profile) {
+        <app-profile-banner
+          [profile]="state.profile"
+          (edit)="openBannerEditModal(state.profile)">
+        </app-profile-banner>
+
+        @if (isBannerModalOpen) {
+          <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+            <div class="relative w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
+              <button
+                type="button"
+                class="absolute right-4 top-4 text-slate-400 hover:text-slate-700"
+                [disabled]="isSaving"
+                (click)="closeBannerEditModal()">
+                ✕
+              </button>
+
+              <h2 class="mb-5 text-xl font-bold text-slate-800">
+                Edit Profile Details
+              </h2>
+
+              <label class="block">
+                <span class="mb-1 block text-sm font-medium text-slate-700">
+                  Field
+                </span>
+
+                <select
+                  class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+                  [(ngModel)]="selectedBannerField"
+                  (ngModelChange)="onBannerFieldChange()">
+                  <option value="title">Title</option>
+                  <option value="location">Location</option>
+                </select>
+              </label>
+
+              <label class="mt-5 block">
+                <span class="mb-1 block text-sm font-medium text-slate-700">
+                  Enter here
+                </span>
+
+                <input
+                  type="text"
+                  class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+                  [(ngModel)]="bannerEditValue">
+              </label>
+
+              <div class="mt-6 flex gap-3">
+                <button
+                  type="button"
+                  class="rounded-lg bg-slate-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800 disabled:opacity-50"
+                  [disabled]="isSaving"
+                  (click)="saveBannerField(state.profile)">
+                  @if (isSaving) {
+                    Saving...
+                  } @else {
+                    Save
+                  }
+                </button>
+
+                <button
+                  type="button"
+                  class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:opacity-50"
+                  [disabled]="isSaving"
+                  (click)="closeBannerEditModal()">
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+
+        @if (editingSection === 'about') {
+          <section class="rounded-xl bg-white p-6 shadow-lg">
+            <h2 class="mb-5 text-xl font-bold text-slate-800">
+              Edit About
+            </h2>
+
+            <textarea
+              rows="5"
+              class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+              [(ngModel)]="editForm.about">
+            </textarea>
+
+            <div class="mt-6 flex gap-3">
+              <button
+                type="button"
+                class="rounded-lg bg-slate-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800 disabled:opacity-50"
+                [disabled]="isSaving"
+                (click)="saveProfile(state.profile)">
+                @if (isSaving) {
+                  Saving...
+                } @else {
+                  Save
+                }
+              </button>
+
+              <button
+                type="button"
+                class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:opacity-50"
+                [disabled]="isSaving"
+                (click)="cancelEditing()">
+                Cancel
+              </button>
+            </div>
+          </section>
+        } @else {
+          <app-profile-information
+            title="About"
+            [text]="state.profile.about || 'No description.'"
+            (edit)="startEditing(state.profile, 'about')">
+          </app-profile-information>
+        }
+
+        @if (editingSection === 'experience') {
+          <section class="rounded-xl bg-white p-6 shadow-lg">
+            <h2 class="mb-5 text-xl font-bold text-slate-800">
+              Edit Experience
+            </h2>
+
+            <textarea
+              rows="5"
+              class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+              [(ngModel)]="editForm.experience">
+            </textarea>
+
+            <div class="mt-6 flex gap-3">
+              <button
+                type="button"
+                class="rounded-lg bg-slate-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800 disabled:opacity-50"
+                [disabled]="isSaving"
+                (click)="saveProfile(state.profile)">
+                @if (isSaving) {
+                  Saving...
+                } @else {
+                  Save
+                }
+              </button>
+
+              <button
+                type="button"
+                class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:opacity-50"
+                [disabled]="isSaving"
+                (click)="cancelEditing()">
+                Cancel
+              </button>
+            </div>
+          </section>
+        } @else {
+          <app-profile-information
+            title="Experience"
+            [text]="state.profile.experience || 'No experience.'"
+            (edit)="startEditing(state.profile, 'experience')">
+          </app-profile-information>
+        }
+      }
+    }
   </main>
+
+  @if (showSuccessModal) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+      <div class="relative w-full max-w-md rounded-xl bg-white p-6 text-center shadow-xl">
+        <button
+          type="button"
+          class="absolute right-4 top-4 text-slate-400 hover:text-slate-700"
+          (click)="closeSuccessModal()">
+          ✕
+        </button>
+
+        <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
+          <span class="text-2xl font-bold text-green-600">
+            ✓
+          </span>
+        </div>
+
+        <p class="mb-5 text-lg font-semibold text-slate-900">
+          Profile successfully updated.
+        </p>
+
+        <button
+          type="button"
+          class="rounded-lg bg-slate-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
+          (click)="closeSuccessModal()">
+          Continue
+        </button>
+      </div>
+    </div>
+  }
 </div>

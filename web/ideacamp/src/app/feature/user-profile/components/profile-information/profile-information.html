@@ -1,14 +1,15 @@
-<section class="rounded-xl bg-white p-6 shadow-lg">
+<section class="relative rounded-xl bg-white p-6 shadow-lg">
   <div class="mb-4 flex items-center justify-between">
-
     <h2 class="text-xl font-bold text-slate-800">
-      {{title}}
+      {{ title }}
     </h2>
-
-    <app-edit-button></app-edit-button>
   </div>
 
-  <p class="whitespace-pre-line wrap-break-word text-sm leading-6 text-slate-600">
-    {{text}}
+  <p class="whitespace-pre-line break-words text-sm leading-6 text-slate-600">
+    {{ text }}
   </p>
+
+  <div class="absolute bottom-4 right-4">
+    <app-edit-button (click)="edit.emit()"></app-edit-button>
+  </div>
 </section>
