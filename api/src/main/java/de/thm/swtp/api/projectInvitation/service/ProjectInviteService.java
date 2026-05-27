@@ -112,7 +112,7 @@ public class ProjectInviteService {
 
     private ProjectInviteEntity createPendingInvite(ProjectEntity projectEntity, UserProfile invitedUserEntity, String message){
         ProjectInviteEntity invite = new ProjectInviteEntity();
-        invite.setProjectEntity(projectEntity);
+        invite.setProject(projectEntity);
         invite.setInvitedUser(invitedUserEntity);
         invite.setMessage(message);
         invite.setStatus(ProjectInviteStatus.PENDING);

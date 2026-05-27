@@ -10,7 +10,7 @@ public class ProjectInviteMapper {
     public static ProjectInvite toDomain(ProjectInviteEntity projectInviteEntity) {
         return ProjectInvite.builder()
                 .id(projectInviteEntity.getId())
-                .projectId(projectInviteEntity.getProjectEntity().getId())
+                .projectId(projectInviteEntity.getProject().getId())
                 .invitedUserId(projectInviteEntity.getInvitedUser().getKeycloakId())
                 .message(projectInviteEntity.getMessage())
                 .createdAt(projectInviteEntity.getCreatedAt())

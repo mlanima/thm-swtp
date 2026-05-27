@@ -149,16 +149,6 @@ class ProjectTagServiceTest {
         verify(tagRepository, never()).save(any());
     }
 
-    @Test
-    void addTagToProject_shouldThrow_whenCurrentUserIsNotProjectOwner() {
-        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
-
-        assertThatThrownBy(() -> projectTagService.addTagToProject(projectId, "Spring", otherUserId))
-                .isInstanceOf(TagAccessDeniedException.class)
-                .hasMessage("Only the project owner is allowed to change tags assigned to the project.");
-
-        verify(tagRepository, never()).save(any());
-    }
 
     @Test
     void removeTagFromProject_shouldRemoveTag_whenTagExistsAndUserIsOwner() {

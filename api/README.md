@@ -31,7 +31,12 @@ docker build -t swtp-api .
 # Starten (SQLite-DB aus db/ mounten)
 docker run -p 8080:8080 -v $(pwd)/db:/app/db swtp-api
 ```
+Unter Windows funktioniert 
+```bash 
+docker build -t swtp-api .
 
+docker run -p 8080:8080 -v ${PWD}/db:/app/db swtp-api
+```
 Läuft dann auf `http://localhost:8080`.
 
 ## Konfiguration

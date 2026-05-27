@@ -110,7 +110,7 @@ public class ProjectEntityInviteServiceTest {
         verify(projectInviteRepository).save(captor.capture());
 
         ProjectInviteEntity saved =  captor.getValue();
-        assertThat(saved.getProjectEntity()).isEqualTo(project);
+        assertThat(saved.getProject()).isEqualTo(project);
         assertThat(saved.getInvitedUser()).isEqualTo(invitedUser);
         assertThat(saved.getStatus()).isEqualTo(ProjectInviteStatus.PENDING);
     }
@@ -259,7 +259,7 @@ public class ProjectEntityInviteServiceTest {
     private ProjectInviteEntity createPendingInviteEntity() {
         ProjectInviteEntity invite = new ProjectInviteEntity();
         invite.setId(inviteId);
-        invite.setProjectEntity(project);
+        invite.setProject(project);
         invite.setInvitedUser(invitedUser);
         invite.setMessage("Hello, please join my project.");
         invite.setCreatedAt(LocalDateTime.now());
