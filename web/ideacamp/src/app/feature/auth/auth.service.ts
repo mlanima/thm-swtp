@@ -33,7 +33,7 @@ type OAuthServiceBridge = Partial<Pick<
 export class AuthService {
   /** True when a valid access token is present. */
   readonly isLoggedIn: WritableSignal<boolean> = signal(false);
-
+  readonly isLoggingOut = signal(false);
   /** Minimal authenticated user representation for UI components. */
   readonly user: WritableSignal<User | null> = signal(null);
 
@@ -85,11 +85,9 @@ export class AuthService {
     }
 
     // Start discovery only after initial stabilization to avoid hydration timeout warnings.
-    this.appRef.isStable
-      .pipe(filter(Boolean), take(1))
-      .subscribe(() => {
-        this.startAuthBootstrap();
-      });
+    this.appRef.isStable.pipe(filter(Boolean), take(1)).subscribe(() => {
+      this.startAuthBootstrap();
+    });
   }
 
   /**
@@ -109,7 +107,8 @@ export class AuthService {
       return this.initPromise;
     }
 
-    this.initPromise = oauthService.loadDiscoveryDocumentAndTryLogin()
+    this.initPromise = oauthService
+      .loadDiscoveryDocumentAndTryLogin()
       .then(() => this.updateStateAfterTick())
       .catch(() => this.updateStateAfterTick());
 
@@ -149,6 +148,8 @@ export class AuthService {
     }
 
     if (hasToken) {
+      this.isLoggingOut.set(false);
+      
       const claims = oauthService.getIdentityClaims?.() as Record<string, unknown> | null;
       const preferred = claims?.['preferred_username'];
       const username = typeof preferred === 'string' ? preferred : '';
@@ -211,7 +212,7 @@ export class AuthService {
   /** Fallback redirect to the Keycloak authorization endpoint. */
   private redirectToKeycloakLogin(): void {
     const env = environment as { issuer?: string; clientId?: string; scope?: string };
-    const issuer = ((env.issuer ?? '')).replace(/\/$/, '');
+    const issuer = (env.issuer ?? '').replace(/\/$/, '');
     const clientId = env.clientId ?? '';
     const scope = env.scope ?? 'openid profile email';
 
@@ -224,6 +225,16 @@ export class AuthService {
 
   /** Triggers OIDC logout and lets Keycloak redirect back to post logout URI. */
   logout(): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
+    this.isLoggingOut.set(true);
+
+    this.isLoggedIn.set(false);
+    this.user.set(null);
+    this.username.set('');
+
     const oauthService = this.oauthService as OAuthServiceBridge;
     oauthService.logOut?.();
   }
