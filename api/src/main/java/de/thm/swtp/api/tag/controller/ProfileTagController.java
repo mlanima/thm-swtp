@@ -34,4 +34,11 @@ public class ProfileTagController {
         UUID currentUserId = UUID.fromString(jwt.getSubject());
         return TagResponse.toResponse(profileTagService.addTagToProfile(currentUserId, request.name()));
     }
+
+    /** Removes a tag from the currently authenticated users profile. */
+    @DeleteMapping("me/profile/tags/{tagName}")
+    public void removeTagFromProfile(@PathVariable String tagName, @AuthenticationPrincipal Jwt jwt) {
+        UUID currentUserId = UUID.fromString(jwt.getSubject());
+        profileTagService.removeTagFromProfile(currentUserId, tagName);
+    }
 }

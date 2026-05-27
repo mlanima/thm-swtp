@@ -30,7 +30,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-public class ProjectInviteServiceTest {
+public class ProjectEntityInviteServiceTest {
 
     private ProjectInviteRepository projectInviteRepository;
     private ProjectRepository projectRepository;

@@ -1,11 +1,13 @@
-package de.thm.swtp.api.project.dto.request;
+package de.thm.swtp.api.project.dto.response;
 
 import lombok.*;
+import java.util.*;
+
+
 
 @Data
-public class UpdateProjectRequest {
-    private String name;
-    private String description;
-    private String projectUrl;
-    private boolean isPrivateProject;
+@Builder
+public class DeleteProjectResponse {
+    private UUID projectId;
+    private String message;
 }

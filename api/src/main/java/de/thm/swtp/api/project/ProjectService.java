@@ -7,6 +7,7 @@ import de.thm.swtp.api.project.exception.*;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 
+import jakarta.transaction.*;
 import lombok.*;
 import java.util.*;
 import java.time.*;
@@ -21,19 +22,17 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
     private final UserProfileRepository userProfileRepository;
 
-    public ProjectResponse createProject(CreateProjectRequest request, UUID ownerId) {
-
+    public ProjectResponse createProject(CreateProjectRequest request, String username) {
 
         if (projectRepository.existsByName(request.name())) {
             throw new ExceptionProjectResponse(request.name());
         }
 
+        UserProfile owner = userProfileRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User profile not found for username: " + username));
 
-        UserProfile owner = userProfileRepository.findById(ownerId)
-                .orElseThrow(() -> new ExceptionOwnerNotFound(ownerId));
 
-
-        Set<UserProfile> members = new HashSet<>(
+        List<UserProfile> members = new ArrayList<>(
                 userProfileRepository.findAllById(request.memberIds())
         );
 
@@ -63,7 +62,7 @@ public class ProjectService {
                 .build();
     }
 
-    public DeleteProjectResponse deleteProject(UUID projectId, UUID requestingUserId) {
+    public DeleteProjectResponse deleteProject(UUID projectId, String username) {
 
         ProjectEntity project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ExceptionProjectNotFound(projectId));
@@ -72,9 +71,10 @@ public class ProjectService {
             throw new ExceptionProjectAlreadyDeleted(projectId);
         }
 
-        if (!project.getOwner().getKeycloakId().equals(requestingUserId)) {
-            throw new ExceptionProjectDeleteNotAllowed(requestingUserId, projectId);
-        }
+        userProfileRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User profile not found for username: " + username));
+
+
 
         project.setDeletedAt(LocalDateTime.now());
         projectRepository.save(project);
@@ -84,7 +84,7 @@ public class ProjectService {
                 .message("Projekt erfolgreich gelöscht.")
                 .build();
     }
-
+    @Transactional
     public ProjectResponse getProject(UUID projectId) {
 
         ProjectEntity project = projectRepository.findById(projectId)
@@ -109,7 +109,7 @@ public class ProjectService {
                 .build();
     }
 
-    public ProjectResponse editProject(UUID projectId, UpdateProjectRequest request, UUID requestingUserId) {
+    public ProjectResponse editProject(UUID projectId, UpdateProjectRequest request, String username) {
 
         ProjectEntity project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ExceptionProjectNotFound(projectId));
@@ -118,9 +118,10 @@ public class ProjectService {
             throw new ExceptionProjectAlreadyDeleted(projectId);
         }
 
-        if (!project.getOwner().getKeycloakId().equals(requestingUserId)) {
-            throw new ExceptionProjectEditNotAllowed(requestingUserId, projectId);
-        }
+        userProfileRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User profile not found for username: " + username));
+
+
 
         if (request.getName() != null &&
                 !request.getName().equals(project.getName()) &&

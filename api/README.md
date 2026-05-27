@@ -22,6 +22,23 @@ Läuft auf `http://localhost:8080`.
 | `GET /api/public/hello` | — | Öffentlich |
 | `GET /api/hello` | JWT required | Gibt Username, UUID und Rollen zurück |
 
+## Docker
+
+```bash
+# Image bauen
+docker build -t swtp-api .
+
+# Starten (SQLite-DB aus db/ mounten)
+docker run -p 8080:8080 -v $(pwd)/db:/app/db swtp-api
+```
+Unter Windows funktioniert 
+```bash 
+docker build -t swtp-api .
+
+docker run -p 8080:8080 -v ${PWD}/db:/app/db swtp-api
+```
+Läuft dann auf `http://localhost:8080`.
+
 ## Konfiguration
 
 `src/main/resources/application.yaml` — Keycloak `issuer-uri` und SQLite-Pfad bei Bedarf anpassen.

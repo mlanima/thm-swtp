@@ -4,12 +4,14 @@ package de.thm.swtp.api.project;
 import de.thm.swtp.api.project.dto.request.*;
 import de.thm.swtp.api.project.dto.response.*;
 import lombok.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.*;
 import java.util.*;
 
 @RestController
-@RequestMapping("/projects")
+@RequestMapping("/api/projects")
 @RequiredArgsConstructor
 public class ProjectController {
 
@@ -18,16 +20,18 @@ public class ProjectController {
     @PostMapping
     public ResponseEntity<ProjectResponse> createProject(
             @RequestBody CreateProjectRequest request,
-            @RequestHeader ("X-User-Id")UUID ownerId){
-        ProjectResponse response = projectService.createProject(request, ownerId);
+            @AuthenticationPrincipal Jwt jwt) {
+        String username = jwt.getClaimAsString("preferred_username");
+        ProjectResponse response = projectService.createProject(request, username);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @DeleteMapping("/{projectId}")
     public ResponseEntity<DeleteProjectResponse> deleteProject(
             @PathVariable UUID projectId,
-            @RequestHeader("X-User-Id") UUID requestingUserId) {
-        DeleteProjectResponse response = projectService.deleteProject(projectId, requestingUserId);
+            @AuthenticationPrincipal Jwt jwt) {
+        String username = jwt.getClaimAsString("preferred_username");
+        DeleteProjectResponse response = projectService.deleteProject(projectId, username);
         return ResponseEntity.ok(response);
     }
 
@@ -42,8 +46,9 @@ public class ProjectController {
     public ResponseEntity<ProjectResponse> editProject(
             @PathVariable UUID projectId,
             @RequestBody UpdateProjectRequest request,
-            @RequestHeader("X-User-Id") UUID requestingUserId) {
-        ProjectResponse response = projectService.editProject(projectId, request, requestingUserId);
+            @AuthenticationPrincipal Jwt jwt) {
+        String username = jwt.getClaimAsString("preferred_username");
+        ProjectResponse response = projectService.editProject(projectId, request, username);
         return ResponseEntity.ok(response);
     }
 

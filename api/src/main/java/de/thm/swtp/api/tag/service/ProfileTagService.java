@@ -47,6 +47,16 @@ public class ProfileTagService {
         return TagMapper.toDomain(tag);
     }
 
+    /** Removes a tag from the user profile. */
+    @Transactional
+    public void removeTagFromProfile(UUID userId, String tagName) {
+        UserProfile profile = userProfileRepository.findById(userId)
+                .orElseThrow(() -> new UserProfileNotFoundException(userId.toString()));
+
+        tagRepository.findByNameIgnoreCase(tagName.trim())
+                .ifPresent(tag -> profile.getTags().remove(tag));
+    }
+
     private TagEntity getOrCreateTag(String tagName) {
         String cleaned = tagName.trim();
 
