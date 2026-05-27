@@ -128,9 +128,9 @@ public class ProjectService {
             throw new ExceptionProjectNameAlreadyExists(request.getName());
         }
 
-        if (request.getName() != null) project.setName(request.getName());
-        if (request.getDescription() != null) project.setDescription(request.getDescription());
-        if (request.getProjectUrl() != null) project.setProjectUrl(request.getProjectUrl());
+        if (request.getName() != null) { project.setName(request.getName());}
+        if (request.getDescription() != null) { project.setDescription(request.getDescription());}
+        if (request.getProjectUrl() != null) { project.setProjectUrl(request.getProjectUrl()); }
         project.setPrivateProject(request.isPrivateProject());
 
         ProjectEntity saved = projectRepository.save(project);

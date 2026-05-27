@@ -19,7 +19,7 @@ public class ProjectController {
     public ResponseEntity<ProjectResponse> createProject(
             @RequestBody CreateProjectRequest request,
             @RequestHeader ("X-User-Id")UUID ownerId){
-        ProjectResponse response = projectService.createProject(request,ownerId);
+        ProjectResponse response = projectService.createProject(request, ownerId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
