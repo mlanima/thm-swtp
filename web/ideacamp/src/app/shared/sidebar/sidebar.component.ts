@@ -2,10 +2,11 @@ import { Component, effect, inject, signal } from '@angular/core';
 import { SidebarService } from './sidebar.service';
 import { MenuLinkComponent } from './menu-link/menu-link.component';
 import { AuthService } from '../../feature/auth/auth.service';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-sidebar',
-  imports: [MenuLinkComponent],
+  imports: [MenuLinkComponent, RouterLink],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.css',
 })

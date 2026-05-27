@@ -22,20 +22,21 @@
 
         <!--TODO: Connect to pages, delete unused-->
         <div class="mt-4 space-y-1">
+          <a routerLink="/search">
           <app-menu-link>
-            <i class="pi pi-compass text-sm text-zinc-400"></i>
-            <span>Explore</span>
-          </app-menu-link>
-
-          <app-menu-link>
+             <i class="pi pi-compass text-sm text-zinc-400"></i>
+             <span>Explore</span>
+           </app-menu-link>
+          </a>
+          <!--<app-menu-link>
             <i class="pi pi-users text-sm text-zinc-400"></i>
             <span>Kontakten</span>
-          </app-menu-link>
+          </app-menu-link>-->
 
-          <app-menu-link>
+          <!--<app-menu-link>
             <i class="pi pi-folder text-sm text-zinc-400"></i>
             <span>Meine Projekte</span>
-          </app-menu-link>
+          </app-menu-link>-->
         </div>
 
         <!--TODO: Recent Projects-->
@@ -44,10 +45,12 @@
       </menu>
 
       <footer class="space-y-2 border-t border-zinc-700 px-6 py-5">
+        <a routerLink="/profile">
         <app-menu-link>
           <i class="pi pi-cog text-md text-zinc-400"></i>
           <span>Einstellungen</span>
         </app-menu-link>
+        </a>
 
         <app-menu-link (click)="logout()">
           <i class="pi pi-sign-out text-sm text-red-400"></i>

@@ -4,6 +4,8 @@ import { OAuthService } from 'angular-oauth2-oidc';
 
 import { HeaderComponent } from './header.component';
 
+import { provideRouter } from '@angular/router';
+
 describe('HeaderComponent', () => {
   let component: HeaderComponent;
   let fixture: ComponentFixture<HeaderComponent>;
@@ -14,7 +16,7 @@ describe('HeaderComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      providers: [{ provide: OAuthService, useValue: oauthServiceMock }],
+      providers: [{ provide: OAuthService, useValue: oauthServiceMock }, provideRouter([])],
       imports: [HeaderComponent],
     }).compileComponents();
 

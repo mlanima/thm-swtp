@@ -13,6 +13,19 @@ describe('ProfileBanner', () => {
 
     fixture = TestBed.createComponent(ProfileBanner);
     component = fixture.componentInstance;
+
+    component.profile = {
+      keycloakId: '',
+      username: '',
+      email: '',
+      title: '',
+      location: '',
+      followers: 0,
+      about: '',
+      experience: ''
+    };
+
+    fixture.detectChanges();
     await fixture.whenStable();
   });
 

@@ -13,14 +13,18 @@
 
 <!--    Add Features with app-feature component-->
     <nav>
-      <app-feature>
-        <i class="pi pi-home text-md"></i>
-        Home
-      </app-feature>
-      <app-feature>
-        <i class="pi pi-compass text-md"></i>
-        Explore
-      </app-feature>
+      <a routerLink="/impressum">
+        <app-feature>
+          <i class="pi pi-home text-md"></i>
+          Home
+        </app-feature>
+      </a>
+      <a routerLink="/search">
+        <app-feature>
+          <i class="pi pi-compass text-md"></i>
+          Explore
+        </app-feature>
+      </a>
     </nav>
 
     <div class="flex justify-end flex-1">
