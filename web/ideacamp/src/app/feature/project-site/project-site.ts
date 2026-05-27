@@ -36,7 +36,7 @@ export class ProjectSite  implements OnInit {
     const user = this.authService.user();
     const proj = this.project();
     if (!user || !proj) return false;
-    return user.username === proj.ownerId;
+    return user.id === proj.ownerId;
   }
 
   ngOnInit(): void {

@@ -13,11 +13,15 @@ export class AuthInterceptor implements HttpInterceptor {
 
     // Only attach token for our API backend
     if (token && req.url.startsWith(environment.apiUrl)) {
-      const cloned = req.clone({ setHeaders: { Authorization: `Bearer ${token}` } });
+      const userId = this.auth.user()?.id ?? '';
+      const cloned = req.clone({
+        setHeaders: { Authorization: `Bearer ${token}`, 'X-User-Id': userId },
+      });
       return next.handle(cloned);
     }
 
     return next.handle(req);
   }
+
 }
 

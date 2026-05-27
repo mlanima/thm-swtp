@@ -26,7 +26,7 @@
     <div class="flex justify-end flex-1">
       @if (isAuthenticated()) {
         <a routerLink="/profile">
-          <app-auth-panel [user]="{ username: auth.username() }"/>
+          <app-auth-panel [user]="{ username: auth.username(), id: auth.user()?.id ?? '' }"/>
         </a>
       } @else {
         <div class="flex gap-1 items-center">
