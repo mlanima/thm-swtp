@@ -1,48 +1,40 @@
-<div class="rounded-2xl bg-white p-6 shadow-sm">
-  <div class="mb-4 flex items-center justify-between">
-    <h2 class="text-lg font-semibold text-slate-700">
-      <span class="text-lime-500">•</span>
-      About the Project
-    </h2>
-here  </div>
+<!-- Info content only: this component is intended to be used inside an outer card provided by the page -->
+<p class="text-sm leading-7 text-slate-500">
+  {{ project.description || 'Keine Beschreibung vorhanden.' }}
+</p>
 
-  <p class="text-sm leading-7 text-slate-500">
-    {{ project.description || 'Keine Beschreibung vorhanden.' }}
-  </p>
-
-  <div class="mt-6 grid grid-cols-2 gap-4 border-t pt-5 text-left">
-    <div>
-      <p class="text-xs text-slate-400">Projekt-URL</p>
-      <p class="text-sm font-medium text-slate-700">{{ project.projectUrl }}</p>
-    </div>
-
-    <div>
-      <p class="text-xs text-slate-400">Sichtbarkeit</p>
-      <p class="text-sm font-medium text-slate-700">
-        {{ project.isPrivateProject ? 'Privat' : 'Öffentlich' }}
-      </p>
-    </div>
+<div class="mt-6 grid grid-cols-2 gap-4 border-t pt-5 text-left">
+  <div>
+    <p class="text-xs text-slate-400">Projekt-URL</p>
+    <p class="text-sm font-medium text-slate-700">{{ project.projectUrl }}</p>
   </div>
 
-  <div class="mt-6 grid grid-cols-4 border-t pt-5 text-center">
-    <div>
-      <p class="text-xl font-bold text-lime-500">38</p>
-      <p class="text-xs text-slate-400">Contributors</p>
-    </div>
+  <div>
+    <p class="text-xs text-slate-400">Sichtbarkeit</p>
+    <p class="text-sm font-medium text-slate-700">
+      {{ project.isPrivateProject ? 'Privat' : 'Öffentlich' }}
+    </p>
+  </div>
+</div>
 
-    <div>
-      <p class="text-xl font-bold text-lime-500">247</p>
-      <p class="text-xs text-slate-400">Views</p>
-    </div>
+<div class="mt-6 grid grid-cols-4 border-t pt-5 text-center">
+  <div>
+    <p class="text-xl font-bold text-lime-500">38</p>
+    <p class="text-xs text-slate-400">Contributors</p>
+  </div>
 
-    <div>
-      <p class="text-xl font-bold text-lime-500">12</p>
-      <p class="text-xs text-slate-400">Likes</p>
-    </div>
+  <div>
+    <p class="text-xl font-bold text-lime-500">247</p>
+    <p class="text-xs text-slate-400">Views</p>
+  </div>
 
-    <div>
-      <p class="text-xl font-bold text-lime-500">3</p>
-      <p class="text-xs text-slate-400">Open Positions</p>
-    </div>
+  <div>
+    <p class="text-xl font-bold text-lime-500">12</p>
+    <p class="text-xs text-slate-400">Likes</p>
+  </div>
+
+  <div>
+    <p class="text-xl font-bold text-lime-500">3</p>
+    <p class="text-xs text-slate-400">Open Positions</p>
   </div>
 </div>
