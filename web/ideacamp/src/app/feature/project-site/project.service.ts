@@ -15,7 +15,7 @@ export class ProjectService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/projects`;
 
-  createProject(data: ProjectCreateData): Observable<ProjectResponse> {
+  createProject(data: ProjectCreateData & { memberIds: string [] }): Observable<ProjectResponse> {
     return this.http.post<ProjectResponse>(this.baseUrl, data);
   }
 

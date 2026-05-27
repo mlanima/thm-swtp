@@ -79,7 +79,7 @@ export class ProjectCreate {
     this.isLoading = true;
     this.errorMessage = null;
 
-    this.projectService.createProject(res.data).subscribe({
+    this.projectService.createProject({ ...res.data, memberIds: [] }).subscribe({
       next: (project) => {
         this.isLoading = false;
         this.successMessage = 'Projekt erfolgreich erstellt!';

@@ -11,17 +11,20 @@ export class AuthInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     const token = this.auth.getAccessToken();
 
-    // Only attach token for our API backend
     if (token && req.url.startsWith(environment.apiUrl)) {
-      const userId = this.auth.user()?.id ?? '';
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const userId = payload['sub'] ?? '';
+
       const cloned = req.clone({
-        setHeaders: { Authorization: `Bearer ${token}`, 'X-User-Id': userId },
+        setHeaders: {
+          Authorization: `Bearer ${token}`,
+          'X-User-Id': userId,
+        },
       });
       return next.handle(cloned);
     }
 
     return next.handle(req);
   }
-
 }
 
