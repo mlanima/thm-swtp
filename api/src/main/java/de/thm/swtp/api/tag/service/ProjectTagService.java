@@ -49,6 +49,17 @@ public class ProjectTagService {
         return TagMapper.toDomain(tagEntity);
     }
 
+    /** Removes a tag from the given project. Only the project owner is allowed to remove tags. */
+    @Transactional
+    public void removeTagFromProject(UUID projectId, String tagName, UUID currentUserId) {
+        ProjectEntity project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException(projectId));
+
+        checkProjectTagPermission(project, currentUserId);
+
+        tagRepository.findByNameIgnoreCase(tagName.trim())
+                .ifPresent(tag -> project.getTags().remove(tag));
+    }
 
     private TagEntity getOrCreateTag(String tagName) {
         String cleaned = tagName.trim();

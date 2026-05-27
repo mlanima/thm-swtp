@@ -125,4 +125,56 @@ class ProfileTagServiceTest {
 
         verify(tagRepository, never()).save(any());
     }
+
+    @Test
+    void removeTagFromProfile_shouldRemoveTag_whenTagExists() {
+        TagEntity tag = new TagEntity("Java");
+        userProfile.getTags().add(tag);
+
+        when(userProfileRepository.findById(userId)).thenReturn(Optional.of(userProfile));
+        when(tagRepository.findByNameIgnoreCase("Java")).thenReturn(Optional.of(tag));
+
+        profileTagService.removeTagFromProfile(userId, "Java");
+
+        assertThat(userProfile.getTags()).doesNotContain(tag);
+        verify(tagRepository, never()).delete(any());
+    }
+
+    @Test
+    void removeTagFromProfile_shouldTrimTagName_whenRemovingTag() {
+        TagEntity tag = new TagEntity("Java");
+        userProfile.getTags().add(tag);
+
+        when(userProfileRepository.findById(userId)).thenReturn(Optional.of(userProfile));
+        when(tagRepository.findByNameIgnoreCase("Java")).thenReturn(Optional.of(tag));
+
+        profileTagService.removeTagFromProfile(userId, "  Java  ");
+
+        assertThat(userProfile.getTags()).doesNotContain(tag);
+        verify(tagRepository).findByNameIgnoreCase("Java");
+        verify(tagRepository, never()).delete(any());
+    }
+
+    @Test
+    void removeTagFromProfile_shouldDoNothing_whenTagDoesNotExist() {
+        when(userProfileRepository.findById(userId)).thenReturn(Optional.of(userProfile));
+        when(tagRepository.findByNameIgnoreCase("Java")).thenReturn(Optional.empty());
+
+        profileTagService.removeTagFromProfile(userId, "Java");
+
+        assertThat(userProfile.getTags()).isEmpty();
+        verify(tagRepository, never()).delete(any());
+    }
+
+    @Test
+    void removeTagFromProfile_shouldThrow_whenUserProfileDoesNotExist() {
+        when(userProfileRepository.findById(userId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> profileTagService.removeTagFromProfile(userId, "Java"))
+                .isInstanceOf(UserProfileNotFoundException.class)
+                .hasMessage("Profile not found for user: " + userId);
+
+        verify(tagRepository, never()).findByNameIgnoreCase(any());
+        verify(tagRepository, never()).delete(any());
+    }
 }

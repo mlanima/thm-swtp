@@ -30,7 +30,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-public class ProjectInviteServiceTest {
+public class ProjectEntityInviteServiceTest {
 
     private ProjectInviteRepository projectInviteRepository;
     private ProjectRepository projectRepository;
@@ -110,7 +110,7 @@ public class ProjectInviteServiceTest {
         verify(projectInviteRepository).save(captor.capture());
 
         ProjectInviteEntity saved =  captor.getValue();
-        assertThat(saved.getProject()).isEqualTo(project);
+        assertThat(saved.getProjectEntity()).isEqualTo(project);
         assertThat(saved.getInvitedUser()).isEqualTo(invitedUser);
         assertThat(saved.getStatus()).isEqualTo(ProjectInviteStatus.PENDING);
     }
@@ -259,7 +259,7 @@ public class ProjectInviteServiceTest {
     private ProjectInviteEntity createPendingInviteEntity() {
         ProjectInviteEntity invite = new ProjectInviteEntity();
         invite.setId(inviteId);
-        invite.setProject(project);
+        invite.setProjectEntity(project);
         invite.setInvitedUser(invitedUser);
         invite.setMessage("Hello, please join my project.");
         invite.setCreatedAt(LocalDateTime.now());
