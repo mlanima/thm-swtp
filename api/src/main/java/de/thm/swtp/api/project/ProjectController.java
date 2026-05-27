@@ -3,10 +3,7 @@ package de.thm.swtp.api.project;
 
 import de.thm.swtp.api.project.dto.request.*;
 import de.thm.swtp.api.project.dto.response.*;
-import de.thm.swtp.api.userprofile.entity.UserProfile;
-import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import lombok.*;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
