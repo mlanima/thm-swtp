@@ -1,9 +1,11 @@
 import { Component, Input } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { ProjectSearchResult } from '../../models/project-search-result.model';
 
 @Component({
   selector: 'app-project-result-card',
   standalone: true,
+  imports: [RouterLink],
   templateUrl: './project-result-card.html',
 })
 export class ProjectResultCard {

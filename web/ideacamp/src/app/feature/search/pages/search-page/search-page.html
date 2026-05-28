@@ -101,7 +101,7 @@
     @if (!isLoading() && !errorMessage()) {
       @if (activeTab() === 'projects' && projects().length > 0) {
         <div class="mt-6 space-y-4">
-          @for (project of projects(); track project.id) {
+          @for (project of projects(); track project.projectUrl) {
             <app-project-result-card [project]="project" />
           }
         </div>

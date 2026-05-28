@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { SearchProject } from './feature/project-search/search-project';
 import {UserProfile} from './feature/user-profile/pages/user-profile/user-profile';
 import {Impressum} from './feature/legal-notice/pages/impressum';
 import {ContactRequests} from './feature/contact-request/pages/contact-requests/contact-requests';
