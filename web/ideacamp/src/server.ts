@@ -12,6 +12,9 @@ const browserDistFolder = join(import.meta.dirname, '../browser');
 const app = express();
 const angularApp = new AngularNodeAppEngine();
 
+// used by Docker HEALTHCHECK
+app.get('/health', (req, res) => res.sendStatus(200));
+
 /**
  * Example Express Rest API endpoints can be defined here.
  * Uncomment and define endpoints as necessary.
