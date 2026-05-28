@@ -42,6 +42,13 @@ public class ProjectController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/by-url/{projectUrl}")
+    public ResponseEntity<ProjectResponse> getProjectByUrl(
+            @PathVariable String projectUrl) {
+        ProjectResponse response = projectService.getProjectByUrl(projectUrl);
+        return ResponseEntity.ok(response);
+    }
+
     @PutMapping("/{projectId}")
     public ResponseEntity<ProjectResponse> editProject(
             @PathVariable UUID projectId,

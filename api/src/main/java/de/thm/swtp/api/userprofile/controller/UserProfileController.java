@@ -1,12 +1,15 @@
 package de.thm.swtp.api.userprofile.controller;
 
 import de.thm.swtp.api.exceptionhandling.exceptions.ProfileAccessDeniedException;
+import de.thm.swtp.api.project.ProjectService;
+import de.thm.swtp.api.project.dto.response.ProjectResponse;
 import de.thm.swtp.api.userprofile.dto.UserProfileRequest;
 import de.thm.swtp.api.userprofile.dto.UserProfileResponse;
 import de.thm.swtp.api.userprofile.mapper.UserProfileMapper;
 import de.thm.swtp.api.userprofile.service.UserProfileService;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,6 +22,7 @@ public class UserProfileController {
 
     private final UserProfileService userProfileService;
     private final UserProfileMapper userProfileMapper;
+    private final ProjectService projectService;
 
     @PostMapping("/api/users/me")
     public UserProfileResponse syncProfile(@AuthenticationPrincipal Jwt jwt) {
@@ -31,6 +35,12 @@ public class UserProfileController {
     @GetMapping("/api/users/{username}/profile")
     public UserProfileResponse getProfile(@PathVariable String username) {
         return userProfileMapper.toResponse(userProfileService.getProfile(username));
+    }
+
+    @GetMapping("/api/users/{username}/projects")
+    public List<ProjectResponse> getProjects(@PathVariable String username, @AuthenticationPrincipal Jwt jwt) {
+        verifyOwnership(username, jwt);
+        return projectService.getProjectsByUsername(username);
     }
 
     @PutMapping("/api/users/{username}/profile")

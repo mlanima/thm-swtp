@@ -3,8 +3,11 @@ spring:
     name: api
 
   datasource:
-    url: jdbc:sqlite:./db/dev.db
+    url: jdbc:sqlite:./db/dev.db?busy_timeout=5000&journal_mode=WAL&foreign_keys=on
     driver-class-name: org.sqlite.JDBC
+    hikari:
+      maximum-pool-size: 1
+      connection-timeout: 30000
 
   jpa:
     database-platform: org.hibernate.community.dialect.SQLiteDialect

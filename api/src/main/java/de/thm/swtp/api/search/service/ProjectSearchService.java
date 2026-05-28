@@ -23,6 +23,7 @@ public class ProjectSearchService {
                         .id(p.getId())
                         .name(p.getName())
                         .description(p.getDescription())
+                        .projectUrl(p.getProjectUrl())
                         .build())
                 .toList();
     }

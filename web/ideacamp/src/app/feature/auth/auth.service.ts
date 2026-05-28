@@ -157,8 +157,10 @@ export class AuthService {
         this.username.set(username);
       }
       const currentUser = this.user();
-      if (currentUser?.username !== username) {
-        this.user.set({ username });
+      const sub = claims?.['sub'];
+      const id = typeof sub === 'string' ? sub : '';
+      if (currentUser?.username !== username || currentUser?.id !== id) {
+        this.user.set({ username, id });
       }
     } else {
       if (this.username() !== '') {
@@ -252,4 +254,5 @@ export class AuthService {
     const oauthService = this.oauthService as OAuthServiceBridge;
     return oauthService.hasValidAccessToken?.() ?? false;
   }
+
 }

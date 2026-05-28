@@ -100,15 +100,15 @@
     <!-- Results -->
     @if (!isLoading() && !errorMessage()) {
       @if (activeTab() === 'projects' && projects().length > 0) {
-        <div class="mt-6 space-y-4">
-          @for (project of projects(); track project.id) {
+        <div class="flex flex-col gap mt-6 space-y-4">
+          @for (project of projects(); track project.projectUrl) {
             <app-project-result-card [project]="project" />
           }
         </div>
       }
 
       @if (activeTab() === 'users' && users().length > 0) {
-        <div class="mt-6 space-y-4">
+        <div class="flex flex-col gap mt-6 space-y-4">
           @for (user of users(); track user.keycloakId) {
             <app-user-result-card [user]="user" />
           }

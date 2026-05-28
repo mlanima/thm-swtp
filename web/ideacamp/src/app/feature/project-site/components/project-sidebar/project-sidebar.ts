@@ -1,14 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
-import { MemberList } from '../member-list/member-list';
 import { TagList } from '../tag-list/tag-list';
-import { Quicklinks } from '../quicklinks/quicklinks';
-import { TechStack } from '../tech-stack/tech-stack';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [MemberList, TagList, Quicklinks, TechStack],
+  imports: [TagList,],
   templateUrl: './project-sidebar.html'
 })
-export class ProjectSidebar {}
+export class ProjectSidebar {
+  @Input({ required: true }) projectId?: string;
+  @Input() isOwner = false;
+}

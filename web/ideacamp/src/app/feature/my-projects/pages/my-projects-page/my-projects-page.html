@@ -1,0 +1,67 @@
+<section class="min-h-screen bg-slate-100 px-6 py-8 text-slate-700">
+  <div class="mx-auto max-w-6xl">
+    <header class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+      <h1 class="text-4xl font-bold text-slate-700">Meine Projekte</h1>
+      <a
+        routerLink="/createProject"
+        class="inline-flex items-center justify-center rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-900">
+        Projekt erstellen
+      </a>
+    </header>
+
+    @if (isLoading()) {
+      <div class="mt-8 rounded-2xl border border-slate-200 bg-white px-6 py-12 text-center shadow-sm">
+        <p class="text-sm text-slate-500">Deine Projekte werden geladen…</p>
+      </div>
+    } @else if (errorMessage()) {
+      <div class="mt-8 rounded-2xl border border-red-200 bg-red-50 px-6 py-12 text-center shadow-sm">
+        <p class="text-sm font-medium text-red-700">{{ errorMessage() }}</p>
+      </div>
+    } @else if (projects().length === 0) {
+      <div class="mt-8 rounded-2xl border border-slate-200 bg-white px-6 py-12 text-center shadow-sm">
+        <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-slate-500">
+          <i class="pi pi-folder text-2xl"></i>
+        </div>
+        <h2 class="mt-5 text-2xl font-semibold text-slate-700">Noch keine Projekte</h2>
+        <p class="mt-2 text-sm text-slate-500">
+          Sobald du dein erstes Projekt erstellst, erscheint es hier.
+        </p>
+      </div>
+    } @else {
+      <div class="mt-8 grid gap-4">
+        @for (project of projects(); track project.id) {
+          <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:border-slate-300 hover:shadow-md">
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div class="space-y-2">
+                <div class="flex flex-wrap items-center gap-2">
+                  <h2 class="text-xl font-semibold text-slate-700">{{ project.name }}</h2>
+                  <span class="rounded-full px-2.5 py-1 text-xs font-medium"
+                        [class.bg-emerald-100]="!project.isPrivateProject"
+                        [class.text-emerald-700]="!project.isPrivateProject"
+                        [class.bg-amber-100]="project.isPrivateProject"
+                        [class.text-amber-700]="project.isPrivateProject">
+                    {{ project.isPrivateProject ? 'Privat' : 'Öffentlich' }}
+                  </span>
+                </div>
+
+                <p class="max-w-3xl text-sm leading-6 text-slate-500">
+                  {{ project.description || 'Keine Beschreibung vorhanden.' }}
+                </p>
+
+                <p class="text-xs text-slate-400">URL: /project/{{ project.projectUrl }}</p>
+              </div>
+
+              <a
+                [routerLink]="['/project', project.projectUrl]"
+                class="inline-flex items-center justify-center rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
+                Projekt öffnen
+              </a>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  </div>
+</section>
+
+

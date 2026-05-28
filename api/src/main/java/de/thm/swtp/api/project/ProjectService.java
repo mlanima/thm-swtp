@@ -12,7 +12,6 @@ import lombok.*;
 import java.util.*;
 import java.time.*;
 
-
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,6 +20,22 @@ public class ProjectService {
 
     private final ProjectRepository projectRepository;
     private final UserProfileRepository userProfileRepository;
+
+    private ProjectResponse toResponse(ProjectEntity project) {
+        return ProjectResponse.builder()
+                .id(project.getId())
+                .name(project.getName())
+                .description(project.getDescription())
+                .projectUrl(project.getProjectUrl())
+                .isPrivateProject(project.isPrivateProject())
+                .ownerId(project.getOwner().getKeycloakId())
+                .memberIds(project.getMembers().stream()
+                        .map(UserProfile::getKeycloakId)
+                        .collect(java.util.stream.Collectors.toSet()))
+                .createdAt(project.getCreatedAt())
+                .updatedAt(project.getUpdatedAt())
+                .build();
+    }
 
     public ProjectResponse createProject(CreateProjectRequest request, String username) {
 
@@ -32,8 +47,10 @@ public class ProjectService {
                 .orElseThrow(() -> new RuntimeException("User profile not found for username: " + username));
 
 
+        Set<UUID> memberIds = Optional.ofNullable(request.memberIds()).orElseGet(Collections::emptySet);
+
         List<UserProfile> members = new ArrayList<>(
-                userProfileRepository.findAllById(request.memberIds())
+                userProfileRepository.findAllById(memberIds)
         );
 
 
@@ -49,17 +66,7 @@ public class ProjectService {
         ProjectEntity saved = projectRepository.save(project);
 
 
-        return ProjectResponse.builder()
-                .id(saved.getId())
-                .name(saved.getName())
-                .description(saved.getDescription())
-                .projectUrl(saved.getProjectUrl())
-                .isPrivateProject(saved.isPrivateProject())
-                .ownerId(saved.getOwner().getKeycloakId())
-                .memberIds(request.memberIds())
-                .createdAt(saved.getCreatedAt())
-                .updatedAt(saved.getUpdatedAt())
-                .build();
+        return toResponse(saved);
     }
 
     public DeleteProjectResponse deleteProject(UUID projectId, String username) {
@@ -94,21 +101,23 @@ public class ProjectService {
             throw new ExceptionProjectAlreadyDeleted(projectId);
         }
 
-        return ProjectResponse.builder()
-                .id(project.getId())
-                .name(project.getName())
-                .description(project.getDescription())
-                .projectUrl(project.getProjectUrl())
-                .isPrivateProject(project.isPrivateProject())
-                .ownerId(project.getOwner().getKeycloakId())
-                .memberIds(project.getMembers().stream()
-                        .map(m -> m.getKeycloakId())
-                        .collect(java.util.stream.Collectors.toSet()))
-                .createdAt(project.getCreatedAt())
-                .updatedAt(project.getUpdatedAt())
-                .build();
+        return toResponse(project);
     }
 
+    @Transactional
+    public ProjectResponse getProjectByUrl(String projectUrl) {
+
+        ProjectEntity project = projectRepository.findByProjectUrl(projectUrl)
+                .orElseThrow(() -> new RuntimeException("Kein Projekt mit der URL " + projectUrl + " gefunden."));
+
+        if (project.getDeletedAt() != null) {
+            throw new ExceptionProjectAlreadyDeleted(project.getId());
+        }
+
+        return toResponse(project);
+    }
+
+    @Transactional
     public ProjectResponse editProject(UUID projectId, UpdateProjectRequest request, String username) {
 
         ProjectEntity project = projectRepository.findById(projectId)
@@ -142,20 +151,14 @@ public class ProjectService {
 
         ProjectEntity saved = projectRepository.save(project);
 
-        return ProjectResponse.builder()
-                .id(saved.getId())
-                .name(saved.getName())
-                .description(saved.getDescription())
-                .projectUrl(saved.getProjectUrl())
-                .isPrivateProject(saved.isPrivateProject())
-                .ownerId(saved.getOwner().getKeycloakId())
-                .memberIds(saved.getMembers().stream()
-                        .map(m -> m.getKeycloakId())
-                        .collect(java.util.stream.Collectors.toSet()))
-                .createdAt(saved.getCreatedAt())
-                .updatedAt(saved.getUpdatedAt())
-                .build();
+        return toResponse(saved);
+    }
+
+    @Transactional
+    public List<ProjectResponse> getProjectsByUsername(String username) {
+        return projectRepository.findAllByOwnerUsernameAndDeletedAtIsNullOrderByCreatedAtDesc(username)
+                .stream()
+                .map(this::toResponse)
+                .toList();
     }
 }
-
-

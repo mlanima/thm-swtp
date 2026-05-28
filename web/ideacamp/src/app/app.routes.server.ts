@@ -23,12 +23,17 @@ export const serverRoutes: ServerRoute[] = [
   },
 
   {
-    path: 'project',
+    path: 'project/:id',
     renderMode: RenderMode.Client,
   },
 
   {
     path: 'success',
+    renderMode: RenderMode.Client,
+  },
+
+  {
+    path: 'my-projects',
     renderMode: RenderMode.Client,
   },
 
