@@ -1,6 +1,5 @@
 package de.thm.swtp.api.projectJoinRequest.repository;
 
-import de.thm.swtp.api.projectJoinRequest.domain.ProjectJoinRequest;
 import de.thm.swtp.api.projectJoinRequest.domain.ProjectJoinRequestStatus;
 import de.thm.swtp.api.projectJoinRequest.entity.ProjectJoinRequestEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

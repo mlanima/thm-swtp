@@ -4,10 +4,7 @@ import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.projectJoinRequest.domain.ProjectJoinRequestStatus;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -18,6 +15,7 @@ import java.util.UUID;
 @Table(name="project_join_requests")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProjectJoinRequestEntity {
@@ -58,7 +56,9 @@ public class ProjectJoinRequestEntity {
     /** Automatically sets the creation date and the status to pending when creating the entity. */
     @PrePersist
     protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now();
+        this.createdAt = now;
+        this.updatedAt = now;
 
         if(this.status == null) {
             this.status = ProjectJoinRequestStatus.PENDING;
