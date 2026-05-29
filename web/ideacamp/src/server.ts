@@ -10,9 +10,14 @@ import { join } from 'node:path';
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
-const angularApp = new AngularNodeAppEngine();
+const angularApp = new AngularNodeAppEngine({
+    trustProxyHeaders: ['x-forwarded-server',
+                        'x-forwarded-for',
+                        'x-forwarded-host',
+                        'x-forwarded-port',
+                        'x-forwarded-proto'],         // required to work behind reverse proxy (prod-env)
+});
 
-app.set('trust proxy', true);                          // required to work behind reverse proxy (prod-env)
 app.get('/health', (req, res) => res.sendStatus(200)); // used by Docker HEALTHCHECK
 
 /**
