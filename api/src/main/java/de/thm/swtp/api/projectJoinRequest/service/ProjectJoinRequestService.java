@@ -1,6 +1,8 @@
 package de.thm.swtp.api.projectJoinRequest.service;
 
+import de.thm.swtp.api.exceptionhandling.exceptions.ProjectJoinRequestAccessDeniedException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectJoinRequestAlreadyExistsException;
+import de.thm.swtp.api.exceptionhandling.exceptions.ProjectJoinRequestNotFoundException;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
 import de.thm.swtp.api.project.exception.ProjectNotFoundException;
@@ -14,6 +16,7 @@ import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.EnumSet;
 import java.util.UUID;
@@ -31,6 +34,7 @@ public class ProjectJoinRequestService {
      *  Join-request can only be created when the project and the user exist and
      *  when there are no further active join requests for the same project and user.
      */
+    @Transactional
     public ProjectJoinRequest createProjectJoinRequest(UUID projectId, UUID currentUserId, String message){
         ProjectEntity projectEntity = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException(projectId));
@@ -39,7 +43,7 @@ public class ProjectJoinRequestService {
                 .orElseThrow(() -> new UserProfileNotFoundException(currentUserId.toString()));
 
         if(hasActiveRequests(projectId,currentUserId)){
-            throw new ProjectJoinRequestAlreadyExistsException("A join request has already been created for the project: " + projectId);
+            throw new ProjectJoinRequestAlreadyExistsException(projectId);
         }
 
         ProjectJoinRequestEntity joinRequestEntity = ProjectJoinRequestEntity.builder()
@@ -52,10 +56,40 @@ public class ProjectJoinRequestService {
         return ProjectJoinRequestMapper.toDomain(saved);
     }
 
+    @Transactional
+    public ProjectJoinRequest acceptJoinRequest(UUID requestId, UUID currentUserId){
+        ProjectJoinRequestEntity joinRequestEntity = projectJoinRequestRepository.findById(requestId)
+                .orElseThrow(() -> new ProjectJoinRequestNotFoundException(requestId));
+
+        ProjectEntity projectEntity = joinRequestEntity.getProject();
+
+        checkProjectOwner(projectEntity, currentUserId);
+
+        if(joinRequestEntity.getStatus() !=  ProjectJoinRequestStatus.PENDING){
+            throw new IllegalStateException("Only a pending join-request can be accepted.");
+        }
+
+        joinRequestEntity.setStatus(ProjectJoinRequestStatus.ACCEPTED);
+
+        projectEntity.getMembers().add(joinRequestEntity.getRequestingUser());
+        ProjectJoinRequestEntity saved = projectJoinRequestRepository.save(joinRequestEntity);
+
+        return ProjectJoinRequestMapper.toDomain(saved);
+
+    }
+
 
     private boolean hasActiveRequests(UUID projectId, UUID currentUserId) {
         EnumSet<ProjectJoinRequestStatus> activeRequestStates = EnumSet.of(ProjectJoinRequestStatus.PENDING, ProjectJoinRequestStatus.ACCEPTED);
         return projectJoinRequestRepository.existsByProjectIdAndRequestingUserKeycloakIdAndStatusIn(projectId, currentUserId, activeRequestStates);
 
+    }
+
+    private void checkProjectOwner(ProjectEntity projectEntity, UUID currentUserId) {
+        UUID ownerId = projectEntity.getOwner().getKeycloakId();
+
+        if(!ownerId.equals(currentUserId)){
+            throw new ProjectJoinRequestAccessDeniedException("Only the project owner is allowed to manage join-requests.");
+        }
     }
 }

@@ -16,17 +16,27 @@ import java.util.UUID;
 /** REST controller for managing project join requests. */
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/projects/{projectId}/join-requests")
+@RequestMapping("/api/v1")
 public class ProjectJoinRequestController {
     private final ProjectJoinRequestService projectJoinRequestService;
 
     /** Creates a join request to the given project for the given authenticated user. */
-    @PostMapping
+    @PostMapping("/projects/{projectId}/join-requests")
     public ProjectJoinRequestResponse createProjectJoinRequest(@PathVariable UUID projectId,
                                                                @Valid @RequestBody CreateProjectJoinRequestRequest request,
                                                                @AuthenticationPrincipal Jwt jwt) {
-        UUID currentUserId = UUID.fromString(jwt.getClaim("userId"));
+        UUID currentUserId = UUID.fromString(jwt.getSubject());
         ProjectJoinRequest joinRequest = projectJoinRequestService.createProjectJoinRequest(projectId,currentUserId, request.message());
+
+        return ProjectJoinRequestResponse.toResponse(joinRequest);
+    }
+
+
+    @PatchMapping("/project-join-requests/{requestId}/accept")
+    public ProjectJoinRequestResponse acceptJoinRequest(@PathVariable UUID requestId, @AuthenticationPrincipal Jwt jwt) {
+        UUID currentUser = UUID.fromString(jwt.getSubject());
+
+        ProjectJoinRequest joinRequest = projectJoinRequestService.acceptJoinRequest(requestId, currentUser);
 
         return ProjectJoinRequestResponse.toResponse(joinRequest);
     }
