@@ -32,6 +32,7 @@ public class ProjectJoinRequestController {
     }
 
 
+    /** Updates a join-request and sets its status to accepted. Only the project owner is allowed to accept the request. */
     @PatchMapping("/project-join-requests/{requestId}/accept")
     public ProjectJoinRequestResponse acceptJoinRequest(@PathVariable UUID requestId, @AuthenticationPrincipal Jwt jwt) {
         UUID currentUser = UUID.fromString(jwt.getSubject());
