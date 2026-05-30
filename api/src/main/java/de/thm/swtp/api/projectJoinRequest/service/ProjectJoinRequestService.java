@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.EnumSet;
+import java.util.List;
 import java.util.UUID;
 
 /** Service for managing project join-requests. */
@@ -61,7 +62,7 @@ public class ProjectJoinRequestService {
      * Only possible for the project owner.
      * The user, who created the join-request, is added as a member of the given project. */
     @Transactional
-    public ProjectJoinRequest acceptJoinRequest(UUID requestId, UUID currentUserId){
+    public ProjectJoinRequest acceptProjectJoinRequest(UUID requestId, UUID currentUserId){
         ProjectJoinRequestEntity joinRequestEntity = projectJoinRequestRepository.findById(requestId)
                 .orElseThrow(() -> new ProjectJoinRequestNotFoundException(requestId));
 
@@ -86,7 +87,7 @@ public class ProjectJoinRequestService {
      * Only possible for the project owner
      * The user, who created the join-request, is removed as a member  of the given project. */
     @Transactional
-    public ProjectJoinRequest rejectJoinRequest(UUID requestId, UUID currentUserId){
+    public ProjectJoinRequest rejectProjectJoinRequest(UUID requestId, UUID currentUserId){
         ProjectJoinRequestEntity joinRequestEntity = projectJoinRequestRepository.findById(requestId)
                 .orElseThrow(() -> new ProjectJoinRequestNotFoundException(requestId));
 
@@ -102,6 +103,31 @@ public class ProjectJoinRequestService {
         ProjectJoinRequestEntity saved = projectJoinRequestRepository.save(joinRequestEntity);
 
         return ProjectJoinRequestMapper.toDomain(saved);
+    }
+
+
+    /** Returns all join-requests for a given project.
+     * Only the project owner is allowed to get the join-requests for his project. */
+    @Transactional
+    public List<ProjectJoinRequest> getProjectJoinRequestsForProject(UUID projectId, UUID currentUserId){
+        ProjectEntity projectEntity = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException(projectId));
+
+        checkProjectOwner(projectEntity, currentUserId);
+
+        return projectJoinRequestRepository.findByProjectId(projectId)
+                .stream()
+                .map(ProjectJoinRequestMapper::toDomain)
+                .toList();
+    }
+
+    /** Returns all join-requests sent by the given user.*/
+    @Transactional
+    public List<ProjectJoinRequest> getProjectJoinRequestsFromUser(UUID currentUserId){
+        return projectJoinRequestRepository.findByRequestingUserKeycloakId(currentUserId)
+                .stream()
+                .map(ProjectJoinRequestMapper::toDomain)
+                .toList();
     }
 
 

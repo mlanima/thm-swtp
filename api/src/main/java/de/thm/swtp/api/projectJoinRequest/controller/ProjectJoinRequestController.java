@@ -11,6 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 /** REST controller for managing project join requests. */
@@ -19,6 +20,31 @@ import java.util.UUID;
 @RequestMapping("/api/v1")
 public class ProjectJoinRequestController {
     private final ProjectJoinRequestService projectJoinRequestService;
+
+
+    /** Returns all join-requests for the given project. */
+    @GetMapping("/projects{projectId}/join-requests")
+    public List<ProjectJoinRequestResponse> getProjectJoinRequestsForProject(@PathVariable UUID projectId, @AuthenticationPrincipal Jwt jwt) {
+        UUID currentUserId = UUID.fromString(jwt.getSubject());
+
+        return projectJoinRequestService.getProjectJoinRequestsForProject(projectId, currentUserId)
+                .stream()
+                .map(ProjectJoinRequestResponse::toResponse)
+                .toList();
+    }
+
+    /** Returns all join-requests sent by the given user. */
+    @GetMapping("/project-join-requests/me")
+    public List<ProjectJoinRequestResponse> getOwnProjectJoinRequests(@AuthenticationPrincipal Jwt jwt) {
+        UUID currentUserId = UUID.fromString(jwt.getSubject());
+
+        return projectJoinRequestService.getProjectJoinRequestsFromUser(currentUserId)
+                .stream()
+                .map(ProjectJoinRequestResponse::toResponse)
+                .toList();
+    }
+
+
 
     /** Creates a join request to the given project for the given authenticated user. */
     @PostMapping("/projects/{projectId}/join-requests")
@@ -34,20 +60,20 @@ public class ProjectJoinRequestController {
 
     /** Updates a join-request and sets its status to accepted. Only the project owner is allowed to accept the request. */
     @PatchMapping("/project-join-requests/{requestId}/accept")
-    public ProjectJoinRequestResponse acceptJoinRequest(@PathVariable UUID requestId, @AuthenticationPrincipal Jwt jwt) {
+    public ProjectJoinRequestResponse acceptProjectJoinRequest(@PathVariable UUID requestId, @AuthenticationPrincipal Jwt jwt) {
         UUID currentUser = UUID.fromString(jwt.getSubject());
 
-        ProjectJoinRequest joinRequest = projectJoinRequestService.acceptJoinRequest(requestId, currentUser);
+        ProjectJoinRequest joinRequest = projectJoinRequestService.acceptProjectJoinRequest(requestId, currentUser);
 
         return ProjectJoinRequestResponse.toResponse(joinRequest);
     }
 
     /** Updates a join-request and sets its status to rejected. Only the project owner is allowed to reject the request. */
     @PatchMapping("/project-join-requests/{requestId}/reject")
-    public ProjectJoinRequestResponse rejectJoinRequest(@PathVariable UUID requestId, @AuthenticationPrincipal Jwt jwt) {
+    public ProjectJoinRequestResponse rejectProjectJoinRequest(@PathVariable UUID requestId, @AuthenticationPrincipal Jwt jwt) {
         UUID currentUser = UUID.fromString(jwt.getSubject());
 
-        ProjectJoinRequest joinRequest = projectJoinRequestService.rejectJoinRequest(requestId, currentUser);
+        ProjectJoinRequest joinRequest = projectJoinRequestService.rejectProjectJoinRequest(requestId, currentUser);
         return ProjectJoinRequestResponse.toResponse(joinRequest);
     }
 }

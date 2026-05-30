@@ -19,7 +19,4 @@ public interface ProjectJoinRequestRepository extends JpaRepository<ProjectJoinR
 
     /** Returns a list of all join-requests from a given user. */
     List<ProjectJoinRequestEntity> findByRequestingUserKeycloakId(UUID requestingUserKeycloakId);
-
-    /** Returns a list of all join-requests to the given project from the given user. */
-    List<ProjectJoinRequestEntity> findByProjectIdAndRequestingUserKeycloakId(UUID projectId, UUID requestingUserKeycloakId);
 }
