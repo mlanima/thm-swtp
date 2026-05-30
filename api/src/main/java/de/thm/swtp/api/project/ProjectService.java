@@ -49,7 +49,7 @@ public class ProjectService {
 
         Set<UUID> memberIds = Optional.ofNullable(request.memberIds()).orElseGet(Collections::emptySet);
 
-        List<UserProfile> members = new ArrayList<>(
+        Set<UserProfile> members = new HashSet<>(
                 userProfileRepository.findAllById(memberIds)
         );
 
