@@ -41,4 +41,13 @@ public class ProjectJoinRequestController {
 
         return ProjectJoinRequestResponse.toResponse(joinRequest);
     }
+
+    /** Updates a join-request and sets its status to rejected. Only the project owner is allowed to reject the request. */
+    @PatchMapping("/project-join-requests/{requestId}/reject")
+    public ProjectJoinRequestResponse rejectJoinRequest(@PathVariable UUID requestId, @AuthenticationPrincipal Jwt jwt) {
+        UUID currentUser = UUID.fromString(jwt.getSubject());
+
+        ProjectJoinRequest joinRequest = projectJoinRequestService.rejectJoinRequest(requestId, currentUser);
+        return ProjectJoinRequestResponse.toResponse(joinRequest);
+    }
 }

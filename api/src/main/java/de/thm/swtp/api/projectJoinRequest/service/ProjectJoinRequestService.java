@@ -59,7 +59,7 @@ public class ProjectJoinRequestService {
 
     /** Updates the status of a project join-request to accepted.
      * Only possible for the project owner.
-     * The user, who created the join-request, is added as a members of the given project. */
+     * The user, who created the join-request, is added as a member of the given project. */
     @Transactional
     public ProjectJoinRequest acceptJoinRequest(UUID requestId, UUID currentUserId){
         ProjectJoinRequestEntity joinRequestEntity = projectJoinRequestRepository.findById(requestId)
@@ -82,6 +82,9 @@ public class ProjectJoinRequestService {
 
     }
 
+    /** Updates the status of a project join-request to rejected.
+     * Only possible for the project owner
+     * The user, who created the join-request, is removed as a member  of the given project. */
     @Transactional
     public ProjectJoinRequest rejectJoinRequest(UUID requestId, UUID currentUserId){
         ProjectJoinRequestEntity joinRequestEntity = projectJoinRequestRepository.findById(requestId)
@@ -99,7 +102,7 @@ public class ProjectJoinRequestService {
 
         projectEntity.getMembers().remove(joinRequestEntity.getRequestingUser());
         ProjectJoinRequestEntity saved = projectJoinRequestRepository.save(joinRequestEntity);
-        
+
         return ProjectJoinRequestMapper.toDomain(saved);
     }
 
