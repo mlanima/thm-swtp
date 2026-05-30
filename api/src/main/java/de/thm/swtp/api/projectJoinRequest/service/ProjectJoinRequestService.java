@@ -2,6 +2,7 @@ package de.thm.swtp.api.projectJoinRequest.service;
 
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectJoinRequestAccessDeniedException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectJoinRequestAlreadyExistsException;
+import de.thm.swtp.api.exceptionhandling.exceptions.ProjectJoinRequestInvalidStatusForEditException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectJoinRequestNotFoundException;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
@@ -69,7 +70,7 @@ public class ProjectJoinRequestService {
         checkProjectOwner(projectEntity, currentUserId);
 
         if(joinRequestEntity.getStatus() !=  ProjectJoinRequestStatus.PENDING){
-            throw new IllegalStateException("Only a pending join-request can be accepted.");
+            throw new ProjectJoinRequestInvalidStatusForEditException("Only a pending join-request can be accepted.");
         }
 
         joinRequestEntity.setStatus(ProjectJoinRequestStatus.ACCEPTED);
@@ -79,6 +80,27 @@ public class ProjectJoinRequestService {
 
         return ProjectJoinRequestMapper.toDomain(saved);
 
+    }
+
+    @Transactional
+    public ProjectJoinRequest rejectJoinRequest(UUID requestId, UUID currentUserId){
+        ProjectJoinRequestEntity joinRequestEntity = projectJoinRequestRepository.findById(requestId)
+                .orElseThrow(() -> new ProjectJoinRequestNotFoundException(requestId));
+
+        ProjectEntity projectEntity = joinRequestEntity.getProject();
+
+        checkProjectOwner(projectEntity, currentUserId);
+
+        if(joinRequestEntity.getStatus() !=  ProjectJoinRequestStatus.PENDING){
+            throw new ProjectJoinRequestInvalidStatusForEditException("Only a pending join-request can be rejected.");
+        }
+
+        joinRequestEntity.setStatus(ProjectJoinRequestStatus.REJECTED);
+
+        projectEntity.getMembers().remove(joinRequestEntity.getRequestingUser());
+        ProjectJoinRequestEntity saved = projectJoinRequestRepository.save(joinRequestEntity);
+        
+        return ProjectJoinRequestMapper.toDomain(saved);
     }
 
 
