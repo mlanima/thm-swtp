@@ -99,8 +99,6 @@ public class ProjectJoinRequestService {
         }
 
         joinRequestEntity.setStatus(ProjectJoinRequestStatus.REJECTED);
-
-        projectEntity.getMembers().remove(joinRequestEntity.getRequestingUser());
         ProjectJoinRequestEntity saved = projectJoinRequestRepository.save(joinRequestEntity);
 
         return ProjectJoinRequestMapper.toDomain(saved);
