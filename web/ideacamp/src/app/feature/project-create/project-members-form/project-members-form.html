@@ -131,7 +131,7 @@
             </div>
           }
 
-          @if (isSearchFinished && !isSearching && searchQuery.trim() && searchResults.length === 0) {
+          @if (hasSearched && !isSearching && searchQuery.trim().length >= 2 && searchResults.length === 0) {
             <div class="rounded-lg bg-slate-50 px-4 py-8 text-center">
               <p class="text-sm text-slate-500">
                 No users found matching "{{ searchQuery }}"

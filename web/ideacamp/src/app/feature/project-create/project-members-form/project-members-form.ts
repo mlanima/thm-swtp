@@ -5,6 +5,7 @@ import {FormsModule } from '@angular/forms'
 import { ProjectInviteMember } from '../../../models/project-invite-member.model'
 import { SearchService } from '../../search/services/search.service'
 import {UserSearchResult} from '../../search/models/user-search-result.model'
+import {UserProfileService} from '../../../services/user-profile.service'
 
 
 @Component({
@@ -20,6 +21,9 @@ export class ProjectMembersForm implements OnChanges, OnDestroy {
   private readonly searchService = inject(SearchService);
   private readonly searchTerms = new Subject<string>();
   private readonly searchSubscription: Subscription;
+  private readonly userProfileService = inject(UserProfileService);
+  currentUserKeycloakId: string | null = null;
+
 
 
   @Input() initialMembers: ProjectInviteMember[] = [];
@@ -31,20 +35,28 @@ export class ProjectMembersForm implements OnChanges, OnDestroy {
   isMemberDialogOpen = false;
   searchQuery = '';
   isSearching = false;
-  isSearchFinished = false;
-
+  hasSearched = false;
   searchResults : UserSearchResult[] = [];
   selectedUser : UserSearchResult | null = null;
 
 
   constructor(){
-    this.searchSubscription = this.searchTerms.pipe(debounceTime(300), distinctUntilChanged(), switchMap(query => {
+    this.userProfileService.getMyProfile().subscribe({
+      next : profile => {
+        this.currentUserKeycloakId = profile.keycloakId;
+      },
+      error: () => {
+        this.currentUserKeycloakId = null;
+      },
+    });
+
+    this.searchSubscription = this.searchTerms.pipe(debounceTime(250), distinctUntilChanged(), switchMap(query => {
         const cleanedQuery = query.trim();
         this.selectedUser = null;
         this.searchResults = [];
-        this.isSearchFinished = cleanedQuery.length > 0;
+        this.hasSearched = cleanedQuery.length > 0;
 
-        if(!cleanedQuery){
+        if(cleanedQuery.length < 2){
           this.isSearching = false;
           return of([]);
         }
@@ -57,8 +69,12 @@ export class ProjectMembersForm implements OnChanges, OnDestroy {
           })
         );
       })
-    ).subscribe(users => {
-      this.searchResults = users;
+    ).subscribe((users : UserSearchResult[]) => {
+      const cleanedQuery = this.searchQuery.trim().toLowerCase();
+      this.searchResults = users.filter(user =>
+        user.keycloakId !== this.currentUserKeycloakId &&
+        user.username.toLowerCase().includes(cleanedQuery)
+      )
     });
   }
 
@@ -77,7 +93,7 @@ export class ProjectMembersForm implements OnChanges, OnDestroy {
     this.searchQuery = '';
     this.searchResults = [];
     this.selectedUser = null;
-    this.isSearchFinished = false;
+    this.hasSearched = false;
     this.isSearching = false;
   }
 
@@ -86,7 +102,7 @@ export class ProjectMembersForm implements OnChanges, OnDestroy {
     this.searchQuery = '';
     this.searchResults = [];
     this.selectedUser = null;
-    this.isSearchFinished = false;
+    this.hasSearched = false;
     this.isSearching = false;
   }
 
