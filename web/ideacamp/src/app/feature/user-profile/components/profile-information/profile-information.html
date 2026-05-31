@@ -9,7 +9,9 @@
     {{ text }}
   </p>
 
-  <div class="absolute bottom-4 right-4">
-    <app-edit-button (click)="edit.emit()"></app-edit-button>
-  </div>
+  @if (isOwnProfile) {
+    <div class="absolute bottom-4 right-4">
+      <app-edit-button (click)="edit.emit()"></app-edit-button>
+    </div>
+  }
 </section>

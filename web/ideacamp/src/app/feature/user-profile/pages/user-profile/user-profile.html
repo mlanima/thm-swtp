@@ -22,10 +22,11 @@
       } @else if (state.profile) {
         <app-profile-banner
           [profile]="state.profile"
+          [isOwnProfile]="isOwner"
           (edit)="openBannerEditModal(state.profile)">
         </app-profile-banner>
 
-        @if (isBannerModalOpen) {
+        @if (isBannerModalOpen && isOwner) {
           <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
             <div class="relative w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
               <button
@@ -90,7 +91,7 @@
           </div>
         }
 
-        @if (editingSection === 'about') {
+        @if (isOwner && editingSection === 'about') {
           <section class="rounded-xl bg-white p-6 shadow-lg">
             <h2 class="mb-5 text-xl font-bold text-slate-800">
               Edit About
@@ -128,11 +129,12 @@
           <app-profile-information
             title="About"
             [text]="state.profile.about || 'No description.'"
+            [isOwnProfile]="isOwner"
             (edit)="startEditing(state.profile, 'about')">
           </app-profile-information>
         }
 
-        @if (editingSection === 'experience') {
+        @if (isOwner && editingSection === 'experience') {
           <section class="rounded-xl bg-white p-6 shadow-lg">
             <h2 class="mb-5 text-xl font-bold text-slate-800">
               Edit Experience
@@ -170,6 +172,7 @@
           <app-profile-information
             title="Experience"
             [text]="state.profile.experience || 'No experience.'"
+            [isOwnProfile]="isOwner"
             (edit)="startEditing(state.profile, 'experience')">
           </app-profile-information>
         }

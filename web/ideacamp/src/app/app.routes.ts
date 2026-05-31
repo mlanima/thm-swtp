@@ -14,7 +14,7 @@ export const routes: Routes = [
   {path: '', redirectTo: 'impressum', pathMatch: 'full' },
   {path: 'success', component: SuccessComponent},
   {path: 'impressum',component: Impressum},
-  {path: 'profile', component: UserProfile, canActivate: [authGuard]},
+  {path: 'profiles/:username', component: UserProfile, canActivate: [authGuard]},
   {path:'contact-requests', component: ContactRequests, canActivate: [authGuard]},
   {path: 'project/:projectUrl',component: ProjectSite, canActivate: [authGuard]},
   {path: 'contact-requests', component: ContactRequests, canActivate: [authGuard]},
