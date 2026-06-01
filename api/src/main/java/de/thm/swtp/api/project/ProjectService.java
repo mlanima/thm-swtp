@@ -4,6 +4,7 @@ package de.thm.swtp.api.project;
 import de.thm.swtp.api.project.dto.request.*;
 import de.thm.swtp.api.project.dto.response.*;
 import de.thm.swtp.api.project.exception.*;
+import de.thm.swtp.api.projectFavorite.repository.ProjectFavoriteRepository;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 
@@ -20,6 +21,7 @@ public class ProjectService {
 
     private final ProjectRepository projectRepository;
     private final UserProfileRepository userProfileRepository;
+    private final ProjectFavoriteRepository projectFavoriteRepository;
 
     private ProjectResponse toResponse(ProjectEntity project) {
         return ProjectResponse.builder()
@@ -69,6 +71,7 @@ public class ProjectService {
         return toResponse(saved);
     }
 
+    @Transactional
     public DeleteProjectResponse deleteProject(UUID projectId, String username) {
 
         ProjectEntity project = projectRepository.findById(projectId)
@@ -83,6 +86,7 @@ public class ProjectService {
 
 
 
+        projectFavoriteRepository.deleteByProjectId(projectId);
         project.setDeletedAt(LocalDateTime.now());
         projectRepository.save(project);
 
