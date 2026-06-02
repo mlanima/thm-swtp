@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, RouterLink} from '@angular/router';
 import{CommonModule} from '@angular/common';
 import{FormsModule} from '@angular/forms';
 import {ProjectService} from './project.service';
@@ -13,7 +13,7 @@ import {AuthService} from '../auth/auth.service';
 @Component({
   selector: 'app-project-site',
   standalone: true,
-  imports: [ProjectHeader, InfoCard, ProjectSidebar, FormsModule, CommonModule],
+  imports: [ProjectHeader, InfoCard, ProjectSidebar, FormsModule, CommonModule, RouterLink],
   templateUrl: './project-site.html',
 })
 export class ProjectSite  implements OnInit {
