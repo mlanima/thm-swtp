@@ -1,12 +1,10 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
-type UUID = string;
-
 type SettingsTab = 'join-requests' | 'members' | 'privacy' | 'danger-zone';
 
 interface JoinRequest {
-  id: UUID;
+  id: string;
   name: string;
   email: string;
   initials: string;
@@ -16,7 +14,7 @@ interface JoinRequest {
 }
 
 interface ProjectMember {
-  id: UUID;
+  id: string;
   name: string;
   email: string;
   initials: string;
@@ -133,7 +131,7 @@ export class ProjectSettings {
   /**
    * Approves a join request and removes it from the pending request list
    */
-  protected approveJoinRequest(requestId: UUID): void {
+  protected approveJoinRequest(requestId: string): void {
     this.joinRequests.update((requests) =>
       requests.filter((request) => request.id !== requestId),
     );
@@ -143,7 +141,7 @@ export class ProjectSettings {
   /**
    * Declines a join request and removes it from the pending request list
    */
-  protected declineJoinRequest(requestId: UUID): void {
+  protected declineJoinRequest(requestId: string): void {
     this.joinRequests.update((requests) =>
       requests.filter((request) => request.id !== requestId),
     );
