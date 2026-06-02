@@ -72,20 +72,17 @@ export class ProjectCreate {
     this.previousStep();
   }
 
-
+  /** Saves the added members from the member-form and goes to the next wizard step.*/
   saveMembersAndContinue(members: ProjectInviteMember[]) {
     this.invitedMembers = members;
     this.nextStep();
   }
 
+  /** Saves the added members from the member-form and goes back to the previous wizard step.*/
   saveMembersAndBack(members: ProjectInviteMember[]) {
     this.invitedMembers = members;
     this.previousStep();
   }
-
-
-
-
 
   /** Validates the collected project data before creating the project.*/
   finishProjectCreation() {

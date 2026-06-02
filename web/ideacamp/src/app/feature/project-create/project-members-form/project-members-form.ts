@@ -36,11 +36,107 @@ export class ProjectMembersForm implements OnChanges, OnDestroy {
   searchQuery = '';
   isSearching = false;
   hasSearched = false;
+
   searchResults : UserSearchResult[] = [];
   selectedUser : UserSearchResult | null = null;
 
 
+  /** Initializes the current user lookup and the user search subscription. */
   constructor(){
+    this.loadCurrentUserProfile();
+    this.searchSubscription =  this.createSearchSubscription();
+  }
+
+  /** Updates the member list when a new member is added. */
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['initialMembers']) {
+      this.members = [...this.initialMembers];
+    }
+  }
+
+  /** Cleans up the search subscription*/
+  ngOnDestroy() {
+    this.searchSubscription.unsubscribe();
+  }
+
+  /** Opens the add-member dialog and resets the search state. */
+  openDialog() {
+    this.isMemberDialogOpen = true;
+    this.resetDialogSearch()
+  }
+
+  /** Closes the add-member dialog and resets the search state. */
+  closeDialog() {
+    this.isMemberDialogOpen = false;
+    this.resetDialogSearch()
+  }
+
+  /** Updates the search query and starts the user search. */
+  searchUser(query: string){
+    this.searchQuery = query;
+    this.searchTerms.next(query);
+  }
+
+  /** Stores the selected user for the confirmation to add the user*/
+  selectUser(user: UserSearchResult){
+    this.selectedUser = user;
+  }
+
+  /** Adds the selected user to the invite list if not added yet. */
+  addSelectedUser(){
+    if(!this.selectedUser){
+      return;
+    }
+
+    const member = this.toProjectInviteMember(this.selectedUser);
+    if(!this.isMemberAlreadyAdded(member.keycloakId)){
+      this.members = [...this.members,member];
+    }
+    this.closeDialog();
+  }
+
+  /** Removes the selected member from the invitation list. */
+  removeMember(keycloakId: string){
+    this.members = this.members.filter(m => m.keycloakId !== keycloakId);
+  }
+  isAlreadyAdded(user : UserSearchResult): boolean {
+    return this.isMemberAlreadyAdded(user.keycloakId);
+  }
+
+  /** Emits the selected members and moves to the next wizard step. */
+  submit() {
+    this.next.emit(this.members);
+  }
+
+  /** Emits the selected members and moves back to the previous wizard step. */
+  goBack() {
+    this.back.emit(this.members)
+  }
+
+
+
+  private resetDialogSearch(){
+    this.searchQuery = '';
+    this.searchResults = [];
+    this.selectedUser = null;
+    this.hasSearched = false;
+    this.isSearching = false;
+  }
+
+  private toProjectInviteMember(user : UserSearchResult) : ProjectInviteMember{
+    return {
+      keycloakId: user.keycloakId,
+      username: user.username,
+      title: user.title,
+      location: user.location
+    };
+  }
+
+  private isMemberAlreadyAdded(keycloakId : string) {
+    return this.members.some(mem => mem.keycloakId === keycloakId);
+  }
+
+  private loadCurrentUserProfile(){
     this.userProfileService.getMyProfile().subscribe({
       next : profile => {
         this.currentUserKeycloakId = profile.keycloakId;
@@ -49,106 +145,43 @@ export class ProjectMembersForm implements OnChanges, OnDestroy {
         this.currentUserKeycloakId = null;
       },
     });
+  }
 
-    this.searchSubscription = this.searchTerms.pipe(debounceTime(250), distinctUntilChanged(), switchMap(query => {
-        const cleanedQuery = query.trim();
-        this.selectedUser = null;
-        this.searchResults = [];
-        this.hasSearched = cleanedQuery.length > 0;
+  private searchUsers(query: string){
+    const cleanedQuery = query.trim();
+    this.selectedUser = null;
+    this.searchResults = [];
+    this.hasSearched = cleanedQuery.length > 0;
 
-        if(cleanedQuery.length < 2){
-          this.isSearching = false;
-          return of([]);
-        }
+    if(cleanedQuery.length < 2){
+      this.isSearching = false;
+      return of([]);
+    }
 
-        this.isSearching = true;
-        return this.searchService.searchUsers(cleanedQuery).pipe(
-          catchError(() => of([])),
-          finalize(() => {
-            this.isSearching = false;
-          })
-        );
+    this.isSearching = true;
+    return this.searchService.searchUsers(cleanedQuery).pipe(
+      catchError(() => of([])),
+      finalize(() => {
+        this.isSearching = false;
       })
-    ).subscribe((users : UserSearchResult[]) => {
-      const cleanedQuery = this.searchQuery.trim().toLowerCase();
-      this.searchResults = users.filter(user =>
-        user.keycloakId !== this.currentUserKeycloakId &&
-        user.username.toLowerCase().includes(cleanedQuery)
-      )
-    });
+    );
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['initialMembers']) {
-      this.members = [...this.initialMembers];
-    }
+  private isCurrentUser(user : UserSearchResult): boolean {
+    return user.keycloakId === this.currentUserKeycloakId;
   }
 
-  ngOnDestroy() {
-    this.searchSubscription.unsubscribe();
+  private filterSearchResults(users : UserSearchResult[]) : UserSearchResult[] {
+    const cleanedQuery = this.searchQuery.trim().toLowerCase();
+
+    return users.filter(user => !this.isCurrentUser(user) && user.username.toLowerCase().includes(cleanedQuery));
   }
 
-  openDialog() {
-    this.isMemberDialogOpen = true;
-    this.searchQuery = '';
-    this.searchResults = [];
-    this.selectedUser = null;
-    this.hasSearched = false;
-    this.isSearching = false;
-  }
-
-  closeDialog() {
-    this.isMemberDialogOpen = false;
-    this.searchQuery = '';
-    this.searchResults = [];
-    this.selectedUser = null;
-    this.hasSearched = false;
-    this.isSearching = false;
-  }
-
-  searchUser(query: string){
-    this.searchQuery = query;
-    this.searchTerms.next(query);
-  }
-
-  selectUser(user: UserSearchResult){
-    this.selectedUser = user;
-  }
-
-  addSelectedUser(){
-    if(!this.selectedUser){
-      return;
-    }
-
-    const member : ProjectInviteMember = {
-      keycloakId: this.selectedUser.keycloakId,
-      username: this.selectedUser.username,
-      title: this.selectedUser.title,
-      location: this.selectedUser.location
-    };
-
-    const alreadyAdded = this.members.some(existingMember => existingMember.keycloakId === member.keycloakId);
-
-    if(!alreadyAdded){
-      this.members = [...this.members,member];
-    }
-    this.closeDialog();
-  }
-
-  removeMember(keycloakId: string){
-    this.members = this.members.filter(m => m.keycloakId !== keycloakId);
-  }
-
-  submit() {
-    this.next.emit(this.members);
-  }
-
-  goBack() {
-    this.back.emit(this.members)
-  }
-
-  isAlreadyAdded(user : UserSearchResult): boolean {
-    return this.members.some(m => m.keycloakId === user.keycloakId)
+  private createSearchSubscription() {
+    return this.searchTerms.pipe(debounceTime(250), distinctUntilChanged(), switchMap(query => this.searchUsers(query)))
+      .subscribe((user: UserSearchResult[]) => {
+        this.searchResults = this.filterSearchResults(user);
+      });
   }
 
 }
