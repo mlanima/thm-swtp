@@ -8,6 +8,7 @@ import de.thm.swtp.api.projectFavorite.entity.ProjectFavoriteEntity;
 import de.thm.swtp.api.projectFavorite.exception.ProjectAlreadyFavoritedException;
 import de.thm.swtp.api.projectFavorite.exception.ProjectFavoriteNotFoundException;
 import de.thm.swtp.api.projectFavorite.repository.ProjectFavoriteRepository;
+import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
