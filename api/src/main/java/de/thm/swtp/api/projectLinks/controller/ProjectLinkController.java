@@ -34,8 +34,8 @@ public class ProjectLinkController {
                                                  @Valid @RequestBody CreateProjectLinkRequest createProjectLinkRequest) {
         UUID currentUserId = getCurrentUserId(jwt);
 
-        return ProjectLinkResponse.toResponse(projectLinkService.createProjectLink(projectId,currentUserId,
-                createProjectLinkRequest.label(),createProjectLinkRequest.url()));
+        return ProjectLinkResponse.toResponse(projectLinkService.createProjectLink(projectId, currentUserId,
+                createProjectLinkRequest.label(), createProjectLinkRequest.url()));
     }
 
     @PatchMapping("/{linkId}")
@@ -43,15 +43,15 @@ public class ProjectLinkController {
                                                  @Valid @RequestBody UpdateProjectLinkRequest updateProjectLinkRequest) {
         UUID currentUserId = getCurrentUserId(jwt);
 
-        return ProjectLinkResponse.toResponse(projectLinkService.updateProjectLink(projectId,linkId,
-                currentUserId,updateProjectLinkRequest.label(),updateProjectLinkRequest.url()));
+        return ProjectLinkResponse.toResponse(projectLinkService.updateProjectLink(projectId, linkId,
+                currentUserId, updateProjectLinkRequest.label(), updateProjectLinkRequest.url()));
     }
 
     @DeleteMapping("/{linkId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteProjectLink(@PathVariable UUID projectId, @PathVariable UUID linkId, @AuthenticationPrincipal Jwt jwt) {
         UUID currentUserId = getCurrentUserId(jwt);
-        projectLinkService.deleteProjectLink(projectId,currentUserId,linkId);
+        projectLinkService.deleteProjectLink(projectId, currentUserId, linkId);
     }
 
 
