@@ -29,5 +29,32 @@ class ProjectEntityTest {
         assertThat(project.getOwner()).isEqualTo(owner);
         assertThat(project.getMembers()).isNotNull();
         assertThat(project.isPrivateProject()).isFalse();
+        assertThat(project.getViewsCount()).isZero();
+        assertThat(project.getLikesCount()).isZero();
+        assertThat(project.getOpenPositionsCount()).isZero();
+    }
+
+    @Test
+    void shouldBuildProjectWithStats() {
+        UserProfile owner = UserProfile.builder()
+                .keycloakId(UUID.randomUUID())
+                .username("testowner")
+                .email("testowner@mni.thm.de")
+                .build();
+
+        ProjectEntity project = ProjectEntity.builder()
+                .name("Testprojekt")
+                .description("Eine Beschreibung")
+                .projectUrl("testprojekt")
+                .isPrivateProject(false)
+                .owner(owner)
+                .viewsCount(247)
+                .likesCount(12)
+                .openPositionsCount(3)
+                .build();
+
+        assertThat(project.getViewsCount()).isEqualTo(247);
+        assertThat(project.getLikesCount()).isEqualTo(12);
+        assertThat(project.getOpenPositionsCount()).isEqualTo(3);
     }
 }

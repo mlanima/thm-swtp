@@ -22,6 +22,16 @@ public class ProjectService {
     private final UserProfileRepository userProfileRepository;
 
     private ProjectResponse toResponse(ProjectEntity project) {
+        Set<UUID> memberIds = project.getMembers().stream()
+                .map(UserProfile::getKeycloakId)
+                .collect(java.util.stream.Collectors.toSet());
+
+        int contributors = memberIds.size();
+
+        if (project.getOwner() != null) {
+            contributors++;
+        }
+
         return ProjectResponse.builder()
                 .id(project.getId())
                 .name(project.getName())
@@ -34,6 +44,12 @@ public class ProjectService {
                         .collect(java.util.stream.Collectors.toSet()))
                 .createdAt(project.getCreatedAt())
                 .updatedAt(project.getUpdatedAt())
+                .stats(ProjectStatsResponse.builder()
+                        .contributors(contributors)
+                        .views(project.getViewsCount())
+                        .likes(project.getLikesCount())
+                        .openPositions(project.getOpenPositionsCount())
+                        .build())
                 .build();
     }
 
@@ -101,6 +117,10 @@ public class ProjectService {
             throw new ExceptionProjectAlreadyDeleted(projectId);
         }
 
+        project.setViewsCount(project.getViewsCount() + 1);
+
+        ProjectEntity saved = projectRepository.save(project);
+
         return toResponse(project);
     }
 
@@ -113,6 +133,10 @@ public class ProjectService {
         if (project.getDeletedAt() != null) {
             throw new ExceptionProjectAlreadyDeleted(project.getId());
         }
+
+        project.setViewsCount(project.getViewsCount() + 1);
+
+        ProjectEntity saved = projectRepository.save(project);
 
         return toResponse(project);
     }
