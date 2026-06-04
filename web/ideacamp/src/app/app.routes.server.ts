@@ -36,6 +36,11 @@ export const serverRoutes: ServerRoute[] = [
     path: 'my-projects',
     renderMode: RenderMode.Client,
   },
+  
+  {
+    path: 'project/:projectUrl/settings',
+    renderMode: RenderMode.Client,
+  },
 
   {
     path: '**',
