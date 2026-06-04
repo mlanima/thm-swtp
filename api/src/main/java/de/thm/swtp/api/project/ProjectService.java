@@ -36,6 +36,7 @@ public class ProjectService {
                         .collect(java.util.stream.Collectors.toSet()))
                 .createdAt(project.getCreatedAt())
                 .updatedAt(project.getUpdatedAt())
+                .favoriteCount(projectFavoriteRepository.countByProjectId(project.getId()))
                 .build();
     }
 

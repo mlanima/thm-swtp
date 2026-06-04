@@ -1,11 +1,12 @@
 import { Component, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ProjectSearchResult } from '../../models/project-search-result.model';
+import { FavoriteButton } from '../../../../shared/favorite-button/favorite-button';
 
 @Component({
   selector: 'app-project-result-card',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, FavoriteButton],
   templateUrl: './project-result-card.html',
 })
 export class ProjectResultCard {

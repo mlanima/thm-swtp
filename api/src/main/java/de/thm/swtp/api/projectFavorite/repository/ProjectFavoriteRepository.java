@@ -15,6 +15,8 @@ public interface ProjectFavoriteRepository extends JpaRepository<ProjectFavorite
 
     boolean existsByUserKeycloakIdAndProjectId(UUID userKeycloakId, UUID projectId);
 
+    long countByProjectId(UUID projectId);
+
     Optional<ProjectFavoriteEntity> findByUserKeycloakIdAndProjectId(UUID userKeycloakId, UUID projectId);
 
     @Query("SELECT DISTINCT f.project FROM ProjectFavoriteEntity f " +

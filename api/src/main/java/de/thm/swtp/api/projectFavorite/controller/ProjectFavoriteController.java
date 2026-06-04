@@ -74,6 +74,7 @@ public class ProjectFavoriteController {
                         .collect(Collectors.toSet()))
                 .createdAt(project.getCreatedAt())
                 .updatedAt(project.getUpdatedAt())
+                .favoriteCount(projectFavoriteService.countFavorites(project.getId()))
                 .build();
     }
 }

@@ -68,4 +68,9 @@ public class ProjectFavoriteService {
     public boolean isFavorited(UUID projectId, UUID userId) {
         return projectFavoriteRepository.existsByUserKeycloakIdAndProjectId(userId, projectId);
     }
+
+    @Transactional(readOnly = true)
+    public long countFavorites(UUID projectId) {
+        return projectFavoriteRepository.countByProjectId(projectId);
+    }
 }
