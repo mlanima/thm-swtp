@@ -63,4 +63,9 @@ public class ProjectFavoriteService {
     public List<ProjectEntity> getFavorites(UUID userId) {
         return projectFavoriteRepository.findProjectsByUserKeycloakId(userId);
     }
+
+    @Transactional(readOnly = true)
+    public boolean isFavorited(UUID projectId, UUID userId) {
+        return projectFavoriteRepository.existsByUserKeycloakIdAndProjectId(userId, projectId);
+    }
 }

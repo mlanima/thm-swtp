@@ -20,7 +20,7 @@ public interface ProjectFavoriteRepository extends JpaRepository<ProjectFavorite
     @Query("SELECT DISTINCT f.project FROM ProjectFavoriteEntity f " +
            "LEFT JOIN FETCH f.project.owner " +
            "LEFT JOIN FETCH f.project.members " +
-           "WHERE f.user.keycloakId = :userId")
+           "WHERE f.user.keycloakId = :userId AND f.project.deletedAt IS NULL")
     List<ProjectEntity> findProjectsByUserKeycloakId(@Param("userId") UUID userId);
 
     @Modifying

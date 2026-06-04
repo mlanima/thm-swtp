@@ -10,7 +10,9 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "project_favorites")
+@Table(name = "project_favorites", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"user_keycloak_id", "project_id"})
+})
 @Getter
 @Setter
 @Builder

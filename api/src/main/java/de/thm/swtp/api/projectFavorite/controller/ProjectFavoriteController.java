@@ -40,6 +40,15 @@ public class ProjectFavoriteController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/{projectId}")
+    public ResponseEntity<Void> isFavorited(
+            @PathVariable UUID projectId,
+            @AuthenticationPrincipal Jwt jwt) {
+        UUID userId = UUID.fromString(jwt.getSubject());
+        boolean favorited = projectFavoriteService.isFavorited(projectId, userId);
+        return favorited ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
+    }
+
     @GetMapping
     public ResponseEntity<List<ProjectResponse>> getFavorites(
             @AuthenticationPrincipal Jwt jwt) {
