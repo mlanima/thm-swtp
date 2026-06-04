@@ -24,11 +24,12 @@
     <div class="mb-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
       <div class="space-y-3">
         <div>
-          <label class="text-xs font-medium text-slate-500">
+          <label class="text-xs font-medium text-slate-500" for="new-link-label">
             Label
           </label>
 
           <input
+            id="new-link-label"
             type="text"
             [ngModel]="newLabel"
             (ngModelChange)="newLabel = $event"
@@ -38,11 +39,12 @@
         </div>
 
         <div>
-          <label class="text-xs font-medium text-slate-500">
+          <label class="text-xs font-medium text-slate-500" for="new-link-url">
             URL
           </label>
 
           <input
+            id="new-link-url"
             type="url"
             [ngModel]="newUrl"
             (ngModelChange)="newUrl = $event"
@@ -86,11 +88,12 @@
             <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
               <div class="space-y-3">
                 <div>
-                  <label class="text-xs font-medium text-slate-500">
+                  <label class="text-xs font-medium text-slate-500" for="update-link-label">
                     Label
                   </label>
 
                   <input
+                    id="update-link-label"
                     type="text"
                     [ngModel]="updateLabel"
                     (ngModelChange)="updateLabel = $event"
@@ -99,11 +102,12 @@
                 </div>
 
                 <div>
-                  <label class="text-xs font-medium text-slate-500">
+                  <label class="text-xs font-medium text-slate-500" for="update-link-url">
                     URL
                   </label>
 
                   <input
+                    id="update-link-url"
                     type="url"
                     [ngModel]="updateUrl"
                     (ngModelChange)="updateUrl = $event"

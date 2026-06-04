@@ -77,7 +77,7 @@ export class Quicklinks implements OnChanges {
         this.isLoading = false;
         this.changeDetectorRef.markForCheck();
       },
-      error: (error) => {
+      error: () => {
         this.errorMessage = 'Failed to load links.';
         this.isLoading = false;
         this.changeDetectorRef.markForCheck();
