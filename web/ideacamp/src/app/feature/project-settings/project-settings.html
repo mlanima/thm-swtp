@@ -1,0 +1,65 @@
+<div class="min-h-screen bg-slate-100 text-slate-700">
+
+  @if (isLoading()) {
+    <div class="flex items-center justify-center py-20">
+      <p class="text-slate-500">Loading…</p>
+    </div>
+  }
+
+  @if (!isLoading() && errorMessage()) {
+    <div class="mx-auto max-w-5xl px-6 py-10">
+      <div class="rounded-xl border border-red-200 bg-red-50 p-6 text-red-700">
+        <p class="font-semibold">Ein unerwarteter Fehler ist aufgetreten</p>
+        <p class="mt-1 text-sm">{{ errorMessage() }}</p>
+      </div>
+    </div>
+  }
+
+  @if (!isLoading() && project()) {
+    <div class="mx-auto max-w-5xl px-6 py-10">
+      <div class="flex gap-8">
+
+
+        <aside class="w-48 shrink-0">
+          <p class="mb-3 px-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+            Projekt Einstellungen
+          </p>
+          <nav class="space-y-0.5">
+            @for (tab of tabs; track tab.id) {
+              <button
+                (click)="setTab(tab.id)"
+                class="flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors"
+                [ngClass]="activeTab() === tab.id
+                  ? 'bg-slate-800 text-white'
+                  : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'"
+              >
+                <i class="pi text-sm" [ngClass]="tab.icon"></i>
+                {{ tab.label }}
+              </button>
+            }
+          </nav>
+        </aside>
+
+        <main class="flex-1 min-w-0">
+          @if (activeTab() === 'join-requests') {
+            <app-join-requests-tab [projectId]="project()!.id" />
+          }
+          @if (activeTab() === 'members') {
+            <app-members-tab [projectId]="project()!.id" />
+          }
+          @if (activeTab() === 'privacy') {
+            <app-privacy-tab [projectId]="project()!.id" />
+          }
+          @if (activeTab() === 'danger-zone') {
+            <app-danger-zone-tab
+              [projectId]="project()!.id"
+              [projectName]="project()!.name"
+            />
+          }
+        </main>
+
+      </div>
+    </div>
+  }
+
+</div>
