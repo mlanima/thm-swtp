@@ -27,7 +27,7 @@ public interface UserSearchRepository extends JpaRepository<UserProfile, UUID> {
      * @return distinct user profile IDs matching the term
      */
     @Query("""
-            SELECT DISTINCT u.keycloakId FROM UserProfile u
+            SELECT DISTINCT u.keycloakId FROM user_profiles u
             LEFT JOIN u.tags t
             WHERE (LOWER(u.username) LIKE LOWER(CONCAT('%', :query, '%'))
                    OR LOWER(t.name) LIKE LOWER(CONCAT('%', :query, '%')))

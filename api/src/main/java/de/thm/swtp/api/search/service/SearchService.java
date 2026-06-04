@@ -92,7 +92,7 @@ public class SearchService {
         int end = Math.min(start + pageable.getPageSize(), total);
 
         if (start >= total) {
-            return Page.empty(pageable);
+            return new PageImpl<>(List.of(), pageable, total);
         }
 
         List<UUID> pageIds = sortedIds.subList(start, end);
