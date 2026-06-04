@@ -161,4 +161,14 @@ public class ProjectService {
                 .map(this::toResponse)
                 .toList();
     }
+
+    @Transactional
+    public List<UserProfile> getProjectMembers(UUID projectId) {
+        ProjectEntity projectEntity = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ExceptionProjectNotFound(projectId));
+
+        return projectEntity.getMembers()
+                .stream()
+                .toList();
+    }
 }
