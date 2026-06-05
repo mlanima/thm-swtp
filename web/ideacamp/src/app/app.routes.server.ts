@@ -38,6 +38,11 @@ export const serverRoutes: ServerRoute[] = [
   },
 
   {
+    path: 'project/:projectUrl/settings',
+    renderMode: RenderMode.Client,
+  },
+
+  {
     path: '**',
     renderMode: RenderMode.Prerender,
   }
