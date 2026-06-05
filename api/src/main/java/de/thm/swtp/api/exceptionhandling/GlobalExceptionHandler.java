@@ -1,6 +1,8 @@
 package de.thm.swtp.api.exceptionhandling;
 
 import de.thm.swtp.api.exceptionhandling.exceptions.ProfileAccessDeniedException;
+import de.thm.swtp.api.exceptionhandling.exceptions.ProjectMemberNotFoundException;
+import de.thm.swtp.api.exceptionhandling.exceptions.ProjectOwnerCannotBeRemovedException;
 import de.thm.swtp.api.projectInvitation.exception.InvalidProjectInviteException;
 import de.thm.swtp.api.projectInvitation.exception.ProjectInviteAccessDeniedException;
 import de.thm.swtp.api.projectInvitation.exception.ProjectInviteNotFoundException;
@@ -91,5 +93,17 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleTagAccessDenied(TagAccessDeniedException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(ErrorResponse.of(403, "Forbidden", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ProjectMemberNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleProjectMemberNotFound(ProjectMemberNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ProjectOwnerCannotBeRemovedException.class)
+    public ResponseEntity<ErrorResponse> handleProjectOwnerCannotBeRemoved(ProjectOwnerCannotBeRemovedException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
     }
 }

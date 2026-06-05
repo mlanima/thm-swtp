@@ -19,7 +19,7 @@ import java.util.*;
 public class UserProfile {
 
     @Id
-    @Column(nullable = false)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID keycloakId;
 
     @Column(unique = true, nullable = false)
