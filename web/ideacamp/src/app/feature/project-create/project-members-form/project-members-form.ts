@@ -1,5 +1,5 @@
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, inject, SimpleChanges} from '@angular/core';
-import { Subject, Subscription, catchError, debounceTime, distinctUntilChanged, finalize, of, switchMap} from 'rxjs';
+import { Component, ChangeDetectorRef,EventEmitter, Input, OnChanges, OnDestroy, Output, inject, SimpleChanges, ElementRef, ViewChild} from '@angular/core';
+import { Subject, Subscription, catchError, debounceTime, distinctUntilChanged, of, switchMap} from 'rxjs';
 import {FormsModule } from '@angular/forms'
 
 import { ProjectInviteMember } from '../../../models/project-invite-member.model'
@@ -22,6 +22,7 @@ export class ProjectMembersForm implements OnChanges, OnDestroy {
   private readonly searchTerms = new Subject<string>();
   private readonly searchSubscription: Subscription;
   private readonly userProfileService = inject(UserProfileService);
+  private readonly changeDetectorRef = inject(ChangeDetectorRef);
   currentUserKeycloakId: string | null = null;
 
 
@@ -29,6 +30,7 @@ export class ProjectMembersForm implements OnChanges, OnDestroy {
   @Input() initialMembers: ProjectInviteMember[] = [];
   @Output() next = new EventEmitter<ProjectInviteMember[]>();
   @Output() back = new EventEmitter<ProjectInviteMember[]>();
+  @ViewChild('memberSearchInput') memberSearchInput?: ElementRef<HTMLInputElement>;
 
   members: ProjectInviteMember[] = [];
 
@@ -63,6 +65,11 @@ export class ProjectMembersForm implements OnChanges, OnDestroy {
   openDialog() {
     this.isMemberDialogOpen = true;
     this.resetDialogSearch()
+
+    setTimeout(() => {
+      this.memberSearchInput?.nativeElement.focus();
+    });
+
   }
 
   /** Closes the add-member dialog and resets the search state. */
@@ -74,7 +81,15 @@ export class ProjectMembersForm implements OnChanges, OnDestroy {
   /** Updates the search query and starts the user search. */
   searchUser(query: string){
     this.searchQuery = query;
+    const cleanedQuery = query.trim();
+
+    if (cleanedQuery.length >= 2) {
+      this.isSearching = true;
+    } else {
+      this.resetSearchResult();
+    }
     this.searchTerms.next(query);
+    this.changeDetectorRef.detectChanges();
   }
 
   /** Stores the selected user for the confirmation to add the user*/
@@ -117,10 +132,14 @@ export class ProjectMembersForm implements OnChanges, OnDestroy {
 
   private resetDialogSearch(){
     this.searchQuery = '';
+    this.resetSearchResult()
+  }
+
+  private resetSearchResult(){
+    this.isSearching = false;
     this.searchResults = [];
     this.selectedUser = null;
     this.hasSearched = false;
-    this.isSearching = false;
   }
 
   private toProjectInviteMember(user : UserSearchResult) : ProjectInviteMember{
@@ -154,17 +173,9 @@ export class ProjectMembersForm implements OnChanges, OnDestroy {
     this.hasSearched = cleanedQuery.length > 0;
 
     if(cleanedQuery.length < 2){
-      this.isSearching = false;
       return of([]);
     }
-
-    this.isSearching = true;
-    return this.searchService.searchUsers(cleanedQuery).pipe(
-      catchError(() => of([])),
-      finalize(() => {
-        this.isSearching = false;
-      })
-    );
+    return this.searchService.searchUsers(cleanedQuery).pipe(catchError(() => of([])));
   }
 
   private isCurrentUser(user : UserSearchResult): boolean {
@@ -181,6 +192,8 @@ export class ProjectMembersForm implements OnChanges, OnDestroy {
     return this.searchTerms.pipe(debounceTime(250), distinctUntilChanged(), switchMap(query => this.searchUsers(query)))
       .subscribe((user: UserSearchResult[]) => {
         this.searchResults = this.filterSearchResults(user);
+        this.isSearching = false;
+        this.changeDetectorRef.detectChanges();
       });
   }
 
