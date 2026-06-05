@@ -5,35 +5,186 @@
       Project members
     </h3>
 
-    <div class="space-y-3">
+    @if (members.length > 0) {
+      <div class="mb-4 space-y-2">
+        @for (member of members; track member.keycloakId) {
+          <div class="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
+            <div>
+              <p class="text-sm font-semibold text-slate-800">
+                {{ member.username }}
+              </p>
 
+              @if (member.title) {
+                <p class="text-xs text-slate-500">
+                  {{ member.title }}
+                </p>
+              }
+            </div>
+            <button
+              type="button"
+              (click)="removeMember(member.keycloakId)"
+              class="rounded-md px-2 py-1 text-sm text-slate-400 hover:bg-red-50 hover:text-red-600">
+              ×
+            </button>
+          </div>
+        }
+      </div>
+    }
 
 
       <button
         type="button"
+        (click)="openDialog()"
         class="flex w-full items-center justify-center rounded-lg border border-dashed border-slate-700 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50">
         + Add member
       </button>
-
     </div>
-  </div>
+
 
   <div class="flex items-center justify-between border-t border-slate-200 pt-6">
 
     <button
       type="button"
-      (click)="back.emit()"
+      (click)="goBack()"
       class="text-sm text-slate-500 hover:text-slate-800">
       Back
     </button>
 
     <button
       type="button"
-      (click)="next.emit()"
+      (click)="submit()"
       class="rounded-lg bg-lime-500 px-5 py-2 text-sm font-semibold text-white hover:bg-lime-600">
       Next
     </button>
-
   </div>
-
 </form>
+
+@if (isMemberDialogOpen) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 px-4">
+
+    <div class="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
+
+      <div class="mb-5 flex items-start justify-between">
+        <div>
+          <h2 class="text-sm font-bold text-slate-900">
+            Add people to your project
+          </h2>
+
+          <p class="mt-1 text-xs text-slate-500">
+            Search by username
+          </p>
+        </div>
+
+        <button
+          type="button"
+          (click)="closeDialog()"
+          class="text-sm text-slate-400 hover:text-slate-700">
+          ×
+        </button>
+      </div>
+
+      @if (!selectedUser) {
+        <div class="space-y-4">
+
+          <div class="relative">
+            <input
+              #memberSearchInput
+              type="text"
+              name="member-search"
+              [ngModel]="searchQuery"
+              (ngModelChange)="searchUser($event)"
+              placeholder="Find people"
+              class="w-full rounded-lg border border-slate-300 px-3 py-2 pr-10 text-sm outline-none focus:border-lime-500">
+
+            @if (isSearching) {
+              <div class="absolute right-3 top-1/2 -translate-y-1/2">
+                <div class="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-slate-700"></div>
+              </div>
+            }
+          </div>
+
+          @if (searchResults.length > 0) {
+            <div class="space-y-2">
+              @for (user of searchResults; track user.keycloakId) {
+                <button
+                  type="button"
+                  (click)="selectUser(user)"
+                  [disabled]="isAlreadyAdded(user)"
+                  class="flex w-full items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-3 text-left hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50">
+
+                  <div class="flex h-9 w-9 items-center justify-center rounded-full bg-slate-700 text-sm font-semibold text-white">
+                    {{ user.username.charAt(0).toUpperCase() }}
+                  </div>
+
+                  <div>
+                    <p class="text-sm font-semibold text-slate-800">
+                      {{ user.username }}
+                    </p>
+
+                    @if (user.title) {
+                      <p class="text-xs text-slate-500">
+                        {{ user.title }}
+                      </p>
+                    }
+                  </div>
+                </button>
+              }
+            </div>
+          }
+
+          @if (hasSearched && !isSearching && searchQuery.trim().length >= 2 && searchResults.length === 0) {
+            <div class="rounded-lg bg-slate-50 px-4 py-8 text-center">
+              <p class="text-sm text-slate-500">
+                No users found matching "{{ searchQuery }}"
+              </p>
+            </div>
+          }
+
+          <div class="flex justify-end pt-2">
+            <button
+              type="button"
+              (click)="closeDialog()"
+              class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">
+              Cancel
+            </button>
+          </div>
+        </div>
+      }
+
+      @if (selectedUser) {
+        <div class="flex flex-col items-center text-center">
+
+          <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-700 text-xl font-semibold text-white">
+            {{ selectedUser.username.charAt(0).toUpperCase() }}
+          </div>
+
+          <p class="text-sm font-bold text-slate-900">
+            {{ selectedUser.username }}
+          </p>
+
+          @if (selectedUser.title) {
+            <p class="mt-1 text-xs text-slate-500">
+              {{ selectedUser.title }}
+            </p>
+          }
+
+          <div class="mt-8 flex items-center gap-3">
+            <button
+              type="button"
+              (click)="closeDialog()"
+              class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">
+              Cancel
+            </button>
+
+            <button
+              type="button"
+              (click)="addSelectedUser()"
+              class="rounded-lg bg-lime-500 px-4 py-2 text-sm font-semibold text-white hover:bg-lime-600">
+              Add {{ selectedUser.username }}
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}
