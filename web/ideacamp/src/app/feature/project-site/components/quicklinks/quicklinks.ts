@@ -146,7 +146,7 @@ export class Quicklinks implements OnChanges {
   private validateCreateLinkRequest(): CreateProjectLinkRequest | null {
     const res = createProjectLinkSchema.safeParse({
       label: this.newLabel,
-      url: this.newUrl,
+      url: this.addsHttpsToUrl(this.newUrl),
     });
 
     if (!res.success) {
@@ -160,7 +160,7 @@ export class Quicklinks implements OnChanges {
   private validateUpdateLinkRequest(): UpdateProjectLinkRequest | null {
     const res = updateProjectLinkSchema.safeParse({
       label: this.updateLabel,
-      url: this.updateUrl,
+      url: this.addsHttpsToUrl(this.updateUrl),
     });
 
     if (!res.success) {
@@ -185,5 +185,14 @@ export class Quicklinks implements OnChanges {
 
   private removeDeletedLink(linkId: string): void {
     this.links = this.links.filter((link) => link.id !== linkId);
+  }
+
+  private addsHttpsToUrl(url : string): string {
+    const trimmedUrl = url.trim();
+
+    if (/^https?:\/\//i.test(trimmedUrl)){
+      return trimmedUrl;
+    }
+    return `https://${trimmedUrl}`;
   }
 }
