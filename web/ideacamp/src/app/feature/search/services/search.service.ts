@@ -22,4 +22,16 @@ export class SearchService {
       .get<unknown>(`${environment.apiUrl}/search/users`, { params: { q: queries } })
       .pipe(map(data => z.array(UserSearchResultSchema).parse(data)));
   }
+
+  searchTags(query: string, limit: number = 32): Observable<string[]> {
+    return this.http
+      .get<{ name: string }[]>(`${environment.apiUrl}/tags`, { params: { q: query, limit: limit.toString() } })
+      .pipe(map(tags => tags.map(t => t.name)));
+  }
+
+  getProjectTags(projectId: string): Observable<string[]> {
+    return this.http
+      .get<{ name: string }[]>(`${environment.apiUrl}/v1/projects/${projectId}/tags`)
+      .pipe(map(tags => tags.map(t => t.name)));
+  }
 }

@@ -1,5 +1,9 @@
-import { Component, ElementRef, EventEmitter, Output, ViewChild, signal } from '@angular/core';
+import { Component, ElementRef, output, viewChild, signal, computed, inject, DestroyRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Subject, debounceTime, distinctUntilChanged, switchMap, catchError, of } from 'rxjs';
+import { SearchService } from '../../services/search.service';
+
+const SUGGESTED_TAGS_LIMIT = 32;
 
 @Component({
   selector: 'app-search-input',
@@ -8,15 +12,34 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './search-input.html'
 })
 export class SearchInputComponent {
-  @Output() searchChange = new EventEmitter<string[]>();
-  @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
+  readonly searchChange = output<string[]>();
+  readonly searchInput = viewChild.required<ElementRef<HTMLInputElement>>('searchInput');
+
+  private readonly searchService = inject(SearchService);
+  private readonly suggestionQuery$ = new Subject<string>();
+
+  readonly suggestedTags = signal<string[]>([]);
+  readonly filteredSuggestedTags = computed(() => {
+    const queries = this.queries();
+    return this.suggestedTags().filter(tag => !queries.includes(tag));
+  });
 
   queries = signal<string[]>([]);
   readonly removingQueries = signal<Set<string>>(new Set());
   readonly addingQueries = signal<Set<string>>(new Set());
   inputValue = '';
 
-  popularTags = ['TypeScript', 'Node.js', 'API', 'Database', 'Frontend', 'Backend', 'UI/UX', 'DevOps', 'Mobile'];
+  constructor() {
+    const sub = this.suggestionQuery$.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      switchMap(query => this.searchService.searchTags(query, SUGGESTED_TAGS_LIMIT).pipe(catchError(() => of([]))))
+    ).subscribe(tags => this.suggestedTags.set(tags));
+
+    inject(DestroyRef).onDestroy(() => sub.unsubscribe());
+
+    this.suggestionQuery$.next('');
+  }
 
   addQuery(query: string) {
     const trimmed = query.trim();
@@ -47,11 +70,13 @@ export class SearchInputComponent {
       }, 150);
     }
 
-    this.emitChange();
     this.inputValue = '';
+    this.suggestionQuery$.next('');
+    this.emitChange();
   }
 
   onInputChange() {
+    this.suggestionQuery$.next(this.inputValue);
     this.emitChange();
   }
 
@@ -86,7 +111,7 @@ export class SearchInputComponent {
   }
 
   focusInput() {
-    this.searchInput?.nativeElement.focus();
+    this.searchInput().nativeElement.focus();
   }
 
   private emitChange() {

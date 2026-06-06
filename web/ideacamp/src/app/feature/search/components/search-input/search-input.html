@@ -47,9 +47,9 @@
     />
   </div>
 
-  <!-- Popular tags below input -->
+  <!-- Suggested tags below input -->
   <div class="mt-5 flex flex-wrap gap-2">
-    @for (tag of popularTags; track tag) {
+    @for (tag of filteredSuggestedTags(); track tag) {
       <button
         (click)="addQuery(tag)"
         class="rounded-xl bg-slate-50 px-3 py-1.5 text-sm text-slate-600 transition hover:bg-slate-100 border border-slate-100"
@@ -59,4 +59,3 @@
     }
   </div>
 </div>
-
