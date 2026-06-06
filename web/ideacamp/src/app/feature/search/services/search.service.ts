@@ -11,15 +11,15 @@ import { UserSearchResult, UserSearchResultSchema } from '../models/user-search-
 export class SearchService {
   private readonly http = inject(HttpClient);
 
-  searchProjects(query: string): Observable<ProjectSearchResult[]> {
+  searchProjects(queries: string[]): Observable<ProjectSearchResult[]> {
     return this.http
-      .get<unknown>(`${environment.apiUrl}/search/projects`, { params: { q: query } })
+      .get<unknown>(`${environment.apiUrl}/search/projects`, { params: { q: queries } })
       .pipe(map(data => z.array(ProjectSearchResultSchema).parse(data)));
   }
 
-  searchUsers(query: string): Observable<UserSearchResult[]> {
+  searchUsers(queries: string[]): Observable<UserSearchResult[]> {
     return this.http
-      .get<unknown>(`${environment.apiUrl}/search/users`, { params: { q: query } })
+      .get<unknown>(`${environment.apiUrl}/search/users`, { params: { q: queries } })
       .pipe(map(data => z.array(UserSearchResultSchema).parse(data)));
   }
 }
