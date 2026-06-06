@@ -11,6 +11,7 @@ import {EditButton} from '../../../../shared/edit-button/edit-button';
 export class ProfileInformation {
   @Input() title = '';
   @Input() text = '';
+  @Input() isOwnProfile = false;
 
   @Output() edit = new EventEmitter<void>();
 }
