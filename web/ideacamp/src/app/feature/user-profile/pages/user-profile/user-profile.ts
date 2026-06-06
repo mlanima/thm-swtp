@@ -1,10 +1,13 @@
 import { isPlatformBrowser } from '@angular/common';
-import { Component, OnInit, inject, PLATFORM_ID, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, PLATFORM_ID, signal } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 
 import { ProfileInformation } from '../../components/profile-information/profile-information';
 import { ProfileBanner } from '../../components/profile-banner/profile-banner';
 import { UserProfileService } from '../../../../services/user-profile.service';
+import { AuthService } from '../../../auth/auth.service';
 import { UserProfileModel } from '../../../../models/user-profile.model';
 
 interface ProfileViewState {
@@ -18,19 +21,30 @@ interface ProfileViewState {
   errorMessage: string;
 }
 
-/** Displays public user profile information. */
+/** Displays a user profile. Shows edit controls only when the viewer is the profile owner. */
 @Component({
   selector: 'app-user-profile',
   standalone: true,
   imports: [ProfileInformation, ProfileBanner, FormsModule],
   templateUrl: './user-profile.html',
 })
-export class UserProfile implements OnInit {
+export class UserProfile implements OnInit, OnDestroy {
   /** Platform identifier used to check whether the component runs in the browser. */
   private readonly platformId = inject(PLATFORM_ID);
 
+  /** Route used to read the :username parameter. */
+  private readonly route = inject(ActivatedRoute);
+
   /** Service used to load and update user profile data from the backend. */
   private readonly userProfileService = inject(UserProfileService);
+
+  /** Auth service used to determine whether the viewer is the profile owner. */
+  private readonly authService = inject(AuthService);
+
+  /** Username read from the route parameter :username. */
+  routeUsername = '';
+
+  private paramSub: Subscription | null = null;
 
   /** Reactive view state used by the template for loading, success and error states */
   readonly profileState = signal<ProfileViewState>({
@@ -38,6 +52,11 @@ export class UserProfile implements OnInit {
     profile: null,
     errorMessage: '',
   });
+
+  /** True when the logged-in user is viewing their own profile. */
+  get isOwner(): boolean {
+    return this.authService.username() === this.routeUsername;
+  }
 
   /** Currently edited inline profile section */
   editingSection: 'banner' | 'about' | 'experience' | null = null;
@@ -66,11 +85,12 @@ export class UserProfile implements OnInit {
   };
 
   /**
-   * Initializes profile loading when the component runs in the browser
+   * Initializes profile loading when the component runs in the browser.
+   * Waits for auth to be ready so the isOwner check is reliable before fetching.
    *
    * Server-side rendering does not send an authenticated profile request
    */
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     if (!isPlatformBrowser(this.platformId)) {
       this.profileState.set({
         isLoading: false,
@@ -81,11 +101,26 @@ export class UserProfile implements OnInit {
       return;
     }
 
-    this.loadProfile();
+    await this.authService.waitUntilAuthReady();
+
+    this.paramSub = this.route.paramMap.subscribe(params => {
+      this.routeUsername = params.get('username') ?? '';
+
+      if (!this.routeUsername) {
+        this.profileState.set({ isLoading: false, profile: null, errorMessage: 'User not found.' });
+        return;
+      }
+
+      this.loadProfile();
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.paramSub?.unsubscribe();
   }
 
   /**
-   * Loads the authenticated user's profile from the backend
+   * Loads the profile by username from the route parameter.
    *
    * Updates the reactive profile state with loading, success or error data
    */
@@ -96,7 +131,7 @@ export class UserProfile implements OnInit {
       errorMessage: '',
     });
 
-    this.userProfileService.getMyProfile().subscribe({
+    this.userProfileService.getProfile(this.routeUsername).subscribe({
       next: (profile) => {
         this.profileState.set({
           isLoading: false,
@@ -107,8 +142,10 @@ export class UserProfile implements OnInit {
       error: (error) => {
         const errorMessage =
           error.status === 401 || error.status === 403
-            ? 'Please log in to view the Profile'
-            : 'Profile information could not be loaded. Please try again later.';
+            ? 'Please log in to view this profile.'
+            : error.status === 404
+              ? 'User not found.'
+              : 'Profile information could not be loaded. Please try again later.';
 
         this.profileState.set({
           isLoading: false,
