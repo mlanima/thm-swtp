@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { UserSearchResult } from '../../models/user-search-result.model';
 
 @Component({
@@ -7,9 +7,9 @@ import { UserSearchResult } from '../../models/user-search-result.model';
   templateUrl: './user-result-card.html',
 })
 export class UserResultCard {
-  @Input({ required: true }) user!: UserSearchResult;
+  readonly user = input.required<UserSearchResult>();
 
   get initials(): string {
-    return this.user.username.slice(0, 2).toUpperCase();
+    return this.user().username.slice(0, 2).toUpperCase();
   }
 }
