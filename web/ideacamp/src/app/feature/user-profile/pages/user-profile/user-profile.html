@@ -91,91 +91,101 @@
           </div>
         }
 
-        @if (isOwner && editingSection === 'about') {
-          <section class="rounded-xl bg-white p-6 shadow-lg">
-            <h2 class="mb-5 text-xl font-bold text-slate-800">
-              Edit About
-            </h2>
+        <div class="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_320px]">
+          <div class="flex flex-col gap-10">
+            @if (isOwner && editingSection === 'about') {
+              <section class="rounded-xl bg-white p-6 shadow-lg">
+                <h2 class="mb-5 text-xl font-bold text-slate-800">
+                  Edit About
+                </h2>
 
-            <textarea
-              rows="5"
-              class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
-              [(ngModel)]="editForm.about">
-            </textarea>
+                <textarea
+                  rows="5"
+                  class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+                  [(ngModel)]="editForm.about">
+                </textarea>
 
-            <div class="mt-6 flex gap-3">
-              <button
-                type="button"
-                class="rounded-lg bg-slate-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800 disabled:opacity-50"
-                [disabled]="isSaving"
-                (click)="saveProfile(state.profile)">
-                @if (isSaving) {
-                  Saving...
-                } @else {
-                  Save
-                }
-              </button>
+                <div class="mt-6 flex gap-3">
+                  <button
+                    type="button"
+                    class="rounded-lg bg-slate-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800 disabled:opacity-50"
+                    [disabled]="isSaving"
+                    (click)="saveProfile(state.profile)">
+                    @if (isSaving) {
+                      Saving...
+                    } @else {
+                      Save
+                    }
+                  </button>
 
-              <button
-                type="button"
-                class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:opacity-50"
-                [disabled]="isSaving"
-                (click)="cancelEditing()">
-                Cancel
-              </button>
-            </div>
-          </section>
-        } @else {
-          <app-profile-information
-            title="About"
-            [text]="state.profile.about || 'No description.'"
-            [isOwnProfile]="isOwner"
-            (edit)="isOwner && startEditing(state.profile, 'about')">
-          </app-profile-information>
-        }
+                  <button
+                    type="button"
+                    class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:opacity-50"
+                    [disabled]="isSaving"
+                    (click)="cancelEditing()">
+                    Cancel
+                  </button>
+                </div>
+              </section>
+            } @else {
+              <app-profile-information
+                title="About"
+                [text]="state.profile.about || 'No description.'"
+                [isOwnProfile]="isOwner"
+                (edit)="isOwner && startEditing(state.profile, 'about')">
+              </app-profile-information>
+            }
 
-        @if (isOwner && editingSection === 'experience') {
-          <section class="rounded-xl bg-white p-6 shadow-lg">
-            <h2 class="mb-5 text-xl font-bold text-slate-800">
-              Edit Experience
-            </h2>
+            @if (isOwner && editingSection === 'experience') {
+              <section class="rounded-xl bg-white p-6 shadow-lg">
+                <h2 class="mb-5 text-xl font-bold text-slate-800">
+                  Edit Experience
+                </h2>
 
-            <textarea
-              rows="5"
-              class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
-              [(ngModel)]="editForm.experience">
-            </textarea>
+                <textarea
+                  rows="5"
+                  class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+                  [(ngModel)]="editForm.experience">
+                </textarea>
 
-            <div class="mt-6 flex gap-3">
-              <button
-                type="button"
-                class="rounded-lg bg-slate-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800 disabled:opacity-50"
-                [disabled]="isSaving"
-                (click)="saveProfile(state.profile)">
-                @if (isSaving) {
-                  Saving...
-                } @else {
-                  Save
-                }
-              </button>
+                <div class="mt-6 flex gap-3">
+                  <button
+                    type="button"
+                    class="rounded-lg bg-slate-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800 disabled:opacity-50"
+                    [disabled]="isSaving"
+                    (click)="saveProfile(state.profile)">
+                    @if (isSaving) {
+                      Saving...
+                    } @else {
+                      Save
+                    }
+                  </button>
 
-              <button
-                type="button"
-                class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:opacity-50"
-                [disabled]="isSaving"
-                (click)="cancelEditing()">
-                Cancel
-              </button>
-            </div>
-          </section>
-        } @else {
-          <app-profile-information
-            title="Experience"
-            [text]="state.profile.experience || 'No experience.'"
-            [isOwnProfile]="isOwner"
-            (edit)="isOwner && startEditing(state.profile, 'experience')">
-          </app-profile-information>
-        }
+                  <button
+                    type="button"
+                    class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:opacity-50"
+                    [disabled]="isSaving"
+                    (click)="cancelEditing()">
+                    Cancel
+                  </button>
+                </div>
+              </section>
+            } @else {
+              <app-profile-information
+                title="Experience"
+                [text]="state.profile.experience || 'No experience.'"
+                [isOwnProfile]="isOwner"
+                (edit)="isOwner && startEditing(state.profile, 'experience')">
+              </app-profile-information>
+            }
+          </div>
+          <aside class="lg:self-start">
+            <app-profile-tag-list
+              [username]="state.profile.keycloakId"
+              [isOwner]="isOwner">
+            </app-profile-tag-list>
+          </aside>
+        </div>
       }
     }
   </main>

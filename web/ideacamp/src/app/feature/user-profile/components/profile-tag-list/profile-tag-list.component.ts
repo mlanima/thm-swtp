@@ -1,19 +1,17 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges, inject, signal } from '@angular/core';
-import { ProjectTagService, TagResponse } from '../../services/project-tag.service';
 import { EditableTagListComponent } from '../../../../shared/tags/tag-list/editable-tag-list.component';
-
+import { UserProfileTagService, TagResponse } from '../../services/user-profile-tag.service'
 @Component({
-  selector: 'app-tag-list',
+  selector: 'app-profile-tag-list',
   standalone: true,
   imports: [EditableTagListComponent],
-  templateUrl: './tag-list.html',
+  templateUrl: './profile-tag-list.component.html',
 })
-export class TagList implements OnInit, OnChanges {
-  private readonly projectTagService = inject(ProjectTagService);
+export class ProfileTagListComponent implements OnInit, OnChanges {
+  private readonly userProfileTagService = inject(UserProfileTagService);
 
-  @Input({ required: true }) projectId?: string;
+  @Input({ required: true }) username?: string;
   @Input() isOwner = false;
-
 
   tags = signal<TagResponse[]>([]);
   isLoading = signal(false);
@@ -26,32 +24,31 @@ export class TagList implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['projectId'] && !changes['projectId'].firstChange) {
+    if (changes['username'] && !changes['username'].firstChange) {
       this.loadTags();
     }
   }
 
-
-
   saveTag(name: string): void {
-    const projectId = this.projectId;
+    const username = this.username;
     const cleanedName = name.trim();
 
-    if (!projectId || !cleanedName) {
+    if (!username || !cleanedName || !this.isOwner || this.isSaving()) {
       return;
     }
-
 
     this.isSaving.set(true);
     this.errorMessage.set(null);
 
-    this.projectTagService.addTag(projectId, { name: cleanedName }).subscribe({
+    this.userProfileTagService.addTag(username, { name: cleanedName }).subscribe({
       next: (tag) => {
         const lower = tag.name.toLowerCase();
         const existing = this.tags().some((item) => item.name.toLowerCase() === lower);
+
         if (!existing) {
           this.tags.set([...this.tags(), tag]);
         }
+
         this.isSaving.set(false);
       },
       error: () => {
@@ -62,13 +59,16 @@ export class TagList implements OnInit, OnChanges {
   }
 
   deleteTag(tagName: string): void {
-    const projectId = this.projectId;
-    if (!projectId || !this.isOwner) return;
+    const username = this.username;
+
+    if (!username || !this.isOwner || this.isDeleting()) {
+      return;
+    }
 
     this.isDeleting.set(true);
     this.errorMessage.set(null);
 
-    this.projectTagService.deleteTag(projectId, tagName).subscribe({
+    this.userProfileTagService.deleteTag(tagName).subscribe({
       next: () => {
         const lower = tagName.toLowerCase();
         this.tags.set(this.tags().filter((tag) => tag.name.toLowerCase() !== lower));
@@ -82,11 +82,14 @@ export class TagList implements OnInit, OnChanges {
   }
 
   private loadTags(): void {
-    if (!this.projectId) return;
+    if (!this.username) {
+      return;
+    }
+
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
-    this.projectTagService.getProjectTags(this.projectId).subscribe({
+    this.userProfileTagService.getProfileTags(this.username).subscribe({
       next: (tags) => {
         this.tags.set(tags);
         this.isLoading.set(false);
