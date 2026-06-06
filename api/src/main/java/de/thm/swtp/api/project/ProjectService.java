@@ -62,7 +62,7 @@ public class ProjectService {
 
         ProjectEntity saved = projectRepository.save(project);
 
-        createProjectInvites(saved,owner,request.memberIds());
+        createProjectInvites(saved, owner, request.memberIds());
 
         return toResponse(saved);
     }
