@@ -1,6 +1,8 @@
 package de.thm.swtp.api.exceptionhandling;
 
 import de.thm.swtp.api.exceptionhandling.exceptions.ProfileAccessDeniedException;
+import de.thm.swtp.api.exceptionhandling.exceptions.ProjectLinkAlreadyExistsException;
+import de.thm.swtp.api.exceptionhandling.exceptions.ProjectLinkDoesNotBelongToProjectException;
 import de.thm.swtp.api.projectFavorite.exception.ProjectAlreadyFavoritedException;
 import de.thm.swtp.api.projectFavorite.exception.ProjectFavoriteNotFoundException;
 import de.thm.swtp.api.projectInvitation.exception.InvalidProjectInviteException;
@@ -103,6 +105,18 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ProjectFavoriteNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleProjectFavoriteNotFound(ProjectFavoriteNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ProjectLinkAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleProjectLinkAlreadyExists(ProjectLinkAlreadyExistsException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ProjectLinkDoesNotBelongToProjectException.class)
+    public ResponseEntity<ErrorResponse> handleProjectLinkDoesNotBelongToProject(ProjectLinkDoesNotBelongToProjectException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
     }

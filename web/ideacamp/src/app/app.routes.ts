@@ -8,17 +8,17 @@ import { SuccessComponent } from './feature/auth/success/success.component';
 import {authGuard} from './feature/auth/auth.guard'
 import { SearchPage } from './feature/search/pages/search-page/search-page';
 import { MyProjectsPage } from './feature/my-projects/pages/my-projects-page/my-projects-page';
-
+import { ProjectSettings } from './feature/project-settings/project-settings';
 
 export const routes: Routes = [
   {path: '', redirectTo: 'impressum', pathMatch: 'full' },
   {path: 'success', component: SuccessComponent},
-  {path: 'impressum',component: Impressum},
-  {path: 'profile', component: UserProfile, canActivate: [authGuard]},
-  {path:'contact-requests', component: ContactRequests, canActivate: [authGuard]},
-  {path: 'project/:projectUrl',component: ProjectSite, canActivate: [authGuard]},
+  {path: 'impressum', component: Impressum},
+  {path: 'profiles/:username', component: UserProfile, canActivate: [authGuard]},
   {path: 'contact-requests', component: ContactRequests, canActivate: [authGuard]},
+  {path: 'project/:projectUrl', component: ProjectSite, canActivate: [authGuard]},
+  {path: 'project/:projectUrl/settings', component: ProjectSettings, canActivate: [authGuard]},
   {path: 'search', component: SearchPage, canActivate: [authGuard]},
   {path: 'createProject', component: ProjectCreate, canActivate: [authGuard]},
-  {path: 'my-projects', component: MyProjectsPage, canActivate: [authGuard]}
+  {path: 'my-projects', component: MyProjectsPage, canActivate: [authGuard]},
 ];

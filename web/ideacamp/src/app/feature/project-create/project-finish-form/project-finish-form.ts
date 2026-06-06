@@ -1,5 +1,6 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {ProjectCreateData} from '../schemas/project-create.schema';
+import { ProjectInviteMember } from '../../../models/project-invite-member.model';
 
 @Component({
   selector: 'app-project-finish-form',
@@ -13,6 +14,7 @@ import {ProjectCreateData} from '../schemas/project-create.schema';
  * */
 export class ProjectFinishForm {
   @Input() projectData : Partial<ProjectCreateData> = {};
+  @Input() members : ProjectInviteMember[] = [];
 
   @Output() back = new EventEmitter<void>();
   @Output() finished = new EventEmitter<void>();

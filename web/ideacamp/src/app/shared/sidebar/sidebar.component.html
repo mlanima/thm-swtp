@@ -58,7 +58,7 @@
         </app-menu-link>
         </a>
 
-        <a routerLink="/profile">
+        <a [routerLink]="['/profiles', auth.username()]">
         <app-menu-link>
           <i class="pi pi-cog text-md text-zinc-400"></i>
           <span>Einstellungen</span>
