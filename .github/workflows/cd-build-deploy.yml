@@ -48,8 +48,8 @@ jobs:
           context: ./api
           push: true
           tags: |
-            ghcr.io/t0sch/swtp-api:latest
-            ghcr.io/t0sch/swtp-api:${{ github.run_number }}
+            ghcr.io/mlanima/swtp-api:latest
+            ghcr.io/mlanima/swtp-api:${{ github.run_number }}
 
   build-frontend:
     name: Build & Push (Frontend)
@@ -72,8 +72,8 @@ jobs:
           context: ./web/ideacamp
           push: true
           tags: |
-            ghcr.io/t0sch/swtp-web:latest
-            ghcr.io/t0sch/swtp-web:${{ github.run_number }}
+            ghcr.io/mlanima/swtp-web:latest
+            ghcr.io/mlanima/swtp-web:${{ github.run_number }}
 
   deploy:
     name: Deploy to Server
