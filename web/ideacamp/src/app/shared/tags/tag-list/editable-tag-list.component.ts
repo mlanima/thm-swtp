@@ -47,6 +47,10 @@ export class EditableTagListComponent {
   }
 
   saveTag(): void {
+    if (this.isSaving()){
+      return;
+    }
+
     const tagName = this.newTagName().trim();
 
     if (!tagName) {

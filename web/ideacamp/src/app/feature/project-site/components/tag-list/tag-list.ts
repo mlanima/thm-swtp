@@ -49,6 +49,11 @@ export class TagList implements OnInit, OnChanges {
       next: (tag) => {
         const lower = tag.name.toLowerCase();
         const existing = this.tags().some((item) => item.name.toLowerCase() === lower);
+
+        if (existing) {
+          this.errorMessage.set('Tag already exists on this project.');
+        }
+
         if (!existing) {
           this.tags.set([...this.tags(), tag]);
         }

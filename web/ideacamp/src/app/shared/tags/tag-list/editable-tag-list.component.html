@@ -10,7 +10,7 @@
   }
 
   @if (!isLoading() && errorMessage()) {
-    <p class="text-xs text-red-600">
+    <p class="mb-2 text-xs text-red-600">
       {{ errorMessage() }}
     </p>
   }
@@ -23,7 +23,7 @@
           <button
             type="button"
             (click)="deleteTag.emit(tag.name)"
-            [disabled]="isDeleting()"
+            [disabled]="isDeleting() || isSaving()"
             class="inline-flex h-4 w-4 items-center justify-center rounded-full text-[10px] transition hover:bg-white/15 disabled:opacity-50"
             aria-label="Delete Tag">
             <i class="pi pi-times"></i>
