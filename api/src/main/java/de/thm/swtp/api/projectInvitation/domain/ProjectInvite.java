@@ -16,7 +16,16 @@ public class ProjectInvite {
     /** Unique Identifier of the project.*/
     UUID projectId;
 
-    /** Unique Identifier of the user which receives the invitation*/
+    /** Name of the project.*/
+    String projectName;
+
+    /** URL slug of the project.*/
+    String projectUrl;
+
+    /** Username of the project owner who sent the invitation.*/
+    String invitedByUsername;
+
+    /** Unique Identifier of the user which receives the invitation.*/
     UUID invitedUserId;
 
     /** Message the Project-Owner can define to the invited user.*/
