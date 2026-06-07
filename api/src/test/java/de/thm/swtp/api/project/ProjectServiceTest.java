@@ -3,6 +3,7 @@ package de.thm.swtp.api.project;
 import de.thm.swtp.api.project.dto.response.ProjectResponse;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
+import de.thm.swtp.api.projectFavorite.repository.ProjectFavoriteRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -26,6 +27,9 @@ class ProjectServiceTest {
 
     @Mock
     private UserProfileRepository userProfileRepository;
+
+    @Mock
+    private ProjectFavoriteRepository projectFavoriteRepository;
 
     @InjectMocks
     private ProjectService projectService;
@@ -63,6 +67,7 @@ class ProjectServiceTest {
 
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
         when(projectRepository.save(project)).thenReturn(project);
+        when(projectFavoriteRepository.countByProjectId(projectId)).thenReturn(12L);
 
         ProjectResponse response = projectService.getProject(projectId);
 
@@ -102,6 +107,7 @@ class ProjectServiceTest {
 
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
         when(projectRepository.save(project)).thenReturn(project);
+        when(projectFavoriteRepository.countByProjectId(projectId)).thenReturn(0L);
 
         ProjectResponse response = projectService.getProject(projectId);
 
@@ -140,6 +146,8 @@ class ProjectServiceTest {
                 .build();
 
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(projectRepository.save(project)).thenReturn(project);
+        when(projectFavoriteRepository.countByProjectId(projectId)).thenReturn(0L);
 
         ProjectResponse response = projectService.getProject(projectId);
 
