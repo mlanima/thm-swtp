@@ -66,6 +66,7 @@ public class ProjectJoinRequestServiceTest {
 
         requestingUser = new UserProfile();
         requestingUser.setKeycloakId(requestingUserId);
+        requestingUser.setUsername("testuser");
 
         project = new ProjectEntity();
         project.setId(projectId);
