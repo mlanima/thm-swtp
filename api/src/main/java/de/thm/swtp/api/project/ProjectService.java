@@ -6,6 +6,7 @@ import de.thm.swtp.api.project.dto.response.*;
 import de.thm.swtp.api.project.exception.*;
 import de.thm.swtp.api.projectInvitation.repository.ProjectInviteRepository;
 import de.thm.swtp.api.projectLinks.repository.ProjectLinkRepository;
+import de.thm.swtp.api.projectFavorite.repository.ProjectFavoriteRepository;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 
@@ -24,6 +25,7 @@ public class ProjectService {
     private final UserProfileRepository userProfileRepository;
     private final ProjectInviteRepository projectInviteRepository;
     private final ProjectLinkRepository projectLinkRepository;
+    private final ProjectFavoriteRepository projectFavoriteRepository;
 
     private ProjectResponse toResponse(ProjectEntity project) {
         return ProjectResponse.builder()
@@ -38,6 +40,7 @@ public class ProjectService {
                         .collect(java.util.stream.Collectors.toSet()))
                 .createdAt(project.getCreatedAt())
                 .updatedAt(project.getUpdatedAt())
+                .favoriteCount(projectFavoriteRepository.countByProjectId(project.getId()))
                 .build();
     }
 
@@ -159,6 +162,16 @@ public class ProjectService {
         return projectRepository.findAllByOwnerUsernameAndDeletedAtIsNullOrderByCreatedAtDesc(username)
                 .stream()
                 .map(this::toResponse)
+                .toList();
+    }
+
+    @Transactional
+    public List<UserProfile> getProjectMembers(UUID projectId) {
+        ProjectEntity projectEntity = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ExceptionProjectNotFound(projectId));
+
+        return projectEntity.getMembers()
+                .stream()
                 .toList();
     }
 }

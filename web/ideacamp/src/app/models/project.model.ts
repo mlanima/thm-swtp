@@ -6,6 +6,7 @@ export interface ProjectResponse {
   isPrivateProject: boolean;
   ownerId: string;
   memberIds: string[];
+  favoriteCount: number;
   createdAt: string;
   updatedAt: string;
 }

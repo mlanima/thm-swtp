@@ -4,7 +4,6 @@ spring:
 
   datasource:
     url: jdbc:sqlite:./db/dev.db?busy_timeout=5000&journal_mode=WAL&foreign_keys=on
-    driver-class-name: org.sqlite.JDBC
     hikari:
       maximum-pool-size: 1
       connection-timeout: 30000
@@ -20,3 +19,4 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: https://auth.swtp-ss26.de/realms/swtp
+
