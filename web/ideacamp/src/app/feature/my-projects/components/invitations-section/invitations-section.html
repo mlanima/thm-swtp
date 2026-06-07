@@ -17,10 +17,10 @@
       ></i>
     </button>
 
-    @if (invitationsExpanded()) {
-      <div class="border-t border-slate-100 px-6 py-4">
+    <div class="collapsible-content px-6" [class.expanded]="invitationsExpanded()" [class.border-t]="invitationsExpanded()" [class.border-slate-100]="invitationsExpanded()">
+      <div class="py-4">
         @for (invite of invitations(); track invite.id) {
-          <div [class.mt-3]="!$first">
+          <div [class.mt-3]="!$first" class="invitation-item" [style.transition-delay]="$index * 0.05 + 's'">
             <app-invitation-card
               [invite]="invite"
               (accept)="accept($event)"
@@ -29,7 +29,7 @@
           </div>
         }
       </div>
-    }
+    </div>
   } @else {
     <div class="flex w-full items-center justify-between px-6 py-4">
       <div class="flex items-center gap-3">

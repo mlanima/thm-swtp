@@ -9,6 +9,25 @@ import { InvitationCard } from '../invitation-card/invitation-card';
   imports: [InvitationCard],
   templateUrl: './invitations-section.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  styles: [`
+    .collapsible-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .collapsible-content.expanded {
+      max-height: 999px;
+    }
+    .invitation-item {
+      opacity: 0;
+      transform: translateY(-8px);
+      transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+    }
+    .collapsible-content.expanded .invitation-item {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  `],
 })
 export class InvitationsSection implements OnInit {
   private readonly invitationService = inject(ProjectInvitationService);

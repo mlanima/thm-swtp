@@ -25,8 +25,8 @@ describe('App', () => {
             isLoggedIn: () => false,
             username: () => '',
             user: () => null,
-            login: () => {},
-            logout: () => {},
+            login: () => undefined,
+            logout: () => undefined,
           },
         },
         {
