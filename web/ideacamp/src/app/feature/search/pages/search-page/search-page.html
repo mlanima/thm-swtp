@@ -7,31 +7,25 @@
     </div>
 
     <!-- Search bar -->
-    <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-      <div
-        class="flex items-center rounded-lg border bg-white px-4 py-3 transition"
-        [class.border-red-400]="errorMessage()"
-        [class.border-slate-200]="!errorMessage()"
-      >
-        <svg class="mr-3 h-5 w-5 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-4.35-4.35m0 0A7.5 7.5 0 1 0 6 6a7.5 7.5 0 0 0 10.65 10.65Z" />
-        </svg>
-        <input
-          type="text"
-          [(ngModel)]="searchTerm"
-          (input)="onSearchChange()"
-          placeholder="Search for projects and users..."
-          class="w-full bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400"
-        />
-      </div>
+    <app-search-input (searchChange)="onQueriesChange($event)"></app-search-input>
 
-      @if (errorMessage()) {
-        <p class="mt-2 text-sm text-red-500">{{ errorMessage() }}</p>
-      }
-    </div>
+    @if (errorMessage()) {
+      <p class="mt-2 text-sm text-red-500">{{ errorMessage() }}</p>
+    }
 
     <!-- Tabs -->
     <div class="mt-6 border-b border-slate-200">
+      <button
+        (click)="setTab('all')"
+        class="px-4 py-3 text-sm font-medium transition"
+        [class.border-b-2]="activeTab() === 'all'"
+        [class.border-green-500]="activeTab() === 'all'"
+        [class.text-green-600]="activeTab() === 'all'"
+        [class.text-slate-500]="activeTab() !== 'all'"
+      >
+        All
+      </button>
+
       <button
         (click)="setTab('projects')"
         class="px-4 py-3 text-sm font-medium transition"
@@ -55,6 +49,15 @@
       </button>
     </div>
 
+    <!-- Results count -->
+    @if (currentQueriesCount() > 0 && !isLoading() && !errorMessage()) {
+      <div class="mt-6">
+        <h2 class="text-lg font-semibold text-slate-700">
+          Results ({{ activeTab() === 'all' ? totalResults() : (activeTab() === 'projects' ? projects().length : users().length) }})
+        </h2>
+      </div>
+    }
+
     <!-- Loading -->
     @if (isLoading()) {
       <div class="mt-8 flex justify-center">
@@ -63,8 +66,12 @@
     }
 
     <!-- No results -->
-    @if (!isLoading() && searchTerm.trim() !== '' && !errorMessage()) {
-      @if (activeTab() === 'projects' && projects().length === 0) {
+    @if (!isLoading() && currentQueriesCount() > 0 && !errorMessage()) {
+      @if (
+        (activeTab() === 'all' && projects().length === 0 && users().length === 0) ||
+        (activeTab() === 'projects' && projects().length === 0) ||
+        (activeTab() === 'users' && users().length === 0)
+      ) {
         <div class="mt-8 flex flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white px-6 py-16 text-center shadow-sm">
           <svg class="mx-auto h-56 w-56" viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M52 74C65 48 96 38 128 41C163 44 192 61 196 94C199 130 174 160 139 170C104 180 62 172 42 145C22 118 31 99 52 74Z" fill="#F1F5F9" />
@@ -73,42 +80,28 @@
             <circle cx="126" cy="104" r="5" fill="#64748B" />
             <path d="M97 126C101 120 119 120 123 126" stroke="#64748B" stroke-width="4" stroke-linecap="round" />
           </svg>
-          <h3 class="text-3xl font-semibold text-slate-700">No projects found</h3>
+          <h3 class="text-3xl font-semibold text-slate-700">No results found</h3>
           <p class="mt-3 max-w-xl text-sm leading-7 text-slate-500">
-            No matching projects were found. Please check your spelling or try different keywords.
-          </p>
-        </div>
-      }
-
-      @if (activeTab() === 'users' && users().length === 0) {
-        <div class="mt-8 flex flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white px-6 py-16 text-center shadow-sm">
-          <svg class="mx-auto h-56 w-56" viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M52 74C65 48 96 38 128 41C163 44 192 61 196 94C199 130 174 160 139 170C104 180 62 172 42 145C22 118 31 99 52 74Z" fill="#F1F5F9" />
-            <path d="M110 58C80 58 58 80 58 111V146C58 151 63 154 68 151L79 144L90 151C94 154 99 154 103 151L110 145L117 151C121 154 126 154 130 151L141 144L152 151C157 154 162 151 162 146V111C162 80 140 58 110 58Z" fill="#CBD5E1" />
-            <circle cx="94" cy="104" r="5" fill="#64748B" />
-            <circle cx="126" cy="104" r="5" fill="#64748B" />
-            <path d="M97 126C101 120 119 120 123 126" stroke="#64748B" stroke-width="4" stroke-linecap="round" />
-          </svg>
-          <h3 class="text-3xl font-semibold text-slate-700">No users found</h3>
-          <p class="mt-3 max-w-xl text-sm leading-7 text-slate-500">
-            No matching users were found. Please check your spelling or try different keywords.
+            No matching results were found. Please check your spelling or try different keywords.
           </p>
         </div>
       }
     }
 
     <!-- Results -->
-    @if (!isLoading() && !errorMessage()) {
-      @if (activeTab() === 'projects' && projects().length > 0) {
+    @if (!isLoading() && !errorMessage() && currentQueriesCount() > 0) {
+      @if ((activeTab() === 'projects' || activeTab() === 'all') && projects().length > 0) {
         <div class="flex flex-col gap mt-6 space-y-4">
+          @if (activeTab() === 'all') { <h3 class="text-sm font-semibold tracking-wider text-slate-500 uppercase">Projects</h3> }
           @for (project of projects(); track project.projectUrl) {
             <app-project-result-card [project]="project" />
           }
         </div>
       }
 
-      @if (activeTab() === 'users' && users().length > 0) {
+      @if ((activeTab() === 'users' || activeTab() === 'all') && users().length > 0) {
         <div class="flex flex-col gap mt-6 space-y-4">
+          @if (activeTab() === 'all') { <h3 class="text-sm font-semibold tracking-wider text-slate-500 uppercase">Users</h3> }
           @for (user of users(); track user.keycloakId) {
             <app-user-result-card [user]="user" />
           }

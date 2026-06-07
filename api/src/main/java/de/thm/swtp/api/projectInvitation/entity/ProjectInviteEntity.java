@@ -44,10 +44,27 @@ public class ProjectInviteEntity {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(nullable = false, updatable = true)
+    private LocalDateTime updatedAt;
+
     /** Current status of the invite.*/
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ProjectInviteStatus status;
 
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+
+        if (this.updatedAt == null) {
+            this.updatedAt = this.createdAt;
+        }
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 
 }

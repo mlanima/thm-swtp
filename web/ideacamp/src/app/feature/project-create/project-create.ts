@@ -97,7 +97,7 @@ export class ProjectCreate {
     this.projectService.createProject({ ...res.data, memberIds: this.invitedMembers.map(member => member.keycloakId), tagIds: [] }).subscribe({
       next: (project) => {
         this.isLoading = false;
-        this.successMessage = 'Projekt erfolgreich erstellt!';
+        this.successMessage = this.invitedMembers.length > 0 ? 'Projekt erfolgreich erstellt und Einladungen gesendet!' : 'Projekt erfolgreich erstellt!';
         setTimeout(() => {
           this.router.navigate(['/project', project.projectUrl]);
         }, 1500);
