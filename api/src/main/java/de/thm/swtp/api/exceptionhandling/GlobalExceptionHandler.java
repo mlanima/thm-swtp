@@ -1,8 +1,6 @@
 package de.thm.swtp.api.exceptionhandling;
 
-import de.thm.swtp.api.exceptionhandling.exceptions.ProfileAccessDeniedException;
-import de.thm.swtp.api.exceptionhandling.exceptions.ProjectLinkAlreadyExistsException;
-import de.thm.swtp.api.exceptionhandling.exceptions.ProjectLinkDoesNotBelongToProjectException;
+import de.thm.swtp.api.exceptionhandling.exceptions.*;
 import de.thm.swtp.api.projectFavorite.exception.ProjectAlreadyFavoritedException;
 import de.thm.swtp.api.projectFavorite.exception.ProjectFavoriteNotFoundException;
 import de.thm.swtp.api.projectInvitation.exception.InvalidProjectInviteException;
@@ -97,14 +95,25 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(403, "Forbidden", ex.getMessage()));
     }
 
-    @ExceptionHandler(ProjectAlreadyFavoritedException.class)
-    public ResponseEntity<ErrorResponse> handleProjectAlreadyFavorited(ProjectAlreadyFavoritedException ex) {
+    @ExceptionHandler(ProjectJoinRequestAccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleProjectJoinRequestAccessDenied(ProjectJoinRequestAccessDeniedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ErrorResponse.of(403, "Forbidden", ex.getMessage()));
+    }
+    @ExceptionHandler(ProjectJoinRequestAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleProjectJoinRequestAlreadyExists(ProjectJoinRequestAlreadyExistsException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
     }
 
-    @ExceptionHandler(ProjectFavoriteNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleProjectFavoriteNotFound(ProjectFavoriteNotFoundException ex) {
+    @ExceptionHandler(ProjectJoinRequestInvalidStatusForEditException.class)
+    public ResponseEntity<ErrorResponse> handleProjectJoinRequestInvalidStatusForEdit(ProjectJoinRequestInvalidStatusForEditException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ProjectJoinRequestNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleProjectJoinRequestNotFound(ProjectJoinRequestNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
     }
@@ -117,6 +126,18 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ProjectLinkDoesNotBelongToProjectException.class)
     public ResponseEntity<ErrorResponse> handleProjectLinkDoesNotBelongToProject(ProjectLinkDoesNotBelongToProjectException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ProjectAlreadyFavoritedException.class)
+    public ResponseEntity<ErrorResponse> handleProjectAlreadyFavorited(ProjectAlreadyFavoritedException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ProjectFavoriteNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleProjectFavoriteNotFound(ProjectFavoriteNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
     }

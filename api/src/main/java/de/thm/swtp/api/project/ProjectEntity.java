@@ -50,7 +50,7 @@ public class ProjectEntity {
             inverseJoinColumns = @JoinColumn(name = "user_profile_keycloak_id")
     )
     @Builder.Default
-    private List<UserProfile> members = new ArrayList<>();
+    private Set<UserProfile> members = new HashSet<>();
 
     // Misses Join to TagEntity for project-tags. ManyToMany should work.
     @ManyToMany

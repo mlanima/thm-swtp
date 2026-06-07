@@ -53,14 +53,13 @@ public class ProjectService {
         UserProfile owner = userProfileRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User profile not found for username: " + username));
 
-
         ProjectEntity project = ProjectEntity.builder()
                 .name(request.name())
                 .description(request.description())
                 .projectUrl(request.projectUrl())
                 .isPrivateProject(request.isPrivateProject())
                 .owner(owner)
-                .members(new ArrayList<>())
+                .members(Set.of())
                 .build();
 
         ProjectEntity saved = projectRepository.save(project);
