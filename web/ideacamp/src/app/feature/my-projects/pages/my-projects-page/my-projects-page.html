@@ -51,11 +51,14 @@
                 <p class="text-xs text-slate-400">URL: /project/{{ project.projectUrl }}</p>
               </div>
 
-              <a
-                [routerLink]="['/project', project.projectUrl]"
-                class="inline-flex items-center justify-center rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
-                Projekt öffnen
-              </a>
+              <div class="flex items-center gap-2">
+                <app-favorite-button [projectId]="project.id" [count]="project.favoriteCount" />
+                <a
+                  [routerLink]="['/project', project.projectUrl]"
+                  class="inline-flex items-center justify-center rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
+                  Projekt öffnen
+                </a>
+              </div>
             </div>
           </article>
         }

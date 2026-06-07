@@ -50,6 +50,23 @@
 <!--        Anfragen (3)-->
 <!--      </button>-->
       </div>
+      <div class="hidden items-start justify-end md:flex">
+        <app-favorite-button
+          [projectId]="project.id"
+          [count]="project.favoriteCount"
+          (favoriteCountChanged)="favoriteCountChanged.emit($event)"
+        />
+
+        @if (isOwner) {
+          <a
+            [routerLink]="['/project', project.projectUrl, 'settings']"
+            class="inline-flex items-center gap-2 rounded-full bg-slate-700/80 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-600 hover:text-lime-300"
+          >
+            <i class="pi pi-cog text-base"></i>
+            <span>Settings</span>
+          </a>
+        }
+      </div>
     </div>
   }
 </header>

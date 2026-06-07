@@ -3,7 +3,7 @@ import { RenderMode, ServerRoute } from '@angular/ssr';
 export const serverRoutes: ServerRoute[] = [
 
   {
-    path: 'profile',
+    path: 'profiles/:username',
     renderMode: RenderMode.Client,
   },
 
@@ -34,6 +34,16 @@ export const serverRoutes: ServerRoute[] = [
 
   {
     path: 'my-projects',
+    renderMode: RenderMode.Client,
+  },
+  
+  {
+    path: 'project/:projectUrl/settings',
+    renderMode: RenderMode.Client,
+  },
+
+  {
+    path: 'project/:projectUrl/settings',
     renderMode: RenderMode.Client,
   },
 

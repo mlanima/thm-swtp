@@ -59,4 +59,12 @@ public class ProjectController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/{projectId}/members")
+    public List<ProjectMemberResponse> getProjectMembers(@PathVariable UUID projectId) {
+        return projectService.getProjectMembers(projectId)
+                .stream()
+                .map(ProjectMemberResponse::toResponse)
+                .toList();
+    }
+
 }

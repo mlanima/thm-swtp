@@ -1,0 +1,85 @@
+<div>
+  <h1 class="text-2xl font-semibold text-slate-800">Projekt Löschen</h1>
+  <p class="mt-1 text-sm text-slate-500">Diese Aktion kann nicht Rückgängig gemacht werden.</p>
+
+  <div class="mt-6 space-y-3">
+
+    <div class="rounded-xl border border-red-200 bg-red-50 p-5 shadow-sm">
+      <p class="text-sm font-semibold text-red-700">Projekt Löschen</p>
+      <p class="mt-0.5 text-xs text-red-500">Dieses Projekt und alle zugehörigen Daten werden unwideruflich gelöscht!</p>
+      <button
+        (click)="openDeleteModal()"
+        class="mt-3 flex cursor-pointer items-center gap-1.5 rounded-md bg-red-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-600"
+      >
+        <i class="pi pi-trash text-xs"></i>
+        Projekt Löschen
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
+@if (showDeleteModal()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+    <div class="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+      <button
+        (click)="closeDeleteModal()"
+        class="absolute right-4 top-4 cursor-pointer text-slate-400 hover:text-slate-700"
+      >
+        <i class="pi pi-times text-sm"></i>
+      </button>
+
+      <div class="flex items-center gap-3">
+        <div class="flex h-9 w-9 items-center justify-center rounded-full bg-red-100">
+          <i class="pi pi-trash text-sm text-red-500"></i>
+        </div>
+        <div>
+          <h2 class="font-semibold text-slate-800">Projekt Löschen</h2>
+          <p class="text-xs text-slate-400">Das ist eine unwiderufliche Aktion</p>
+        </div>
+      </div>
+
+      <p class="mt-4 text-sm text-slate-600">
+        Wenn du <strong>{{ projectName }}</strong> endgültig löschst, werden alle Ideen, Mitglieder und Einstellungen gelöscht werden.
+        Die Daten können nicht wiederhergestellt werden.
+      </p>
+
+      <div class="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2">
+        <p class="text-xs text-red-600">
+         Um diese Aktion zu bestätigen bitte tippe das ein <strong>{{ projectName }}</strong> .
+        </p>
+      </div>
+
+      <input
+        type="text"
+        [value]="deleteConfirmInput()"
+        (input)="deleteConfirmInput.set($any($event.target).value)"
+        [placeholder]="projectName"
+        class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:border-slate-400 focus:outline-none"
+      />
+
+      @if (deleteError()) {
+        <p class="mt-3 text-xs text-red-600">{{ deleteError() }}</p>
+      }
+
+      <div class="mt-5 flex gap-3">
+        <button
+          (click)="closeDeleteModal()"
+          class="flex-1 cursor-pointer rounded-lg border border-slate-200 bg-white py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+        >
+          Abbrechen
+        </button>
+        <button
+          (click)="confirmDelete()"
+          [disabled]="!deleteEnabled()"
+          class="flex-1 rounded-lg py-2 text-sm font-medium text-white transition-colors
+                 enabled:cursor-pointer enabled:bg-red-500 enabled:hover:bg-red-600
+                 disabled:cursor-not-allowed disabled:bg-red-200"
+        >
+          {{ isDeleting() ? 'Wird gelöscht…' : 'Projekt Löschen' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

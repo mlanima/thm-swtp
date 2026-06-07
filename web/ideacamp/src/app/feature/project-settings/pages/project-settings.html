@@ -1,0 +1,494 @@
+<section class="min-h-[calc(100vh-4rem)] bg-slate-50 px-8 py-8 text-slate-700">
+  <div class="mx-auto flex max-w-6xl gap-10">
+
+    <aside class="w-56 shrink-0 pt-4">
+      <p class="mb-4 px-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+        Project Settings
+      </p>
+
+      <nav class="space-y-1">
+        <button
+          type="button"
+          class="flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm transition"
+          [class.bg-slate-700]="activeTab() === 'join-requests'"
+          [class.text-white]="activeTab() === 'join-requests'"
+          [class.text-slate-700]="activeTab() !== 'join-requests'"
+          [class.hover:bg-slate-100]="activeTab() !== 'join-requests'"
+          (click)="selectTab('join-requests')"
+        >
+          <i class="pi pi-user-plus text-sm"></i>
+          <span>Join Requests</span>
+        </button>
+
+        <button
+          type="button"
+          class="flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm transition"
+          [class.bg-slate-700]="activeTab() === 'members'"
+          [class.text-white]="activeTab() === 'members'"
+          [class.text-slate-700]="activeTab() !== 'members'"
+          [class.hover:bg-slate-100]="activeTab() !== 'members'"
+          (click)="selectTab('members')"
+        >
+          <i class="pi pi-users text-sm"></i>
+          <span>Members</span>
+        </button>
+
+        <button
+          type="button"
+          class="flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm transition"
+          [class.bg-slate-700]="activeTab() === 'privacy'"
+          [class.text-white]="activeTab() === 'privacy'"
+          [class.text-slate-700]="activeTab() !== 'privacy'"
+          [class.hover:bg-slate-100]="activeTab() !== 'privacy'"
+          (click)="selectTab('privacy')"
+        >
+          <i class="pi pi-shield text-sm"></i>
+          <span>Privacy</span>
+        </button>
+
+        <div class="my-5 border-t border-slate-200"></div>
+
+        <button
+          type="button"
+          class="flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm transition"
+          [class.bg-slate-700]="activeTab() === 'danger-zone'"
+          [class.text-white]="activeTab() === 'danger-zone'"
+          [class.text-slate-700]="activeTab() !== 'danger-zone'"
+          [class.hover:bg-slate-100]="activeTab() !== 'danger-zone'"
+          (click)="selectTab('danger-zone')"
+        >
+          <i class="pi pi-trash text-sm"></i>
+          <span>Danger Zone</span>
+        </button>
+      </nav>
+    </aside>
+
+    <main class="flex-1 pt-4">
+
+      <a
+        [routerLink]="['/project', projectUrl]"
+        class="mb-6 inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-slate-500 transition hover:bg-slate-100 hover:text-lime-500"
+      >
+        <i class="pi pi-arrow-left text-sm text-zinc-400"></i>
+        <span>Back to project</span>
+      </a>
+
+      @if (activeTab() === 'join-requests') {
+        <section>
+          <h1 class="text-2xl font-semibold text-slate-800">
+            Join Requests
+          </h1>
+
+          <p class="mt-1 text-sm text-slate-500">
+            Review and manage requests to join this project.
+          </p>
+
+          <div class="mt-6 space-y-4">
+            @if (hasJoinRequests()) {
+              @for (request of joinRequests(); track request.id) {
+                <article class="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+                  <div class="flex items-start justify-between gap-4">
+                    <div class="flex items-start gap-4">
+                      <div
+                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white"
+                        [class]="request.colorClass"
+                      >
+                        {{ request.initials }}
+                      </div>
+
+                      <div>
+                        <h2 class="text-sm font-semibold text-slate-800">
+                          {{ request.name }}
+                        </h2>
+
+                        <p class="text-xs text-slate-500">
+                          {{ request.email }}
+                        </p>
+                      </div>
+                    </div>
+
+                    <span class="text-xs text-slate-500">
+                      {{ request.date }}
+                    </span>
+                  </div>
+
+                  @if (request.message) {
+                    <div class="mt-4 rounded-md bg-slate-50 px-4 py-3 text-sm italic text-slate-600">
+                      "{{ request.message }}"
+                    </div>
+                  }
+
+                  <div class="mt-4 flex gap-2">
+                    <button
+                      type="button"
+                      class="inline-flex items-center gap-2 rounded-md bg-slate-700 px-4 py-2 text-xs font-medium text-white transition hover:bg-slate-800"
+                      (click)="approveJoinRequest(request.id)"
+                    >
+                      <i class="pi pi-check text-xs"></i>
+                      Approve
+                    </button>
+
+                    <button
+                      type="button"
+                      class="inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white px-4 py-2 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
+                      (click)="declineJoinRequest(request.id)"
+                    >
+                      <i class="pi pi-times text-xs"></i>
+                      Decline
+                    </button>
+                  </div>
+                </article>
+              }
+            } @else {
+              <div class="rounded-lg border border-slate-200 bg-white p-8 text-center shadow-sm">
+                <p class="text-sm font-medium text-slate-700">
+                  No join requests
+                </p>
+
+                <p class="mt-1 text-sm text-slate-500">
+                  There are currently no pending requests for this project.
+                </p>
+              </div>
+            }
+          </div>
+        </section>
+      }
+
+      @if (activeTab() === 'members') {
+        <section>
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <h1 class="text-2xl font-semibold text-slate-800">
+                Members
+              </h1>
+
+              <p class="mt-1 text-sm text-slate-500">
+                Manage who has access to this project.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              class="rounded-md bg-slate-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
+            >
+              Invite Member
+            </button>
+          </div>
+
+          <div class="mt-6 overflow-hidden rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+            <table class="w-full text-left text-sm">
+              <thead>
+              <tr class="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
+                <th class="px-4 py-3 font-semibold">Member</th>
+                <th class="px-4 py-3 font-semibold">Role</th>
+                <th class="px-4 py-3 font-semibold">Joined</th>
+                <th class="px-4 py-3 font-semibold"></th>
+              </tr>
+              </thead>
+
+              <tbody>
+                @for (member of members(); track member.id) {
+                  <tr class="border-b border-slate-100 last:border-b-0">
+                    <td class="px-4 py-4">
+                      <div class="flex items-center gap-3">
+                        <div class="flex h-9 w-9 items-center justify-center rounded-full bg-slate-700 text-xs font-semibold text-white">
+                          {{ member.initials }}
+                        </div>
+
+                        <div>
+                          <p class="font-semibold text-slate-800">
+                            {{ member.name }}
+                          </p>
+
+                          <p class="text-xs text-slate-500">
+                            {{ member.email }}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+
+                    <td class="px-4 py-4">
+                      @if (member.role === 'Owner') {
+                        <span class="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
+                          Owner
+                        </span>
+                      } @else {
+                        <span class="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600">
+                          Member
+                        </span>
+                      }
+                    </td>
+
+                    <td class="px-4 py-4 text-slate-500">
+                      {{ member.joined }}
+                    </td>
+
+                    <td class="px-4 py-4 text-right">
+                      @if (member.role !== 'Owner') {
+                        <button
+                          type="button"
+                          class="text-xs font-medium text-slate-500 transition hover:text-red-600"
+                          (click)="openRemoveMemberDialog(member)"
+                        >
+                          Remove
+                        </button>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </section>
+      }
+
+      @if (activeTab() === 'privacy') {
+        <section>
+          <h1 class="text-2xl font-semibold text-slate-800">
+            Privacy
+          </h1>
+
+          <p class="mt-1 text-sm text-slate-500">
+            Control who can see and interact with this project.
+          </p>
+
+          <div class="mt-6 rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+            <div class="flex items-center justify-between border-b border-slate-200 px-4 py-5">
+              <div>
+                <h2 class="text-sm font-semibold text-slate-800">
+                  Public visibility
+                </h2>
+
+                <p class="mt-1 text-xs text-slate-500">
+                  Anyone can discover and view this project.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                class="relative h-6 w-11 rounded-full transition"
+                [class.bg-slate-700]="publicVisibility()"
+                [class.bg-slate-300]="!publicVisibility()"
+                (click)="togglePublicVisibility()"
+              >
+                <span
+                  class="absolute top-1 h-4 w-4 rounded-full bg-white transition"
+                  [class.left-6]="publicVisibility()"
+                  [class.left-1]="!publicVisibility()"
+                ></span>
+              </button>
+            </div>
+
+            <div class="flex items-center justify-between px-4 py-5">
+              <div>
+                <h2 class="text-sm font-semibold text-slate-800">
+                  Allow join requests
+                </h2>
+
+                <p class="mt-1 text-xs text-slate-500">
+                  Users can request to join; owners approve or decline.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                class="relative h-6 w-11 rounded-full transition"
+                [class.bg-slate-700]="allowJoinRequests()"
+                [class.bg-slate-300]="!allowJoinRequests()"
+                (click)="toggleJoinRequests()"
+              >
+                <span
+                  class="absolute top-1 h-4 w-4 rounded-full bg-white transition"
+                  [class.left-6]="allowJoinRequests()"
+                  [class.left-1]="!allowJoinRequests()"
+                ></span>
+              </button>
+            </div>
+          </div>
+        </section>
+      }
+
+      @if (activeTab() === 'danger-zone') {
+        <section>
+          <h1 class="text-2xl font-semibold text-slate-800">
+            Danger Zone
+          </h1>
+
+          <p class="mt-1 text-sm text-slate-500">
+            Irreversible actions. Please proceed with caution.
+          </p>
+
+          <div class="mt-6 space-y-5">
+            <div class="rounded-lg border border-red-200 bg-white p-5 shadow-sm">
+              <h2 class="text-sm font-semibold text-red-700">
+                Delete project
+              </h2>
+
+              <p class="mt-1 text-sm text-slate-500">
+                Permanently delete this project and all its data.
+              </p>
+
+              <button
+                type="button"
+                class="mt-4 inline-flex items-center gap-2 rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700"
+                (click)="openDeleteProjectDialog()"
+              >
+                <i class="pi pi-trash text-xs"></i>
+                Delete project
+              </button>
+            </div>
+          </div>
+        </section>
+      }
+    </main>
+  </div>
+</section>
+
+@if (selectedMemberToRemove(); as member) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+    <div class="w-full max-w-md rounded-lg bg-white p-5 shadow-xl">
+      <div class="flex items-start justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="flex h-9 w-9 items-center justify-center rounded-full bg-red-50 text-red-600">
+            <i class="pi pi-user-minus text-sm"></i>
+          </div>
+
+          <div>
+            <h2 class="text-lg font-semibold text-slate-800">
+              Remove member
+            </h2>
+
+            <p class="text-xs text-slate-500">
+              This will revoke their access
+            </p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="text-slate-400 transition hover:text-slate-700"
+          (click)="closeRemoveMemberDialog()"
+        >
+          <i class="pi pi-times text-sm"></i>
+        </button>
+      </div>
+
+      <div class="mt-5 rounded-md bg-slate-50 p-4">
+        <div class="flex items-center gap-3">
+          <div class="flex h-9 w-9 items-center justify-center rounded-full bg-slate-700 text-xs font-semibold text-white">
+            {{ member.initials }}
+          </div>
+
+          <div>
+            <p class="text-sm font-semibold text-slate-800">
+              {{ member.name }}
+            </p>
+
+            <p class="text-xs text-slate-500">
+              {{ member.email }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <p class="mt-5 text-sm leading-6 text-slate-600">
+        Are you sure you want to remove
+        <span class="font-semibold text-slate-800">{{ member.name }}</span>
+        from this project? They will immediately lose access.
+      </p>
+
+      <div class="mt-5 grid grid-cols-2 gap-3">
+        <button
+          type="button"
+          class="rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+          (click)="closeRemoveMemberDialog()"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          class="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700"
+          (click)="confirmRemoveMember()"
+        >
+          Remove member
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (showDeleteProjectDialog()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+    <div class="w-full max-w-md rounded-lg bg-white p-5 shadow-xl">
+      <div class="flex items-start justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="flex h-9 w-9 items-center justify-center rounded-full bg-red-50 text-red-600">
+            <i class="pi pi-trash text-sm"></i>
+          </div>
+
+          <div>
+            <h2 class="text-lg font-semibold text-slate-800">
+              Delete project
+            </h2>
+
+            <p class="text-xs text-slate-500">
+              This action cannot be undone
+            </p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="text-slate-400 transition hover:text-slate-700"
+          (click)="closeDeleteProjectDialog()"
+        >
+          <i class="pi pi-times text-sm"></i>
+        </button>
+      </div>
+
+      <p class="mt-5 text-sm leading-6 text-slate-600">
+        Permanently deleting
+        <span class="font-semibold text-slate-800">{{ projectName() }}</span>
+        will remove all ideas, members, and settings. There is no way to recover this data.
+      </p>
+
+      <div class="mt-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        To confirm, type
+        <span class="font-semibold">{{ deleteConfirmationText() }}</span>
+        below.
+      </div>
+
+      <input
+        type="text"
+        class="mt-4 w-full rounded-md border border-slate-200 px-4 py-2 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-2 focus:ring-slate-100"
+        placeholder="IdeaCamp Project"
+        [value]="deleteProjectConfirmation()"
+        (input)="updateDeleteProjectConfirmation($any($event.target).value)"
+      />
+
+      <div class="mt-5 grid grid-cols-2 gap-3">
+        <button
+          type="button"
+          class="rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+          (click)="closeDeleteProjectDialog()"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          class="rounded-md px-4 py-2 text-sm font-medium text-white transition"
+          [class.bg-red-600]="isDeleteProjectConfirmationValid()"
+          [class.hover:bg-red-700]="isDeleteProjectConfirmationValid()"
+          [class.bg-red-300]="!isDeleteProjectConfirmationValid()"
+          [class.cursor-not-allowed]="!isDeleteProjectConfirmationValid()"
+          [disabled]="!isDeleteProjectConfirmationValid()"
+          (click)="confirmDeleteProject()"
+        >
+          Delete project
+        </button>
+      </div>
+    </div>
+  </div>
+}
