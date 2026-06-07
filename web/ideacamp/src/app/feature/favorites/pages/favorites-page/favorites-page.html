@@ -1,17 +1,12 @@
 <section class="min-h-screen bg-slate-100 px-6 py-8 text-slate-700">
   <div class="mx-auto max-w-6xl">
-    <header class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-      <h1 class="text-4xl font-bold text-slate-700">Meine Projekte</h1>
-      <a
-        routerLink="/createProject"
-        class="inline-flex items-center justify-center rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-900">
-        Projekt erstellen
-      </a>
+    <header class="flex flex-col gap-2">
+      <h1 class="text-4xl font-bold text-slate-700">Meine Favoriten</h1>
     </header>
 
     @if (isLoading()) {
       <div class="mt-8 rounded-2xl border border-slate-200 bg-white px-6 py-12 text-center shadow-sm">
-        <p class="text-sm text-slate-500">Deine Projekte werden geladen…</p>
+        <p class="text-sm text-slate-500">Deine Favoriten werden geladen…</p>
       </div>
     } @else if (errorMessage()) {
       <div class="mt-8 rounded-2xl border border-red-200 bg-red-50 px-6 py-12 text-center shadow-sm">
@@ -20,11 +15,11 @@
     } @else if (projects().length === 0) {
       <div class="mt-8 rounded-2xl border border-slate-200 bg-white px-6 py-12 text-center shadow-sm">
         <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-slate-500">
-          <i class="pi pi-folder text-2xl"></i>
+          <i class="pi pi-heart text-2xl"></i>
         </div>
-        <h2 class="mt-5 text-2xl font-semibold text-slate-700">Noch keine Projekte</h2>
+        <h2 class="mt-5 text-2xl font-semibold text-slate-700">Noch keine Favoriten</h2>
         <p class="mt-2 text-sm text-slate-500">
-          Sobald du dein erstes Projekt erstellst, erscheint es hier.
+          Sobald du ein Projekt favorisierst, erscheint es hier.
         </p>
       </div>
     } @else {
@@ -66,5 +61,3 @@
     }
   </div>
 </section>
-
-

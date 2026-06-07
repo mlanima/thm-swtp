@@ -1,18 +1,18 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { MyProjectsService } from '../../services/my-projects.service';
+import { ProjectFavoriteService } from '../../../../services/project-favorite.service';
 import { ProjectResponse } from '../../../../models/project.model';
 import { AuthService } from '../../../auth/auth.service';
 import { FavoriteButton } from '../../../../shared/favorite-button/favorite-button';
 
 @Component({
-  selector: 'app-my-projects-page',
+  selector: 'app-favorites-page',
   standalone: true,
   imports: [RouterLink, FavoriteButton],
-  templateUrl: './my-projects-page.html',
+  templateUrl: './favorites-page.html',
 })
-export class MyProjectsPage implements OnInit {
-  private readonly myProjectsService = inject(MyProjectsService);
+export class FavoritesPage implements OnInit {
+  private readonly projectFavoriteService = inject(ProjectFavoriteService);
   private readonly authService = inject(AuthService);
 
   readonly projects = signal<ProjectResponse[]>([]);
@@ -21,33 +21,22 @@ export class MyProjectsPage implements OnInit {
 
   async ngOnInit(): Promise<void> {
     await this.authService.waitUntilAuthReady();
-    this.loadProjects();
+    this.loadFavorites();
   }
 
-  private loadProjects(): void {
-    const username = this.authService.username();
-
-    if (!username) {
-      this.errorMessage.set('Dein Benutzername konnte nicht geladen werden.');
-      this.isLoading.set(false);
-      return;
-    }
-
+  private loadFavorites(): void {
     this.isLoading.set(true);
     this.errorMessage.set('');
 
-    this.myProjectsService.getMyProjects(username).subscribe({
+    this.projectFavoriteService.getFavorites().subscribe({
       next: projects => {
         this.projects.set(projects);
         this.isLoading.set(false);
       },
       error: () => {
-        this.errorMessage.set('Deine Projekte konnten nicht geladen werden.');
+        this.errorMessage.set('Deine Favoriten konnten nicht geladen werden.');
         this.isLoading.set(false);
       },
     });
   }
 }
-
-
-

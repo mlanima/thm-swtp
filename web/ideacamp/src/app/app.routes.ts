@@ -9,6 +9,7 @@ import {authGuard} from './feature/auth/auth.guard'
 import { SearchPage } from './feature/search/pages/search-page/search-page';
 import { MyProjectsPage } from './feature/my-projects/pages/my-projects-page/my-projects-page';
 import { ProjectSettings } from './feature/project-settings/project-settings';
+import { FavoritesPage } from './feature/favorites/pages/favorites-page/favorites-page';
 
 export const routes: Routes = [
   {path: '', redirectTo: 'impressum', pathMatch: 'full' },
@@ -21,4 +22,5 @@ export const routes: Routes = [
   {path: 'search', component: SearchPage, canActivate: [authGuard]},
   {path: 'createProject', component: ProjectCreate, canActivate: [authGuard]},
   {path: 'my-projects', component: MyProjectsPage, canActivate: [authGuard]},
+  {path: 'favorites', component: FavoritesPage, canActivate: [authGuard]},
 ];
