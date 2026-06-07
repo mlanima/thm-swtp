@@ -10,7 +10,7 @@
       <div class="status text-xs">Eingeloggt</div>
     </div>
 
-    <button class="">
+    <a [routerLink]="['/profiles', username]">
       @if (imageUrl) {
         <img ngSrc="{{imageUrl}}" width="12" height="12" alt="User Avatar" class="rounded-full size-12 object-cover">
       } @else {
@@ -18,7 +18,7 @@
           <i class="pi pi-user text-xl"></i>
         </div>
       }
-    </button>
+    </a>
 
     <button type="button" (click)="logout()" class="text-xs underline text-gray-600 hover:text-black">
       Logout

@@ -29,7 +29,7 @@
 
     <div class="flex justify-end flex-1">
       @if (isAuthenticated()) {
-        <a routerLink="/profile">
+        <a [routerLink]="['/profiles', auth.username()]">
           <app-auth-panel [user]="{ username: auth.username(), id: auth.user()?.id ?? '' }"/>
         </a>
       } @else {

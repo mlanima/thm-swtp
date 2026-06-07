@@ -20,4 +20,5 @@ public class ProjectResponse {
     private LocalDateTime updatedAt;
 
     private ProjectStatsResponse stats;
+    private long favoriteCount;
 }
