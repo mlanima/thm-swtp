@@ -41,14 +41,16 @@
 
   @if (currentStep === 2){
     <app-project-members-form
-      (back)="previousStep()"
-      (next)="nextStep()">
+      [initialMembers]="invitedMembers"
+      (back)="saveMembersAndBack($event)"
+      (next)="saveMembersAndContinue($event)">
     </app-project-members-form>
   }
 
   @if (currentStep === 3) {
     <app-project-finish-form
       [projectData]="projectData"
+      [members]="invitedMembers"
       (back)="previousStep()"
       (finished)="finishProjectCreation()">
     </app-project-finish-form>

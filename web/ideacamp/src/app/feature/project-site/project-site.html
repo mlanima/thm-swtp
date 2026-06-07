@@ -24,7 +24,10 @@
   }
 
   @if (!isLoading() && project()) {
-    <app-project-header [project]="project()!" />
+    <app-project-header
+      [project]="project()!"
+      (favoriteCountChanged)="onFavoriteCountChanged($event)"
+    />
 
     <main class="mx-auto grid max-w-6xl grid-cols-1 gap-6 px-6 py-10 lg:grid-cols-[1fr_320px]">
       <section class="space-y-6">

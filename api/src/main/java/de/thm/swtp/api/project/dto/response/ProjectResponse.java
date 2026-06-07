@@ -18,6 +18,10 @@ public class ProjectResponse {
     private Set<UUID> memberIds;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+<<<<<<< HEAD
 
     private ProjectStatsResponse stats;
+=======
+    private long favoriteCount;
+>>>>>>> developer
 }

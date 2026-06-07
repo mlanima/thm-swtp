@@ -41,7 +41,7 @@ public class ProjectInviteController {
     }
 
     /** Current user can accept or reject an invitation. */
-    @PutMapping("/invitations/{invitationId}")
+    @PatchMapping("/invitations/{invitationId}")
     public ProjectInviteResponse updateInviteStatus(@PathVariable UUID invitationId, @Valid @RequestBody UpdateProjectInviteStatusRequest request, @AuthenticationPrincipal Jwt jwt) {
         UUID currentUserId = UUID.fromString(jwt.getSubject());
         return ProjectInviteResponse.toResponse(
