@@ -1,118 +1,52 @@
 <div class="mt-8 rounded-xl border border-slate-200 bg-white shadow-sm">
-  <button
-    (click)="toggle()"
-    class="flex w-full items-center justify-between px-6 py-4 text-left"
-  >
-    <div class="flex items-center gap-3">
-      <span class="text-base font-semibold text-slate-700">Project Invitations</span>
-      <span
-        class="flex h-6 w-6 items-center justify-center rounded-full bg-slate-800 text-xs font-medium text-white"
-        >3</span
-      >
-    </div>
-    <i
-      class="pi text-slate-400"
-      [class]="invitationsExpanded() ? 'pi-chevron-up' : 'pi-chevron-down'"
-    ></i>
-  </button>
-
-  @if (invitationsExpanded()) {
-    <div class="border-t border-slate-100 px-6 py-4">
-      <div class="rounded-xl border border-slate-100 p-5">
-        <div class="flex items-start gap-4">
-          <div
-            class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-slate-700 text-sm font-bold text-white"
-          >
-            DE
-          </div>
-          <div class="flex-1">
-            <h3 class="text-base font-semibold text-slate-700">Design System 2.0</h3>
-            <p class="mt-0.5 text-sm text-slate-400">
-              Invited by <span class="font-medium text-slate-600">Maria Schmidt</span> · 2 hours ago
-            </p>
-            <blockquote class="mt-3 border-l-4 border-slate-200 pl-4 text-sm text-slate-500">
-              Hey! Would love your input on the new token structure we're building out. Jump in
-              whenever you're ready.
-            </blockquote>
-            <div class="mt-4 flex gap-2">
-              <button
-                class="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-700"
-              >
-                <i class="pi pi-check text-xs"></i> Accept
-              </button>
-              <button
-                class="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
-              >
-                <i class="pi pi-times text-xs"></i> Decline
-              </button>
-            </div>
-          </div>
-        </div>
+  @if (invitations().length > 0) {
+    <button
+      (click)="toggle()"
+      class="flex w-full items-center justify-between px-6 py-4 text-left"
+    >
+      <div class="flex items-center gap-3">
+        <span class="text-base font-semibold text-slate-700">Project Invitations</span>
+        <span
+          class="flex h-6 w-6 items-center justify-center rounded-full bg-slate-800 text-xs font-medium text-white"
+          >{{ invitations().length }}</span
+        >
       </div>
+      <i
+        class="pi text-slate-400"
+        [class]="invitationsExpanded() ? 'pi-chevron-up' : 'pi-chevron-down'"
+      ></i>
+    </button>
 
-      <div class="mt-3 rounded-xl border border-slate-100 p-5">
-        <div class="flex items-start gap-4">
-          <div
-            class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-slate-700 text-sm font-bold text-white"
-          >
-            MO
+    @if (invitationsExpanded()) {
+      <div class="border-t border-slate-100 px-6 py-4">
+        @for (invite of invitations(); track invite.id) {
+          <div [class.mt-3]="!$first">
+            <app-invitation-card
+              [invite]="invite"
+              (accept)="accept($event)"
+              (decline)="decline($event)"
+            />
           </div>
-          <div class="flex-1">
-            <h3 class="text-base font-semibold text-slate-700">Mobile App Redesign</h3>
-            <p class="mt-0.5 text-sm text-slate-400">
-              Invited by <span class="font-medium text-slate-600">Tom Müller</span> · Yesterday
-            </p>
-            <blockquote class="mt-3 border-l-4 border-slate-200 pl-4 text-sm text-slate-500">
-              Added you as a viewer so you can follow along with the redesign progress. Let me know
-              if you'd like edit access too.
-            </blockquote>
-            <div class="mt-4 flex gap-2">
-              <button
-                class="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-700"
-              >
-                <i class="pi pi-check text-xs"></i> Accept
-              </button>
-              <button
-                class="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
-              >
-                <i class="pi pi-times text-xs"></i> Decline
-              </button>
-            </div>
-          </div>
-        </div>
+        }
       </div>
-
-      <div class="mt-3 rounded-xl border border-slate-100 p-5">
-        <div class="flex items-start gap-4">
-          <div
-            class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-slate-700 text-sm font-bold text-white"
-          >
-            MA
-          </div>
-          <div class="flex-1">
-            <h3 class="text-base font-semibold text-slate-700">Marketing Campaign Q3</h3>
-            <p class="mt-0.5 text-sm text-slate-400">
-              Invited by <span class="font-medium text-slate-600">Anna Weber</span> · 3 days ago
-            </p>
-            <blockquote class="mt-3 border-l-4 border-slate-200 pl-4 text-sm text-slate-500">
-              We're kicking off the Q3 campaign planning and need someone to own the content
-              calendar. Thought of you!
-            </blockquote>
-            <div class="mt-4 flex gap-2">
-              <button
-                class="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-700"
-              >
-                <i class="pi pi-check text-xs"></i> Accept
-              </button>
-              <button
-                class="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
-              >
-                <i class="pi pi-times text-xs"></i> Decline
-              </button>
-            </div>
-          </div>
-        </div>
+    }
+  } @else {
+    <div class="flex w-full items-center justify-between px-6 py-4">
+      <div class="flex items-center gap-3">
+        <span class="text-base font-semibold text-slate-700">Project Invitations</span>
+        <span
+          class="flex h-6 w-6 items-center justify-center rounded-full bg-slate-800 text-xs font-medium text-white"
+          >0</span
+        >
       </div>
     </div>
   }
 </div>
+
+@if (errorMessage()) {
+  <div
+    class="mt-2 rounded-xl border border-red-200 bg-red-50 px-6 py-3 text-center shadow-sm"
+  >
+    <p class="text-sm font-medium text-red-700">{{ errorMessage() }}</p>
+  </div>
+}
