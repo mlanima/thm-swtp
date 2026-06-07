@@ -67,6 +67,11 @@ export class ProjectSite  implements OnInit {
     this.successMessage.set(null);
   }
 
+  onFavoriteCountChanged(newCount: number): void {
+    const proj = this.project();
+    if (proj) this.project.set({ ...proj, favoriteCount: newCount });
+  }
+
   cancelEdit(): void {
     this.isEditing.set(false);
   }

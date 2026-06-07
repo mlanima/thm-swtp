@@ -5,6 +5,7 @@ import de.thm.swtp.api.project.dto.request.*;
 import de.thm.swtp.api.project.dto.response.*;
 import de.thm.swtp.api.project.exception.*;
 import de.thm.swtp.api.projectInvitation.service.ProjectInviteService;
+import de.thm.swtp.api.projectFavorite.repository.ProjectFavoriteRepository;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 
@@ -23,6 +24,7 @@ public class ProjectService {
     private final UserProfileRepository userProfileRepository;
     private final ProjectInviteService projectInviteService;
     private static final String PROJECT_CREATION_INVITE_MESSAGE = "You have been invited to join this project.";
+    private final ProjectFavoriteRepository projectFavoriteRepository;
 
     private ProjectResponse toResponse(ProjectEntity project) {
         return ProjectResponse.builder()
@@ -37,6 +39,7 @@ public class ProjectService {
                         .collect(java.util.stream.Collectors.toSet()))
                 .createdAt(project.getCreatedAt())
                 .updatedAt(project.getUpdatedAt())
+                .favoriteCount(projectFavoriteRepository.countByProjectId(project.getId()))
                 .build();
     }
 
@@ -67,6 +70,7 @@ public class ProjectService {
         return toResponse(saved);
     }
 
+    @Transactional
     public DeleteProjectResponse deleteProject(UUID projectId, String username) {
 
         ProjectEntity project = projectRepository.findById(projectId)
@@ -81,6 +85,7 @@ public class ProjectService {
 
 
 
+        projectFavoriteRepository.deleteByProjectId(projectId);
         project.setDeletedAt(LocalDateTime.now());
         projectRepository.save(project);
 
@@ -174,5 +179,13 @@ public class ProjectService {
                         PROJECT_CREATION_INVITE_MESSAGE,
                         owner.getKeycloakId()
                 ));
+    @Transactional
+    public List<UserProfile> getProjectMembers(UUID projectId) {
+        ProjectEntity projectEntity = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ExceptionProjectNotFound(projectId));
+
+        return projectEntity.getMembers()
+                .stream()
+                .toList();
     }
 }

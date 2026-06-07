@@ -3,11 +3,12 @@ import { RouterLink } from '@angular/router';
 import { MyProjectsService } from '../../services/my-projects.service';
 import { ProjectResponse } from '../../../../models/project.model';
 import { AuthService } from '../../../auth/auth.service';
+import { FavoriteButton } from '../../../../shared/favorite-button/favorite-button';
 
 @Component({
   selector: 'app-my-projects-page',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, FavoriteButton],
   templateUrl: './my-projects-page.html',
 })
 export class MyProjectsPage implements OnInit {

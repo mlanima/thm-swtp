@@ -175,7 +175,7 @@ export class ProjectMembersForm implements OnChanges, OnDestroy {
     if(cleanedQuery.length < 2){
       return of([]);
     }
-    return this.searchService.searchUsers(cleanedQuery).pipe(catchError(() => of([])));
+    return this.searchService.searchUsers([cleanedQuery]).pipe(catchError(() => of([])));
   }
 
   private isCurrentUser(user : UserSearchResult): boolean {

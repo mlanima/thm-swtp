@@ -23,6 +23,9 @@ export class ProfileBanner {
    */
   @Input({ required: true }) profile!: UserProfileModel;
 
+  /** Whether the current viewer is the profile owner and may edit */
+  @Input() isOwnProfile = false;
+
   /** Emits when the edit button inside the banner is clicked */
   @Output() edit = new EventEmitter<void>();
 

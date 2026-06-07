@@ -39,7 +39,7 @@
             "server": "src/main.server.ts",
             "outputMode": "server",
             "security": {
-              "allowedHosts": []
+              "allowedHosts": ["localhost", "dev.swtp-ss26.de"]
             },
             "ssr": {
               "entry": "src/server.ts"
@@ -47,6 +47,12 @@
           },
           "configurations": {
             "production": {
+              "fileReplacements": [
+                {
+                  "replace": "src/app/enviroments/enviroment.dev.ts",
+                  "with": "src/app/enviroments/enviroment.prod.ts"
+                }
+              ],
               "budgets": [
                 {
                   "type": "initial",

@@ -51,6 +51,12 @@
 <!--      </button>-->
       </div>
       <div class="hidden items-start justify-end md:flex">
+        <app-favorite-button
+          [projectId]="project.id"
+          [count]="project.favoriteCount"
+          (favoriteCountChanged)="favoriteCountChanged.emit($event)"
+        />
+
         @if (isOwner) {
           <a
             [routerLink]="['/project', project.projectUrl, 'settings']"
