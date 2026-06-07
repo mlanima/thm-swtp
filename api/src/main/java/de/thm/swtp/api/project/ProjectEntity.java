@@ -36,6 +36,10 @@ public class ProjectEntity {
     @Builder.Default
     private boolean isPrivateProject = false;
 
+    @Column(name = "open_positions_count", nullable = false, columnDefinition = "integer default 0")
+    @Builder.Default
+    private int openPositionsCount = 0;
+
     @Column(name = "delete_at")
     private LocalDateTime deletedAt;
 

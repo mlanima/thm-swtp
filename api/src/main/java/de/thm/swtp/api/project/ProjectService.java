@@ -7,7 +7,9 @@ import de.thm.swtp.api.project.exception.*;
 import de.thm.swtp.api.projectInvitation.service.ProjectInviteService;
 import de.thm.swtp.api.projectFavorite.repository.ProjectFavoriteRepository;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
+import de.thm.swtp.api.projectView.entity.ProjectViewEntity;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
+import de.thm.swtp.api.projectView.repository.ProjectViewRepository;
 
 import jakarta.transaction.*;
 import lombok.*;
@@ -25,8 +27,19 @@ public class ProjectService {
     private final ProjectInviteService projectInviteService;
     private static final String PROJECT_CREATION_INVITE_MESSAGE = "You have been invited to join this project.";
     private final ProjectFavoriteRepository projectFavoriteRepository;
+    private final ProjectViewRepository projectViewRepository;
 
     private ProjectResponse toResponse(ProjectEntity project) {
+        Set<UUID> memberIds = project.getMembers().stream()
+                .map(UserProfile::getKeycloakId)
+                .collect(java.util.stream.Collectors.toSet());
+
+        int contributors = memberIds.size();
+
+        if (project.getOwner() != null) {
+            contributors++;
+        }
+
         return ProjectResponse.builder()
                 .id(project.getId())
                 .name(project.getName())
@@ -39,7 +52,14 @@ public class ProjectService {
                         .collect(java.util.stream.Collectors.toSet()))
                 .createdAt(project.getCreatedAt())
                 .updatedAt(project.getUpdatedAt())
+                .stats(ProjectStatsResponse.builder()
+                        .contributors(contributors)
+                        .views((int) projectViewRepository.countByProjectId(project.getId()))
+                        .likes((int) projectFavoriteRepository.countByProjectId(project.getId()))
+                        .openPositions(project.getOpenPositionsCount())
+                        .build())
                 .favoriteCount(projectFavoriteRepository.countByProjectId(project.getId()))
+
                 .build();
     }
 
@@ -103,6 +123,12 @@ public class ProjectService {
             throw new ExceptionProjectAlreadyDeleted(projectId);
         }
 
+        projectViewRepository.save(
+                ProjectViewEntity.builder()
+                        .project(project)
+                        .build()
+        );
+
         return toResponse(project);
     }
 
@@ -115,6 +141,12 @@ public class ProjectService {
         if (project.getDeletedAt() != null) {
             throw new ExceptionProjectAlreadyDeleted(project.getId());
         }
+
+        projectViewRepository.save(
+                ProjectViewEntity.builder()
+                        .project(project)
+                        .build()
+        );
 
         return toResponse(project);
     }

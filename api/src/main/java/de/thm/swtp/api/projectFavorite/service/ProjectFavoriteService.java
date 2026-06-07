@@ -56,6 +56,7 @@ public class ProjectFavoriteService {
                 .findByUserKeycloakIdAndProjectId(userId, projectId)
                 .orElseThrow(() -> new ProjectFavoriteNotFoundException(projectId));
 
+        ProjectEntity project = favorite.getProject();
         projectFavoriteRepository.delete(favorite);
     }
 

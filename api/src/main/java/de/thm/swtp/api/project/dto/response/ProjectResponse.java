@@ -18,5 +18,7 @@ public class ProjectResponse {
     private Set<UUID> memberIds;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    private ProjectStatsResponse stats;
     private long favoriteCount;
 }
