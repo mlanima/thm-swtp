@@ -7,7 +7,9 @@ import de.thm.swtp.api.project.exception.*;
 import de.thm.swtp.api.projectInvitation.service.ProjectInviteService;
 import de.thm.swtp.api.projectFavorite.repository.ProjectFavoriteRepository;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
+import de.thm.swtp.api.projectView.entity.ProjectViewEntity;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
+import de.thm.swtp.api.projectView.repository.ProjectViewRepository;
 
 import jakarta.transaction.*;
 import lombok.*;
@@ -25,6 +27,7 @@ public class ProjectService {
     private final ProjectInviteService projectInviteService;
     private static final String PROJECT_CREATION_INVITE_MESSAGE = "You have been invited to join this project.";
     private final ProjectFavoriteRepository projectFavoriteRepository;
+    private final ProjectViewRepository projectViewRepository;
 
     private ProjectResponse toResponse(ProjectEntity project) {
         Set<UUID> memberIds = project.getMembers().stream()
@@ -51,7 +54,7 @@ public class ProjectService {
                 .updatedAt(project.getUpdatedAt())
                 .stats(ProjectStatsResponse.builder()
                         .contributors(contributors)
-                        .views(project.getViewsCount())
+                        .views((int) projectViewRepository.countByProjectId(project.getId()))
                         .likes((int) projectFavoriteRepository.countByProjectId(project.getId()))
                         .openPositions(project.getOpenPositionsCount())
                         .build())
@@ -121,9 +124,11 @@ public class ProjectService {
             throw new ExceptionProjectAlreadyDeleted(projectId);
         }
 
-        project.setViewsCount(project.getViewsCount() + 1);
-
-        ProjectEntity saved = projectRepository.save(project);
+        projectViewRepository.save(
+                ProjectViewEntity.builder()
+                        .project(project)
+                        .build()
+        );
 
         return toResponse(project);
     }
@@ -138,9 +143,11 @@ public class ProjectService {
             throw new ExceptionProjectAlreadyDeleted(project.getId());
         }
 
-        project.setViewsCount(project.getViewsCount() + 1);
-
-        ProjectEntity saved = projectRepository.save(project);
+        projectViewRepository.save(
+                ProjectViewEntity.builder()
+                        .project(project)
+                        .build()
+        );
 
         return toResponse(project);
     }

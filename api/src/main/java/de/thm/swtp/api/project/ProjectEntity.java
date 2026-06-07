@@ -36,10 +36,6 @@ public class ProjectEntity {
     @Builder.Default
     private boolean isPrivateProject = false;
 
-    @Column(name = "views_count", nullable = false, columnDefinition = "integer default 0")
-    @Builder.Default
-    private int viewsCount = 0;
-
     @Column(name = "open_positions_count", nullable = false, columnDefinition = "integer default 0")
     @Builder.Default
     private int openPositionsCount = 0;

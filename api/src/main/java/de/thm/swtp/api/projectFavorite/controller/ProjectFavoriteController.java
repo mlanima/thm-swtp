@@ -5,6 +5,7 @@ import de.thm.swtp.api.project.dto.response.ProjectResponse;
 import de.thm.swtp.api.project.dto.response.ProjectStatsResponse;
 import de.thm.swtp.api.projectFavorite.service.ProjectFavoriteService;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
+import de.thm.swtp.api.projectView.service.ProjectViewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 public class ProjectFavoriteController {
 
     private final ProjectFavoriteService projectFavoriteService;
+    private final ProjectViewService projectViewService;
 
     @PostMapping("/{projectId}")
     public ResponseEntity<Void> addFavorite(
@@ -77,7 +79,7 @@ public class ProjectFavoriteController {
                 .updatedAt(project.getUpdatedAt())
                 .stats(ProjectStatsResponse.builder()
                         .contributors(project.getMembers().size() + 1)
-                        .views(project.getViewsCount())
+                        .views((int) projectViewService.countViews(project.getId()))
                         .likes((int) projectFavoriteService.countFavorites(project.getId()))
                         .openPositions(project.getOpenPositionsCount())
                         .build())

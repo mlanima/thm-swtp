@@ -4,6 +4,8 @@ import de.thm.swtp.api.project.dto.response.ProjectResponse;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import de.thm.swtp.api.projectFavorite.repository.ProjectFavoriteRepository;
+import de.thm.swtp.api.projectView.repository.ProjectViewRepository;
+import de.thm.swtp.api.projectView.entity.ProjectViewEntity;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -30,6 +32,9 @@ class ProjectServiceTest {
 
     @Mock
     private ProjectFavoriteRepository projectFavoriteRepository;
+
+    @Mock
+    private ProjectViewRepository projectViewRepository;
 
     @InjectMocks
     private ProjectService projectService;
@@ -58,30 +63,31 @@ class ProjectServiceTest {
                 .isPrivateProject(false)
                 .owner(owner)
                 .members(Set.of(member))
-                .viewsCount(247)
                 .openPositionsCount(3)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
 
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
-        when(projectRepository.save(project)).thenReturn(project);
         when(projectFavoriteRepository.countByProjectId(projectId)).thenReturn(12L);
+        when(projectViewRepository.countByProjectId(projectId)).thenReturn(247L);
 
         ProjectResponse response = projectService.getProject(projectId);
 
         assertThat(response.getId()).isEqualTo(projectId);
         assertThat(response.getStats()).isNotNull();
         assertThat(response.getStats().getContributors()).isEqualTo(2);
-        assertThat(response.getStats().getViews()).isEqualTo(248);
+        assertThat(response.getStats().getViews()).isEqualTo(247);
         assertThat(response.getStats().getLikes()).isEqualTo(12);
         assertThat(response.getStats().getOpenPositions()).isEqualTo(3);
 
-        verify(projectRepository).save(project);
+        verify(projectViewRepository).save(any(ProjectViewEntity.class));
+        verify(projectViewRepository).countByProjectId(projectId);
+        verify(projectRepository, never()).save(project);
     }
 
     @Test
-    void shouldIncreaseViewsWhenProjectIsLoaded() {
+    void shouldAddViewWhenProjectIsLoaded() {
         UserProfile owner = UserProfile.builder()
                 .keycloakId(UUID.randomUUID())
                 .username("owner")
@@ -97,26 +103,22 @@ class ProjectServiceTest {
                 .projectUrl("testprojekt")
                 .isPrivateProject(false)
                 .owner(owner)
-                .viewsCount(5)
                 .openPositionsCount(0)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
 
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
-        when(projectRepository.save(project)).thenReturn(project);
         when(projectFavoriteRepository.countByProjectId(projectId)).thenReturn(0L);
+        when(projectViewRepository.countByProjectId(projectId)).thenReturn(6L);
 
         ProjectResponse response = projectService.getProject(projectId);
 
         assertThat(response.getStats().getViews()).isEqualTo(6);
 
-        ArgumentCaptor<ProjectEntity> projectCaptor = ArgumentCaptor.forClass(ProjectEntity.class);
-        verify(projectRepository).save(projectCaptor.capture());
-
-        ProjectEntity savedProject = projectCaptor.getValue();
-
-        assertThat(savedProject.getViewsCount()).isEqualTo(6);
+        verify(projectViewRepository).save(any(ProjectViewEntity.class));
+        verify(projectViewRepository).countByProjectId(projectId);
+        verify(projectRepository, never()).save(project);
     }
 
     @Test
@@ -136,15 +138,14 @@ class ProjectServiceTest {
                 .projectUrl("testprojekt")
                 .isPrivateProject(false)
                 .owner(owner)
-                .viewsCount(0)
                 .openPositionsCount(0)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
 
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
-        when(projectRepository.save(project)).thenReturn(project);
         when(projectFavoriteRepository.countByProjectId(projectId)).thenReturn(0L);
+        when(projectViewRepository.countByProjectId(projectId)).thenReturn(0L);
 
         ProjectResponse response = projectService.getProject(projectId);
 

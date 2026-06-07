@@ -29,7 +29,6 @@ class ProjectEntityTest {
         assertThat(project.getOwner()).isEqualTo(owner);
         assertThat(project.getMembers()).isNotNull();
         assertThat(project.isPrivateProject()).isFalse();
-        assertThat(project.getViewsCount()).isZero();
         assertThat(project.getOpenPositionsCount()).isZero();
     }
 
@@ -47,11 +46,9 @@ class ProjectEntityTest {
                 .projectUrl("testprojekt")
                 .isPrivateProject(false)
                 .owner(owner)
-                .viewsCount(247)
                 .openPositionsCount(3)
                 .build();
 
-        assertThat(project.getViewsCount()).isEqualTo(247);
         assertThat(project.getOpenPositionsCount()).isEqualTo(3);
     }
 }
