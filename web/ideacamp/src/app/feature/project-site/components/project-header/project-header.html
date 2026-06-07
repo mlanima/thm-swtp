@@ -52,7 +52,7 @@
       </div>
       <div class="hidden items-start justify-end md:flex">
         @if (showJoinButton) {
-          <app-join-request-button [projectId]="project.id" [onDark]="true" />
+          <app-join-request-button [projectId]="project.id" [onDark]="true" [allowJoinRequests]="project.allowJoinRequests" />
         }
 
         <app-favorite-button

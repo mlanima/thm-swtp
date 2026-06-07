@@ -44,6 +44,10 @@ public class ProjectJoinRequestService {
         UserProfile requestingUserEntity = userProfileRepository.findById(currentUserId)
                 .orElseThrow(() -> new UserProfileNotFoundException(currentUserId.toString()));
 
+        if (!projectEntity.isAllowJoinRequests()) {
+            throw new ProjectJoinRequestAccessDeniedException("Join requests are disabled for this project.");
+        }
+
         checkUserIsNotProjectOwner(projectEntity, currentUserId);
 
         if (hasActiveRequests(projectId, currentUserId)){

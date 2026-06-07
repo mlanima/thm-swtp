@@ -46,6 +46,7 @@ public class ProjectService {
                 .description(project.getDescription())
                 .projectUrl(project.getProjectUrl())
                 .isPrivateProject(project.isPrivateProject())
+                .allowJoinRequests(project.isAllowJoinRequests())
                 .ownerId(project.getOwner().getKeycloakId())
                 .memberIds(project.getMembers().stream()
                         .map(UserProfile::getKeycloakId)
@@ -210,6 +211,23 @@ public class ProjectService {
                         PROJECT_CREATION_INVITE_MESSAGE,
                         owner.getKeycloakId()
                 ));
+    }
+
+    @Transactional
+    public ProjectResponse updateAllowJoinRequests(UUID projectId, boolean allow, UUID currentUserId) {
+        ProjectEntity project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ExceptionProjectNotFound(projectId));
+
+        if (project.getDeletedAt() != null) {
+            throw new ExceptionProjectAlreadyDeleted(projectId);
+        }
+
+        if (!project.getOwner().getKeycloakId().equals(currentUserId)) {
+            throw new ExceptionProjectEditNotAllowed(currentUserId, projectId);
+        }
+
+        project.setAllowJoinRequests(allow);
+        return toResponse(projectRepository.save(project));
     }
 
     @Transactional

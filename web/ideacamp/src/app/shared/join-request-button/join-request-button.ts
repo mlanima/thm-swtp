@@ -9,6 +9,7 @@ import { ProjectJoinRequestService } from '../../services/project-join-request.s
 export class JoinRequestButton implements OnInit {
   @Input({ required: true }) projectId!: string;
   @Input() onDark = false;
+  @Input() allowJoinRequests = true;
 
   private readonly joinRequestService = inject(ProjectJoinRequestService);
 

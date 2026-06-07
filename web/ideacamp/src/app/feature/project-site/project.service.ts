@@ -40,4 +40,10 @@ export class ProjectService {
   updateProject(projectId: string, request: UpdateProjectRequest): Observable<ProjectResponse> {
     return this.http.put<ProjectResponse>(`${this.baseUrl}/${projectId}`, request);
   }
+
+  updateAllowJoinRequests(projectId: string, allow: boolean): Observable<ProjectResponse> {
+    return this.http.patch<ProjectResponse>(`${this.baseUrl}/${projectId}/allow-join-requests`, null, {
+      params: { allow: String(allow) },
+    });
+  }
 }
