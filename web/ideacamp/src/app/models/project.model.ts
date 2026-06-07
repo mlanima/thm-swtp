@@ -1,3 +1,10 @@
+export interface ProjectStatsResponse {
+  contributors: number;
+  views: number;
+  likes: number;
+  openPositions: number;
+}
+
 export interface ProjectResponse {
   id: string;
   name: string;
@@ -7,6 +14,7 @@ export interface ProjectResponse {
   ownerId: string;
   memberIds: string[];
   favoriteCount: number;
+  stats: ProjectStatsResponse;
   createdAt: string;
   updatedAt: string;
 }
