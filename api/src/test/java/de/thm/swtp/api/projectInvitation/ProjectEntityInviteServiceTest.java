@@ -199,6 +199,8 @@ public class ProjectEntityInviteServiceTest {
         ProjectInviteEntity invite = createPendingInviteEntity();
 
         when(projectInviteRepository.findById(inviteId)).thenReturn(Optional.of(invite));
+        when(projectInviteRepository.save(any(ProjectInviteEntity.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
 
         ProjectInvite res = projectInviteService.updateInviteStatus(inviteId,ProjectInviteStatus.ACCEPTED, invitedUserId);
 

@@ -231,7 +231,7 @@ public class ProjectService {
 
         checkProjectOwner(projectEntity, currentUserId);
         if (currentUserId.equals(memberId)) {
-            throw new ProjectOwnerCannotBeRemovedException(currentUserId,projectId);
+            throw new ProjectOwnerCannotBeRemovedException(currentUserId, projectId);
         }
 
         UserProfile member = userProfileRepository.findById(memberId)
