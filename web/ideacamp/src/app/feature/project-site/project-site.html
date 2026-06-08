@@ -109,7 +109,7 @@
 <!--        <app-open-position-card />-->
       </section>
 
-      <app-sidebar [projectId]="project()!.id" [isOwner]="isOwner" />
+      <app-sidebar [projectId]="project()!.id" [isOwner]="isOwner" [ownerId]="project()!.ownerId" [ownerUsername]="project()!.ownerUsername" />
     </main>
   }
 

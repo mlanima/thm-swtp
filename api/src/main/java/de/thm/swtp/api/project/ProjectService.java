@@ -52,6 +52,7 @@ public class ProjectService {
                 .isPrivateProject(project.isPrivateProject())
                 .allowJoinRequests(project.isAllowJoinRequests())
                 .ownerId(project.getOwner().getKeycloakId())
+                .ownerUsername(project.getOwner().getUsername())
                 .memberIds(project.getMembers().stream()
                         .map(UserProfile::getKeycloakId)
                         .collect(java.util.stream.Collectors.toSet()))
