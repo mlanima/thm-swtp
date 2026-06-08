@@ -9,6 +9,7 @@ import { ProfileBanner } from '../../components/profile-banner/profile-banner';
 import { UserProfileService } from '../../../../services/user-profile.service';
 import { AuthService } from '../../../auth/auth.service';
 import { UserProfileModel } from '../../../../models/user-profile.model';
+import { ProfileTagListComponent } from '../../components/profile-tag-list/profile-tag-list.component'
 
 interface ProfileViewState {
   /** Indicates whether the profile request is currently running. */
@@ -25,7 +26,7 @@ interface ProfileViewState {
 @Component({
   selector: 'app-user-profile',
   standalone: true,
-  imports: [ProfileInformation, ProfileBanner, FormsModule],
+  imports: [ProfileInformation, ProfileBanner, FormsModule, ProfileTagListComponent],
   templateUrl: './user-profile.html',
 })
 export class UserProfile implements OnInit, OnDestroy {
