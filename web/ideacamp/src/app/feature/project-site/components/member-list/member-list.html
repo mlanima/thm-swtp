@@ -68,8 +68,14 @@
 </div>
 
 @if (showModal()) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" (click)="closeModal()">
-    <div class="relative w-full max-w-sm rounded-2xl bg-linear-to-br from-slate-600 to-slate-800 p-6 text-white shadow-xl" (click)="$event.stopPropagation()">
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+    role="button"
+    tabindex="0"
+    (click)="$event.target === $event.currentTarget && closeModal()"
+    (keydown.escape)="closeModal()"
+  >
+    <div class="relative w-full max-w-sm rounded-2xl bg-linear-to-br from-slate-600 to-slate-800 p-6 text-white shadow-xl">
 
       <button (click)="closeModal()" class="absolute right-4 top-4 text-slate-400 hover:text-white">
         <i class="pi pi-times text-sm"></i>
