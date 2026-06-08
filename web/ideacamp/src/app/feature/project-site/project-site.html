@@ -66,6 +66,16 @@
                 />
               </div>
               <div>
+                <label for="editShortDescription" class="text-xs font-medium text-slate-500">Kurzbeschreibung</label>
+                <input
+                  id="editShortDescription"
+                  [ngModel]="editShortDescription()"
+                  (ngModelChange)="editShortDescription.set($event)"
+                  rows="2"
+                  class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:border-lime-400 focus:outline-none"
+                />
+              </div>
+              <div>
                 <label for="editDescription" class="text-xs font-medium text-slate-500">Beschreibung</label>
                 <textarea
                   id="editDescription"
