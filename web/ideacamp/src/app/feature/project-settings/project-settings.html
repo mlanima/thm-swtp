@@ -48,7 +48,11 @@
             <app-members-tab [projectId]="project()!.id" />
           }
           @if (activeTab() === 'privacy') {
-            <app-privacy-tab [projectId]="project()!.id" />
+            <app-privacy-tab
+              [projectId]="project()!.id"
+              [allowJoinRequests]="project()!.allowJoinRequests"
+              (allowJoinRequestsChange)="project.update(p => p ? { ...p, allowJoinRequests: $event } : p)"
+            />
           }
           @if (activeTab() === 'danger-zone') {
             <app-danger-zone-tab

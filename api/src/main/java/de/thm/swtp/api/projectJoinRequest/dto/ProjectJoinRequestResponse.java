@@ -7,8 +7,9 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 /** Response DTO for project join-requests. */
-public record ProjectJoinRequestResponse(UUID id, UUID projectId, UUID requestingUser, String message,
-                                         LocalDateTime createdAt, LocalDateTime updatedAt, ProjectJoinRequestStatus status) {
+public record ProjectJoinRequestResponse(UUID id, UUID projectId, UUID requestingUser, String requestingUsername,
+                                         String message, LocalDateTime createdAt, LocalDateTime updatedAt,
+                                         ProjectJoinRequestStatus status) {
 
     /** Converts a project join-request domain object into a response DTO. */
     public static ProjectJoinRequestResponse toResponse(ProjectJoinRequest joinRequest) {
@@ -16,6 +17,7 @@ public record ProjectJoinRequestResponse(UUID id, UUID projectId, UUID requestin
                 joinRequest.getId(),
                 joinRequest.getProjectId(),
                 joinRequest.getRequestingUserId(),
+                joinRequest.getRequestingUsername(),
                 joinRequest.getMessage(),
                 joinRequest.getCreatedAt(),
                 joinRequest.getUpdatedAt(),

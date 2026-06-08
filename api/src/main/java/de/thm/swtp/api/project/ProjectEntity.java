@@ -36,6 +36,10 @@ public class ProjectEntity {
     @Builder.Default
     private boolean isPrivateProject = false;
 
+    @Column(name = "allow_join_requests", nullable = false, columnDefinition = "boolean default true")
+    @Builder.Default
+    private boolean allowJoinRequests = true;
+
     @Column(name = "open_positions_count", nullable = false, columnDefinition = "integer default 0")
     @Builder.Default
     private int openPositionsCount = 0;

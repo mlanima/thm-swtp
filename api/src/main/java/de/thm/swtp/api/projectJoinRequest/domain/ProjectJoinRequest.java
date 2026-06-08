@@ -13,6 +13,7 @@ public class ProjectJoinRequest {
     UUID id;
     UUID projectId;
     UUID requestingUserId;
+    String requestingUsername;
     String message;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;

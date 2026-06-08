@@ -11,6 +11,7 @@ export interface ProjectResponse {
   description: string;
   projectUrl: string;
   isPrivateProject: boolean;
+  allowJoinRequests: boolean;
   ownerId: string;
   memberIds: string[];
   favoriteCount: number;

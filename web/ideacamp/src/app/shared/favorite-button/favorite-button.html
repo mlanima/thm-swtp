@@ -2,14 +2,20 @@
   <button
     (click)="toggle($event)"
     [title]="favorited() ? 'Aus Favoriten entfernen' : 'Zu Favoriten hinzufügen'"
-    class="flex items-center gap-1.5 rounded-full p-2 transition hover:bg-white/20"
+    class="flex items-center gap-1.5 rounded-full p-3 transition"
+    [class]="onDark ? 'hover:bg-white/20' : 'hover:bg-slate-100'"
   >
     <i
-      class="pi text-xl transition-colors"
-      [class]="favorited() ? 'pi-heart-fill text-red-500' : 'pi-heart text-slate-400 hover:text-red-400'"
+      class="pi text-base transition-colors"
+      [class]="favorited()
+        ? 'pi-heart-fill text-red-500'
+        : (onDark ? 'pi-heart text-white hover:text-red-400' : 'pi-heart text-slate-500 hover:text-red-400')"
+      style="-webkit-text-stroke: 0.5px"
     ></i>
     @if (displayCount() !== null) {
-      <span class="text-sm font-medium" [class]="favorited() ? 'text-red-500' : 'text-slate-400'">
+      <span class="text-sm font-medium"
+        [class]="favorited() ? 'text-red-500' : (onDark ? 'text-white' : 'text-slate-500')"
+      >
         {{ displayCount() }}
       </span>
     }

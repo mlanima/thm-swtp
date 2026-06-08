@@ -14,6 +14,7 @@ public class ProjectResponse {
     private String description;
     private String projectUrl;
     private boolean isPrivateProject;
+    private boolean allowJoinRequests;
     private UUID ownerId;
     private Set<UUID> memberIds;
     private LocalDateTime createdAt;
