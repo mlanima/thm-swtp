@@ -77,4 +77,10 @@ public class ProjectController {
                 .toList();
     }
 
+    @DeleteMapping("/{projectId}/members/{memberId}")
+    public void deleteProjectMember(@PathVariable UUID projectId, @PathVariable UUID memberId, @AuthenticationPrincipal Jwt jwt) {
+        UUID currentUserId = UUID.fromString(jwt.getSubject());
+        projectService.deleteProjectMember(projectId, currentUserId, memberId);
+    }
+
 }
