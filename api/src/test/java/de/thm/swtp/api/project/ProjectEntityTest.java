@@ -20,12 +20,14 @@ class ProjectEntityTest {
         ProjectEntity project = ProjectEntity.builder()
                 .name("Testprojekt")
                 .description("Eine Beschreibung")
+                .shortDescription("Short")
                 .projectUrl("testprojekt")
                 .isPrivateProject(false)
                 .owner(owner)
                 .build();
 
         assertThat(project.getName()).isEqualTo("Testprojekt");
+        assertThat(project.getShortDescription()).isEqualTo("Short");
         assertThat(project.getOwner()).isEqualTo(owner);
         assertThat(project.getMembers()).isNotNull();
         assertThat(project.isPrivateProject()).isFalse();

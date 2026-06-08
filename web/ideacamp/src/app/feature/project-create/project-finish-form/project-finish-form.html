@@ -22,17 +22,22 @@
 
       <div>
         <p class="font-medium text-slate-600">Project name:</p>
-        <p>{{ projectData.name || 'Not set' }}</p>
+        <p class="max-w-full overflow-hidden truncate whitespace-nowrap">{{ projectData.name || 'Not set' }}</p>
+      </div>
+
+      <div>
+        <p class="font-medium text-slate-600">Short description:</p>
+        <p class="max-w-full overflow-hidden truncate whitespace-nowrap">{{ projectData.shortDescription || 'No short-description' }}</p>
       </div>
 
       <div>
         <p class="font-medium text-slate-600">Description:</p>
-        <p>{{ projectData.description || 'No description' }}</p>
+        <p class="max-w-full overflow-hidden truncate whitespace-nowrap">{{ projectData.description || 'No description' }}</p>
       </div>
 
       <div>
         <p class="font-medium text-slate-600">Project URL:</p>
-        <p>{{ projectData.projectUrl || 'Not set' }}</p>
+        <p class="max-w-full overflow-hidden truncate whitespace-nowrap">{{ projectData.projectUrl || 'Not set' }}</p>
       </div>
 
       <div>

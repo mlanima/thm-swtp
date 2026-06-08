@@ -12,6 +12,7 @@ public class ProjectResponse {
     private UUID id;
     private String name;
     private String description;
+    private String shortDescription;
     private String projectUrl;
     private boolean isPrivateProject;
     private boolean allowJoinRequests;

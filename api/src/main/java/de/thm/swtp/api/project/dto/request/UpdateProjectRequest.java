@@ -6,6 +6,7 @@ import lombok.*;
 public class UpdateProjectRequest {
     private String name;
     private String description;
+    private String shortDescription;
     private String projectUrl;
     private boolean isPrivateProject;
 }

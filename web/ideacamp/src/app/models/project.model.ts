@@ -8,6 +8,7 @@ export interface ProjectStatsResponse {
 export interface ProjectResponse {
   id: string;
   name: string;
+  shortDescription?: string;
   description: string;
   projectUrl: string;
   isPrivateProject: boolean;
