@@ -68,15 +68,6 @@ export class UserProfile implements OnInit, OnDestroy {
   /** Controls the visibility of the success modal */
   showSuccessModal = false;
 
-  /** Controls the visibility of the banner edit modal */
-  isBannerModalOpen = false;
-
-  /** Selected banner field that should be edited in the modal */
-  selectedBannerField: 'title' | 'location' = 'title';
-
-  /** Temporary input value used by the banner edit modal */
-  bannerEditValue = '';
-
   /** Form state containing all editable profile fields */
   editForm = {
     title: '',
@@ -158,71 +149,12 @@ export class UserProfile implements OnInit, OnDestroy {
   }
 
   /**
-   * Opens the banner edit modal and initializes the form with current profile values
-   *
-   * @param profile Profile data used to prefill the editable fields
-   */
-  openBannerEditModal(profile: UserProfileModel): void {
-    this.editForm = {
-      title: profile.title ?? '',
-      location: profile.location ?? '',
-      about: profile.about ?? '',
-      experience: profile.experience ?? '',
-    };
-
-    this.selectedBannerField = 'title';
-    this.bannerEditValue = this.editForm.title;
-    this.isBannerModalOpen = true;
-  }
-
-  /**
-   * Closes the banner edit modal when no save request is running
-   *
-   * Keeps the modal open while saving to avoid interrupting an active request
-   */
-  closeBannerEditModal(): void {
-    if (this.isSaving) {
-      return;
-    }
-
-    this.isBannerModalOpen = false;
-    this.bannerEditValue = '';
-  }
-
-  /**
-   * Updates the modal input value when the selected banner field changes
-   *
-   * Reads either the current title or location value from the edit form
-   */
-  onBannerFieldChange(): void {
-    this.bannerEditValue =
-      this.selectedBannerField === 'title'
-        ? this.editForm.title
-        : this.editForm.location;
-  }
-
-  /**
-   * Copies the selected banner field value into the edit form and saves the profile
-   *
-   * @param profile Profile that should be updated
-   */
-  saveBannerField(profile: UserProfileModel): void {
-    if (this.selectedBannerField === 'title') {
-      this.editForm.title = this.bannerEditValue;
-    } else {
-      this.editForm.location = this.bannerEditValue;
-    }
-
-    this.saveProfile(profile);
-  }
-
-  /**
    * Starts inline editing for the selected profile section
    *
    * @param profile Profile data used to prefill the edit form
    * @param section Profile section that should be edited
    */
-  startEditing(profile: UserProfileModel, section: 'about' | 'experience'): void {
+  startEditing(profile: UserProfileModel, section: 'banner' | 'about' | 'experience'): void {
     this.editForm = {
       title: profile.title ?? '',
       location: profile.location ?? '',
@@ -263,8 +195,6 @@ export class UserProfile implements OnInit, OnDestroy {
           });
 
           this.editingSection = null;
-          this.isBannerModalOpen = false;
-          this.bannerEditValue = '';
           this.isSaving = false;
           this.showSuccessModal = true;
         },

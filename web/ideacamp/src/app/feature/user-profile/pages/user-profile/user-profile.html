@@ -23,73 +23,12 @@
         <app-profile-banner
           [profile]="state.profile"
           [isOwnProfile]="isOwner"
-          (edit)="isOwner && openBannerEditModal(state.profile)">
+          [isEditing]="editingSection === 'banner'"
+          [isSaving]="isSaving"
+          [editForm]="editForm"
+          (edit)="isOwner && startEditing(state.profile, 'banner')"
+          (save)="saveProfile(state.profile)">
         </app-profile-banner>
-
-        @if (isBannerModalOpen && isOwner) {
-          <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-            <div class="relative w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
-              <button
-                type="button"
-                class="absolute right-4 top-4 text-slate-400 hover:text-slate-700"
-                [disabled]="isSaving"
-                (click)="closeBannerEditModal()">
-                ✕
-              </button>
-
-              <h2 class="mb-5 text-xl font-bold text-slate-800">
-                Edit Profile Details
-              </h2>
-
-              <label class="block">
-                <span class="mb-1 block text-sm font-medium text-slate-700">
-                  Field
-                </span>
-
-                <select
-                  class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
-                  [(ngModel)]="selectedBannerField"
-                  (ngModelChange)="onBannerFieldChange()">
-                  <option value="title">Title</option>
-                  <option value="location">Location</option>
-                </select>
-              </label>
-
-              <label class="mt-5 block">
-                <span class="mb-1 block text-sm font-medium text-slate-700">
-                  Enter here
-                </span>
-
-                <input
-                  type="text"
-                  class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
-                  [(ngModel)]="bannerEditValue">
-              </label>
-
-              <div class="mt-6 flex gap-3">
-                <button
-                  type="button"
-                  class="rounded-lg bg-slate-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800 disabled:opacity-50"
-                  [disabled]="isSaving"
-                  (click)="saveBannerField(state.profile)">
-                  @if (isSaving) {
-                    Saving...
-                  } @else {
-                    Save
-                  }
-                </button>
-
-                <button
-                  type="button"
-                  class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:opacity-50"
-                  [disabled]="isSaving"
-                  (click)="closeBannerEditModal()">
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        }
 
         <div class="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_320px]">
           <div class="flex flex-col gap-10">

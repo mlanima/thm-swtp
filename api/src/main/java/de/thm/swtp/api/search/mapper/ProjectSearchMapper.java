@@ -22,6 +22,7 @@ public class ProjectSearchMapper {
         return ProjectSearchResult.builder()
                 .id(project.getId())
                 .name(project.getName())
+                .shortDescription(project.getShortDescription())
                 .description(project.getDescription())
                 .projectUrl(project.getProjectUrl())
                 .tags(project.getTags().stream().map(TagEntity::getName).toList())

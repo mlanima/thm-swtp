@@ -21,6 +21,7 @@ import java.util.UUID;
 public record ProjectSearchResult(
         UUID id,
         String name,
+        String shortDescription,
         String description,
         String projectUrl,
         List<String> tags

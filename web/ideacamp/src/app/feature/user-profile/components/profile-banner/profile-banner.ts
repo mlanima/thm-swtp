@@ -1,4 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { LocationIcon } from '../../../../shared/icons/location-icon/location-icon';
 import { FollowersIcon } from '../../../../shared/icons/followers-icon/followers-icon';
 import { UserProfileModel } from '../../../../models/user-profile.model';
@@ -12,7 +13,7 @@ import { EditButton } from '../../../../shared/edit-button/edit-button';
 @Component({
   selector: 'app-profile-banner',
   standalone: true,
-  imports: [LocationIcon, FollowersIcon, EditButton],
+  imports: [LocationIcon, FollowersIcon, EditButton, FormsModule],
   templateUrl: './profile-banner.html',
 })
 export class ProfileBanner {
@@ -26,8 +27,21 @@ export class ProfileBanner {
   /** Whether the current viewer is the profile owner and may edit */
   @Input() isOwnProfile = false;
 
+  @Input() isEditing = false;
+
+  @Input() isSaving = false;
+
+  @Input() editForm!: {
+    title: string;
+    location: string;
+    about: string;
+    experience: string;
+  };
+
   /** Emits when the edit button inside the banner is clicked */
   @Output() edit = new EventEmitter<void>();
+
+  @Output() save = new EventEmitter<void>();
 
   /**
    * First uppercase letter of the username
