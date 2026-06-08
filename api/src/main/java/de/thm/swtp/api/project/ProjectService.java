@@ -99,10 +99,12 @@ public class ProjectService {
             throw new ExceptionProjectAlreadyDeleted(projectId);
         }
 
-        userProfileRepository.findByUsername(username)
+        UserProfile requester = userProfileRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User profile not found for username: " + username));
 
-
+        if (!project.getOwner().getKeycloakId().equals(requester.getKeycloakId())) {
+            throw new ExceptionProjectDeleteNotAllowed(requester.getKeycloakId(), projectId);
+        }
 
         projectFavoriteRepository.deleteByProjectId(projectId);
         projectRepository.delete(project);
@@ -160,10 +162,12 @@ public class ProjectService {
             throw new ExceptionProjectAlreadyDeleted(projectId);
         }
 
-        userProfileRepository.findByUsername(username)
+        UserProfile requester = userProfileRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User profile not found for username: " + username));
 
-
+        if (!project.getOwner().getKeycloakId().equals(requester.getKeycloakId())) {
+            throw new ExceptionProjectEditNotAllowed(requester.getKeycloakId(), projectId);
+        }
 
         if (request.getName() != null &&
                 !request.getName().equals(project.getName()) &&
