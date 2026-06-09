@@ -47,6 +47,9 @@ export class ProfileTagListComponent implements OnInit, OnChanges {
 
         if (existing) {
           this.errorMessage.set('Tag already exists on this profile.');
+          setTimeout(() => {
+            this.errorMessage.set(null);
+          }, 3000);
         }
 
         if (!existing) {
@@ -56,7 +59,10 @@ export class ProfileTagListComponent implements OnInit, OnChanges {
         this.isSaving.set(false);
       },
       error: () => {
-        this.errorMessage.set('Could not save tag.');
+        this.errorMessage.set('Tag zu lang!');
+        setTimeout(() => {
+          this.errorMessage.set(null);
+        }, 3000);
         this.isSaving.set(false);
       },
     });
@@ -80,6 +86,9 @@ export class ProfileTagListComponent implements OnInit, OnChanges {
       },
       error: () => {
         this.errorMessage.set('Could not delete tag.');
+        setTimeout(() => {
+          this.errorMessage.set(null);
+        }, 3000);
         this.isDeleting.set(false);
       },
     });
