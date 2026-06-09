@@ -27,7 +27,8 @@
           [isSaving]="isSaving"
           [editForm]="editForm"
           (edit)="isOwner && startEditing(state.profile, 'banner')"
-          (save)="saveProfile(state.profile)">
+          (save)="saveProfile(state.profile)"
+          (cancel)="cancelEditing()">
         </app-profile-banner>
 
         <div class="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_320px]">
