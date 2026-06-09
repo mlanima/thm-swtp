@@ -9,6 +9,7 @@ import { ProjectFavoriteService } from '../../services/project-favorite.service'
 export class FavoriteButton implements OnInit {
   @Input({ required: true }) projectId!: string;
   @Input() count: number | null = null;
+  @Input() onDark = false;
   @Output() favoriteCountChanged = new EventEmitter<number>();
 
   private readonly favoriteService = inject(ProjectFavoriteService);

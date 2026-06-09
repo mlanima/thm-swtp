@@ -16,10 +16,16 @@ export interface ProjectMember {
   initials: string;
   avatarColor: string;
   role: 'Owner' | 'Member';
-  joinedDate: string;
+  //joinedDate: string;
 }
 
 export interface PrivacySettings {
   isPublic: boolean;
   allowJoinRequests: boolean;
+}
+
+export interface ProjectMemberResponse {
+  keycloakId: string;
+  username: string;
+  email: string;
 }

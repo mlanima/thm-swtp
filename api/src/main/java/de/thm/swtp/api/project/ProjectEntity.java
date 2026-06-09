@@ -31,12 +31,19 @@ public class ProjectEntity {
     @Column(length = 500)
     private String description;
 
+    @Column(name = "short_description", length = 200)
+    private String shortDescription;
+
     @Column(name = "project_url", nullable = false, length = 30)
     private String projectUrl;
 
     @Column(name = "is_private", nullable = false)
     @Builder.Default
     private boolean isPrivateProject = false;
+
+    @Column(name = "allow_join_requests", nullable = false, columnDefinition = "boolean default true")
+    @Builder.Default
+    private boolean allowJoinRequests = true;
 
     @Column(name = "open_positions_count", nullable = false, columnDefinition = "integer default 0")
     @Builder.Default

@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AuthService } from '../../feature/auth/auth.service';
 import { SidebarService } from './sidebar.service';
+import { ProjectInvitationService } from '../../feature/my-projects/services/project-invitation.service';
+import { of } from 'rxjs';
 
 import { SidebarComponent } from './sidebar.component';
 
@@ -14,7 +16,10 @@ describe('SidebarComponent', () => {
     logoutCalls = 0;
 
     await TestBed.configureTestingModule({
-      providers: [{ provide: AuthService, useValue: { logout: () => logoutCalls++ } }],
+      providers: [
+        { provide: AuthService, useValue: { logout: () => logoutCalls++, waitUntilAuthReady: () => Promise.resolve() } },
+        { provide: ProjectInvitationService, useValue: { getInvitations: () => of([]) } },
+      ],
       imports: [SidebarComponent],
     }).compileComponents();
 

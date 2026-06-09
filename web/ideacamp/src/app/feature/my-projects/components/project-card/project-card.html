@@ -1,0 +1,53 @@
+<a
+  [routerLink]="['/project', project().projectUrl]"
+  class="project-card-animate flex items-center gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-green-300 hover:shadow-md"
+  [style.animation-delay.ms]="animationDelay()"
+>
+  <div
+    class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
+    [class]="getAvatarColor(project().name)"
+  >
+    {{ getInitials(project().name) }}
+  </div>
+
+  <div class="min-w-0 flex-1">
+    <div class="flex items-center gap-2">
+      <h3 class="truncate text-base font-semibold text-slate-700">
+        {{ project().name }}
+      </h3>
+    </div>
+    <p class="mt-0.5 truncate text-sm text-slate-400">
+      {{ project().description || 'Keine Beschreibung vorhanden.' }}
+    </p>
+  </div>
+
+  @if (tags().length > 0) {
+    <div class="hidden flex-wrap items-center justify-end gap-1.5 lg:flex">
+      @for (tag of tags().slice(0, 3); track tag) {
+        <span class="rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">{{
+          tag
+        }}</span>
+      }
+      @if (tags().length > 3) {
+        <span class="text-xs text-slate-400">+{{ tags().length - 3 }}</span>
+      }
+    </div>
+  }
+
+  <div class="hidden items-center gap-3 text-sm text-slate-400 xl:flex">
+    <span class="inline-flex items-center gap-1">
+      <i class="pi pi-users text-xs"></i> {{ project().memberIds.length }}
+    </span>
+    <span class="inline-flex items-center gap-1">
+      <i class="pi text-xs" [class]="project().isPrivateProject ? 'pi-lock' : 'pi-globe'"></i>
+      {{ project().isPrivateProject ? 'Private' : 'Public' }}
+    </span>
+    <span class="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-700"
+      >Owner</span
+    >
+  </div>
+
+  <app-favorite-button [projectId]="project().id" [count]="project().favoriteCount" />
+
+  <i class="pi pi-chevron-right text-sm text-slate-300"></i>
+</a>

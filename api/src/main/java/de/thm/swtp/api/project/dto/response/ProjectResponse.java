@@ -13,9 +13,11 @@ public class ProjectResponse {
     private UUID id;
     private String name;
     private String description;
+    private String shortDescription;
     private String projectUrl;
     @JsonProperty("isPrivateProject")
     private boolean isPrivateProject;
+    private boolean allowJoinRequests;
     private UUID ownerId;
     private Set<UUID> memberIds;
     private LocalDateTime createdAt;

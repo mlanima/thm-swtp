@@ -67,7 +67,13 @@ public class ProjectInviteService {
         checkInviteStatus(invite, newStatus, currentUserId);
         inviteEntity.setStatus(newStatus);
 
-        return ProjectInviteMapper.toDomain(inviteEntity);
+
+        if (newStatus == ProjectInviteStatus.ACCEPTED) {
+            addInvitedUserToProject(inviteEntity);
+        }
+
+        ProjectInviteEntity saved = projectInviteRepository.save(inviteEntity);
+        return ProjectInviteMapper.toDomain(saved);
     }
 
 
@@ -117,5 +123,26 @@ public class ProjectInviteService {
         invite.setMessage(message);
         invite.setStatus(ProjectInviteStatus.PENDING);
         return invite;
+    }
+
+    private void addInvitedUserToProject(ProjectInviteEntity inviteEntity){
+        ProjectEntity projectEntity = inviteEntity.getProject();
+        UserProfile invitedUserEntity = inviteEntity.getInvitedUser();
+
+        if (projectEntity.getOwner().getKeycloakId().equals(invitedUserEntity.getKeycloakId())) {
+            return;
+        }
+
+        if (alreadyMember(projectEntity, invitedUserEntity)) {
+            return;
+        }
+        projectEntity.getMembers().add(invitedUserEntity);
+        projectRepository.save(projectEntity);
+    }
+
+    private boolean alreadyMember(ProjectEntity projectEntity, UserProfile invitedUserEntity){
+        return projectEntity.getMembers()
+                .stream()
+                .anyMatch(member -> member.getKeycloakId().equals(invitedUserEntity.getKeycloakId()));
     }
 }

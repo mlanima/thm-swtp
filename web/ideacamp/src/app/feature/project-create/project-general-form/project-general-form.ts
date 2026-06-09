@@ -5,7 +5,7 @@ import {ProjectGeneralData, projectGeneralSchema} from '../schemas/project-creat
 import {FormErrors, mapZodErrors} from '../schemas/zod-error.helper';
 
 
-type GeneralFormFields = 'name' | 'description';
+type GeneralFormFields = 'name' | 'shortDescription' | 'description';
 
 @Component({
   selector: 'app-project-general-form',
@@ -24,13 +24,14 @@ export class ProjectGeneralForm implements OnChanges {
   @Output() next = new EventEmitter<ProjectGeneralData>();
 
 
-  formData = {name: '', description: ''};
+  formData = {name: '', shortDescription: '', description: ''};
   errors: FormErrors<GeneralFormFields> = {};
 
   ngOnChanges(changes: SimpleChanges) {
     if(changes['initialFormData'] && this.initialFormData){
       this.formData = {
         name : this.initialFormData.name ?? '',
+        shortDescription: this.initialFormData.shortDescription ?? '',
         description : this.initialFormData.description ?? ''
       };
     }

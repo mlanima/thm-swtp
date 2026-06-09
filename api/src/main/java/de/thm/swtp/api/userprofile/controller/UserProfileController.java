@@ -43,6 +43,12 @@ public class UserProfileController {
         return projectService.getProjectsByUsername(username);
     }
 
+    @GetMapping("/api/users/{username}/projects/all")
+    public List<ProjectResponse> getAllProjects(@PathVariable String username, @AuthenticationPrincipal Jwt jwt) {
+        verifyOwnership(username, jwt);
+        return projectService.getAllProjectsByUsername(username);
+    }
+
     @PutMapping("/api/users/{username}/profile")
     public UserProfileResponse updateProfile(
             @PathVariable String username,

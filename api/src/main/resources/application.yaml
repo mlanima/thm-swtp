@@ -3,7 +3,7 @@ spring:
     name: api
 
   datasource:
-    url: jdbc:sqlite:./db/dev.db?busy_timeout=5000&journal_mode=WAL&foreign_keys=on
+    url: jdbc:sqlite:./api/db/dev.db?busy_timeout=5000&journal_mode=WAL&foreign_keys=on
     hikari:
       maximum-pool-size: 1
       connection-timeout: 30000

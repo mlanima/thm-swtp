@@ -9,9 +9,14 @@ export class MyProjectsService {
   private readonly http = inject(HttpClient);
 
   getMyProjects(username: string): Observable<ProjectResponse[]> {
-    return this.http.get<ProjectResponse[]>(`${environment.apiUrl}/users/${encodeURIComponent(username)}/projects`);
+    return this.http.get<ProjectResponse[]>(
+      `${environment.apiUrl}/users/${encodeURIComponent(username)}/projects`,
+    );
+  }
+
+  getAllProjects(username: string): Observable<ProjectResponse[]> {
+    return this.http.get<ProjectResponse[]>(
+      `${environment.apiUrl}/users/${encodeURIComponent(username)}/projects/all`,
+    );
   }
 }
-
-
-

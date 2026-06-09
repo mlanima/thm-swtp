@@ -13,6 +13,7 @@ public class Project {
     UUID id;
     String name;
     String description;
+    String shortDescription;
     String projectUrl;
     boolean isPrivateProject;
     Set<UUID> memberIds;

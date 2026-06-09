@@ -12,6 +12,7 @@ public class ProjectJoinRequestMapper {
                 .id(entity.getId())
                 .projectId(entity.getProject().getId())
                 .requestingUserId(entity.getRequestingUser().getKeycloakId())
+                .requestingUsername(entity.getRequestingUser().getUsername())
                 .message(entity.getMessage())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())

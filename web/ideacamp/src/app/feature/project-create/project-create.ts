@@ -94,7 +94,7 @@ export class ProjectCreate {
     this.isLoading = true;
     this.errorMessage = null;
 
-    this.projectService.createProject({ ...res.data, memberIds: this.invitedMembers.map(member => member.keycloakId), tagIds: [] }).subscribe({
+    this.projectService.createProject({ ...res.data, shortDescription: res.data.shortDescription ?? null, description: res.data.description ?? null,memberIds: this.invitedMembers.map(member => member.keycloakId), tagIds: [] }).subscribe({
       next: (project) => {
         this.isLoading = false;
         this.successMessage = this.invitedMembers.length > 0 ? 'Projekt erfolgreich erstellt und Einladungen gesendet!' : 'Projekt erfolgreich erstellt!';

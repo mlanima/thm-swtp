@@ -1,6 +1,8 @@
 package de.thm.swtp.api.project;
 
 
+import de.thm.swtp.api.exceptionhandling.exceptions.ProjectMemberNotFoundException;
+import de.thm.swtp.api.exceptionhandling.exceptions.ProjectOwnerCannotBeRemovedException;
 import de.thm.swtp.api.project.dto.request.*;
 import de.thm.swtp.api.project.dto.response.*;
 import de.thm.swtp.api.project.exception.*;
@@ -8,6 +10,7 @@ import de.thm.swtp.api.projectInvitation.service.ProjectInviteService;
 import de.thm.swtp.api.projectFavorite.repository.ProjectFavoriteRepository;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.projectView.entity.ProjectViewEntity;
+import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import de.thm.swtp.api.projectView.repository.ProjectViewRepository;
 
@@ -44,8 +47,10 @@ public class ProjectService {
                 .id(project.getId())
                 .name(project.getName())
                 .description(project.getDescription())
+                .shortDescription(project.getShortDescription())
                 .projectUrl(project.getProjectUrl())
                 .isPrivateProject(project.isPrivateProject())
+                .allowJoinRequests(project.isAllowJoinRequests())
                 .ownerId(project.getOwner().getKeycloakId())
                 .memberIds(project.getMembers().stream()
                         .map(UserProfile::getKeycloakId)
@@ -76,10 +81,10 @@ public class ProjectService {
         ProjectEntity project = ProjectEntity.builder()
                 .name(request.name())
                 .description(request.description())
+                .shortDescription(request.shortDescription())
                 .projectUrl(request.projectUrl())
                 .isPrivateProject(request.isPrivateProject())
                 .owner(owner)
-                .members(Set.of())
                 .build();
 
         ProjectEntity saved = projectRepository.save(project);
@@ -181,6 +186,9 @@ public class ProjectService {
         if (request.getDescription() != null) {
             project.setDescription(request.getDescription());
         }
+        if (request.getShortDescription() != null) {
+            project.setShortDescription(request.getShortDescription());
+        }
         if (request.getProjectUrl() != null) {
             project.setProjectUrl(request.getProjectUrl());
         }
@@ -194,6 +202,14 @@ public class ProjectService {
     @Transactional
     public List<ProjectResponse> getProjectsByUsername(String username) {
         return projectRepository.findAllByOwnerUsernameAndDeletedAtIsNullOrderByCreatedAtDesc(username)
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    @Transactional
+    public List<ProjectResponse> getAllProjectsByUsername(String username) {
+        return projectRepository.findAllByOwnerOrMemberUsernameAndDeletedAtIsNull(username)
                 .stream()
                 .map(this::toResponse)
                 .toList();
@@ -216,6 +232,23 @@ public class ProjectService {
     }
 
     @Transactional
+    public ProjectResponse updateAllowJoinRequests(UUID projectId, boolean allow, UUID currentUserId) {
+        ProjectEntity project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ExceptionProjectNotFound(projectId));
+
+        if (project.getDeletedAt() != null) {
+            throw new ExceptionProjectAlreadyDeleted(projectId);
+        }
+
+        if (!project.getOwner().getKeycloakId().equals(currentUserId)) {
+            throw new ExceptionProjectEditNotAllowed(currentUserId, projectId);
+        }
+
+        project.setAllowJoinRequests(allow);
+        return toResponse(projectRepository.save(project));
+    }
+
+    @Transactional
     public List<UserProfile> getProjectMembers(UUID projectId) {
         ProjectEntity projectEntity = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ExceptionProjectNotFound(projectId));
@@ -223,5 +256,40 @@ public class ProjectService {
         return projectEntity.getMembers()
                 .stream()
                 .toList();
+    }
+
+    @Transactional
+    public void deleteProjectMember(UUID projectId, UUID currentUserId, UUID memberId){
+        ProjectEntity projectEntity =  projectRepository.findById(projectId)
+                .orElseThrow(() -> new ExceptionProjectNotFound(projectId));
+
+        checkProjectOwner(projectEntity, currentUserId);
+        if (currentUserId.equals(memberId)) {
+            throw new ProjectOwnerCannotBeRemovedException(currentUserId, projectId);
+        }
+
+        UserProfile member = userProfileRepository.findById(memberId)
+                .orElseThrow(() -> new UserProfileNotFoundException(memberId.toString()));
+
+        boolean memberExists = projectEntity.getMembers()
+                .stream()
+                .anyMatch(existingMember -> existingMember.getKeycloakId().equals(memberId));
+
+        if (!memberExists) {
+            throw new ProjectMemberNotFoundException(memberId, projectId);
+        }
+
+        projectEntity.getMembers().remove(member);
+        projectRepository.save(projectEntity);
+    }
+
+
+
+    private void checkProjectOwner(ProjectEntity projectEntity, UUID currentUserId){
+        UUID ownerId = projectEntity.getOwner().getKeycloakId();
+
+        if (!ownerId.equals(currentUserId)) {
+            throw new ExceptionProjectEditNotAllowed(currentUserId, projectEntity.getId());
+        }
     }
 }

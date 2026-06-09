@@ -25,6 +25,31 @@
   </div>
 
   <div>
+    <label for="project-short-description" class="mb-1 block text-sm font-medium text-gray-700">
+      Short description
+    </label>
+
+    <input
+      id="project-short-description"
+      type="text"
+      name="shortDescription"
+      [(ngModel)]="formData.shortDescription"
+      placeholder="Briefly describe your project"
+      maxlength="300"
+      class="w-full rounded-lg border px-3 py-2 outline-none"
+      [class.border-red-500]="errors.shortDescription"
+      [class.border-gray-300]="!errors.shortDescription"
+      [class.focus:border-lime-500]="!errors.shortDescription"
+    >
+
+    @if(errors.shortDescription){
+      <p class="mt-1 text-sm text-red-600">
+        {{errors.shortDescription}}
+      </p>
+    }
+  </div>
+
+  <div>
     <label for="project-description" class="mb-1 block text-sm font-medium text-gray-700">
       Description
     </label>

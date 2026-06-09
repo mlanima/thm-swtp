@@ -1,9 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { Subject } from 'rxjs';
+import { Subject, of } from 'rxjs';
 import { OAuthService } from 'angular-oauth2-oidc';
 
 import { App } from './app';
+import { AuthService } from './feature/auth/auth.service';
+import { ProjectInvitationService } from './feature/my-projects/services/project-invitation.service';
 
 describe('App', () => {
   const events$ = new Subject<void>();
@@ -16,6 +18,21 @@ describe('App', () => {
       providers: [
         provideRouter([]),
         { provide: OAuthService, useValue: oauthServiceMock },
+        {
+          provide: AuthService,
+          useValue: {
+            waitUntilAuthReady: () => Promise.resolve(),
+            isLoggedIn: () => false,
+            username: () => '',
+            user: () => null,
+            login: () => undefined,
+            logout: () => undefined,
+          },
+        },
+        {
+          provide: ProjectInvitationService,
+          useValue: { getInvitations: () => of([]) },
+        },
       ],
       imports: [App],
     }).compileComponents();
