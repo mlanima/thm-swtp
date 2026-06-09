@@ -15,11 +15,13 @@ export class PrivacyTab implements OnInit {
   private readonly projectService = inject(ProjectService);
 
   isPublic = signal(true);
+  joinRequestsAllowed = signal(true);
   isSaving = signal(false);
   saveError = signal<string | null>(null);
 
   ngOnInit(): void {
     this.isPublic.set(!this.project.isPrivateProject);
+    this.joinRequestsAllowed.set(this.project.allowJoinRequests);
   }
 
   togglePublicVisibility(): void {
@@ -41,6 +43,14 @@ export class PrivacyTab implements OnInit {
         this.saveError.set('Einstellung konnte nicht gespeichert werden.');
         this.isSaving.set(false);
       },
+    });
+  }
+
+  toggleAllowJoinRequests(): void {
+    const newValue = !this.joinRequestsAllowed();
+    this.joinRequestsAllowed.set(newValue);
+    this.projectService.updateAllowJoinRequests(this.project.id, newValue).subscribe({
+      error: () => this.joinRequestsAllowed.set(!newValue),
     });
   }
 }
