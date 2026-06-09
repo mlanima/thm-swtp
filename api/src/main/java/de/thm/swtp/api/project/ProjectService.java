@@ -76,7 +76,7 @@ public class ProjectService {
         }
 
         UserProfile owner = userProfileRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User profile not found for username: " + username));
+                .orElseThrow(() -> new UserProfileNotFoundException(username));
 
         ProjectEntity project = ProjectEntity.builder()
                 .name(request.name())
@@ -105,7 +105,7 @@ public class ProjectService {
         }
 
         UserProfile requester = userProfileRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User profile not found for username: " + username));
+                .orElseThrow(() -> new UserProfileNotFoundException(username));
 
         if (!project.getOwner().getKeycloakId().equals(requester.getKeycloakId())) {
             throw new ExceptionProjectDeleteNotAllowed(requester.getKeycloakId(), projectId);
@@ -168,7 +168,7 @@ public class ProjectService {
         }
 
         UserProfile requester = userProfileRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User profile not found for username: " + username));
+                .orElseThrow(() -> new UserProfileNotFoundException(username));
 
         if (!project.getOwner().getKeycloakId().equals(requester.getKeycloakId())) {
             throw new ExceptionProjectEditNotAllowed(requester.getKeycloakId(), projectId);
