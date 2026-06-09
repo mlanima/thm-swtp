@@ -3,12 +3,12 @@
     (click)="send($event)"
     [disabled]="isPending()"
     [title]="isPending() ? 'Anfrage ausstehend' : 'Beitreten beantragen'"
-    class="flex items-center gap-1.5 rounded-full p-3 transition"
+    class="group flex items-center gap-1.5 rounded-full p-3 transition"
     [class]="isPending() ? 'cursor-default opacity-50' : (onDark ? 'hover:bg-white/20' : 'hover:bg-slate-100')"
   >
     <i
-      class="pi pi-user-plus text-base transition-colors"
-      [class]="onDark ? 'text-white' : 'text-slate-500'"
+      class="pi pi-user-plus text-lg transition-colors"
+      [class]="isPending() ? (onDark ? 'text-white' : 'text-slate-500') : (onDark ? 'text-white group-hover:text-blue-400' : 'text-slate-500 group-hover:text-blue-400')"
       style="-webkit-text-stroke: 0.5px"
     ></i>
   </button>
