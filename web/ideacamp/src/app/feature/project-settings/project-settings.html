@@ -17,6 +17,15 @@
 
   @if (!isLoading() && project()) {
     <div class="mx-auto max-w-5xl px-6 py-10">
+
+      <a
+        [routerLink]="['/project', project()!.projectUrl]"
+        class="mb-6 inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-slate-500 transition hover:bg-slate-100 hover:text-lime-500"
+      >
+        <i class="pi pi-arrow-left text-sm text-zinc-400"></i>
+        <span>Zurück zum Projekt</span>
+      </a>
+
       <div class="flex gap-8">
 
 
@@ -45,14 +54,12 @@
             <app-join-requests-tab [projectId]="project()!.id" />
           }
           @if (activeTab() === 'members') {
-            <app-members-tab [projectId]="project()!.id" />
+            <app-members-tab [projectId]="project()!.id"
+            [ownerId]="project()!.ownerId"
+            />
           }
           @if (activeTab() === 'privacy') {
-            <app-privacy-tab
-              [projectId]="project()!.id"
-              [allowJoinRequests]="project()!.allowJoinRequests"
-              (allowJoinRequestsChange)="project.update(p => p ? { ...p, allowJoinRequests: $event } : p)"
-            />
+            <app-privacy-tab [project]="project()!" />
           }
           @if (activeTab() === 'danger-zone') {
             <app-danger-zone-tab

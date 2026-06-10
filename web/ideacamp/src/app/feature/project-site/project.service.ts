@@ -16,7 +16,7 @@ export interface CreateProjectRequest {
 
 export interface UpdateProjectRequest {
   name: string;
-  shortDescription: string;
+  shortDescription?: string;
   description: string;
   projectUrl: string;
   isPrivateProject: boolean;
@@ -47,5 +47,8 @@ export class ProjectService {
     return this.http.patch<ProjectResponse>(`${this.baseUrl}/${projectId}/allow-join-requests`, null, {
       params: { allow: String(allow) },
     });
+  }
+  projectUrlExists(projectUrl: string){
+    return this.http.get<boolean>(`${this.baseUrl}/url-exists/${encodeURIComponent(projectUrl)}`);
   }
 }

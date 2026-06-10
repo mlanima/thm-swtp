@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NgClass } from '@angular/common';
 import { ProjectService } from '../project-site/project.service';
 import { ProjectResponse } from '../../models/project.model';
@@ -14,7 +14,7 @@ type Tab = 'join-requests' | 'members' | 'privacy' | 'danger-zone';
 @Component({
   selector: 'app-project-settings',
   standalone: true,
-  imports: [NgClass, JoinRequestsTab, MembersTab, PrivacyTab, DangerZoneTab],
+  imports: [NgClass, RouterLink, JoinRequestsTab, MembersTab, PrivacyTab, DangerZoneTab],
   templateUrl: './project-settings.html',
 })
 export class ProjectSettings implements OnInit {

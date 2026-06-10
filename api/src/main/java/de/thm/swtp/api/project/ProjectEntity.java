@@ -1,5 +1,7 @@
 package de.thm.swtp.api.project;
 
+import de.thm.swtp.api.projectInvitation.entity.ProjectInviteEntity;
+import de.thm.swtp.api.projectLinks.entity.ProjectLinkEntity;
 import de.thm.swtp.api.tag.entity.TagEntity;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import jakarta.persistence.*;
@@ -71,6 +73,14 @@ public class ProjectEntity {
             inverseJoinColumns = @JoinColumn(name = "tag_name")
     )
     private Set<TagEntity> tags = new HashSet<>();
+
+    @OneToMany(mappedBy = "project", orphanRemoval = true)
+    @Builder.Default
+    private List<ProjectInviteEntity> invitations = new ArrayList<>();
+
+    @OneToMany(mappedBy = "project", orphanRemoval = true)
+    @Builder.Default
+    private List<ProjectLinkEntity> links = new ArrayList<>();
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

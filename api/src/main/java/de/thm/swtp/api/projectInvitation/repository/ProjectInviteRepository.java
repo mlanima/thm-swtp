@@ -17,4 +17,5 @@ public interface ProjectInviteRepository extends JpaRepository<ProjectInviteEnti
     /** Returns all invites send to a specific user from a specific project with a specific status*/
     Optional<ProjectInviteEntity> findByProjectIdAndInvitedUserKeycloakIdAndStatus(UUID projectId, UUID invitedUserId, ProjectInviteStatus status);
 
+
 }

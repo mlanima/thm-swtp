@@ -83,4 +83,9 @@ public class ProjectController {
         projectService.deleteProjectMember(projectId, currentUserId, memberId);
     }
 
+    @GetMapping("/url-exists/{projectUrl}")
+    public ResponseEntity<Boolean> projectUrlExists(@PathVariable String projectUrl) {
+        return ResponseEntity.ok(projectService.projectUrlExists(projectUrl));
+    }
+
 }

@@ -40,6 +40,15 @@ public class ProjectInviteController {
                 .toList();
     }
 
+    @GetMapping("/projects/{projectId}/invitations")
+    public List<ProjectInviteResponse> getInvitesForProject(@PathVariable UUID projectId, @AuthenticationPrincipal Jwt jwt) {
+        UUID currentUserId = UUID.fromString(jwt.getSubject());
+        return projectInviteService.getInvitesForProject(projectId, currentUserId)
+                .stream()
+                .map(ProjectInviteResponse::toResponse)
+                .toList();
+    }
+
     /** Current user can accept or reject an invitation. */
     @PatchMapping("/invitations/{invitationId}")
     public ProjectInviteResponse updateInviteStatus(@PathVariable UUID invitationId, @Valid @RequestBody UpdateProjectInviteStatusRequest request, @AuthenticationPrincipal Jwt jwt) {

@@ -1,6 +1,8 @@
 import { Component, Input, OnInit, inject, signal } from '@angular/core';
 import { ProjectJoinRequestService } from '../../services/project-join-request.service';
 
+type JoinButtonStatus = 'loading' | 'idle' | 'pending';
+
 @Component({
   selector: 'app-join-request-button',
   standalone: true,
@@ -13,13 +15,11 @@ export class JoinRequestButton implements OnInit {
 
   private readonly joinRequestService = inject(ProjectJoinRequestService);
 
-  readonly loading = signal(true);
-  readonly isPending = signal(false);
+  readonly status = signal<JoinButtonStatus>('loading');
 
   ngOnInit(): void {
     this.joinRequestService.hasPendingRequest(this.projectId).subscribe(pending => {
-      this.isPending.set(pending);
-      this.loading.set(false);
+      this.status.set(pending ? 'pending' : 'idle');
     });
   }
 
@@ -27,12 +27,12 @@ export class JoinRequestButton implements OnInit {
     event.stopPropagation();
     event.preventDefault();
 
-    if (this.isPending()) return;
+    if (this.status() !== 'idle') return;
 
-    this.isPending.set(true);
+    this.status.set('pending');
 
     this.joinRequestService.sendJoinRequest(this.projectId).subscribe({
-      error: () => this.isPending.set(false),
+      error: () => this.status.set('idle'),
     });
   }
 }

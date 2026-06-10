@@ -52,6 +52,7 @@ public class ProjectService {
                 .isPrivateProject(project.isPrivateProject())
                 .allowJoinRequests(project.isAllowJoinRequests())
                 .ownerId(project.getOwner().getKeycloakId())
+                .ownerUsername(project.getOwner().getUsername())
                 .memberIds(project.getMembers().stream()
                         .map(UserProfile::getKeycloakId)
                         .collect(java.util.stream.Collectors.toSet()))
@@ -76,7 +77,7 @@ public class ProjectService {
         }
 
         UserProfile owner = userProfileRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User profile not found for username: " + username));
+                .orElseThrow(() -> new UserProfileNotFoundException(username));
 
         ProjectEntity project = ProjectEntity.builder()
                 .name(request.name())
@@ -104,14 +105,15 @@ public class ProjectService {
             throw new ExceptionProjectAlreadyDeleted(projectId);
         }
 
-        userProfileRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User profile not found for username: " + username));
+        UserProfile requester = userProfileRepository.findByUsername(username)
+                .orElseThrow(() -> new UserProfileNotFoundException(username));
 
-
+        if (!project.getOwner().getKeycloakId().equals(requester.getKeycloakId())) {
+            throw new ExceptionProjectDeleteNotAllowed(requester.getKeycloakId(), projectId);
+        }
 
         projectFavoriteRepository.deleteByProjectId(projectId);
-        project.setDeletedAt(LocalDateTime.now());
-        projectRepository.save(project);
+        projectRepository.delete(project);
 
         return DeleteProjectResponse.builder()
                 .projectId(projectId)
@@ -141,7 +143,7 @@ public class ProjectService {
     public ProjectResponse getProjectByUrl(String projectUrl) {
 
         ProjectEntity project = projectRepository.findByProjectUrl(projectUrl)
-                .orElseThrow(() -> new RuntimeException("Kein Projekt mit der URL " + projectUrl + " gefunden."));
+                .orElseThrow(() -> new ProjectNotFoundByUrlException(projectUrl));
 
         if (project.getDeletedAt() != null) {
             throw new ExceptionProjectAlreadyDeleted(project.getId());
@@ -157,6 +159,11 @@ public class ProjectService {
     }
 
     @Transactional
+    public boolean projectUrlExists(String projectUrl){
+        return projectRepository.existsByProjectUrl(projectUrl);
+    }
+
+    @Transactional
     public ProjectResponse editProject(UUID projectId, UpdateProjectRequest request, String username) {
 
         ProjectEntity project = projectRepository.findById(projectId)
@@ -166,10 +173,12 @@ public class ProjectService {
             throw new ExceptionProjectAlreadyDeleted(projectId);
         }
 
-        userProfileRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User profile not found for username: " + username));
+        UserProfile requester = userProfileRepository.findByUsername(username)
+                .orElseThrow(() -> new UserProfileNotFoundException(username));
 
-
+        if (!project.getOwner().getKeycloakId().equals(requester.getKeycloakId())) {
+            throw new ExceptionProjectEditNotAllowed(requester.getKeycloakId(), projectId);
+        }
 
         if (request.getName() != null &&
                 !request.getName().equals(project.getName()) &&

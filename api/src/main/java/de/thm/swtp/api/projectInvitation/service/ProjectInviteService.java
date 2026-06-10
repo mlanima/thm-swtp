@@ -57,6 +57,23 @@ public class ProjectInviteService {
                 .toList();
     }
 
+    /** Returns all invitations that were sent from a given project.*/
+    @Transactional(readOnly = true)
+    public List<ProjectInvite> getInvitesForProject(UUID projectId, UUID currentUserId){
+        ProjectEntity projectEntity = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException(projectId));
+
+        if (!projectEntity.getOwner().getKeycloakId().equals(currentUserId)) {
+            throw new ProjectInviteAccessDeniedException("Only the Project-owner is allowed to see the project invitations for the project.");
+        }
+
+        return projectInviteRepository.findByProjectId(projectId)
+                .stream()
+                .map(ProjectInviteMapper::toDomain)
+                .toList();
+
+    }
+
     /** Updates the status of the given invitation. Can only be updated when the status is on pending */
     @Transactional
     public ProjectInvite updateInviteStatus(UUID inviteId, ProjectInviteStatus newStatus, UUID currentUserId) {
@@ -75,6 +92,7 @@ public class ProjectInviteService {
         ProjectInviteEntity saved = projectInviteRepository.save(inviteEntity);
         return ProjectInviteMapper.toDomain(saved);
     }
+
 
 
 
