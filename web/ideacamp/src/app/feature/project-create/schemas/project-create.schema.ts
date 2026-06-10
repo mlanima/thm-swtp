@@ -18,6 +18,13 @@ export const projectGeneralSchema = z.object({
     .max(20, 'Project name must be shorter than 20 characters.')
     .refine(containsNoQuotes, 'Project name must not contain quotes.'),
 
+  shortDescription: z.string()
+    .trim()
+    .max(200, 'Short description must be shorter than 200 characters.')
+    .refine(containsNoQuotes, 'Short description must not contain quotes.')
+    .optional()
+    .or(z.literal('')),
+
   description: z.string()
     .trim()
     .max(500, 'Project description must be shorter than 500 characters.')

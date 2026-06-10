@@ -6,6 +6,7 @@ import {ProjectResponse} from '../../models/project.model';
 
 export interface CreateProjectRequest {
   name: string;
+  shortDescription: string | null;
   description?: string | null;
   projectUrl: string;
   isPrivateProject: boolean;
@@ -15,6 +16,7 @@ export interface CreateProjectRequest {
 
 export interface UpdateProjectRequest {
   name: string;
+  shortDescription?: string;
   description: string;
   projectUrl: string;
   isPrivateProject: boolean;
@@ -39,5 +41,14 @@ export class ProjectService {
 
   updateProject(projectId: string, request: UpdateProjectRequest): Observable<ProjectResponse> {
     return this.http.put<ProjectResponse>(`${this.baseUrl}/${projectId}`, request);
+  }
+
+  updateAllowJoinRequests(projectId: string, allow: boolean): Observable<ProjectResponse> {
+    return this.http.patch<ProjectResponse>(`${this.baseUrl}/${projectId}/allow-join-requests`, null, {
+      params: { allow: String(allow) },
+    });
+  }
+  projectUrlExists(projectUrl: string){
+    return this.http.get<boolean>(`${this.baseUrl}/url-exists/${encodeURIComponent(projectUrl)}`);
   }
 }

@@ -13,7 +13,7 @@
         </h1>
 
         <p class="mt-4 text-sm leading-6 text-slate-200">
-          {{ project.description || 'Keine Beschreibung vorhanden.' }}
+          {{ project.shortDescription }}
         </p>
 
         <div class="mt-6 flex gap-3">
@@ -50,7 +50,18 @@
 <!--        Anfragen (3)-->
 <!--      </button>-->
       </div>
-      <div class="hidden items-start justify-end md:flex">
+      <div class="hidden items-center justify-end md:flex">
+        @if (showJoinButton) {
+          <app-join-request-button [projectId]="project.id" [onDark]="true" [allowJoinRequests]="project.allowJoinRequests" />
+        }
+
+        <app-favorite-button
+          [projectId]="project.id"
+          [count]="project.favoriteCount"
+          [onDark]="true"
+          (favoriteCountChanged)="favoriteCountChanged.emit($event)"
+        />
+
         @if (isOwner) {
           <a
             [routerLink]="['/project', project.projectUrl, 'settings']"

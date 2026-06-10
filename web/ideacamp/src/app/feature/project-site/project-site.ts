@@ -29,6 +29,7 @@ export class ProjectSite  implements OnInit {
   isSaving = signal(false);
   successMessage = signal<string | null>(null);
   editName = signal('');
+  editShortDescription = signal('');
   editDescription = signal('');
 
   get isOwner(): boolean {
@@ -62,9 +63,24 @@ export class ProjectSite  implements OnInit {
     const proj = this.project();
     if (!proj) return;
     this.editName.set(proj.name);
-    this.editDescription.set(proj.description);
+    this.editShortDescription.set(proj.shortDescription ?? '');
+    this.editDescription.set(proj.description ?? '');
     this.isEditing.set(true);
     this.successMessage.set(null);
+  }
+
+  onFavoriteCountChanged(newCount: number): void {
+    const proj = this.project();
+    if (!proj) return;
+
+    this.project.set({
+      ...proj,
+      favoriteCount: newCount,
+      stats: {
+        ...proj.stats,
+        likes: newCount,
+      },
+    });
   }
 
   cancelEdit(): void {
@@ -79,6 +95,7 @@ export class ProjectSite  implements OnInit {
     this.projectService
       .updateProject(proj.id, {
         name: this.editName(),
+        shortDescription: this.editShortDescription(),
         description: this.editDescription(),
         projectUrl: proj.projectUrl,
         isPrivateProject: proj.isPrivateProject,

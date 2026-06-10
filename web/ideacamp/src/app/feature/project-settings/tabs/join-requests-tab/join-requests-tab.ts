@@ -1,54 +1,57 @@
-import { Component, Input, signal } from '@angular/core';
-import { NgClass } from '@angular/common';
-import { JoinRequest } from '../../models/project-settings.model';
+import { Component, Input, OnInit, inject, signal } from '@angular/core';
+import { ProjectJoinRequestService, JoinRequestResponse } from '../../../../services/project-join-request.service';
+
+interface DisplayRequest {
+  id: string;
+  initials: string;
+  username: string;
+  message: string;
+  requestDate: string;
+}
 
 @Component({
   selector: 'app-join-requests-tab',
   standalone: true,
-  imports: [NgClass],
+  imports: [],
   templateUrl: './join-requests-tab.html',
 })
-export class JoinRequestsTab {
+export class JoinRequestsTab implements OnInit {
   @Input() projectId = '';
 
-  requests = signal<JoinRequest[]>([
-    {
-      id: '1',
-      userId: 'u1',
-      name: 'Maria Schmidt',
-      email: 'm.schmidt@example.com',
-      initials: 'MS',
-      avatarColor: 'bg-lime-500',
-      message: '"I would love to contribute my UX expertise."',
-      requestDate: 'May 29, 2026',
-    },
-    {
-      id: '2',
-      userId: 'u2',
-      name: 'Luca Bianchi',
-      email: 'luca.b@example.com',
-      initials: 'LB',
-      avatarColor: 'bg-slate-600',
-      message: '"Interested in helping with the roadmap planning."',
-      requestDate: 'May 28, 2026',
-    },
-    {
-      id: '3',
-      userId: 'u3',
-      name: 'Sophie Müller',
-      email: 'sophie.m@example.com',
-      initials: 'SM',
-      avatarColor: 'bg-slate-500',
-      message: '"Happy to support with documentation and testing."',
-      requestDate: 'May 27, 2026',
-    },
-  ]);
+  private readonly joinRequestService = inject(ProjectJoinRequestService);
+
+  requests = signal<DisplayRequest[]>([]);
+  loading = signal(true);
+
+  ngOnInit(): void {
+    this.joinRequestService.getProjectRequests(this.projectId).subscribe({
+      next: (data) => {
+        this.requests.set(data.filter(r => r.status === 'PENDING').map(r => this.toDisplay(r)));
+        this.loading.set(false);
+      },
+      error: () => this.loading.set(false),
+    });
+  }
 
   approve(id: string): void {
-    this.requests.update(list => list.filter(r => r.id !== id));
+    this.joinRequestService.acceptRequest(id).subscribe({
+      next: () => this.requests.update(list => list.filter(r => r.id !== id)),
+    });
   }
 
   decline(id: string): void {
-    this.requests.update(list => list.filter(r => r.id !== id));
+    this.joinRequestService.rejectRequest(id).subscribe({
+      next: () => this.requests.update(list => list.filter(r => r.id !== id)),
+    });
+  }
+
+  private toDisplay(r: JoinRequestResponse): DisplayRequest {
+    return {
+      id: r.id,
+      initials: r.requestingUsername.substring(0, 2).toUpperCase(),
+      username: r.requestingUsername,
+      message: r.message ?? '',
+      requestDate: new Date(r.createdAt).toLocaleDateString('de-DE'),
+    };
   }
 }

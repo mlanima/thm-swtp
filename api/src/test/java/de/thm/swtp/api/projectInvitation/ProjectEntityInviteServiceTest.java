@@ -199,6 +199,8 @@ public class ProjectEntityInviteServiceTest {
         ProjectInviteEntity invite = createPendingInviteEntity();
 
         when(projectInviteRepository.findById(inviteId)).thenReturn(Optional.of(invite));
+        when(projectInviteRepository.save(any(ProjectInviteEntity.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
 
         ProjectInvite res = projectInviteService.updateInviteStatus(inviteId,ProjectInviteStatus.ACCEPTED, invitedUserId);
 
@@ -211,7 +213,15 @@ public class ProjectEntityInviteServiceTest {
         ProjectInviteEntity invite = createPendingInviteEntity();
         when(projectInviteRepository.findById(inviteId)).thenReturn(Optional.of(invite));
 
-        ProjectInvite res = projectInviteService.updateInviteStatus(inviteId,ProjectInviteStatus.REJECTED, invitedUserId);
+        when(projectInviteRepository.findById(inviteId)).thenReturn(Optional.of(invite));
+        when(projectInviteRepository.save(any(ProjectInviteEntity.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        ProjectInvite res = projectInviteService.updateInviteStatus(
+                inviteId,
+                ProjectInviteStatus.REJECTED,
+                invitedUserId
+        );
 
         assertThat(res.getStatus()).isEqualTo(ProjectInviteStatus.REJECTED);
         assertThat(invite.getStatus()).isEqualTo(ProjectInviteStatus.REJECTED);
@@ -225,6 +235,8 @@ public class ProjectEntityInviteServiceTest {
         UUID otherUserId = UUID.randomUUID();
 
         when(projectInviteRepository.findById(inviteId)).thenReturn(Optional.of(invite));
+        when(projectInviteRepository.save(any(ProjectInviteEntity.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
 
         assertThatThrownBy(() -> projectInviteService.updateInviteStatus(inviteId,ProjectInviteStatus.ACCEPTED, otherUserId))
                 .isInstanceOf(ProjectInviteAccessDeniedException.class)

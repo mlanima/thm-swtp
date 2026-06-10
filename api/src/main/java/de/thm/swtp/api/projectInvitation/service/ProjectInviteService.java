@@ -57,6 +57,23 @@ public class ProjectInviteService {
                 .toList();
     }
 
+    /** Returns all invitations that were sent from a given project.*/
+    @Transactional(readOnly = true)
+    public List<ProjectInvite> getInvitesForProject(UUID projectId, UUID currentUserId){
+        ProjectEntity projectEntity = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException(projectId));
+
+        if (!projectEntity.getOwner().getKeycloakId().equals(currentUserId)) {
+            throw new ProjectInviteAccessDeniedException("Only the Project-owner is allowed to see the project invitations for the project.");
+        }
+
+        return projectInviteRepository.findByProjectId(projectId)
+                .stream()
+                .map(ProjectInviteMapper::toDomain)
+                .toList();
+
+    }
+
     /** Updates the status of the given invitation. Can only be updated when the status is on pending */
     @Transactional
     public ProjectInvite updateInviteStatus(UUID inviteId, ProjectInviteStatus newStatus, UUID currentUserId) {
@@ -67,8 +84,15 @@ public class ProjectInviteService {
         checkInviteStatus(invite, newStatus, currentUserId);
         inviteEntity.setStatus(newStatus);
 
-        return ProjectInviteMapper.toDomain(inviteEntity);
+
+        if (newStatus == ProjectInviteStatus.ACCEPTED) {
+            addInvitedUserToProject(inviteEntity);
+        }
+
+        ProjectInviteEntity saved = projectInviteRepository.save(inviteEntity);
+        return ProjectInviteMapper.toDomain(saved);
     }
+
 
 
 
@@ -117,5 +141,26 @@ public class ProjectInviteService {
         invite.setMessage(message);
         invite.setStatus(ProjectInviteStatus.PENDING);
         return invite;
+    }
+
+    private void addInvitedUserToProject(ProjectInviteEntity inviteEntity){
+        ProjectEntity projectEntity = inviteEntity.getProject();
+        UserProfile invitedUserEntity = inviteEntity.getInvitedUser();
+
+        if (projectEntity.getOwner().getKeycloakId().equals(invitedUserEntity.getKeycloakId())) {
+            return;
+        }
+
+        if (alreadyMember(projectEntity, invitedUserEntity)) {
+            return;
+        }
+        projectEntity.getMembers().add(invitedUserEntity);
+        projectRepository.save(projectEntity);
+    }
+
+    private boolean alreadyMember(ProjectEntity projectEntity, UserProfile invitedUserEntity){
+        return projectEntity.getMembers()
+                .stream()
+                .anyMatch(member -> member.getKeycloakId().equals(invitedUserEntity.getKeycloakId()));
     }
 }

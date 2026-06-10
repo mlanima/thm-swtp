@@ -22,16 +22,24 @@
 
         <!--TODO: Connect to pages, delete unused-->
         <div class="mt-4 space-y-1">
-          <a routerLink="/search">
+          <a routerLink="/search" (click)="requestClose()">
           <app-menu-link>
              <i class="pi pi-compass text-sm text-zinc-400"></i>
              <span>Explore</span>
            </app-menu-link>
           </a>
-          <a routerLink="/my-projects">
+          <a routerLink="/my-projects" (click)="requestClose()">
           <app-menu-link>
              <i class="pi pi-folder text-sm text-zinc-400"></i>
-             <span>Meine Projekte</span>
+             <span>Meine Projekte @if (pendingInvitations() > 0) {
+               <span class="text-lime-400">({{ pendingInvitations() }})</span>
+             }</span>
+           </app-menu-link>
+          </a>
+          <a routerLink="/favorites" (click)="requestClose()">
+          <app-menu-link>
+             <i class="pi pi-heart text-sm text-zinc-400"></i>
+             <span>Favoriten</span>
            </app-menu-link>
           </a>
           <!--<app-menu-link>
@@ -51,14 +59,14 @@
       </menu>
 
       <footer class="space-y-2 border-t border-zinc-700 px-6 py-5">
-        <a routerLink="/impressum">
+        <a routerLink="/impressum" (click)="requestClose()">
         <app-menu-link>
           <i class="pi pi-file text-sm text-zinc-400"></i>
           <span>Impressum</span>
         </app-menu-link>
         </a>
 
-        <a [routerLink]="['/profiles', auth.username()]">
+        <a [routerLink]="['/profiles', auth.username()]" (click)="requestClose()">
         <app-menu-link>
           <i class="pi pi-cog text-md text-zinc-400"></i>
           <span>Einstellungen</span>

@@ -1,5 +1,7 @@
 package de.thm.swtp.api.project;
 
+import de.thm.swtp.api.projectInvitation.entity.ProjectInviteEntity;
+import de.thm.swtp.api.projectLinks.entity.ProjectLinkEntity;
 import de.thm.swtp.api.tag.entity.TagEntity;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import jakarta.persistence.*;
@@ -29,12 +31,23 @@ public class ProjectEntity {
     @Column(length = 500)
     private String description;
 
+    @Column(name = "short_description", length = 200)
+    private String shortDescription;
+
     @Column(name = "project_url", nullable = false, length = 30)
     private String projectUrl;
 
     @Column(name = "is_private", nullable = false)
     @Builder.Default
     private boolean isPrivateProject = false;
+
+    @Column(name = "allow_join_requests", nullable = false, columnDefinition = "boolean default true")
+    @Builder.Default
+    private boolean allowJoinRequests = true;
+
+    @Column(name = "open_positions_count", nullable = false, columnDefinition = "integer default 0")
+    @Builder.Default
+    private int openPositionsCount = 0;
 
     @Column(name = "delete_at")
     private LocalDateTime deletedAt;
@@ -50,7 +63,7 @@ public class ProjectEntity {
             inverseJoinColumns = @JoinColumn(name = "user_profile_keycloak_id")
     )
     @Builder.Default
-    private List<UserProfile> members = new ArrayList<>();
+    private Set<UserProfile> members = new HashSet<>();
 
     // Misses Join to TagEntity for project-tags. ManyToMany should work.
     @ManyToMany
@@ -60,6 +73,14 @@ public class ProjectEntity {
             inverseJoinColumns = @JoinColumn(name = "tag_name")
     )
     private Set<TagEntity> tags = new HashSet<>();
+
+    @OneToMany(mappedBy = "project", orphanRemoval = true)
+    @Builder.Default
+    private List<ProjectInviteEntity> invitations = new ArrayList<>();
+
+    @OneToMany(mappedBy = "project", orphanRemoval = true)
+    @Builder.Default
+    private List<ProjectLinkEntity> links = new ArrayList<>();
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

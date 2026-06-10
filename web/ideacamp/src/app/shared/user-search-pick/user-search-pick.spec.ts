@@ -1,17 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {UserSearchPick} from './user-search-pick';
 
-import { TagComponent } from './tag';
-
-describe('Tag', () => {
-  let component: TagComponent;
-  let fixture: ComponentFixture<TagComponent>;
+describe('UserSearchPickComponent', () => {
+  let component: UserSearchPick;
+  let fixture: ComponentFixture<UserSearchPick>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TagComponent],
+      imports: [UserSearchPick],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(TagComponent);
+    fixture = TestBed.createComponent(UserSearchPick);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

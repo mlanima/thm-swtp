@@ -7,14 +7,21 @@
     <div class="flex items-center justify-between px-5 py-4">
       <div>
         <p class="text-sm font-medium text-slate-800">Öffentliche Sichtbarkeit</p>
-        <p class="mt-0.5 text-xs text-slate-500">Dieses Projekt ist öffentlich sichtbar und kann von jedem gefunden werden.</p>
+        <p class="mt-0.5 text-xs text-slate-500">
+          @if (isPublic()) {
+            Dieses Projekt ist öffentlich sichtbar und kann von jedem gefunden werden.
+          } @else {
+            Dieses Projekt ist privat und erscheint nicht in der Suche.
+          }
+        </p>
       </div>
       <label class="relative inline-flex cursor-pointer items-center">
         <input
           type="checkbox"
           class="peer sr-only"
           [checked]="isPublic()"
-          (change)="isPublic.set(!isPublic())"
+          [disabled]="isSaving()"
+          (change)="togglePublicVisibility()"
         />
         <div class="relative h-6 w-11 rounded-full bg-slate-200 transition-colors
                     peer-checked:bg-slate-700
@@ -29,14 +36,15 @@
     <div class="flex items-center justify-between px-5 py-4">
       <div>
         <p class="text-sm font-medium text-slate-800">Beitrittsanfragen zulassen</p>
-        <p class="mt-0.5 text-xs text-slate-500">Nutzer können beantragen, dem Projekt beizutreten.Akzeptieren und Ablehnen durch Projektinhaber möglich</p>
+        <p class="mt-0.5 text-xs text-slate-500">Nutzer können beantragen, dem Projekt beizutreten. Akzeptieren und Ablehnen durch Projektinhaber möglich</p>
       </div>
       <label class="relative inline-flex cursor-pointer items-center">
         <input
           type="checkbox"
           class="peer sr-only"
-          [checked]="allowJoinRequests()"
-          (change)="allowJoinRequests.set(!allowJoinRequests())"
+          [checked]="joinRequestsAllowed()"
+          [disabled]="isSaving()"
+          (change)="toggleAllowJoinRequests()"
         />
         <div class="relative h-6 w-11 rounded-full bg-slate-200 transition-colors
                     peer-checked:bg-slate-700
@@ -48,5 +56,4 @@
       </label>
     </div>
 
-  </div>
-</div>
+  </div></div>

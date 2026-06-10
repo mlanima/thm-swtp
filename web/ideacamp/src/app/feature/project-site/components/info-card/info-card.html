@@ -20,22 +20,30 @@
 
   <div class="mt-6 grid grid-cols-4 border-t pt-5 text-center">
     <div>
-      <p class="text-xl font-bold text-lime-500">38</p>
+      <p class="text-xl font-bold text-lime-500">
+        {{ project.stats.contributors }}
+      </p>
       <p class="text-xs text-slate-400">Contributors</p>
     </div>
 
     <div>
-      <p class="text-xl font-bold text-lime-500">247</p>
+      <p class="text-xl font-bold text-lime-500">
+        {{ project.stats.views }}
+      </p>
       <p class="text-xs text-slate-400">Views</p>
     </div>
 
     <div>
-      <p class="text-xl font-bold text-lime-500">12</p>
+      <p class="text-xl font-bold text-lime-500">
+        {{ project.stats.likes }}
+      </p>
       <p class="text-xs text-slate-400">Likes</p>
     </div>
 
     <div>
-      <p class="text-xl font-bold text-lime-500">3</p>
+      <p class="text-xl font-bold text-lime-500">
+        {{ project.stats.openPositions }}
+      </p>
       <p class="text-xs text-slate-400">Open Positions</p>
     </div>
   </div>

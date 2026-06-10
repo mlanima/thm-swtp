@@ -32,6 +32,7 @@ public interface ProjectSearchRepository extends JpaRepository<ProjectEntity, UU
             SELECT DISTINCT p.id FROM projects p
             LEFT JOIN p.tags t
             WHERE p.deletedAt IS NULL
+            AND p.isPrivateProject = false
             AND (LOWER(p.name) LIKE LOWER(CONCAT('%', :query, '%'))
                  OR LOWER(t.name) LIKE LOWER(CONCAT('%', :query, '%')))
             """)

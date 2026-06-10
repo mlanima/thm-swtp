@@ -1,0 +1,43 @@
+<div
+  #pillContainer
+  class="relative inline-flex items-center rounded-xl border border-slate-200 bg-white p-1 shadow-sm"
+>
+  <div
+    class="absolute bottom-1 left-0 right-0 top-1 rounded-xl bg-slate-700 transition-all duration-300 ease-in-out"
+    [style.left.px]="pillLeft()"
+    [style.width.px]="pillWidth()"
+  ></div>
+  <span class="relative z-10 flex items-center px-2.5">
+    <svg
+      width="12"
+      height="12"
+      viewBox="0 0 12 12"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M4.87415 9.75002C4.87411 9.85068 4.90211 9.94936 4.95502 10.035C5.00793 10.1206 5.08365 10.1898 5.1737 10.2348L6.25703 10.7765C6.33963 10.8178 6.43141 10.8372 6.52366 10.8331C6.61591 10.8289 6.70555 10.8012 6.78409 10.7526C6.86262 10.704 6.92743 10.6362 6.97237 10.5555C7.0173 10.4748 7.04086 10.384 7.04082 10.2917V6.50002C7.04094 6.23156 7.14074 5.97271 7.32086 5.77365L11.2333 1.44627C11.3034 1.36857 11.3496 1.27222 11.3661 1.16887C11.3826 1.06552 11.3688 0.9596 11.3264 0.863911C11.284 0.768222 11.2148 0.686866 11.1272 0.629682C11.0395 0.572497 10.9371 0.541934 10.8325 0.541687H1.08249C0.977733 0.541725 0.875236 0.572137 0.787414 0.62924C0.699592 0.686343 0.630211 0.767686 0.587677 0.863417C0.545143 0.959148 0.53128 1.06516 0.547767 1.16861C0.564254 1.27206 0.610385 1.3685 0.68057 1.44627L4.59411 5.77365C4.77424 5.97271 4.87403 6.23156 4.87415 6.50002V9.75002Z"
+        stroke="#62748E"
+        stroke-width="1.08333"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  </span>
+  <button
+    #btnAll
+    (click)="setFilter('all')"
+    class="relative z-10 inline-flex items-center gap-1.5 rounded-md px-4 py-1.5 text-sm font-medium transition-colors duration-300"
+    [class]="activeFilter() === 'all' ? 'text-white' : 'text-slate-500 hover:text-slate-700'"
+  >
+    All projects
+  </button>
+  <button
+    #btnMy
+    (click)="setFilter('my')"
+    class="relative z-10 inline-flex items-center rounded-md px-4 py-1.5 text-sm font-medium transition-colors duration-300"
+    [class]="activeFilter() === 'my' ? 'text-white' : 'text-slate-500 hover:text-slate-700'"
+  >
+    Owned
+  </button>
+</div>

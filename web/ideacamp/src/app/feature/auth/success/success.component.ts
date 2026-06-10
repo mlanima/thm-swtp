@@ -1,12 +1,12 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { UserProfileService } from '../../../services/user-profile.service';
 
 @Component({
   selector: 'app-success',
   standalone: true,
-  imports: [RouterLink],
+  imports: [],
   templateUrl: './success.component.html',
 })
 export class SuccessComponent implements OnInit {
