@@ -8,4 +8,5 @@ import java.util.UUID;
 public interface ProjectViewRepository extends JpaRepository<ProjectViewEntity, UUID> {
 
     long countByProjectId(UUID projectId);
+    void deleteByProjectId(UUID projectId);
 }
