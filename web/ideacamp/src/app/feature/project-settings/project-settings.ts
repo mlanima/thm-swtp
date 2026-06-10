@@ -38,7 +38,7 @@ export class ProjectSettings implements OnInit {
   ngOnInit(): void {
     const projectUrl = this.route.snapshot.paramMap.get('projectUrl');
     if (!projectUrl) {
-      this.errorMessage.set('No project URL provided.');
+      this.errorMessage.set('Keine Projekt URL gegeben.');
       this.isLoading.set(false);
       return;
     }
@@ -54,7 +54,7 @@ export class ProjectSettings implements OnInit {
         this.isLoading.set(false);
       },
       error: () => {
-        this.errorMessage.set('Could not load project.');
+        this.errorMessage.set('Projekt konnte nicht geladen werden.');
         this.isLoading.set(false);
       },
     });

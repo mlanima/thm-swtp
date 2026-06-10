@@ -46,11 +46,11 @@ export class InvitationCard {
     const diffHours = Math.floor(diffMins / 60);
     const diffDays = Math.floor(diffHours / 24);
 
-    if (diffMins < 1) return 'just now';
-    if (diffMins < 60) return `${diffMins} minute${diffMins === 1 ? '' : 's'} ago`;
-    if (diffHours < 24) return `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`;
-    if (diffDays === 1) return 'yesterday';
-    if (diffDays < 30) return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
+    if (diffMins < 1) return 'gerade eben';
+    if (diffMins < 60) return `${diffMins} vor${diffMins === 1 ? '' : 's'} minuten`;
+    if (diffHours < 24) return `${diffHours} vor${diffHours === 1 ? '' : 's'} stunden`;
+    if (diffDays === 1) return 'gestern';
+    if (diffDays < 30) return `${diffDays} vor${diffDays === 1 ? '' : 's'} Tag(en)`;
     return new Date(dateStr).toLocaleDateString();
   }
 }

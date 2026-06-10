@@ -70,7 +70,7 @@ export class InvitationsSection implements OnInit {
         this.isLoading.set(false);
       },
       error: () => {
-        this.errorMessage.set('Invitations could not be loaded.');
+        this.errorMessage.set('Einladungen konnten nicht geladen werden.');
         this.isLoading.set(false);
       },
     });

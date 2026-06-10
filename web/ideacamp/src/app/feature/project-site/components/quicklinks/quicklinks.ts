@@ -78,7 +78,7 @@ export class Quicklinks implements OnChanges {
         this.changeDetectorRef.markForCheck();
       },
       error: () => {
-        this.errorMessage = 'Failed to load links.';
+        this.errorMessage = 'Links konnten nicht geladen werden.';
         this.isLoading = false;
         this.changeDetectorRef.markForCheck();
       },
@@ -98,7 +98,7 @@ export class Quicklinks implements OnChanges {
         this.changeDetectorRef.markForCheck();
       },
       error: () => {
-        this.errorMessage = 'Failed to add link.';
+        this.errorMessage = 'Link konnte nicht hinzugefügt werden.';
       },
     });
   }
@@ -116,7 +116,7 @@ export class Quicklinks implements OnChanges {
         this.changeDetectorRef.markForCheck();
       },
       error: () => {
-        this.errorMessage = 'Failed to update link.';
+        this.errorMessage = 'Link konnte nicht aktualisiert werden.';
       },
     });
   }
@@ -128,7 +128,7 @@ export class Quicklinks implements OnChanges {
         this.changeDetectorRef.markForCheck();
       },
       error: () => {
-        this.errorMessage = 'Failed to delete link.';
+        this.errorMessage = 'Link konnte nicht gelöscht werden.';
       },
     });
   }
@@ -172,7 +172,7 @@ export class Quicklinks implements OnChanges {
   }
 
   private setValidationError(message?: string): void {
-    this.errorMessage = message ?? 'Invalid link data.';
+    this.errorMessage = message ?? 'Ungültige Linkdaten.';
   }
 
   private addCreatedProjectLink(link: ProjectLinkModel) {

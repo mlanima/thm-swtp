@@ -56,7 +56,7 @@ export class TagList implements OnInit, OnChanges {
         const existing = this.tags().some((item) => item.name.toLowerCase() === lower);
 
         if (existing) {
-          this.errorMessage.set('Tag already exists on this project.');
+          this.errorMessage.set('Tag ist bereits in diesem Projekt enthalten.');
         }
 
         if (!existing) {
@@ -65,7 +65,7 @@ export class TagList implements OnInit, OnChanges {
         this.isSaving.set(false);
       },
       error: () => {
-        this.errorMessage.set('Could not save tag.');
+        this.errorMessage.set('Tag zu lang.');
         this.isSaving.set(false);
       },
     });
@@ -85,7 +85,7 @@ export class TagList implements OnInit, OnChanges {
         this.isDeleting.set(false);
       },
       error: () => {
-        this.errorMessage.set('Could not delete tag.');
+        this.errorMessage.set('Tag konnte nicht gelöscht werden.');
         this.isDeleting.set(false);
       },
     });
@@ -102,7 +102,7 @@ export class TagList implements OnInit, OnChanges {
         this.isLoading.set(false);
       },
       error: () => {
-        this.errorMessage.set('Could not load tags.');
+        this.errorMessage.set('Tags konnten nicht geladen werden.');
         this.isLoading.set(false);
       },
     });

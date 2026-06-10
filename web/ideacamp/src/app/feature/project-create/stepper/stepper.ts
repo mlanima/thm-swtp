@@ -11,10 +11,10 @@ export class Stepper {
   @Input() currentStep = 0;
 
   steps = [
-    'General',
-    'Settings',
-    'Members',
-    'Finish'
+    'Allgemeines',
+    'Einstellungen',
+    'Mitglieder',
+    'Fertigstellen'
   ];
 
 }

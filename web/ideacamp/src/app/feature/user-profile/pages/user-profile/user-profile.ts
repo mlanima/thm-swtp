@@ -100,7 +100,7 @@ export class UserProfile implements OnInit, OnDestroy {
       this.routeUsername = params.get('username') ?? '';
 
       if (!this.routeUsername) {
-        this.profileState.set({ isLoading: false, profile: null, errorMessage: 'User not found.' });
+        this.profileState.set({ isLoading: false, profile: null, errorMessage: 'Nutzer nicht gefunden.' });
         return;
       }
 
@@ -135,10 +135,10 @@ export class UserProfile implements OnInit, OnDestroy {
       error: (error) => {
         const errorMessage =
           error.status === 401 || error.status === 403
-            ? 'Please log in to view this profile.'
+            ? 'Bitte melde dich an, um dieses Profil anzuzeigen.'
             : error.status === 404
-              ? 'User not found.'
-              : 'Profile information could not be loaded. Please try again later.';
+              ? 'Nutzer nicht gefunden.'
+              : 'Profilinformationen konnten nicht geladen werden. Bitte versuche es später erneut.';
 
         this.profileState.set({
           isLoading: false,
@@ -202,8 +202,8 @@ export class UserProfile implements OnInit, OnDestroy {
         error: (error) => {
           const errorMessage =
             error.status === 401 || error.status === 403
-              ? 'You are not authorized to edit this profile.'
-              : 'Profile could not be updated. Please try again later.';
+              ? 'Du bist nicht berechtigt, dieses Profil zu bearbeiten.'
+              : 'Das Profil konnte nicht aktualisiert werden. Bitte versuche es später erneut.';
 
           this.profileState.set({
             isLoading: false,

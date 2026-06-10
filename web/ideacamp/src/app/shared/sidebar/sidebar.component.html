@@ -18,14 +18,14 @@
       </div>
 
       <menu class="flex-1 overflow-y-auto px-6 py-6">
-        <p class="text-xs font-semibold uppercase tracking-wider text-zinc-400">Menu</p>
+        <p class="text-xs font-semibold uppercase tracking-wider text-zinc-400">Menü</p>
 
         <!--TODO: Connect to pages, delete unused-->
         <div class="mt-4 space-y-1">
           <a routerLink="/search" (click)="requestClose()">
           <app-menu-link>
              <i class="pi pi-compass text-sm text-zinc-400"></i>
-             <span>Explore</span>
+             <span>Erkunden</span>
            </app-menu-link>
           </a>
           <a routerLink="/my-projects" (click)="requestClose()">
@@ -45,7 +45,7 @@
           <a [routerLink]="['/profiles', auth.username()]" (click)="requestClose()">
           <app-menu-link>
             <i class="pi pi-user text-sm text-zinc-400"></i>
-            <span>My Profile</span>
+            <span>Mein Profil</span>
           </app-menu-link>
           </a>
           <!--<app-menu-link>
