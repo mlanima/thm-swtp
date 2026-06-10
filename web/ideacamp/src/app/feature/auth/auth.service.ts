@@ -14,6 +14,7 @@ type OAuthServiceBridge = Partial<Pick<
   | 'initCodeFlow'
   | 'logOut'
   | 'getAccessToken'
+  | 'setupAutomaticSilentRefresh'
 >> & {
   events?: { subscribe: (next: () => void) => unknown };
 };
@@ -109,7 +110,14 @@ export class AuthService {
 
     this.initPromise = oauthService
       .loadDiscoveryDocumentAndTryLogin()
-      .then(() => this.updateStateAfterTick())
+      .then(() => {
+        // auto-refresh the access token before it expires
+        const oauth = this.oauthService as OAuthServiceBridge;
+        if (typeof oauth.setupAutomaticSilentRefresh === 'function') {
+          oauth.setupAutomaticSilentRefresh();
+        }
+        return this.updateStateAfterTick();
+      })
       .catch(() => this.updateStateAfterTick());
 
     return this.initPromise!;
@@ -149,7 +157,7 @@ export class AuthService {
 
     if (hasToken) {
       this.isLoggingOut.set(false);
-      
+
       const claims = oauthService.getIdentityClaims?.() as Record<string, unknown> | null;
       const preferred = claims?.['preferred_username'];
       const username = typeof preferred === 'string' ? preferred : '';
