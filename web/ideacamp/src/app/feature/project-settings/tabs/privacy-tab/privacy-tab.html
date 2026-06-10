@@ -56,19 +56,4 @@
       </label>
     </div>
 
-  </div>
-
-</div>
-
-<button
-  (click)="saveSettings()"
-  [disabled]="!hasChanges() || isSaving()"
-  class="fixed bottom-6 right-6 flex items-center gap-2 rounded-lg bg-slate-800 px-5 py-3 text-sm font-medium text-white shadow-lg transition-opacity disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-700"
->
-  @if (isSaving()) {
-    <i class="pi pi-spin pi-spinner"></i>
-  } @else {
-    <i class="pi pi-save"></i>
-  }
-  Speichern
-</button>
+  </div></div>
