@@ -48,4 +48,7 @@ export class ProjectService {
       params: { allow: String(allow) },
     });
   }
+  projectUrlExists(projectUrl: string){
+    return this.http.get<boolean>(`${this.baseUrl}/url-exists/${encodeURIComponent(projectUrl)}`);
+  }
 }
