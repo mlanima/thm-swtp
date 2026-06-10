@@ -6,7 +6,7 @@ git fetch --prune
 
 # 1. lokale branches löschen, deren upstream weg ist
 echo "→ Removing branches with deleted upstream..."
-git branch -vv | grep ': gone]' | awk '{print $1}' | xargs -r git branch -d
+git branch -vv | grep ': gone]' | awk '{print $1}' | xargs -r git branch -D
 
 # 2. neue remote branches lokal tracken
 echo "→ Tracking new remote branches..."
