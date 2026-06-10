@@ -142,7 +142,7 @@ public class ProjectService {
     public ProjectResponse getProjectByUrl(String projectUrl) {
 
         ProjectEntity project = projectRepository.findByProjectUrl(projectUrl)
-                .orElseThrow(() -> new RuntimeException("Kein Projekt mit der URL " + projectUrl + " gefunden."));
+                .orElseThrow(() -> new ProjectNotFoundByUrlException(projectUrl));
 
         if (project.getDeletedAt() != null) {
             throw new ExceptionProjectAlreadyDeleted(project.getId());
@@ -155,6 +155,11 @@ public class ProjectService {
         );
 
         return toResponse(project);
+    }
+
+    @Transactional
+    public boolean projectUrlExists(String projectUrl){
+        return projectRepository.existsByProjectUrl(projectUrl);
     }
 
     @Transactional
