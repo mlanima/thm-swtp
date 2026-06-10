@@ -2,7 +2,7 @@ import {Component, Output, EventEmitter, Input, OnChanges,SimpleChanges, inject,
 import {FormsModule} from '@angular/forms';
 import {ProjectSettingsData, projectSettingsSchema} from '../schemas/project-create.schema';
 import {FormErrors, mapZodErrors} from '../schemas/zod-error.helper';
-import { catchError, debounceTime, distinctUntilChanged, map, of, Subject, Subscription, switchMap, } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, of, Subject, Subscription, switchMap, } from 'rxjs';
 import { ProjectService } from '../../project-site/project.service'
 type SettingsFormFields = 'projectUrl' | 'isPrivateProject';
 
