@@ -43,7 +43,7 @@ export class ProfileBanner {
 
   @Output() save = new EventEmitter<void>();
 
-  @Output() cancel = new EventEmitter<void>();
+  @Output() cancelEdit = new EventEmitter<void>();
 
   /**
    * First uppercase letter of the username
