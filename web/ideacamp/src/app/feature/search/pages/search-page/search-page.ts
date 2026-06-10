@@ -38,13 +38,13 @@ export class SearchPage implements OnInit, OnDestroy {
           if (queries.length === 0) {
              return of({ projects: [], users: [] });
           }
+          this.isLoading.set(true);
           return forkJoin({
             projects: this.searchService.searchProjects(queries),
             users: this.searchService.searchUsers(queries),
           }).pipe(
             catchError(() => {
               this.errorMessage.set('Search failed. Please try again.');
-              this.isLoading.set(false);
               return of(null);
             })
           );
@@ -55,8 +55,8 @@ export class SearchPage implements OnInit, OnDestroy {
         if (result) {
           this.projects.set(result.projects);
           this.users.set(result.users);
-          this.isLoading.set(false);
         }
+        this.isLoading.set(false);
       });
   }
 
@@ -76,7 +76,6 @@ export class SearchPage implements OnInit, OnDestroy {
       return;
     }
 
-    this.isLoading.set(true);
     this.query$.next(queries);
   }
 
