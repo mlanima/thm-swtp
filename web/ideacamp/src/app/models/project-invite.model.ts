@@ -9,3 +9,9 @@ export interface ProjectInviteResponse {
   status: 'PENDING' | 'ACCEPTED' | 'REJECTED';
   createdAt: string;
 }
+
+
+export interface CreateProjectInviteRequest {
+  invitedUserId: string;
+  message?: string;
+}

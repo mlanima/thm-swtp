@@ -1,52 +1,39 @@
-import { Component, ChangeDetectorRef,EventEmitter, Input, OnChanges, OnDestroy, Output, inject, SimpleChanges, ElementRef, ViewChild} from '@angular/core';
-import { Subject, Subscription, catchError, debounceTime, distinctUntilChanged, of, switchMap} from 'rxjs';
-import {FormsModule } from '@angular/forms'
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject, ViewChild } from '@angular/core';
+import {FormsModule } from '@angular/forms';
 
-import { ProjectInviteMember } from '../../../models/project-invite-member.model'
-import { SearchService } from '../../search/services/search.service'
-import {UserSearchResult} from '../../search/models/user-search-result.model'
-import {UserProfileService} from '../../../services/user-profile.service'
+import { ProjectInviteMember } from '../../../models/project-invite-member.model';
+import {UserSearchResult} from '../../search/models/user-search-result.model';
+import { UserSearchPick } from '../../../shared/user-search-pick/user-search-pick';
+import { UserProfileService } from '../../../services/user-profile.service';
 
 
 @Component({
   selector: 'app-project-members-form',
   standalone : true,
-  imports: [FormsModule],
+  imports: [FormsModule, UserSearchPick],
   templateUrl: './project-members-form.html',
 })
 
 /** Third step of the project creation wizard.*/
-export class ProjectMembersForm implements OnChanges, OnDestroy {
-
-  private readonly searchService = inject(SearchService);
-  private readonly searchTerms = new Subject<string>();
-  private readonly searchSubscription: Subscription;
+export class ProjectMembersForm implements OnChanges {
   private readonly userProfileService = inject(UserProfileService);
-  private readonly changeDetectorRef = inject(ChangeDetectorRef);
-  currentUserKeycloakId: string | null = null;
 
-
+  @ViewChild('userSearchPick') userSearchPick?: UserSearchPick;
 
   @Input() initialMembers: ProjectInviteMember[] = [];
   @Output() next = new EventEmitter<ProjectInviteMember[]>();
   @Output() back = new EventEmitter<ProjectInviteMember[]>();
-  @ViewChild('memberSearchInput') memberSearchInput?: ElementRef<HTMLInputElement>;
+
+  currentUserKeycloakId: string | null = null;
 
   members: ProjectInviteMember[] = [];
-
   isMemberDialogOpen = false;
-  searchQuery = '';
-  isSearching = false;
-  hasSearched = false;
-
-  searchResults : UserSearchResult[] = [];
   selectedUser : UserSearchResult | null = null;
 
 
   /** Initializes the current user lookup and the user search subscription. */
   constructor(){
     this.loadCurrentUserProfile();
-    this.searchSubscription =  this.createSearchSubscription();
   }
 
   /** Updates the member list when a new member is added. */
@@ -56,40 +43,16 @@ export class ProjectMembersForm implements OnChanges, OnDestroy {
     }
   }
 
-  /** Cleans up the search subscription*/
-  ngOnDestroy() {
-    this.searchSubscription.unsubscribe();
-  }
-
   /** Opens the add-member dialog and resets the search state. */
   openDialog() {
     this.isMemberDialogOpen = true;
-    this.resetDialogSearch()
-
-    setTimeout(() => {
-      this.memberSearchInput?.nativeElement.focus();
-    });
-
+    this.selectedUser = null;
   }
 
   /** Closes the add-member dialog and resets the search state. */
   closeDialog() {
     this.isMemberDialogOpen = false;
-    this.resetDialogSearch()
-  }
-
-  /** Updates the search query and starts the user search. */
-  searchUser(query: string){
-    this.searchQuery = query;
-    const cleanedQuery = query.trim();
-
-    if (cleanedQuery.length >= 2) {
-      this.isSearching = true;
-    } else {
-      this.resetSearchResult();
-    }
-    this.searchTerms.next(query);
-    this.changeDetectorRef.detectChanges();
+    this.selectedUser = null;
   }
 
   /** Stores the selected user for the confirmation to add the user*/
@@ -114,9 +77,6 @@ export class ProjectMembersForm implements OnChanges, OnDestroy {
   removeMember(keycloakId: string){
     this.members = this.members.filter(m => m.keycloakId !== keycloakId);
   }
-  isAlreadyAdded(user : UserSearchResult): boolean {
-    return this.isMemberAlreadyAdded(user.keycloakId);
-  }
 
   /** Emits the selected members and moves to the next wizard step. */
   submit() {
@@ -128,19 +88,13 @@ export class ProjectMembersForm implements OnChanges, OnDestroy {
     this.back.emit(this.members)
   }
 
-
-
-  private resetDialogSearch(){
-    this.searchQuery = '';
-    this.resetSearchResult()
+  get excludedUserIds(): string[] {
+    return [...(this.currentUserKeycloakId ? [this.currentUserKeycloakId] : []),
+      ...this.members.map((mem => mem.keycloakId)),
+    ];
   }
 
-  private resetSearchResult(){
-    this.isSearching = false;
-    this.searchResults = [];
-    this.selectedUser = null;
-    this.hasSearched = false;
-  }
+
 
   private toProjectInviteMember(user : UserSearchResult) : ProjectInviteMember{
     return {
@@ -164,37 +118,6 @@ export class ProjectMembersForm implements OnChanges, OnDestroy {
         this.currentUserKeycloakId = null;
       },
     });
-  }
-
-  private searchUsers(query: string){
-    const cleanedQuery = query.trim();
-    this.selectedUser = null;
-    this.searchResults = [];
-    this.hasSearched = cleanedQuery.length > 0;
-
-    if(cleanedQuery.length < 2){
-      return of([]);
-    }
-    return this.searchService.searchUsers([cleanedQuery]).pipe(catchError(() => of([])));
-  }
-
-  private isCurrentUser(user : UserSearchResult): boolean {
-    return user.keycloakId === this.currentUserKeycloakId;
-  }
-
-  private filterSearchResults(users : UserSearchResult[]) : UserSearchResult[] {
-    const cleanedQuery = this.searchQuery.trim().toLowerCase();
-
-    return users.filter(user => !this.isCurrentUser(user) && user.username.toLowerCase().includes(cleanedQuery));
-  }
-
-  private createSearchSubscription() {
-    return this.searchTerms.pipe(debounceTime(250), distinctUntilChanged(), switchMap(query => this.searchUsers(query)))
-      .subscribe((user: UserSearchResult[]) => {
-        this.searchResults = this.filterSearchResults(user);
-        this.isSearching = false;
-        this.changeDetectorRef.detectChanges();
-      });
   }
 
 }

@@ -45,7 +45,9 @@
             <app-join-requests-tab [projectId]="project()!.id" />
           }
           @if (activeTab() === 'members') {
-            <app-members-tab [projectId]="project()!.id" />
+            <app-members-tab [projectId]="project()!.id"
+            [ownerId]="project()!.ownerId"
+            />
           }
           @if (activeTab() === 'privacy') {
             <app-privacy-tab

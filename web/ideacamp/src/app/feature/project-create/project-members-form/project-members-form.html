@@ -2,7 +2,7 @@
 
   <div>
     <h3 class="mb-3 block text-sm font-medium text-slate-700">
-      Project members
+      Projekt Mitglieder
     </h3>
 
     @if (members.length > 0) {
@@ -36,7 +36,7 @@
         type="button"
         (click)="openDialog()"
         class="flex w-full items-center justify-center rounded-lg border border-dashed border-slate-700 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50">
-        + Add member
+        + Mitglied hinzufügen
       </button>
     </div>
 
@@ -47,14 +47,14 @@
       type="button"
       (click)="goBack()"
       class="text-sm text-slate-500 hover:text-slate-800">
-      Back
+      Zurück
     </button>
 
     <button
       type="button"
       (click)="submit()"
       class="rounded-lg bg-lime-500 px-5 py-2 text-sm font-semibold text-white hover:bg-lime-600">
-      Next
+      Weiter
     </button>
   </div>
 </form>
@@ -67,11 +67,11 @@
       <div class="mb-5 flex items-start justify-between">
         <div>
           <h2 class="text-sm font-bold text-slate-900">
-            Add people to your project
+            Füge Personen zu deinem Projekt hinzu
           </h2>
 
           <p class="mt-1 text-xs text-slate-500">
-            Search by username
+            Suche nach Nutzername
           </p>
         </div>
 
@@ -84,71 +84,13 @@
       </div>
 
       @if (!selectedUser) {
-        <div class="space-y-4">
-
-          <div class="relative">
-            <input
-              #memberSearchInput
-              type="text"
-              name="member-search"
-              [ngModel]="searchQuery"
-              (ngModelChange)="searchUser($event)"
-              placeholder="Find people"
-              class="w-full rounded-lg border border-slate-300 px-3 py-2 pr-10 text-sm outline-none focus:border-lime-500">
-
-            @if (isSearching) {
-              <div class="absolute right-3 top-1/2 -translate-y-1/2">
-                <div class="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-slate-700"></div>
-              </div>
-            }
-          </div>
-
-          @if (searchResults.length > 0) {
-            <div class="space-y-2">
-              @for (user of searchResults; track user.keycloakId) {
-                <button
-                  type="button"
-                  (click)="selectUser(user)"
-                  [disabled]="isAlreadyAdded(user)"
-                  class="flex w-full items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-3 text-left hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50">
-
-                  <div class="flex h-9 w-9 items-center justify-center rounded-full bg-slate-700 text-sm font-semibold text-white">
-                    {{ user.username.charAt(0).toUpperCase() }}
-                  </div>
-
-                  <div>
-                    <p class="text-sm font-semibold text-slate-800">
-                      {{ user.username }}
-                    </p>
-
-                    @if (user.title) {
-                      <p class="text-xs text-slate-500">
-                        {{ user.title }}
-                      </p>
-                    }
-                  </div>
-                </button>
-              }
-            </div>
-          }
-
-          @if (hasSearched && !isSearching && searchQuery.trim().length >= 2 && searchResults.length === 0) {
-            <div class="rounded-lg bg-slate-50 px-4 py-8 text-center">
-              <p class="text-sm text-slate-500">
-                No users found matching "{{ searchQuery }}"
-              </p>
-            </div>
-          }
-
-          <div class="flex justify-end pt-2">
-            <button
-              type="button"
-              (click)="closeDialog()"
-              class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">
-              Cancel
-            </button>
-          </div>
-        </div>
+        <app-user-search-pick
+          #userSearchPick
+          [excludedUserIds]="excludedUserIds"
+          placeholder="Find users"
+          emptyMessagePrefix="No users found matching"
+          (userSelected)="selectUser($event)">
+        </app-user-search-pick>
       }
 
       @if (selectedUser) {
@@ -173,14 +115,14 @@
               type="button"
               (click)="closeDialog()"
               class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">
-              Cancel
+              Abbrechen
             </button>
 
             <button
               type="button"
               (click)="addSelectedUser()"
               class="rounded-lg bg-lime-500 px-4 py-2 text-sm font-semibold text-white hover:bg-lime-600">
-              Add {{ selectedUser.username }}
+              {{ selectedUser.username }} hinzufügen
             </button>
           </div>
         </div>
