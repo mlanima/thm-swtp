@@ -10,11 +10,13 @@ import { SearchPage } from './feature/search/pages/search-page/search-page';
 import { MyProjectsPage } from './feature/my-projects/pages/my-projects-page/my-projects-page';
 import { ProjectSettings } from './feature/project-settings/project-settings';
 import { FavoritesPage } from './feature/favorites/pages/favorites-page/favorites-page';
+import { LandingPage } from './feature/landing-page/pages/landing-page/landing-page';
 
 export const routes: Routes = [
-  {path: '', redirectTo: 'impressum', pathMatch: 'full' },
+  {path: '', redirectTo: 'landing', pathMatch: 'full' },
   {path: 'success', component: SuccessComponent},
   {path: 'impressum', component: Impressum},
+  {path: 'landing', component: LandingPage},
   {path: 'profiles/:username', component: UserProfile, canActivate: [authGuard]},
   {path: 'contact-requests', component: ContactRequests, canActivate: [authGuard]},
   {path: 'project/:projectUrl', component: ProjectSite, canActivate: [authGuard]},
