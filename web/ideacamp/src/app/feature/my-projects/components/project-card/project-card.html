@@ -17,7 +17,7 @@
       </h3>
     </div>
     <p class="mt-0.5 truncate text-sm text-slate-400">
-      {{ project().shortDescription || 'No short description.' }}
+      {{ project().shortDescription || 'Keine Kurzbeschreibung.' }}
     </p>
   </div>
 
@@ -40,10 +40,10 @@
     </span>
     <span class="inline-flex items-center gap-1">
       <i class="pi text-xs" [class]="project().isPrivateProject ? 'pi-lock' : 'pi-globe'"></i>
-      {{ project().isPrivateProject ? 'Private' : 'Public' }}
+      {{ project().isPrivateProject ? 'Privat' : 'Öffentlich' }}
     </span>
     <span class="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-700"
-      >Owner</span
+      >Inhaber</span
     >
   </div>
 

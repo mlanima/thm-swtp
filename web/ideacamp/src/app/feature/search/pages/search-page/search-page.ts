@@ -44,7 +44,7 @@ export class SearchPage implements OnInit, OnDestroy {
             users: this.searchService.searchUsers(queries),
           }).pipe(
             catchError(() => {
-              this.errorMessage.set('Search failed. Please try again.');
+              this.errorMessage.set('Die Suche ist fehlgeschlagen. Bitte versuche es erneut..');
               return of(null);
             })
           );

@@ -46,7 +46,7 @@ export class ProfileTagListComponent implements OnInit, OnChanges {
         const existing = this.tags().some((item) => item.name.toLowerCase() === lower);
 
         if (existing) {
-          this.errorMessage.set('Tag already exists on this profile.');
+          this.errorMessage.set('Tag bereits vorhanden.');
           setTimeout(() => {
             this.errorMessage.set(null);
           }, 3000);
@@ -85,7 +85,7 @@ export class ProfileTagListComponent implements OnInit, OnChanges {
         this.isDeleting.set(false);
       },
       error: () => {
-        this.errorMessage.set('Could not delete tag.');
+        this.errorMessage.set('Tag konnte nicht gelöscht werden.');
         setTimeout(() => {
           this.errorMessage.set(null);
         }, 3000);
@@ -108,7 +108,7 @@ export class ProfileTagListComponent implements OnInit, OnChanges {
         this.isLoading.set(false);
       },
       error: () => {
-        this.errorMessage.set('Could not load tags.');
+        this.errorMessage.set('Tags konnten nicht geladen werden.');
         this.isLoading.set(false);
       },
     });

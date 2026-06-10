@@ -6,13 +6,13 @@
       @if (state.isLoading) {
         <section class="rounded-xl bg-white p-6 shadow-lg">
           <p class="text-sm text-slate-600">
-            Profile loading...
+            Profil lädt...
           </p>
         </section>
       } @else if (state.errorMessage) {
         <section class="rounded-xl border border-red-200 bg-red-50 p-6 shadow-lg">
           <h2 class="text-lg font-bold text-red-700">
-            Error
+            Fehler
           </h2>
 
           <p class="mt-2 text-sm text-red-600">
@@ -36,7 +36,7 @@
             @if (isOwner && editingSection === 'about') {
               <section class="rounded-xl bg-white p-6 shadow-lg">
                 <h2 class="mb-5 text-xl font-bold text-slate-800">
-                  Edit About
+                  Profilinformationen
                 </h2>
 
                 <textarea
@@ -52,9 +52,9 @@
                     [disabled]="isSaving"
                     (click)="saveProfile(state.profile)">
                     @if (isSaving) {
-                      Saving...
+                      Speichern...
                     } @else {
-                      Save
+                      Speichern
                     }
                   </button>
 
@@ -63,14 +63,14 @@
                     class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:opacity-50"
                     [disabled]="isSaving"
                     (click)="cancelEditing()">
-                    Cancel
+                    Abbrechen
                   </button>
                 </div>
               </section>
             } @else {
               <app-profile-information
-                title="About"
-                [text]="state.profile.about || 'No description.'"
+                title="Profilinformationen"
+                [text]="state.profile.about || 'Keine Informationen.'"
                 [isOwnProfile]="isOwner"
                 (edit)="isOwner && startEditing(state.profile, 'about')">
               </app-profile-information>
@@ -79,7 +79,7 @@
             @if (isOwner && editingSection === 'experience') {
               <section class="rounded-xl bg-white p-6 shadow-lg">
                 <h2 class="mb-5 text-xl font-bold text-slate-800">
-                  Edit Experience
+                  Erfahrung bearbeiten
                 </h2>
 
                 <textarea
@@ -95,9 +95,9 @@
                     [disabled]="isSaving"
                     (click)="saveProfile(state.profile)">
                     @if (isSaving) {
-                      Saving...
+                      Speichern...
                     } @else {
-                      Save
+                      Speichern
                     }
                   </button>
 
@@ -106,14 +106,14 @@
                     class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:opacity-50"
                     [disabled]="isSaving"
                     (click)="cancelEditing()">
-                    Cancel
+                    Abbrechen
                   </button>
                 </div>
               </section>
             } @else {
               <app-profile-information
-                title="Experience"
-                [text]="state.profile.experience || 'No experience.'"
+                title="Erfahrung"
+                [text]="state.profile.experience || 'Keine Erfahrung.'"
                 [isOwnProfile]="isOwner"
                 (edit)="isOwner && startEditing(state.profile, 'experience')">
               </app-profile-information>

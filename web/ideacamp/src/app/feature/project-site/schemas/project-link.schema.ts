@@ -5,28 +5,28 @@ const containsNoQuotes = (value : string) => !value.includes('"') && !value.incl
 export const createProjectLinkSchema = z.object({
   label: z.string()
     .trim()
-    .min(1, "Label is required.")
-    .max(100, "Label must be shorter than 100 characters.")
-    .refine(containsNoQuotes, "Label must not contain any quotes."),
+    .min(1, "Bezeichnung erforderlich.")
+    .max(100, "Die Bezeichnung darf nicht länger als 100 Zeichen sein.")
+    .refine(containsNoQuotes, "Die Bezeichnung darf keine Anführungszeichen enthalten."),
 
   url: z.string()
     .trim()
-    .min(1, "URL is required.")
-    .max(300, "URL must be shorter than 300 characters.")
-    .url("URL must be a valid URL."),
+    .min(1, "URL erforderlich.")
+    .max(300, "Die URL darf nicht länger als 300 Zeichen sein.")
+    .url("Die URL muss gültig sein."),
 });
 
 export const updateProjectLinkSchema = z.object({
   label: z.string()
     .trim()
-    .max(100, 'Label must be shorter than 100 characters.')
-    .refine(containsNoQuotes, 'Label must not contain any quotes.')
+    .max(100, 'Die Bezeichnung darf nicht länger als 100 Zeichen sein.')
+    .refine(containsNoQuotes, 'Die Bezeichnung darf keine Anführungszeichen enthalten.')
     .optional(),
 
   url: z.string()
     .trim()
-    .max(300, 'URL must be shorter than 300 characters.')
-    .url('URL must be a valid URL.')
+    .max(300, 'Die URL darf nicht länger als 300 Zeichen sein.')
+    .url('Die URL muss gültig sein.')
     .optional(),
 });
 

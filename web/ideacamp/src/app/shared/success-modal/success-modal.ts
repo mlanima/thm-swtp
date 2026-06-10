@@ -6,8 +6,8 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   templateUrl: './success-modal.html',
 })
 export class SuccessModal {
-  @Input() message = 'Successfully updated.';
-  @Input() buttonText = 'Continue';
+  @Input() message = 'Erfolgreich aktualisiert.';
+  @Input() buttonText = 'Weiter';
 
   @Output() closeModal = new EventEmitter<void>();
 

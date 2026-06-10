@@ -17,8 +17,8 @@ export class UserSearchPick implements OnDestroy, AfterViewInit {
   private readonly searchSubscription: Subscription;
 
   excludedUserIds = input<string[]>([]);
-  placeholder = input('Find users')
-  emptyMessage = input('No users found');
+  placeholder = input('Nutzer finden')
+  emptyMessage = input('Keine Nutzer gefunden');
 
   userSelected = output<UserSearchResult>();
 

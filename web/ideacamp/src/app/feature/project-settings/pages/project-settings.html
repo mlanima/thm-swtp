@@ -3,7 +3,7 @@
 
     <aside class="w-56 shrink-0 pt-4">
       <p class="mb-4 px-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-        Project Settings
+        Projekteinstellungen
       </p>
 
       <nav class="space-y-1">
@@ -17,7 +17,7 @@
           (click)="selectTab('join-requests')"
         >
           <i class="pi pi-user-plus text-sm"></i>
-          <span>Join Requests</span>
+          <span>Beitrittsanfragen</span>
         </button>
 
         <button
@@ -30,7 +30,7 @@
           (click)="selectTab('members')"
         >
           <i class="pi pi-users text-sm"></i>
-          <span>Members</span>
+          <span>Mitglieder</span>
         </button>
 
         <button
@@ -43,7 +43,7 @@
           (click)="selectTab('privacy')"
         >
           <i class="pi pi-shield text-sm"></i>
-          <span>Privacy</span>
+          <span>Privatsphäre</span>
         </button>
 
         <div class="my-5 border-t border-slate-200"></div>
@@ -58,7 +58,7 @@
           (click)="selectTab('danger-zone')"
         >
           <i class="pi pi-trash text-sm"></i>
-          <span>Danger Zone</span>
+          <span>Gefahrenzone</span>
         </button>
       </nav>
     </aside>
@@ -70,17 +70,17 @@
         class="mb-6 inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-slate-500 transition hover:bg-slate-100 hover:text-lime-500"
       >
         <i class="pi pi-arrow-left text-sm text-zinc-400"></i>
-        <span>Back to project</span>
+        <span>Zurück zum Projekt</span>
       </a>
 
       @if (activeTab() === 'join-requests') {
         <section>
           <h1 class="text-2xl font-semibold text-slate-800">
-            Join Requests
+            Beitrittsanfragen
           </h1>
 
           <p class="mt-1 text-sm text-slate-500">
-            Review and manage requests to join this project.
+            Beitrittsanfragen für dieses Projekt verwalten.
           </p>
 
           <div class="mt-6 space-y-4">
@@ -125,7 +125,7 @@
                       (click)="approveJoinRequest(request.id)"
                     >
                       <i class="pi pi-check text-xs"></i>
-                      Approve
+                      Annehmen
                     </button>
 
                     <button
@@ -134,7 +134,7 @@
                       (click)="declineJoinRequest(request.id)"
                     >
                       <i class="pi pi-times text-xs"></i>
-                      Decline
+                      Ablehnen
                     </button>
                   </div>
                 </article>
@@ -142,11 +142,11 @@
             } @else {
               <div class="rounded-lg border border-slate-200 bg-white p-8 text-center shadow-sm">
                 <p class="text-sm font-medium text-slate-700">
-                  No join requests
+                  Keine Beitrittsanfragen
                 </p>
 
                 <p class="mt-1 text-sm text-slate-500">
-                  There are currently no pending requests for this project.
+                  Derzeit liegen keine ausstehenden Beitrittsanfragen für dieses Projekt vor.
                 </p>
               </div>
             }
@@ -159,11 +159,11 @@
           <div class="flex items-start justify-between gap-4">
             <div>
               <h1 class="text-2xl font-semibold text-slate-800">
-                Members
+                Mitglieder
               </h1>
 
               <p class="mt-1 text-sm text-slate-500">
-                Manage who has access to this project.
+                Verwalte wer Zugang zu diesem Projekt hat.
               </p>
             </div>
 
@@ -171,7 +171,7 @@
               type="button"
               class="rounded-md bg-slate-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
             >
-              Invite Member
+              Mitglied hinzufügen
             </button>
           </div>
 
@@ -179,9 +179,9 @@
             <table class="w-full text-left text-sm">
               <thead>
               <tr class="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
-                <th class="px-4 py-3 font-semibold">Member</th>
-                <th class="px-4 py-3 font-semibold">Role</th>
-                <th class="px-4 py-3 font-semibold">Joined</th>
+                <th class="px-4 py-3 font-semibold">Mitglied</th>
+                <th class="px-4 py-3 font-semibold">Rolle</th>
+                <th class="px-4 py-3 font-semibold">Beigetreten</th>
                 <th class="px-4 py-3 font-semibold"></th>
               </tr>
               </thead>
@@ -210,11 +210,11 @@
                     <td class="px-4 py-4">
                       @if (member.role === 'Owner') {
                         <span class="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
-                          Owner
+                          Inhaber
                         </span>
                       } @else {
                         <span class="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600">
-                          Member
+                          Mitglied
                         </span>
                       }
                     </td>
@@ -230,7 +230,7 @@
                           class="text-xs font-medium text-slate-500 transition hover:text-red-600"
                           (click)="openRemoveMemberDialog(member)"
                         >
-                          Remove
+                          Entfernen
                         </button>
                       }
                     </td>
@@ -245,22 +245,22 @@
       @if (activeTab() === 'privacy') {
         <section>
           <h1 class="text-2xl font-semibold text-slate-800">
-            Privacy
+            Privatsphäre
           </h1>
 
           <p class="mt-1 text-sm text-slate-500">
-            Control who can see and interact with this project.
+            Lege fest, wer dieses Projekt sehen kann.
           </p>
 
           <div class="mt-6 rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
             <div class="flex items-center justify-between border-b border-slate-200 px-4 py-5">
               <div>
                 <h2 class="text-sm font-semibold text-slate-800">
-                  Public visibility
+                  Öffentlich
                 </h2>
 
                 <p class="mt-1 text-xs text-slate-500">
-                  Anyone can discover and view this project.
+                  Jeder kann das Projekt anschauen.
                 </p>
               </div>
 
@@ -282,11 +282,11 @@
             <div class="flex items-center justify-between px-4 py-5">
               <div>
                 <h2 class="text-sm font-semibold text-slate-800">
-                  Allow join requests
+                  Erlaube Beitrittsanfragen
                 </h2>
 
                 <p class="mt-1 text-xs text-slate-500">
-                  Users can request to join; owners approve or decline.
+                  Nutzer können eine Beitrittsanfrage stellen, die Inhaber genehmigen oder lehnen diese ab.
                 </p>
               </div>
 
@@ -311,21 +311,21 @@
       @if (activeTab() === 'danger-zone') {
         <section>
           <h1 class="text-2xl font-semibold text-slate-800">
-            Danger Zone
+            Gefahrenzone
           </h1>
 
           <p class="mt-1 text-sm text-slate-500">
-            Irreversible actions. Please proceed with caution.
+            Änderungen sind endgültig, bitte gehe vorsichtig vor.
           </p>
 
           <div class="mt-6 space-y-5">
             <div class="rounded-lg border border-red-200 bg-white p-5 shadow-sm">
               <h2 class="text-sm font-semibold text-red-700">
-                Delete project
+                Projekt löschen
               </h2>
 
               <p class="mt-1 text-sm text-slate-500">
-                Permanently delete this project and all its data.
+                Dieses Projekt und alle zugehörigen Daten endgültig löschen.
               </p>
 
               <button
@@ -334,7 +334,7 @@
                 (click)="openDeleteProjectDialog()"
               >
                 <i class="pi pi-trash text-xs"></i>
-                Delete project
+                Projekt löschen
               </button>
             </div>
           </div>
@@ -355,11 +355,11 @@
 
           <div>
             <h2 class="text-lg font-semibold text-slate-800">
-              Remove member
+              Mitglied entfernen
             </h2>
 
             <p class="text-xs text-slate-500">
-              This will revoke their access
+              Dadurch wird ihr Zugriff widerrufen
             </p>
           </div>
         </div>
@@ -392,9 +392,9 @@
       </div>
 
       <p class="mt-5 text-sm leading-6 text-slate-600">
-        Are you sure you want to remove
+        Bist du dir sicher, dass du
         <span class="font-semibold text-slate-800">{{ member.name }}</span>
-        from this project? They will immediately lose access.
+        von diesem Projekt entfernen willst? Dieser Nutzer verliert sofort den Zugriff.
       </p>
 
       <div class="mt-5 grid grid-cols-2 gap-3">
@@ -403,7 +403,7 @@
           class="rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
           (click)="closeRemoveMemberDialog()"
         >
-          Cancel
+          Abbrechen
         </button>
 
         <button
@@ -411,7 +411,7 @@
           class="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700"
           (click)="confirmRemoveMember()"
         >
-          Remove member
+          Mitglied entfernen
         </button>
       </div>
     </div>
@@ -429,11 +429,11 @@
 
           <div>
             <h2 class="text-lg font-semibold text-slate-800">
-              Delete project
+              Projekt löschen
             </h2>
 
             <p class="text-xs text-slate-500">
-              This action cannot be undone
+              Dies kann nicht rückgängig gemacht werden.
             </p>
           </div>
         </div>
@@ -448,21 +448,21 @@
       </div>
 
       <p class="mt-5 text-sm leading-6 text-slate-600">
-        Permanently deleting
+        Endgültig
         <span class="font-semibold text-slate-800">{{ projectName() }}</span>
-        will remove all ideas, members, and settings. There is no way to recover this data.
+        löschen. Dies löscht alle Ideen, Mitglieder und Einstellungen. Es gibt keine Möglichkeit, diese Daten wiederherzustellen.
       </p>
 
       <div class="mt-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-        To confirm, type
+        Zur Bestätigung tippe
         <span class="font-semibold">{{ deleteConfirmationText() }}</span>
-        below.
+        unten.
       </div>
 
       <input
         type="text"
         class="mt-4 w-full rounded-md border border-slate-200 px-4 py-2 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-2 focus:ring-slate-100"
-        placeholder="IdeaCamp Project"
+        placeholder="IdeaCamp Projekt"
         [value]="deleteProjectConfirmation()"
         (input)="updateDeleteProjectConfirmation($any($event.target).value)"
       />
@@ -473,7 +473,7 @@
           class="rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
           (click)="closeDeleteProjectDialog()"
         >
-          Cancel
+          Abbrechen
         </button>
 
         <button
@@ -486,7 +486,7 @@
           [disabled]="!isDeleteProjectConfirmationValid()"
           (click)="confirmDeleteProject()"
         >
-          Delete project
+          Projekt löschen
         </button>
       </div>
     </div>

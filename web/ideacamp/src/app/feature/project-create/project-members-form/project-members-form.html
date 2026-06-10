@@ -2,7 +2,7 @@
 
   <div>
     <h3 class="mb-3 block text-sm font-medium text-slate-700">
-      Projekt Mitglieder
+      Projektmitglieder
     </h3>
 
     @if (members.length > 0) {
@@ -87,8 +87,8 @@
         <app-user-search-pick
           #userSearchPick
           [excludedUserIds]="excludedUserIds"
-          placeholder="Find users"
-          emptyMessagePrefix="No users found matching"
+          placeholder="Nutzer finden"
+          emptyMessagePrefix="Keine passenden User gefunden"
           (userSelected)="selectUser($event)">
         </app-user-search-pick>
       }
@@ -122,7 +122,7 @@
               type="button"
               (click)="addSelectedUser()"
               class="rounded-lg bg-lime-500 px-4 py-2 text-sm font-semibold text-white hover:bg-lime-600">
-              {{ selectedUser.username }} hinzufügen
+              {{ selectedUser.username }} Hinzufügen
             </button>
           </div>
         </div>

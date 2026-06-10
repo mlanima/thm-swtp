@@ -14,21 +14,21 @@ const containsNoQuotes = (value:string) => !value.includes('"') && !value.includ
 export const projectGeneralSchema = z.object({
   name: z.string()
     .trim()
-    .min(3, 'Project name must be at least 3 characters.')
-    .max(20, 'Project name must be shorter than 20 characters.')
-    .refine(containsNoQuotes, 'Project name must not contain quotes.'),
+    .min(3, 'Projektname muss mindestens 3 Zeichen lang sein.')
+    .max(20, 'Projektname darf höchstens 20 Zeichen lang sein.')
+    .refine(containsNoQuotes, 'Projektname darf keine Anführungszeichen beinhalten.'),
 
   shortDescription: z.string()
     .trim()
-    .max(200, 'Short description must be shorter than 200 characters.')
-    .refine(containsNoQuotes, 'Short description must not contain quotes.')
+    .max(200, 'Kurzbeschreibung darf höchstens 200 Zeichen lang sein.')
+    .refine(containsNoQuotes, 'Kurzbeschreibung darf keine Anführungszeichen beinhalten.')
     .optional()
     .or(z.literal('')),
 
   description: z.string()
     .trim()
-    .max(500, 'Project description must be shorter than 500 characters.')
-    .refine(containsNoQuotes, 'Project description must not contain quotes.')
+    .max(500, 'Projektbeschreibung darf höchstens 500 Zeichen lang sein.')
+    .refine(containsNoQuotes, 'Projektbeschreibung darf keine Anführungszeichen beinhalten.')
     .optional()
     .or(z.literal('')),
 });
@@ -41,9 +41,9 @@ export const projectGeneralSchema = z.object({
 export const projectSettingsSchema = z.object({
   projectUrl: z.string()
     .trim()
-    .min(3, 'Project url must be at least 3 characters.')
-    .max(30, 'Project url must be shorter than 30 characters.')
-    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/,'Only use lowercase letters, numbers and hyphens. Hyphens are not allowed at the beginning or end.'),
+    .min(3, 'Projekt URL muss mindestens 3 Zeichen lang sein.')
+    .max(30, 'Projekt URL darf höchstens 30 Zeichen lang sein')
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/,'Verwende ausschließlich Kleinbuchstaben, Zahlen und Bindestriche. Bindestriche sind am Anfang und am Ende nicht zulässig.'),
 
   isPrivateProject: z.boolean(),
 });
