@@ -22,31 +22,31 @@
 
       <div>
         <p class="font-medium text-slate-600">Projektname:</p>
-        <p class="max-w-full overflow-hidden truncate whitespace-nowrap">{{ projectData.name || 'Not set' }}</p>
+        <p class="max-w-full overflow-hidden truncate whitespace-nowrap">{{ projectData.name || 'Kein Projektname' }}</p>
       </div>
 
       <div>
         <p class="font-medium text-slate-600">Kurzbeschreibung:</p>
-        <p class="max-w-full overflow-hidden truncate whitespace-nowrap">{{ projectData.shortDescription || 'No short-description' }}</p>
+        <p class="max-w-full overflow-hidden truncate whitespace-nowrap">{{ projectData.shortDescription || 'Keine Kurzbeschreibung' }}</p>
       </div>
 
       <div>
         <p class="font-medium text-slate-600">Beschreibung:</p>
-        <p class="max-w-full overflow-hidden truncate whitespace-nowrap">{{ projectData.description || 'No description' }}</p>
+        <p class="max-w-full overflow-hidden truncate whitespace-nowrap">{{ projectData.description || 'Keine Projektbeschreibung' }}</p>
       </div>
 
       <div>
         <p class="font-medium text-slate-600">Projekt URL:</p>
-        <p class="max-w-full overflow-hidden truncate whitespace-nowrap">{{ projectData.projectUrl || 'Not set' }}</p>
+        <p class="max-w-full overflow-hidden truncate whitespace-nowrap">{{ projectData.projectUrl || 'Keine Projekt URL' }}</p>
       </div>
 
       <div>
         <p class="font-medium text-slate-600">Status:</p>
 
         @if (projectData.isPrivateProject) {
-          <p>Private</p>
+          <p>Privat</p>
         } @else {
-          <p>Public</p>
+          <p>Öffentlich</p>
         }
       </div>
       <div>

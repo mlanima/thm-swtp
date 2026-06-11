@@ -113,6 +113,7 @@ public class ProjectService {
         }
 
         projectFavoriteRepository.deleteByProjectId(projectId);
+        projectViewRepository.deleteByProjectId(projectId);
         projectRepository.delete(project);
 
         return DeleteProjectResponse.builder()

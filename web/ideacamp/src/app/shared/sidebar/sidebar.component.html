@@ -72,13 +72,6 @@
         </app-menu-link>
         </a>
 
-        <a [routerLink]="['/profiles', auth.username()]" (click)="requestClose()">
-        <app-menu-link>
-          <i class="pi pi-cog text-md text-zinc-400"></i>
-          <span>Einstellungen</span>
-        </app-menu-link>
-        </a>
-
         <app-menu-link (click)="logout()">
           <i class="pi pi-sign-out text-sm text-red-400"></i>
           <span>Logout</span>
