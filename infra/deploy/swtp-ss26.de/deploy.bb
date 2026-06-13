@@ -40,7 +40,7 @@
           (log (str svc ": up-to-date"))
 
           :else
-          (log (str svc ": check output"))))))
+          (log (str svc ": check output")))))))
 
 (log "Restarting services")
 (exec "sudo" "docker" "compose" "up" "-d" {:dir stack-dir})

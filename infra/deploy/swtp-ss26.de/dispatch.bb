@@ -19,17 +19,17 @@
 (defn dispatch [s]
   (cond
     (or (nil? s) (= s "") (= s "deploy-dev"))
-    (exec "/opt/stacks/swtp/deploy.sh" "swtp-dev")
+    (exec "/opt/stacks/swtp/deploy.bb" "swtp-dev")
 
     (= s "deploy-main")
-    (exec "/opt/stacks/swtp/deploy.sh" "swtp-main")
+    (exec "/opt/stacks/swtp/deploy.bb" "swtp-main")
 
     (str/starts-with? s "review-deploy ")
-    (apply exec "/opt/stacks/swtp/review-deploy.sh"
+    (apply exec "/opt/stacks/swtp/review-deploy.bb"
            (str/split (subs s (count "review-deploy ")) #" "))
 
     (str/starts-with? s "review-teardown ")
-    (exec "/opt/stacks/swtp/review-teardown.sh"
+    (exec "/opt/stacks/swtp/review-teardown.bb"
           (subs s (count "review-teardown ")))
 
     :else
