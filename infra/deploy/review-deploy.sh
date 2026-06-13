@@ -3,12 +3,12 @@
 #
 # Spins up per-PR containers routed via Traefik.
 # URLs:
-#   Frontend: https://pr-<n>.preview.swtp-ss26.de
-#   Backend:  https://pr-<n>-api.preview.swtp-ss26.de
+#   Frontend: https://pr-<n>.review.swtp-ss26.de
+#   Backend:  https://pr-<n>-api.review.swtp-ss26.de
 #
 # Prerequisites on the server:
 #   - Traefik running with a certresolver that supports DNS-01 (for wildcard certs)
-#   - *.preview.swtp-ss26.de DNS A-record pointing to this server
+#   - *.review.swtp-ss26.de DNS A-record pointing to this server
 #   - Docker network TRAEFIK_NETWORK exists and Traefik is attached to it
 #   - /opt/stacks/swtp/review.env with runtime env vars for the backend
 #     (DB connection etc. — can point at the dev DB)
@@ -22,7 +22,7 @@ SERVICES="$*"   # e.g. "api web" or just "api" or "web"
 # ── Config ────────────────────────────────────────────────────────────────────
 TRAEFIK_NETWORK="traefik"          # docker network Traefik listens on
 CERTRESOLVER="letsencrypt"         # name of your Traefik certresolver
-DOMAIN="preview.swtp-ss26.de"
+DOMAIN="review.swtp-ss26.de"
 REGISTRY="ghcr.io/mlanima"
 LOG="/opt/stacks/swtp/deploy.log"
 # ──────────────────────────────────────────────────────────────────────────────

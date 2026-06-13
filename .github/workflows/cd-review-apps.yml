@@ -114,8 +114,8 @@ jobs:
             const hasFe = '${{ needs.build-frontend.result }}' === 'success';
 
             let body = '## 🚀 Review App\n\n';
-            if (hasFe) body += `**Frontend:** https://pr-${pr}.preview.swtp-ss26.de\n`;
-            if (hasBe) body += `**Backend:**  https://pr-${pr}-api.preview.swtp-ss26.de\n`;
+            if (hasFe) body += `**Frontend:** https://pr-${pr}.review.swtp-ss26.de\n`;
+            if (hasBe) body += `**Backend:**  https://pr-${pr}-api.review.swtp-ss26.de\n`;
             body += `\n_Updated: ${new Date().toISOString().slice(0,19).replace('T',' ')} UTC_`;
 
             const { data: comments } = await github.rest.issues.listComments({
