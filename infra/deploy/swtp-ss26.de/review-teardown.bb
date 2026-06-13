@@ -1,5 +1,5 @@
 #!/usr/bin/env bb
-;; /opt/stacks/swtp/review-teardown.bb <pr-number>
+;; /opt/stacks/swtp/review-teardown.bb <namespace> <pr-number>
 ;;
 ;; Removes containers and images for a PR review environment.
 ;; Called automatically when a PR is closed or merged.
@@ -7,12 +7,12 @@
 (require '[babashka.process :refer [sh]]
          '[clojure.string :as str])
 
-(def registry (or (System/getenv "GHCR_NAMESPACE") "ghcr.io/mlanima"))
-(def logfile "/opt/stacks/swtp/deploy.log")
-
 ;; Parse args
 (def args (filter #(not (str/blank? %)) *command-line-args*))
-(def pr-num (first args))
+(def namespace (first args))
+(def pr-num (second args))
+(def registry (str "ghcr.io/" namespace))
+(def logfile "/opt/stacks/swtp/deploy.log")
 
 (defn now-str []
   (-> (sh "date" "+%Y-%m-%d %H:%M:%S") :out str/trim))
@@ -20,9 +20,9 @@
 (defn log [msg]
   (spit logfile (str "[" (now-str) "] [PR-" pr-num "] " msg "\n") :append true))
 
-(when (nil? pr-num)
+(when (or (nil? namespace) (nil? pr-num))
   (binding [*out* *err*]
-    (println "Usage: review-teardown.bb <pr-number>"))
+    (println "Usage: review-teardown.bb <namespace> <pr-number>"))
   (System/exit 1))
 
 (log "Teardown triggered")

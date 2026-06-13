@@ -94,25 +94,13 @@ jobs:
       (needs.build-backend.result == 'success' || needs.build-frontend.result == 'success')
     runs-on: ubuntu-latest
     steps:
-      - name: Build services list
-        id: services
-        run: |
-          SERVICES=""
-          if [ "${{ needs.build-backend.result }}" = "success" ]; then
-            SERVICES="api"
-          fi
-          if [ "${{ needs.build-frontend.result }}" = "success" ]; then
-            SERVICES="${SERVICES:+$SERVICES }web"
-          fi
-          echo "list=$SERVICES" >> $GITHUB_OUTPUT
-
       - name: Deploy via SSH
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key -p 2105 tosch@mail.schalz.de \
-            "GHCR_NAMESPACE='${{ needs.namespace.outputs.namespace }}' review-deploy ${{ github.event.pull_request.number }} ${{ steps.services.outputs.list }}"
+            "review-deploy ${{ needs.namespace.outputs.namespace }} ${{ github.event.pull_request.number }}"
 
       - name: Comment on PR
         uses: actions/github-script@v7
@@ -162,4 +150,4 @@ jobs:
           echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key -p 2105 tosch@mail.schalz.de \
-            "GHCR_NAMESPACE='${{ needs.namespace.outputs.namespace }}' review-teardown ${{ github.event.pull_request.number }}"
+            "review-teardown ${{ needs.namespace.outputs.namespace }} ${{ github.event.pull_request.number }}"

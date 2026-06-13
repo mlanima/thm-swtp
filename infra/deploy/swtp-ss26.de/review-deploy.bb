@@ -1,7 +1,7 @@
 #!/usr/bin/env bb
-;; /opt/stacks/swtp/review-deploy.bb <pr-number> [api] [web]
+;; /opt/stacks/swtp/review-deploy.bb <namespace> <pr-number>
 ;;
-;; Spins up per-PR containers routed via Traefik.
+;; Spins up per-PR containers (web + api) routed via Traefik.
 ;; URLs:
 ;;   Frontend: https://pr-<n>.review.swtp-ss26.de
 ;;   Backend:  https://pr-<n>-api.review.swtp-ss26.de
@@ -13,14 +13,14 @@
 (def traefik-network "traefik-net")
 (def certresolver "letsencrypt-inwx")
 (def domain "review.swtp-ss26.de")
-(def registry (or (System/getenv "GHCR_NAMESPACE") "ghcr.io/mlanima"))
 (def logfile "/opt/stacks/swtp/deploy.log")
 ;; ──────────────────────────────────────────────────────────────────────────────
 
 ;; Parse args
 (def args (filter #(not (str/blank? %)) *command-line-args*))
-(def pr-num (first args))
-(def services (rest args))
+(def namespace (first args))
+(def pr-num (second args))
+(def registry (str "ghcr.io/" namespace))
 
 (defn now-str []
   (-> (sh "date" "+%Y-%m-%d %H:%M:%S") :out str/trim))
@@ -28,12 +28,12 @@
 (defn log [msg]
   (spit logfile (str "[" (now-str) "] [PR-" pr-num "] " msg "\n") :append true))
 
-(when (or (nil? pr-num) (empty? services))
+(when (or (nil? namespace) (nil? pr-num))
   (binding [*out* *err*]
-    (println "Usage: review-deploy.bb <pr-number> <api|web> [api|web]"))
+    (println "Usage: review-deploy.bb <namespace> <pr-number>"))
   (System/exit 1))
 
-(log (str "Review deploy triggered (services: " (str/join " " services) ")"))
+(log (str "Review deploy triggered (namespace: " namespace ")"))
 
 (defn deploy-web []
   (let [name (str "swtp-web-pr-" pr-num)
@@ -81,11 +81,8 @@
         image)
     (log (str "Backend live → https://" host))))
 
-(doseq [svc services]
-  (case svc
-    "api" (deploy-api)
-    "web" (deploy-web)
-    (log (str "Unknown service: " svc " — skipped"))))
+(deploy-web)
+(deploy-api)
 
 (log "Review deploy complete")
 (spit logfile "----------------------------------------\n" :append true)

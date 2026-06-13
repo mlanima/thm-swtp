@@ -5,11 +5,11 @@
 #   command="/opt/stacks/swtp/dispatch.sh" ssh-ed25519 ...
 #
 # Dispatches based on SSH_ORIGINAL_COMMAND:
-#   (no command)               → deploy-dev (default)
-#   deploy-dev                 → deploy swtp-dev stack
-#   deploy-main                → deploy swtp-main stack
-#   review-deploy <pr> <svcs>  → spin up review environment
-#   review-teardown <pr>       → tear down review environment
+#   (no command)                     → deploy-dev (default)
+#   deploy-dev                       → deploy swtp-dev stack
+#   deploy-main                      → deploy swtp-main stack
+#   review-deploy <namespace> <pr>   → spin up review environment
+#   review-teardown <namespace> <pr> → tear down review environment
 
 set -e
 
@@ -27,8 +27,8 @@ case "$CMD" in
     exec /opt/stacks/swtp/review-deploy.sh $ARGS
     ;;
   "review-teardown "*)
-    PR="${CMD#review-teardown }"
-    exec /opt/stacks/swtp/review-teardown.sh "$PR"
+    ARGS="${CMD#review-teardown }"
+    exec /opt/stacks/swtp/review-teardown.sh $ARGS
     ;;
   *)
     echo "Unknown command: $CMD" >&2

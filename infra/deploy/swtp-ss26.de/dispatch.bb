@@ -5,11 +5,11 @@
 ;;   command="/opt/stacks/swtp/dispatch.bb" ssh-ed25519 ...
 ;;
 ;; Dispatches based on SSH_ORIGINAL_COMMAND:
-;;   (no command)               → deploy-dev (default)
-;;   deploy-dev                 → deploy swtp-dev stack
-;;   deploy-main                → deploy swtp-main stack
-;;   review-deploy <pr> <svcs>  → spin up review environment
-;;   review-teardown <pr>       → tear down review environment
+;;   (no command)                     → deploy-dev (default)
+;;   deploy-dev                       → deploy swtp-dev stack
+;;   deploy-main                      → deploy swtp-main stack
+;;   review-deploy <namespace> <pr>   → spin up review environment
+;;   review-teardown <namespace> <pr> → tear down review environment
 
 (require '[babashka.process :refer [exec]]
          '[clojure.string :as str])
@@ -29,8 +29,8 @@
            (str/split (subs s (count "review-deploy ")) #" "))
 
     (str/starts-with? s "review-teardown ")
-    (exec "/opt/stacks/swtp/review-teardown.bb"
-          (subs s (count "review-teardown ")))
+    (apply exec "/opt/stacks/swtp/review-teardown.bb"
+           (str/split (subs s (count "review-teardown ")) #" "))
 
     :else
     (do

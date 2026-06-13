@@ -1,40 +1,32 @@
 #!/bin/bash
-# /opt/stacks/swtp/review-deploy.sh <pr-number> [api] [web]
+# /opt/stacks/swtp/review-deploy.sh <namespace> <pr-number>
 #
-# Spins up per-PR containers routed via Traefik.
+# Spins up per-PR containers (web + api) routed via Traefik.
 # URLs:
 #   Frontend: https://pr-<n>.review.swtp-ss26.de
 #   Backend:  https://pr-<n>-api.review.swtp-ss26.de
-#
-# Prerequisites on the server:
-#   - Traefik running with a certresolver that supports DNS-01 (for wildcard certs)
-#   - *.review.swtp-ss26.de DNS A-record pointing to this server
-#   - Docker network TRAEFIK_NETWORK exists and Traefik is attached to it
-#   - /opt/stacks/swtp/review.env with runtime env vars for the backend
-#     (DB connection etc. — can point at the dev DB)
 
 set -e
 
-PR="$1"
-shift
-SERVICES="$*"   # e.g. "api web" or just "api" or "web"
+NAMESPACE="$1"
+PR="$2"
 
 # ── Config ────────────────────────────────────────────────────────────────────
-TRAEFIK_NETWORK="traefik-net"          # docker network Traefik listens on
-CERTRESOLVER="letsencrypt-inwx"         # name of your Traefik certresolver
+REGISTRY="ghcr.io/${NAMESPACE}"
+TRAEFIK_NETWORK="traefik-net"
+CERTRESOLVER="letsencrypt-inwx"
 DOMAIN="review.swtp-ss26.de"
-REGISTRY="${GHCR_NAMESPACE:-ghcr.io/mlanima}"
 LOG="/opt/stacks/swtp/deploy.log"
 # ──────────────────────────────────────────────────────────────────────────────
 
 log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] [PR-${PR}] $1" >> "$LOG"; }
 
-if [ -z "$PR" ] || [ -z "$SERVICES" ]; then
-  echo "Usage: review-deploy.sh <pr-number> <api|web> [api|web]" >&2
+if [ -z "$NAMESPACE" ] || [ -z "$PR" ]; then
+  echo "Usage: review-deploy.sh <namespace> <pr-number>" >&2
   exit 1
 fi
 
-log "Review deploy triggered (services: $SERVICES)"
+log "Review deploy triggered (namespace: $NAMESPACE)"
 
 deploy_web() {
   local name="swtp-web-pr-${PR}"
@@ -88,13 +80,8 @@ deploy_api() {
   log "Backend live → https://${host}"
 }
 
-for svc in $SERVICES; do
-  case "$svc" in
-    api) deploy_api ;;
-    web) deploy_web ;;
-    *)   log "Unknown service: $svc — skipped" ;;
-  esac
-done
+deploy_web
+deploy_api
 
 log "Review deploy complete"
 echo "----------------------------------------" >> "$LOG"
