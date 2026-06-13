@@ -103,7 +103,7 @@ jobs:
           echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key -p 2105 tosch@mail.schalz.de \
-            "review-deploy ${{ github.event.pull_request.number }} ${{ steps.services.outputs.list }}"
+            "GHCR_NAMESPACE='${{ secrets.GHCR_NAMESPACE || github.repository_owner }}' review-deploy ${{ github.event.pull_request.number }} ${{ steps.services.outputs.list }}"
 
       - name: Comment on PR
         uses: actions/github-script@v7
@@ -152,4 +152,4 @@ jobs:
           echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key -p 2105 tosch@mail.schalz.de \
-            "review-teardown ${{ github.event.pull_request.number }}"
+            "GHCR_NAMESPACE='${{ secrets.GHCR_NAMESPACE || github.repository_owner }}' review-teardown ${{ github.event.pull_request.number }}"

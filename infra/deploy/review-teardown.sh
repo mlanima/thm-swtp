@@ -7,7 +7,7 @@
 set -e
 
 PR="$1"
-REGISTRY="ghcr.io/mlanima"
+REGISTRY="${GHCR_NAMESPACE:-ghcr.io/mlanima}"
 LOG="/opt/stacks/swtp/deploy.log"
 
 log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] [PR-${PR}] $1" >> "$LOG"; }

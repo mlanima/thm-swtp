@@ -23,7 +23,7 @@ SERVICES="$*"   # e.g. "api web" or just "api" or "web"
 TRAEFIK_NETWORK="traefik-net"          # docker network Traefik listens on
 CERTRESOLVER="letsencrypt-inwx"         # name of your Traefik certresolver
 DOMAIN="review.swtp-ss26.de"
-REGISTRY="ghcr.io/mlanima"
+REGISTRY="${GHCR_NAMESPACE:-ghcr.io/mlanima}"
 LOG="/opt/stacks/swtp/deploy.log"
 # ──────────────────────────────────────────────────────────────────────────────
 
@@ -73,6 +73,7 @@ deploy_api() {
   sudo docker run -d \
     --name "$name" \
     --network "$TRAEFIK_NETWORK" \
+    --network review_net \
     --restart unless-stopped \
     --env-file /opt/stacks/swtp/review.env \
     --label "traefik.enable=true" \
