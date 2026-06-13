@@ -1,8 +1,8 @@
 #!/bin/bash
-# /opt/stacks/swtp/dispatch.sh
+# /opt/stacks/swtp-infra/dispatch.sh
 #
 # Forced command for the deploy SSH key in authorized_keys:
-#   command="/opt/stacks/swtp/dispatch.sh" ssh-ed25519 ...
+#   command="/opt/stacks/swtp-infra/dispatch.sh" ssh-ed25519 ...
 #
 # Dispatches based on SSH_ORIGINAL_COMMAND:
 #   (no command)                     → deploy-dev (default)
@@ -17,18 +17,18 @@ CMD="${SSH_ORIGINAL_COMMAND:-deploy-dev}"
 
 case "$CMD" in
   deploy-dev)
-    exec /opt/stacks/swtp/deploy.sh swtp-dev
+    exec /opt/stacks/swtp-dev/deploy.sh
     ;;
   deploy-main)
-    exec /opt/stacks/swtp/deploy.sh swtp-main
+    exec /opt/stacks/swtp-main/deploy.sh
     ;;
   "review-deploy "*)
     ARGS="${CMD#review-deploy }"
-    exec /opt/stacks/swtp/review-deploy.sh $ARGS
+    exec /opt/stacks/swtp-infra/review-deploy.sh $ARGS
     ;;
   "review-teardown "*)
     ARGS="${CMD#review-teardown }"
-    exec /opt/stacks/swtp/review-teardown.sh $ARGS
+    exec /opt/stacks/swtp-infra/review-teardown.sh $ARGS
     ;;
   *)
     echo "Unknown command: $CMD" >&2

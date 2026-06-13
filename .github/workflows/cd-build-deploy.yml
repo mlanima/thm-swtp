@@ -57,7 +57,7 @@ jobs:
           context: ./api
           push: true
           tags: |
-            ghcr.io/${{ needs.namespace.outputs.namespace }}/swtp-api:latest
+            ghcr.io/${{ needs.namespace.outputs.namespace }}/swtp-api:${{ github.ref_name == 'main' && 'latest' || 'dev' }}
             ghcr.io/${{ needs.namespace.outputs.namespace }}/swtp-api:${{ github.run_number }}
 
   build-frontend:
@@ -81,7 +81,7 @@ jobs:
           context: ./web/ideacamp
           push: true
           tags: |
-            ghcr.io/${{ needs.namespace.outputs.namespace }}/swtp-web:latest
+            ghcr.io/${{ needs.namespace.outputs.namespace }}/swtp-web:${{ github.ref_name == 'main' && 'latest' || 'dev' }}
             ghcr.io/${{ needs.namespace.outputs.namespace }}/swtp-web:${{ github.run_number }}
 
   deploy:

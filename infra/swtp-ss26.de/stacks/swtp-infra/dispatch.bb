@@ -1,8 +1,8 @@
 #!/usr/bin/env bb
-;; /opt/stacks/swtp/dispatch.bb
+;; /opt/stacks/swtp-infra/dispatch.bb
 ;;
 ;; Forced command for the deploy SSH key in authorized_keys:
-;;   command="/opt/stacks/swtp/dispatch.bb" ssh-ed25519 ...
+;;   command="/opt/stacks/swtp-infra/dispatch.bb" ssh-ed25519 ...
 ;;
 ;; Dispatches based on SSH_ORIGINAL_COMMAND:
 ;;   (no command)                     → deploy-dev (default)
@@ -19,17 +19,17 @@
 (defn dispatch [s]
   (cond
     (or (nil? s) (= s "") (= s "deploy-dev"))
-    (exec "/opt/stacks/swtp/deploy.bb" "swtp-dev")
+    (exec "/opt/stacks/swtp-dev/deploy.bb")
 
     (= s "deploy-main")
-    (exec "/opt/stacks/swtp/deploy.bb" "swtp-main")
+    (exec "/opt/stacks/swtp-main/deploy.bb")
 
     (str/starts-with? s "review-deploy ")
-    (apply exec "/opt/stacks/swtp/review-deploy.bb"
+    (apply exec "/opt/stacks/swtp-infra/review-deploy.bb"
            (str/split (subs s (count "review-deploy ")) #" "))
 
     (str/starts-with? s "review-teardown ")
-    (apply exec "/opt/stacks/swtp/review-teardown.bb"
+    (apply exec "/opt/stacks/swtp-infra/review-teardown.bb"
            (str/split (subs s (count "review-teardown ")) #" "))
 
     :else
