@@ -10,7 +10,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=traefik-net
-      - "traefik.http.routers.swtp-dev-api.rule=Host(`api.dev.swtp-ss26.de`)"
+      - traefik.http.routers.swtp-dev-api.rule=Host(`api.dev.swtp-ss26.de`)
       - traefik.http.routers.swtp-dev-api.entrypoints=websecure
       - traefik.http.routers.swtp-dev-api.tls.certresolver=letsencrypt-inwx
       - traefik.http.routers.swtp-dev-api.service=swtp-dev-api
@@ -26,7 +26,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=traefik-net
-      - "traefik.http.routers.swtp-dev-web.rule=Host(`dev.swtp-ss26.de`)"
+      - traefik.http.routers.swtp-dev-web.rule=Host(`dev.swtp-ss26.de`)
       - traefik.http.routers.swtp-dev-web.entrypoints=websecure
       - traefik.http.routers.swtp-dev-web.tls.certresolver=letsencrypt-inwx
       - traefik.http.routers.swtp-dev-web.service=swtp-dev-web

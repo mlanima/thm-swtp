@@ -43,7 +43,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=traefik-net
-      - "traefik.http.routers.keycloak.rule=Host(`auth.swtp-ss26.de`)"
+      - traefik.http.routers.keycloak.rule=Host(`auth.swtp-ss26.de`)
       - traefik.http.routers.keycloak.entrypoints=websecure
       - traefik.http.routers.keycloak.tls.certresolver=letsencrypt-inwx
       - traefik.http.routers.keycloak.service=keycloak
@@ -84,19 +84,19 @@ services:
       - traefik.enable=true
       - traefik.docker.network=traefik-net
       # Main App
-      - "traefik.http.routers.hopp-app.rule=Host(`restclient.swtp-ss26.de`)"
+      - traefik.http.routers.hopp-app.rule=Host(`restclient.swtp-ss26.de`)
       - traefik.http.routers.hopp-app.entrypoints=websecure
       - traefik.http.routers.hopp-app.tls.certresolver=letsencrypt-inwx
       - traefik.http.routers.hopp-app.service=hopp-app
       - traefik.http.services.hopp-app.loadbalancer.server.port=3000
       # Admin Dashboard
-      - "traefik.http.routers.hopp-admin.rule=Host(`restclient-admin.swtp-ss26.de`)"
+      - traefik.http.routers.hopp-admin.rule=Host(`restclient-admin.swtp-ss26.de`)
       - traefik.http.routers.hopp-admin.entrypoints=websecure
       - traefik.http.routers.hopp-admin.tls.certresolver=letsencrypt-inwx
       - traefik.http.routers.hopp-admin.service=hopp-admin
       - traefik.http.services.hopp-admin.loadbalancer.server.port=3100
       # Backend API
-      - "traefik.http.routers.hopp-api.rule=Host(`restclient-api.swtp-ss26.de`)"
+      - traefik.http.routers.hopp-api.rule=Host(`restclient-api.swtp-ss26.de`)
       - traefik.http.routers.hopp-api.entrypoints=websecure
       - traefik.http.routers.hopp-api.tls.certresolver=letsencrypt-inwx
       - traefik.http.routers.hopp-api.service=hopp-api
