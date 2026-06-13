@@ -11,6 +11,15 @@ permissions:
   pull-requests: write
 
 jobs:
+  namespace:
+    name: Resolve GHCR namespace
+    runs-on: ubuntu-latest
+    outputs:
+      namespace: ${{ steps.lower.outputs.namespace }}
+    steps:
+      - id: lower
+        run: echo "namespace=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+
   # ── Change detection (skip on close) ──────────────────────────────────────
   detect-changes:
     name: Detect changes
@@ -33,7 +42,7 @@ jobs:
   # ── Build images tagged with PR number ────────────────────────────────────
   build-backend:
     name: Build & Push Backend (PR)
-    needs: detect-changes
+    needs: [namespace, detect-changes]
     if: needs.detect-changes.outputs.backend == 'true'
     runs-on: ubuntu-latest
     steps:
@@ -51,11 +60,11 @@ jobs:
         with:
           context: ./api
           push: true
-          tags: ghcr.io/${{ secrets.GHCR_NAMESPACE || github.repository_owner }}/swtp-api:pr-${{ github.event.pull_request.number }}
+          tags: ghcr.io/${{ needs.namespace.outputs.namespace }}/swtp-api:pr-${{ github.event.pull_request.number }}
 
   build-frontend:
     name: Build & Push Frontend (PR)
-    needs: detect-changes
+    needs: [namespace, detect-changes]
     if: needs.detect-changes.outputs.frontend == 'true'
     runs-on: ubuntu-latest
     steps:
@@ -73,12 +82,12 @@ jobs:
         with:
           context: ./web/ideacamp
           push: true
-          tags: ghcr.io/${{ secrets.GHCR_NAMESPACE || github.repository_owner }}/swtp-web:pr-${{ github.event.pull_request.number }}
+          tags: ghcr.io/${{ needs.namespace.outputs.namespace }}/swtp-web:pr-${{ github.event.pull_request.number }}
 
   # ── Deploy review environment ──────────────────────────────────────────────
   deploy-review:
     name: Deploy Review App
-    needs: [build-backend, build-frontend]
+    needs: [namespace, build-backend, build-frontend]
     if: |
       always() &&
       github.event.action != 'closed' &&
@@ -103,7 +112,7 @@ jobs:
           echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key -p 2105 tosch@mail.schalz.de \
-            "GHCR_NAMESPACE='${{ secrets.GHCR_NAMESPACE || github.repository_owner }}' review-deploy ${{ github.event.pull_request.number }} ${{ steps.services.outputs.list }}"
+            "GHCR_NAMESPACE='${{ needs.namespace.outputs.namespace }}' review-deploy ${{ github.event.pull_request.number }} ${{ steps.services.outputs.list }}"
 
       - name: Comment on PR
         uses: actions/github-script@v7
@@ -143,6 +152,7 @@ jobs:
   # ── Teardown on PR close / merge ──────────────────────────────────────────
   teardown-review:
     name: Teardown Review App
+    needs: namespace
     if: github.event.action == 'closed'
     runs-on: ubuntu-latest
     steps:
@@ -152,4 +162,4 @@ jobs:
           echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key -p 2105 tosch@mail.schalz.de \
-            "GHCR_NAMESPACE='${{ secrets.GHCR_NAMESPACE || github.repository_owner }}' review-teardown ${{ github.event.pull_request.number }}"
+            "GHCR_NAMESPACE='${{ needs.namespace.outputs.namespace }}' review-teardown ${{ github.event.pull_request.number }}"

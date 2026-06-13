@@ -10,6 +10,15 @@ permissions:
   packages: write
 
 jobs:
+  namespace:
+    name: Resolve GHCR namespace
+    runs-on: ubuntu-latest
+    outputs:
+      namespace: ${{ steps.lower.outputs.namespace }}
+    steps:
+      - id: lower
+        run: echo "namespace=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+
   detect-changes:
     name: Detect changes
     runs-on: ubuntu-latest
@@ -29,7 +38,7 @@ jobs:
 
   build-backend:
     name: Build & Push (Backend)
-    needs: detect-changes
+    needs: [namespace, detect-changes]
     if: needs.detect-changes.outputs.backend == 'true'
     runs-on: ubuntu-latest
     steps:
@@ -48,12 +57,12 @@ jobs:
           context: ./api
           push: true
           tags: |
-            ghcr.io/${{ secrets.GHCR_NAMESPACE || github.repository_owner }}/swtp-api:latest
-            ghcr.io/${{ secrets.GHCR_NAMESPACE || github.repository_owner }}/swtp-api:${{ github.run_number }}
+            ghcr.io/${{ needs.namespace.outputs.namespace }}/swtp-api:latest
+            ghcr.io/${{ needs.namespace.outputs.namespace }}/swtp-api:${{ github.run_number }}
 
   build-frontend:
     name: Build & Push (Frontend)
-    needs: detect-changes
+    needs: [namespace, detect-changes]
     if: needs.detect-changes.outputs.frontend == 'true'
     runs-on: ubuntu-latest
     steps:
@@ -72,12 +81,12 @@ jobs:
           context: ./web/ideacamp
           push: true
           tags: |
-            ghcr.io/${{ secrets.GHCR_NAMESPACE || github.repository_owner }}/swtp-web:latest
-            ghcr.io/${{ secrets.GHCR_NAMESPACE || github.repository_owner }}/swtp-web:${{ github.run_number }}
+            ghcr.io/${{ needs.namespace.outputs.namespace }}/swtp-web:latest
+            ghcr.io/${{ needs.namespace.outputs.namespace }}/swtp-web:${{ github.run_number }}
 
   deploy:
     name: Deploy to Server
-    needs: [build-backend, build-frontend]
+    needs: [namespace, build-backend, build-frontend]
     if: |
       always() &&
       (needs.build-backend.result == 'success' || needs.build-frontend.result == 'success')
