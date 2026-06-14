@@ -16,6 +16,6 @@
   (spit logfile (str "[" (now-str) "] " msg "\n") :append true))
 
 (log "Deploy triggered (swtp-infra)")
-(sh "docker" "compose" "-f" (str script-dir "/docker-compose.yml") "up" "-d" {:dir script-dir})
+(sh ["docker" "compose" "-f" (str script-dir "/docker-compose.yml") "up" "-d"] {:dir script-dir})
 (log "Deploy complete")
 (spit logfile "----------------------------------------\n" :append true)

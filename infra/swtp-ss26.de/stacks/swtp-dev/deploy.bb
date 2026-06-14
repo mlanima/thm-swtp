@@ -17,7 +17,7 @@
 (log "Deploy triggered (swtp-dev)")
 
 ;; Pull images
-(let [{:keys [out err]} (sh "docker" "compose" "-f" (str script-dir "/docker-compose.yml") "pull" {:dir script-dir})
+(let [{:keys [out err]} (sh ["docker" "compose" "-f" (str script-dir "/docker-compose.yml") "pull"] {:dir script-dir})
       combined (str out "\n" err)]
   (log (str "Pull output:\n" combined))
   (doseq [svc ["swtp-dev-api" "swtp-dev-web"]]
@@ -30,6 +30,6 @@
       (log (str svc ": check output")))))
 
 (log "Restarting services")
-(sh "docker" "compose" "-f" (str script-dir "/docker-compose.yml") "up" "-d" {:dir script-dir})
+(sh ["docker" "compose" "-f" (str script-dir "/docker-compose.yml") "up" "-d"] {:dir script-dir})
 (log "Deploy complete")
 (spit logfile "----------------------------------------\n" :append true)
