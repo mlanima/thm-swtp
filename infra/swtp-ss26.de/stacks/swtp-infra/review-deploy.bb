@@ -14,6 +14,7 @@
 (def certresolver "letsencrypt-inwx")
 (def domain "review.swtp-ss26.de")
 (def logfile "/opt/stacks/swtp-infra/deploy.log")
+(def script-dir (-> (sh "dirname" (System/getProperty "babashka.file")) :out str/trim))
 ;; ──────────────────────────────────────────────────────────────────────────────
 
 ;; Parse args
@@ -21,6 +22,8 @@
 (def namespace (first args))
 (def pr-num (second args))
 (def registry (str "ghcr.io/" namespace))
+(def db-name (str "swtp_pr_" pr-num))
+(def template-db "swtp_template")
 
 (defn now-str []
   (-> (sh "date" "+%Y-%m-%d %H:%M:%S") :out str/trim))
@@ -81,6 +84,48 @@
         image)
     (log (str "Backend live → https://" host))))
 
+;; ── DB clone (swtp_template -> swtp_pr_<n>) ─────────────────────────────────
+;; MySQL has no CREATE DATABASE ... LIKE-with-data, so: mysqldump | mysql.
+
+(defn read-env [path key]
+  (->> (slurp path)
+       str/split-lines
+       (keep #(let [[k v] (str/split % #"=" 2)]
+                (when (= (some-> k str/trim) key) (some-> v str/trim))))
+       first))
+
+(def env-file (str script-dir "/.env"))
+(def db-root-pw (read-env env-file "MYSQL_ROOT_PASSWORD"))
+(def db-app-user (or (read-env env-file "MYSQL_USER") "swtp"))
+
+(defn mysql! [sql]
+  (sh "sudo" "docker" "exec" "-i" "swtp-db" "mysql" "-uroot" (str "-p" db-root-pw) "-e" sql))
+
+(defn check-db [{:keys [exit err]} step]
+  (when-not (zero? exit)
+    (log (str "DB clone FAILED during " step ": " err))
+    (System/exit 1)))
+
+(defn clone-db! []
+  (log (str "Cloning DB (" template-db " -> " db-name ")..."))
+  (when (str/blank? db-root-pw)
+    (log (str "MYSQL_ROOT_PASSWORD not found in " env-file))
+    (System/exit 1))
+
+  (check-db (mysql! (str "CREATE DATABASE IF NOT EXISTS `" db-name "`;")) "CREATE DATABASE")
+  (check-db (mysql! (str "GRANT ALL PRIVILEGES ON `" db-name "`.* TO '" db-app-user "'@'%'; FLUSH PRIVILEGES;"))
+            "GRANT")
+
+  (let [dump (sh ["sudo" "docker" "exec" "swtp-db" "mysqldump" "-uroot" (str "-p" db-root-pw)
+                  "--set-gtid-purged=OFF" template-db])]
+    (check-db dump "mysqldump")
+    (let [restore (sh ["sudo" "docker" "exec" "-i" "swtp-db" "mysql" "-uroot" (str "-p" db-root-pw) db-name]
+                      {:in (:out dump)})]
+      (check-db restore "mysql restore")))
+
+  (log "DB clone done"))
+
+(clone-db!)
 (deploy-web)
 (deploy-api)
 

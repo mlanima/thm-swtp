@@ -13,6 +13,7 @@
 (def pr-num (second args))
 (def registry (str "ghcr.io/" namespace))
 (def logfile "/opt/stacks/swtp-infra/deploy.log")
+(def script-dir (-> (sh "dirname" (System/getProperty "babashka.file")) :out str/trim))
 
 (defn now-str []
   (-> (sh "date" "+%Y-%m-%d %H:%M:%S") :out str/trim))
@@ -44,6 +45,24 @@
   ;; Clean up PR-tagged images to free disk space
   (sh "sudo" "docker" "rmi" (str registry "/swtp-web:pr-" pr-num))
   (sh "sudo" "docker" "rmi" (str registry "/swtp-api:pr-" pr-num)))
+
+;; Drop PR database (swtp_pr_<n>)
+(let [db-name (str "swtp_pr_" pr-num)
+      env-file (str script-dir "/.env")
+      read-env (fn [path key]
+                 (->> (slurp path)
+                      str/split-lines
+                      (keep #(let [[k v] (str/split % #"=" 2)]
+                               (when (= (some-> k str/trim) key) (some-> v str/trim))))
+                      first))
+      root-pw (read-env env-file "MYSQL_ROOT_PASSWORD")]
+  (if (str/blank? root-pw)
+    (log (str "DB drop FAILED: MYSQL_ROOT_PASSWORD not found in " env-file))
+    (let [{:keys [exit err]} (sh "sudo" "docker" "exec" "-i" "swtp-db" "mysql" "-uroot" (str "-p" root-pw)
+                                  "-e" (str "DROP DATABASE IF EXISTS `" db-name "`;"))]
+      (if (zero? exit)
+        (log "DB dropped")
+        (log (str "DB drop FAILED: " err))))))
 
 (log "Teardown complete")
 (spit logfile "----------------------------------------\n" :append true)
