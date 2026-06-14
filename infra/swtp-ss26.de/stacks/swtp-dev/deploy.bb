@@ -5,8 +5,8 @@
 (require '[babashka.process :refer [sh]]
          '[clojure.string :as str])
 
-(def dir (-> (sh "dirname" (System/getProperty "babashka.file")) :out str/trim))
-(def logfile (str dir "/deploy.log"))
+(def script-dir (-> (sh "dirname" (System/getProperty "babashka.file")) :out str/trim))
+(def logfile (str script-dir "/deploy.log"))
 
 (defn now-str []
   (-> (sh "date" "+%Y-%m-%d %H:%M:%S") :out str/trim))
@@ -17,7 +17,7 @@
 (log "Deploy triggered (swtp-dev)")
 
 ;; Pull images
-(let [{:keys [out pull-out]} (sh "docker" "compose" "-f" (str dir "/docker-compose.yml") "pull")]
+(let [{:keys [out pull-out]} (sh "docker" "compose" "-f" (str script-dir "/docker-compose.yml") "pull")]
   (doseq [svc ["swtp-dev-api" "swtp-dev-web"]]
     (cond
       (str/includes? pull-out (str svc ".*Downloaded newer image"))
@@ -28,6 +28,6 @@
       (log (str svc ": check output")))))
 
 (log "Restarting services")
-(sh "docker" "compose" "-f" (str dir "/docker-compose.yml") "up" "-d")
+(sh "docker" "compose" "-f" (str script-dir "/docker-compose.yml") "up" "-d")
 (log "Deploy complete")
 (spit logfile "----------------------------------------\n" :append true)
