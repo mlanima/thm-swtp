@@ -3,7 +3,7 @@ services:
     image: ghcr.io/${GHCR_NAMESPACE:-mlanima}/swtp-api:latest
     container_name: swtp-main-api
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://swtp-db:3306/swtp
+      SPRING_DATASOURCE_URL: jdbc:mysql://swtp-db:3306/swtp_main
       SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
       SPRING_PROFILES_ACTIVE: mysql
