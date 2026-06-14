@@ -18,16 +18,21 @@
 
 ;; Pull images
 (def services ["swtp-main-api" "swtp-main-web"])
+(def compose-file (str script-dir "/docker-compose.yml"))
 
-(defn image-ids []
-  (into {}
-        (for [svc services]
-          [svc (-> (sh ["docker" "compose" "-f" (str script-dir "/docker-compose.yml") "images" "-q" svc] {:dir script-dir})
-                    :out str/trim)])))
+(defn service-image [svc]
+  (-> (sh ["docker" "compose" "-f" compose-file "config" "--images" svc] {:dir script-dir})
+      :out str/trim))
 
-(let [before (image-ids)]
-  (sh ["docker" "compose" "-f" (str script-dir "/docker-compose.yml") "pull"] {:dir script-dir})
-  (let [after (image-ids)]
+(defn image-id [image]
+  (-> (sh ["docker" "image" "inspect" "-f" "{{.Id}}" image] {:dir script-dir})
+      :out str/trim))
+
+(def service-images (into {} (for [svc services] [svc (service-image svc)])))
+
+(let [before (into {} (for [svc services] [svc (image-id (get service-images svc))]))]
+  (sh ["docker" "compose" "-f" compose-file "pull"] {:dir script-dir})
+  (let [after (into {} (for [svc services] [svc (image-id (get service-images svc))]))]
     (doseq [svc services]
       (if (= (get before svc) (get after svc))
         (log (str svc ": up-to-date"))
