@@ -17,12 +17,12 @@
 (log "Deploy triggered (swtp-dev)")
 
 ;; Pull images
-(let [{:keys [out pull-out]} (sh "docker" "compose" "-f" (str script-dir "/docker-compose.yml") "pull")]
+(let [{:keys [out]} (sh "docker" "compose" "-f" (str script-dir "/docker-compose.yml") "pull")]
   (doseq [svc ["swtp-dev-api" "swtp-dev-web"]]
     (cond
-      (str/includes? pull-out (str svc ".*Downloaded newer image"))
+      (re-find (re-pattern (str "(?s)" svc ".*Downloaded newer image")) out)
       (log (str svc ": updated"))
-      (str/includes? pull-out (str svc ".*Image is up to date"))
+      (re-find (re-pattern (str "(?s)" svc ".*Image is up to date")) out)
       (log (str svc ": up-to-date"))
       :else
       (log (str svc ": check output")))))
