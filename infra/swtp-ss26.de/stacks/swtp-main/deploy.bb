@@ -17,16 +17,21 @@
 (log "Deploy triggered (swtp-main)")
 
 ;; Pull images
-(let [{:keys [out err]} (sh ["docker" "compose" "-f" (str script-dir "/docker-compose.yml") "pull"] {:dir script-dir})
-      combined (str out "\n" err)]
-  (doseq [[svc image] [["swtp-main-api" "swtp-api"] ["swtp-main-web" "swtp-web"]]]
-    (cond
-      (re-find (re-pattern (str image ":latest Pulled")) combined)
-      (log (str svc ": pulled"))
-      (re-find (re-pattern (str image ":latest Skipped")) combined)
-      (log (str svc ": up-to-date"))
-      :else
-      (log (str svc ": check output\n" combined)))))
+(def services ["swtp-main-api" "swtp-main-web"])
+
+(defn image-ids []
+  (into {}
+        (for [svc services]
+          [svc (-> (sh ["docker" "compose" "-f" (str script-dir "/docker-compose.yml") "images" "-q" svc] {:dir script-dir})
+                    :out str/trim)])))
+
+(let [before (image-ids)]
+  (sh ["docker" "compose" "-f" (str script-dir "/docker-compose.yml") "pull"] {:dir script-dir})
+  (let [after (image-ids)]
+    (doseq [svc services]
+      (if (= (get before svc) (get after svc))
+        (log (str svc ": up-to-date"))
+        (log (str svc ": updated"))))))
 
 (log "Restarting services")
 (sh ["docker" "compose" "-f" (str script-dir "/docker-compose.yml") "up" "-d"] {:dir script-dir})
