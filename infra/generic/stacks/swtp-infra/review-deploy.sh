@@ -47,7 +47,7 @@ deploy_web() {
     --label "traefik.http.routers.${name}.tls=true" \
     --label "traefik.http.routers.${name}.tls.certresolver=${CERTRESOLVER}" \
     --label "traefik.http.routers.${name}.tls.domains[0].main=*.${DOMAIN}" \
-    --label "traefik.http.services.${name}.loadbalancer.server.port=80" \
+    --label "traefik.http.services.${name}.loadbalancer.server.port=4000" \
     "${REGISTRY}/swtp-web:pr-${PR}"
 
   log "Frontend live → https://${host}"

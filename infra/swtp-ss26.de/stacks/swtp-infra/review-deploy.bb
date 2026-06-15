@@ -62,7 +62,7 @@
         "--label" (str "traefik.http.routers." name ".tls=true")
         "--label" (str "traefik.http.routers." name ".tls.certresolver=" certresolver)
         "--label" (str "traefik.http.routers." name ".tls.domains[0].main=*." domain)
-        "--label" (str "traefik.http.services." name ".loadbalancer.server.port=80")
+        "--label" (str "traefik.http.services." name ".loadbalancer.server.port=4000")
         image)
     (log (str "Frontend live → https://" host))))
 
