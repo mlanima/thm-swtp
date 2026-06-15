@@ -43,7 +43,7 @@
                 "localhost",
                 "dev.swtp-ss26.de",
                 "www.swtp-ss26.de",
-                ".review.swtp-ss26.de"
+                "*.review.swtp-ss26.de"
               ]
             },
             "ssr": {
