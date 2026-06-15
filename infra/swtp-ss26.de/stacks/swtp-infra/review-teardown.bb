@@ -52,6 +52,12 @@
   (sh "sudo" "docker" "rmi" (str registry "/swtp-web:pr-" pr-num))
   (sh "sudo" "docker" "rmi" (str registry "/swtp-api:pr-" pr-num)))
 
+;; Remove Dozzle container (shared image, not removed)
+(let [{:keys [exit]} (sh "sudo" "docker" "rm" "-f" (str "swtp-logs-pr-" pr-num))]
+  (if (= 0 exit)
+    (log "Dozzle container removed")
+    (log "Dozzle container not found (already gone?)")))
+
 ;; Drop PR database (swtp_pr_<n>)
 (let [db-name (str "swtp_pr_" pr-num)
       env-file (str script-dir "/.env")

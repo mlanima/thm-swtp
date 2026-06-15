@@ -56,6 +56,7 @@
         "--network" traefik-network
         "--restart" "unless-stopped"
         "--label" "traefik.enable=true"
+        "--label" (str "pr=" pr-num)
         "--label" (str "traefik.http.routers." name ".entrypoints=websecure")
         "--label" (str "traefik.http.routers." name ".rule=Host(`" host "`)")
         "--label" (str "traefik.http.routers." name ".tls=true")
@@ -80,6 +81,7 @@
         "--restart" "unless-stopped"
         "--env-file" "/opt/stacks/swtp-infra/review.env"
         "--label" "traefik.enable=true"
+        "--label" (str "pr=" pr-num)
         "--label" (str "traefik.http.routers." name ".entrypoints=websecure")
         "--label" (str "traefik.http.routers." name ".rule=Host(`" host "`)")
         "--label" (str "traefik.http.routers." name ".tls=true")
@@ -88,6 +90,29 @@
         "--label" (str "traefik.http.services." name ".loadbalancer.server.port=8080")
         image)
     (log (str "Backend live → https://" host))))
+
+;; ── Dozzle (Logs pro PR) ─────────────────────────────────────────────────────
+
+(defn deploy-dozzle []
+  (let [name (str "swtp-logs-pr-" pr-num)
+        host (str "pr-" pr-num "-logs." domain)]
+    (log "Starting Dozzle container...")
+    (sh "sudo" "docker" "rm" "-f" name)
+    (sh "sudo" "docker" "run" "-d"
+        "--name" name
+        "--network" traefik-network
+        "--restart" "unless-stopped"
+        "-v" "/var/run/docker.sock:/var/run/docker.sock:ro"
+        "-e" (str "DOZZLE_FILTER=label=pr=" pr-num)
+        "--label" "traefik.enable=true"
+        "--label" (str "traefik.http.routers." name ".entrypoints=websecure")
+        "--label" (str "traefik.http.routers." name ".rule=Host(`" host "`)")
+        "--label" (str "traefik.http.routers." name ".tls=true")
+        "--label" (str "traefik.http.routers." name ".tls.certresolver=" certresolver)
+        "--label" (str "traefik.http.routers." name ".tls.domains[0].main=*." domain)
+        "--label" (str "traefik.http.services." name ".loadbalancer.server.port=8080")
+        "amir20/dozzle:latest")
+    (log (str "Dozzle live → https://" host))))
 
 ;; ── DB clone (swtp_template -> swtp_pr_<n>) ─────────────────────────────────
 ;; MySQL has no CREATE DATABASE ... LIKE-with-data, so: mysqldump | mysql.
@@ -211,6 +236,7 @@
 (clone-db!)
 (deploy-web)
 (deploy-api)
+(deploy-dozzle)
 (add-pr-redirect!)
 (register-active-pr!)
 
