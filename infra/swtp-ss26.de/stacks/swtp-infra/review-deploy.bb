@@ -7,6 +7,8 @@
 ;;   Backend:  https://pr-<n>-api.review.swtp-ss26.de
 
 (require '[babashka.process :refer [sh]]
+         '[babashka.http-client :as http]
+         '[cheshire.core :as json]
          '[clojure.string :as str])
 
 ;; ── Config ────────────────────────────────────────────────────────────────────
@@ -15,6 +17,9 @@
 (def domain "review.swtp-ss26.de")
 (def logfile "/opt/stacks/swtp-infra/deploy.log")
 (def script-dir (-> (sh "dirname" (System/getProperty "babashka.file")) :out str/trim))
+(def kc-base "https://auth.swtp-ss26.de")
+(def kc-realm "swtp")
+(def kc-client-id "swtp-frontend")
 ;; ──────────────────────────────────────────────────────────────────────────────
 
 ;; Parse args
@@ -125,9 +130,70 @@
 
   (log "DB clone done"))
 
+;; ── Keycloak: PR-Redirect-URI + Web-Origin eintragen ────────────────────────
+;; Subdomain-Wildcards werden von Keycloak nicht unterstützt → pro PR per
+;; Admin-REST eintragen (vgl. CD Review-Apps – Konzept & Vorgehen, Punkt 7).
+
+(def kc-admin (read-env env-file "KC_ADMIN"))
+(def kc-admin-password (read-env env-file "KC_ADMIN_PASSWORD"))
+(def kc-redirect-uri (str "https://pr-" pr-num "." domain "/*"))
+(def kc-web-origin (str "https://pr-" pr-num "." domain))
+
+(defn kc-get-admin-token []
+  (let [resp (http/post (str kc-base "/realms/master/protocol/openid-connect/token")
+                         {:form-params {"client_id"  "admin-cli"
+                                         "grant_type" "password"
+                                         "username"   kc-admin
+                                         "password"   kc-admin-password}
+                          :throw       false})]
+    (when-not (= 200 (:status resp))
+      (log (str "Keycloak token request FAILED: " (:status resp) " " (:body resp)))
+      (System/exit 1))
+    (-> (:body resp) json/parse-string (get "access_token"))))
+
+(defn kc-get-client [token]
+  (let [resp (http/get (str kc-base "/admin/realms/" kc-realm "/clients")
+                        {:headers      {"Authorization" (str "Bearer " token)}
+                         :query-params {"clientId" kc-client-id}
+                         :throw        false})]
+    (when-not (= 200 (:status resp))
+      (log (str "Keycloak client lookup FAILED: " (:status resp) " " (:body resp)))
+      (System/exit 1))
+    (let [clients (json/parse-string (:body resp))]
+      (when (empty? clients)
+        (log (str "Keycloak client " kc-client-id " not found in realm " kc-realm))
+        (System/exit 1))
+      (first clients))))
+
+(defn add-pr-redirect! []
+  (log "Registering Keycloak redirect URI / web origin...")
+  (when (or (str/blank? kc-admin) (str/blank? kc-admin-password))
+    (log (str "KC_ADMIN / KC_ADMIN_PASSWORD not found in " env-file))
+    (System/exit 1))
+
+  (let [token (kc-get-admin-token)
+        client (kc-get-client token)
+        client-uuid (get client "id")
+        redirect-uris (conj (set (get client "redirectUris" [])) kc-redirect-uri)
+        web-origins (conj (set (get client "webOrigins" [])) kc-web-origin)
+        updated (assoc client
+                       "redirectUris" (vec redirect-uris)
+                       "webOrigins" (vec web-origins))
+        resp (http/put (str kc-base "/admin/realms/" kc-realm "/clients/" client-uuid)
+                        {:headers {"Authorization" (str "Bearer " token)
+                                   "Content-Type" "application/json"}
+                         :body    (json/generate-string updated)
+                         :throw   false})]
+    (if (#{200 204} (:status resp))
+      (log (str "Keycloak: registered " kc-redirect-uri " / " kc-web-origin))
+      (do
+        (log (str "Keycloak client update FAILED: " (:status resp) " " (:body resp)))
+        (System/exit 1)))))
+
 (clone-db!)
 (deploy-web)
 (deploy-api)
+(add-pr-redirect!)
 
 (log "Review deploy complete")
 (spit logfile "----------------------------------------\n" :append true)

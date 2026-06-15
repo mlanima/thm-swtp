@@ -5,6 +5,8 @@
 ;; Called automatically when a PR is closed or merged.
 
 (require '[babashka.process :refer [sh]]
+         '[babashka.http-client :as http]
+         '[cheshire.core :as json]
          '[clojure.string :as str])
 
 ;; Parse args
@@ -14,6 +16,10 @@
 (def registry (str "ghcr.io/" namespace))
 (def logfile "/opt/stacks/swtp-infra/deploy.log")
 (def script-dir (-> (sh "dirname" (System/getProperty "babashka.file")) :out str/trim))
+(def domain "review.swtp-ss26.de")
+(def kc-base "https://auth.swtp-ss26.de")
+(def kc-realm "swtp")
+(def kc-client-id "swtp-frontend")
 
 (defn now-str []
   (-> (sh "date" "+%Y-%m-%d %H:%M:%S") :out str/trim))
@@ -63,6 +69,54 @@
       (if (zero? exit)
         (log "DB dropped")
         (log (str "DB drop FAILED: " err))))))
+
+;; ── Keycloak: PR-Redirect-URI + Web-Origin entfernen ────────────────────────
+(let [env-file (str script-dir "/.env")
+      read-env (fn [path key]
+                 (->> (slurp path)
+                      str/split-lines
+                      (keep #(let [[k v] (str/split % #"=" 2)]
+                               (when (= (some-> k str/trim) key) (some-> v str/trim))))
+                      first))
+      kc-admin (read-env env-file "KC_ADMIN")
+      kc-admin-password (read-env env-file "KC_ADMIN_PASSWORD")
+      kc-redirect-uri (str "https://pr-" pr-num "." domain "/*")
+      kc-web-origin (str "https://pr-" pr-num "." domain)]
+  (if (or (str/blank? kc-admin) (str/blank? kc-admin-password))
+    (log (str "Keycloak cleanup FAILED: KC_ADMIN / KC_ADMIN_PASSWORD not found in " env-file))
+    (let [token-resp (http/post (str kc-base "/realms/master/protocol/openid-connect/token")
+                                 {:form-params {"client_id"  "admin-cli"
+                                                 "grant_type" "password"
+                                                 "username"   kc-admin
+                                                 "password"   kc-admin-password}
+                                  :throw       false})]
+      (if-not (= 200 (:status token-resp))
+        (log (str "Keycloak token request FAILED: " (:status token-resp) " " (:body token-resp)))
+        (let [token (-> (:body token-resp) json/parse-string (get "access_token"))
+              client-resp (http/get (str kc-base "/admin/realms/" kc-realm "/clients")
+                                     {:headers      {"Authorization" (str "Bearer " token)}
+                                      :query-params {"clientId" kc-client-id}
+                                      :throw        false})]
+          (if-not (= 200 (:status client-resp))
+            (log (str "Keycloak client lookup FAILED: " (:status client-resp) " " (:body client-resp)))
+            (let [clients (json/parse-string (:body client-resp))]
+              (if (empty? clients)
+                (log (str "Keycloak client " kc-client-id " not found in realm " kc-realm))
+                (let [client (first clients)
+                      client-uuid (get client "id")
+                      redirect-uris (disj (set (get client "redirectUris" [])) kc-redirect-uri)
+                      web-origins (disj (set (get client "webOrigins" [])) kc-web-origin)
+                      updated (assoc client
+                                     "redirectUris" (vec redirect-uris)
+                                     "webOrigins" (vec web-origins))
+                      update-resp (http/put (str kc-base "/admin/realms/" kc-realm "/clients/" client-uuid)
+                                             {:headers {"Authorization" (str "Bearer " token)
+                                                        "Content-Type" "application/json"}
+                                              :body    (json/generate-string updated)
+                                              :throw   false})]
+                  (if (#{200 204} (:status update-resp))
+                    (log (str "Keycloak: removed " kc-redirect-uri " / " kc-web-origin))
+                    (log (str "Keycloak client update FAILED: " (:status update-resp) " " (:body update-resp)))))))))))))
 
 (log "Teardown complete")
 (spit logfile "----------------------------------------\n" :append true)
