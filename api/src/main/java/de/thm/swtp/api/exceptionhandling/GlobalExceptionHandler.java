@@ -159,4 +159,22 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
     }
+
+    @ExceptionHandler(InvalidProjectPostException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidProjectPost(InvalidProjectPostException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ProjectPostAccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleProjectPostAccessDenied(ProjectPostAccessDeniedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ErrorResponse.of(403, "Forbidden", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ProjectPostNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleProjectPostNotFound(ProjectPostNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
+    }
 }

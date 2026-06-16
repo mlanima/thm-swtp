@@ -13,6 +13,7 @@ public class ProjectPost {
     UUID id;
     UUID projectId;
     UUID authorId;
+    String authorName;
     String title;
     String content;
     ProjectPostStatus status;
