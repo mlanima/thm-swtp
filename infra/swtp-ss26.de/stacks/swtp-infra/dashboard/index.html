@@ -247,14 +247,14 @@ function refresh() {
       updateFavicon(prCount);
 
       if (prs.length) {
-        out += section("Review-Apps", prs.map(([num, env]) => card(`PR #${num}`, env)).join(""));
+        out += section("Review-Apps", prs.map(([num, env]) => card(env.pr_title ? `${env.pr_title} <span style="font-weight:400;color:var(--fg-dim);font-size:.85rem">#${num}</span>` : `PR #${num}`, env)).join(""));
       } else {
         out += section("Review-Apps", `<div class="empty">Aktuell keine offenen Review-Apps</div>`);
       }
 
       document.getElementById("content").innerHTML = out;
       document.getElementById("footer").textContent =
-        "Aktualisiert automatisch durch deploy.bb / review-deploy.bb / review-teardown.bb · geladen " + new Date().toLocaleString("de-DE");
+        "Stand: " + new Date().toLocaleString("de-DE");
     })
     .catch(err => {
       document.getElementById("content").innerHTML =

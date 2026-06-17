@@ -1,7 +1,6 @@
 #!/usr/bin/env bb
 ;; /opt/stacks/swtp-infra/deploy.bb
 ;; Starts the swtp-infra stack (MySQL, Keycloak, Hoppscotch).
-;; No image pull needed — all images are public.
 
 (require '[babashka.process :refer [sh]]
          '[clojure.string :as str])

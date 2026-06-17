@@ -287,8 +287,7 @@
 
 (defn- add-pr-redirect!
   "Registers this PR's redirect URI and web origin on the Keycloak client
-   via Admin REST API. Keycloak does not support subdomain wildcards,
-   so each PR must be registered individually."
+   via Admin REST API."
   [kc-admin kc-admin-password kc-redirect-uri kc-web-origin]
   (log "Registering Keycloak redirect URI / web origin ...")
   (let [{:keys [kc-base kc-realm]} config
@@ -342,18 +341,32 @@
                           (assoc entry "updated_at" (now-str)))]
     (spit dashboard-file (json/generate-string updated {:pretty true}))))
 
+(defn- fetch-pr-title
+  "Fetches the PR title from the public GitHub API. Returns nil on failure."
+  [org]
+  (try
+    (let [resp (http/get (str "https://api.github.com/repos/" org "/thm-swtp/pulls/" *pr-num*)
+                         {:headers {"Accept"     "application/vnd.github+json"
+                                    "User-Agent" "swtp-review-deploy"}
+                          :throw false})]
+      (when (= 200 (:status resp))
+        (-> (:body resp) json/parse-string (get "title"))))
+    (catch Exception _ nil)))
+
 (defn- register-dashboard!
   "Writes this PR's frontend, backend, logs, and GitHub URLs into the
    dashboard data file."
   [org]
-  (let [{:keys [dashboard-file]} config]
+  (let [{:keys [dashboard-file]} config
+        pr-title (fetch-pr-title org)]
     (update-dashboard!
         dashboard-file
         ["prs" *pr-num*]
-        {"fe"     (str "https://" (subdomain *pr-num* nil))
-         "be"     (str "https://" (subdomain *pr-num* "api") "/swagger-ui/index.html")
-         "logs"   (str "https://" (subdomain *pr-num* "logs"))
-         "pr_url" (str "https://github.com/" org "/thm-swtp/pull/" *pr-num*)}))
+        (cond-> {"fe"     (str "https://" (subdomain *pr-num* nil))
+                 "be"     (str "https://" (subdomain *pr-num* "api") "/swagger-ui/index.html")
+                 "logs"   (str "https://" (subdomain *pr-num* "logs"))
+                 "pr_url" (str "https://github.com/" org "/thm-swtp/pull/" *pr-num*)}
+          pr-title (assoc "pr_title" pr-title))))
   (log "Dashboard updated"))
 
 ;; =============================================================================

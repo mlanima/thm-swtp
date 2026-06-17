@@ -19,7 +19,7 @@
 ;; =============================================================================
 (def stacks-dir "/opt/stacks")
 (def infra-dir  (str stacks-dir "/swtp-infra"))
-(def logfile    (str infra-dir "/deploy.log"))   ; shared with review-deploy/-teardown
+(def logfile    (str infra-dir "/deploy.log"))
 
 ;; =============================================================================
 ;; Audit logging
@@ -83,7 +83,8 @@
 ;; Main
 ;; =============================================================================
 (defn- -main
-  "Reads SSH_ORIGINAL_COMMAND, resolves it against the allowlist, and execs the target."
+  "Reads SSH_ORIGINAL_COMMAND, resolves it against the allowlist, and execs the
+   target."
   [& _]
   (let [cmd (System/getenv "SSH_ORIGINAL_COMMAND")]
     (try
