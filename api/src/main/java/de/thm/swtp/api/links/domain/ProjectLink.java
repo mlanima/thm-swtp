@@ -1,4 +1,4 @@
-package de.thm.swtp.api.projectLinks.domain;
+package de.thm.swtp.api.links.domain;
 
 import lombok.Builder;
 import lombok.Getter;
