@@ -1,6 +1,5 @@
 package de.thm.swtp.api.links.entity;
 
-import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import jakarta.persistence.*;
 import lombok.*;

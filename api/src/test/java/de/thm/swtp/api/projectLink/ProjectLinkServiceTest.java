@@ -202,8 +202,8 @@ public class ProjectLinkServiceTest {
 
         ProjectLink result = projectLinkService.updateProjectLink(
                 projectId,
-                linkId,
                 ownerId,
+                linkId,
                 "New Label",
                 null
         );
@@ -236,8 +236,8 @@ public class ProjectLinkServiceTest {
 
         ProjectLink result = projectLinkService.updateProjectLink(
                 projectId,
-                linkId,
                 ownerId,
+                linkId,
                 null,
                 "https://github.com/new-project"
         );
@@ -273,8 +273,8 @@ public class ProjectLinkServiceTest {
 
         ProjectLink result = projectLinkService.updateProjectLink(
                 projectId,
-                linkId,
                 ownerId,
+                linkId,
                 "New Label",
                 "https://github.com/new-project"
         );
@@ -308,8 +308,8 @@ public class ProjectLinkServiceTest {
 
         assertThatThrownBy(() -> projectLinkService.updateProjectLink(
                 projectId,
-                linkId,
                 ownerId,
+                linkId,
                 "New Label",
                 null
         )).isInstanceOf(ProjectLinkNotFoundException.class);

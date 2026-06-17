@@ -3,9 +3,7 @@ package de.thm.swtp.api.links.service;
 
 import de.thm.swtp.api.exceptionhandling.exceptions.*;
 import de.thm.swtp.api.links.domain.UserProfileLink;
-import de.thm.swtp.api.links.entity.ProjectLinkEntity;
 import de.thm.swtp.api.links.entity.UserProfileLinkEntity;
-import de.thm.swtp.api.links.mapper.ProjectLinkMapper;
 import de.thm.swtp.api.links.mapper.UserProfileLinkMapper;
 import de.thm.swtp.api.links.repository.UserProfileLinkRepository;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
@@ -37,7 +35,7 @@ public class UserProfileLinkService {
     @Transactional
     public UserProfileLink createUserProfileLink(UUID userProfileId, UUID currentUserId, String label, String url) {
         UserProfile userProfile = getUserProfileOrThrowError(userProfileId);
-        checkUserProfileOwner(userProfile,currentUserId);
+        checkUserProfileOwner(userProfile, currentUserId);
 
 
         String cleanedLabel = label.trim();
@@ -61,10 +59,10 @@ public class UserProfileLinkService {
     @Transactional
     public UserProfileLink updateUserProfileLink(UUID userProfileId, UUID currentUserId, UUID linkId, String label, String url) {
         UserProfile userProfile = getUserProfileOrThrowError(userProfileId);
-        checkUserProfileOwner(userProfile,currentUserId);
+        checkUserProfileOwner(userProfile, currentUserId);
 
         UserProfileLinkEntity userProfileLinkEntity = getUserProfileLinkOrThrowError(linkId);
-        checkLinkBelongsToUserProfile(userProfileLinkEntity,userProfileId);
+        checkLinkBelongsToUserProfile(userProfileLinkEntity, userProfileId);
 
         if (label != null) {
             userProfileLinkEntity.setLabel(label.trim());
@@ -88,10 +86,10 @@ public class UserProfileLinkService {
     @Transactional
     public void deleteUserProfileLink(UUID userProfileId, UUID currentUserId, UUID linkId) {
         UserProfile userprofile = getUserProfileOrThrowError(userProfileId);
-        checkUserProfileOwner(userprofile,currentUserId);
+        checkUserProfileOwner(userprofile, currentUserId);
 
         UserProfileLinkEntity userProfileLinkEntity = getUserProfileLinkOrThrowError(linkId);
-        checkLinkBelongsToUserProfile(userProfileLinkEntity,userProfileId);
+        checkLinkBelongsToUserProfile(userProfileLinkEntity, userProfileId);
 
         userProfileLinkRepository.delete(userProfileLinkEntity);
     }
