@@ -1,6 +1,6 @@
 package de.thm.swtp.api.projectPost.ProjectPostController;
 
-import de.thm.swtp.api.projectPost.ProjectPostService;
+import de.thm.swtp.api.projectPost.service.ProjectPostService;
 import de.thm.swtp.api.projectPost.dto.CreateProjectPostRequest;
 import de.thm.swtp.api.projectPost.dto.ProjectPostResponse;
 import jakarta.validation.Valid;
@@ -22,7 +22,7 @@ public class ProjectPostController {
     @GetMapping
     public List<ProjectPostResponse> getPublishedPosts(@PathVariable UUID projectId, @AuthenticationPrincipal Jwt jwt) {
         UUID currentUserId = getCurrentUserId(jwt);
-        return projectPostService.getPublishedPostsForProject(projectId,currentUserId)
+        return projectPostService.getPublishedPostsForProject(projectId, currentUserId)
                 .stream()
                 .map(ProjectPostResponse::toResponse)
                 .toList();
@@ -34,7 +34,7 @@ public class ProjectPostController {
                                           @Valid @RequestBody CreateProjectPostRequest createProjectPostRequest) {
 
         UUID currentUserId = getCurrentUserId(jwt);
-        return ProjectPostResponse.toResponse(projectPostService.createProjectPost(projectId,currentUserId,
+        return ProjectPostResponse.toResponse(projectPostService.createProjectPost(projectId, currentUserId,
                 createProjectPostRequest.title(), createProjectPostRequest.content(),
                 createProjectPostRequest.contentFormat(), createProjectPostRequest.status()));
     }

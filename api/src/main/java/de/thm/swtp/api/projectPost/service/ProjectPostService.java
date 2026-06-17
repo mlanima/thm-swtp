@@ -1,4 +1,4 @@
-package de.thm.swtp.api.projectPost;
+package de.thm.swtp.api.projectPost.service;
 
 import de.thm.swtp.api.exceptionhandling.exceptions.InvalidProjectPostException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectPostAccessDeniedException;
@@ -50,12 +50,12 @@ public class ProjectPostService {
 
     @Transactional
     public ProjectPost createProjectPost(UUID projectId, UUID authorId, String title, String content, PostContentFormat contentFormat, ProjectPostStatus status) {
-        validateCreatePost(status,contentFormat);
+        validateCreatePost(status, contentFormat);
 
         ProjectEntity projectEntity = getProjectOrThrowError(projectId);
         UserProfile author = getUserOrThrowError(authorId);
 
-        checkCanCreatePost(projectEntity,authorId);
+        checkCanCreatePost(projectEntity, authorId);
 
         ProjectPostEntity projectPostEntity = ProjectPostEntity.builder()
                 .project(projectEntity)
@@ -82,7 +82,7 @@ public class ProjectPostService {
             case PUBLISHED -> {
                 if (!isProjectOwnerOrPostAuthor(postEntity, currentUserId)) {
                     throw new ProjectPostAccessDeniedException("Only the project owner or post author may access this post.");
-                };
+                }
                 return ProjectPostMapper.toDomain(postEntity);
             }
             default -> throw new InvalidProjectPostException("Invalid post status");

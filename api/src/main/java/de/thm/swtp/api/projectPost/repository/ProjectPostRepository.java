@@ -1,13 +1,9 @@
 package de.thm.swtp.api.projectPost.repository;
 
-import de.thm.swtp.api.projectLinks.entity.ProjectLinkEntity;
 import de.thm.swtp.api.projectPost.domain.ProjectPostStatus;
 import de.thm.swtp.api.projectPost.entity.ProjectPostEntity;
-import org.springframework.data.domain.Limit;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
