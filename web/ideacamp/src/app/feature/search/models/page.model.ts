@@ -9,10 +9,10 @@ export const PageSchema = <T extends z.ZodTypeAny>(item: T) =>
     size: z.number(),
   });
 
-export type Page<T> = {
+export interface Page<T> {
   content: T[];
   totalElements: number;
   totalPages: number;
   number: number;
   size: number;
-};
+}
