@@ -50,11 +50,12 @@ public class ProjectPostService {
 
     @Transactional
     public ProjectPost createProjectPost(UUID projectId, UUID authorId, String title, String content, PostContentFormat contentFormat, ProjectPostStatus status) {
+        validateCreatePost(status,contentFormat);
+
         ProjectEntity projectEntity = getProjectOrThrowError(projectId);
         UserProfile author = getUserOrThrowError(authorId);
 
         checkCanCreatePost(projectEntity,authorId);
-        validateCreatePost(status,contentFormat);
 
         ProjectPostEntity projectPostEntity = ProjectPostEntity.builder()
                 .project(projectEntity)
@@ -73,14 +74,17 @@ public class ProjectPostService {
     public ProjectPost publishProjectPost(UUID projectId, UUID postId, UUID currentUserId){
         ProjectPostEntity postEntity = getPostOrThrowError(postId);
 
-        if (!postEntity.getProject().getId().equals(projectId)) {
-            throw new ProjectPostNotFoundException(postId);
-        }
+        assertPostBelongsToProject(postEntity, projectId);
 
         switch (postEntity.getStatus()) {
             case DRAFT -> checkCanPublishDraft(postEntity, currentUserId);
             case ARCHIVED -> checkCanPublishArchivedPost(postEntity, currentUserId);
-            case PUBLISHED -> {return ProjectPostMapper.toDomain(postEntity);}
+            case PUBLISHED -> {
+                if (!isProjectOwnerOrPostAuthor(postEntity, currentUserId)) {
+                    throw new ProjectPostAccessDeniedException("Only the project owner or post author may access this post.");
+                };
+                return ProjectPostMapper.toDomain(postEntity);
+            }
             default -> throw new InvalidProjectPostException("Invalid post status");
         }
 
@@ -98,9 +102,7 @@ public class ProjectPostService {
     public ProjectPost archiveProjectPost(UUID projectId, UUID postId, UUID currentUserId) {
         ProjectPostEntity postEntity = getPostOrThrowError(postId);
 
-        if (!postEntity.getProject().getId().equals(projectId)) {
-            throw new ProjectPostNotFoundException(postId);
-        }
+        assertPostBelongsToProject(postEntity, projectId);
 
         checkCanArchivePost(postEntity, currentUserId);
 
@@ -118,9 +120,7 @@ public class ProjectPostService {
     public void deleteProjectPost(UUID projectId, UUID postId, UUID currentUserId) {
         ProjectPostEntity postEntity = getPostOrThrowError(postId);
 
-        if (!postEntity.getProject().getId().equals(projectId)) {
-            throw new ProjectPostNotFoundException(postId);
-        }
+        assertPostBelongsToProject(postEntity, projectId);
 
         checkCanDeletePost(postEntity, currentUserId);
         projectPostRepository.delete(postEntity);
@@ -214,6 +214,12 @@ public class ProjectPostService {
 
         if (contentFormat == null) {
             throw new InvalidProjectPostException("Post content format must not be null.");
+        }
+    }
+
+    private void assertPostBelongsToProject(ProjectPostEntity postEntity, UUID projectId){
+        if (!postEntity.getProject().getId().equals(projectId)) {
+            throw new ProjectPostNotFoundException(postEntity.getId());
         }
     }
 
