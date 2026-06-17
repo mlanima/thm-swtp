@@ -1,5 +1,5 @@
 #!/usr/bin/env bb
-;; /opt/stacks/swtp-infra/review-teardown.clj --namespace <namespace> --pr <pr-number>
+;; /opt/stacks/swtp-infra/review-teardown.bb --namespace <namespace> --pr <pr-number>
 ;;
 ;; Tears down a PR review environment. Called when a PR is closed or merged.
 ;;
@@ -44,11 +44,11 @@
         pr-num (let [s (str (:pr opts))]
                  (when-not (re-matches #"\d+" s)
                    (throw (ex-info (str "--pr must be a number, got: " s)
-                            {:usage "review-teardown.clj --namespace <namespace> --pr <pr-number>"})))
+                            {:usage "review-teardown.bb --namespace <namespace> --pr <pr-number>"})))
                  s)]
     (when (or (not (string? org)) (str/blank? org) (nil? pr-num))
       (throw (ex-info "Missing required args"
-               {:usage "review-teardown.clj --namespace <namespace> --pr <pr-number>"})))
+               {:usage "review-teardown.bb --namespace <namespace> --pr <pr-number>"})))
     {:org    org
      :pr-num pr-num}))
 

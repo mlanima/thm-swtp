@@ -1,8 +1,8 @@
 #!/usr/bin/env bb
-;; /opt/stacks/swtp-infra/dispatch.clj
+;; /opt/stacks/swtp-infra/dispatch.bb
 ;;
 ;; Forced command for the deploy SSH key in authorized_keys:
-;;   command="/opt/stacks/swtp-infra/dispatch.clj" ssh-ed25519 ...
+;;   command="/opt/stacks/swtp-infra/dispatch.bb" ssh-ed25519 ...
 ;;
 ;; Routes on SSH_ORIGINAL_COMMAND:
 ;;   (no command)                     -> deploy-dev (default)
@@ -52,7 +52,7 @@
 
 (defn- review-args
   "Validates positional `<namespace> <pr>` and translates them into the flag
-   form the review-*.clj scripts expect. Throws ex-info on bad shape."
+   form the review-*.bb scripts expect. Throws ex-info on bad shape."
   [subcommand tokens]
   (let [[org pr & extra] tokens]
     (when-not (and org (re-matches #"[A-Za-z0-9._-]+" org)
@@ -73,9 +73,9 @@
     (case head
       (nil "deploy-dev") [(str stacks-dir "/swtp-dev/deploy.bb")]
       "deploy-main"      [(str stacks-dir "/swtp-main/deploy.bb")]
-      "review-deploy"    (into [(str infra-dir "/review-deploy.clj")]
+      "review-deploy"    (into [(str infra-dir "/review-deploy.bb")]
                                (review-args "review-deploy" rest))
-      "review-teardown"  (into [(str infra-dir "/review-teardown.clj")]
+      "review-teardown"  (into [(str infra-dir "/review-teardown.bb")]
                                (review-args "review-teardown" rest))
       (throw (ex-info (str "Unknown command: " (pr-str cmd)) {:cmd cmd})))))
 

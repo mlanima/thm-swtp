@@ -1,5 +1,5 @@
 #!/usr/bin/env bb
-;; /opt/stacks/swtp-infra/review-deploy.clj --namespace <namespace> --pr <pr-number>
+;; /opt/stacks/swtp-infra/review-deploy.bb --namespace <namespace> --pr <pr-number>
 ;;
 ;; Features:
 ;; - clones the template DB into a per-PR schema
@@ -45,11 +45,11 @@
         pr-num   (let [s (str (:pr opts))]
                     (when-not (re-matches #"\d+" s)
                       (throw (ex-info (str "--pr must be a number, got: " s)
-                               {:usage "review-deploy.clj --namespace <namespace> --pr <pr-number>"})))
+                               {:usage "review-deploy.bb --namespace <namespace> --pr <pr-number>"})))
                     s)]
     (when (or (not (string? org)) (str/blank? org) (nil? pr-num))
       (throw (ex-info "Missing required args"
-               {:usage "review-deploy.clj --namespace <namespace> --pr <pr-number>"})))
+               {:usage "review-deploy.bb --namespace <namespace> --pr <pr-number>"})))
     {:org org
      :pr-num    pr-num}))
 
