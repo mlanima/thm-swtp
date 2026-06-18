@@ -103,7 +103,7 @@ jobs:
           PR: ${{ github.event.pull_request.number }}
         run: |
           MARKER="<!-- claude-sticky-review -->"
-          NOW="$(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          NOW="$(TZ=Europe/Berlin date '+%Y-%m-%d %H:%M:%S %Z')"
           if [ -f review.md ]; then
             CONTENT="$(cat review.md)"
           else

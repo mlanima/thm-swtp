@@ -122,7 +122,12 @@ jobs:
             if (hasBe) body += `| **Backend** | https://pr-${pr}-api.review.swtp-ss26.de |\n`;
             body += `| **Logs** | https://pr-${pr}-logs.review.swtp-ss26.de |\n`;
             body += `| **Dashboard** | https://status.swtp-ss26.de |\n`;
-            body += `\n_Aktualisiert: ${new Date().toISOString().slice(0,19).replace('T',' ')} UTC_`;
+            const now = new Intl.DateTimeFormat('sv-SE', {
+              timeZone: 'Europe/Berlin', year: 'numeric', month: '2-digit', day: '2-digit',
+              hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false,
+              timeZoneName: 'short',
+            }).format(new Date());
+            body += `\n_Aktualisiert: ${now}_`;
 
             const { data: comments } = await github.rest.issues.listComments({
               ...context.repo,
