@@ -49,12 +49,17 @@ jobs:
               ## Findings
               | Severity | Location | Issue |
               |---|---|---|
-              | 🔴 / 🟡 / 🟣 | [`path:line`](https://github.com/<REPO>/blob/<HEAD_SHA>/<path>#L<line>) | <short description> |
+              | 🔴 / 🟡 / 🟣 | [`File.java:line`](https://github.com/<REPO>/blob/<HEAD_SHA>/<full/path>#L<line>) | <short description> |
 
               ## Notes
               - <optional further remarks>
 
-            Use the HEAD SHA above to build stable blob permalinks to the exact lines.
+            Use the HEAD SHA above to build stable blob permalinks to the exact lines
+            (line ranges as `#L<start>-L<end>`).
+            IMPORTANT: the visible link text in the Location column must be ONLY the
+            file's base name plus line (e.g. `ProjectService.java:79-89`), never the
+            full path — this keeps the table narrow and readable without wide-layout
+            plugins. The full path belongs only inside the URL.
             If you find no issues, write a short `review.md` that says so.
             Write only the file — post nothing.
 
