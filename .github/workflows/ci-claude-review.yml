@@ -50,8 +50,8 @@ jobs:
             - ⚪ grau   = zur Kenntnis: Kontext, den ein Reviewer kennen sollte
                           (z.B. bewusste Verhaltensänderung, Abhängigkeit, unrelated
                           Change im Diff). Neutral, keine Aktion gefordert.
-            - 🟢 grün   = bemerkenswert, aber unkritisch: etwas Auffälliges, das bewusst
-                          oder sauber gelöst ist und der Reviewer NICHT prüfen muss.
+            - 🟢 grün   = nice, smart, clever oder anderweitig bemerkenswert, dabei
+                          aber völlig unkritisch.
             Gibt es nichts Graues/Grünes, lass diese Zeilen einfach weg.
 
             Poste KEINE GitHub-Kommentare und erstelle KEINE Inline-Review-Kommentare.
