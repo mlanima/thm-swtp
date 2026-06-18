@@ -32,16 +32,41 @@
 
 (def service-images (into {} (for [svc services] [svc (service-image svc)])))
 
-(let [before (into {} (for [svc services] [svc (image-id (get service-images svc))]))]
-  (sh ["docker" "compose" "-f" compose-file "pull"] {:dir script-dir})
-  (let [after (into {} (for [svc services] [svc (image-id (get service-images svc))]))]
-    (doseq [svc services]
-      (if (= (get before svc) (get after svc))
-        (log (str svc ": up-to-date"))
-        (log (str svc ": updated"))))))
+(def before (into {} (for [svc services] [svc (image-id (get service-images svc))])))
+
+;; Pull and actually check the result. A failed pull (e.g. missing tag in the
+;; registry) leaves the local image-id unchanged, which the old before/after
+;; comparison silently logged as "up-to-date".
+(def pull-result (sh ["docker" "compose" "-f" compose-file "pull"] {:dir script-dir}))
+(when-not (zero? (:exit pull-result))
+  (log (str "WARNING: 'docker compose pull' exited " (:exit pull-result)
+            (let [err (str/trim (str (:err pull-result)))]
+              (when (seq err) (str " — " err))))))
+
+(def after (into {} (for [svc services] [svc (image-id (get service-images svc))])))
+(def missing (filterv #(str/blank? (get after %)) services))
+
+(doseq [svc services]
+  (cond
+    (str/blank? (get after svc)) (log (str svc ": IMAGE MISSING (" (get service-images svc) ") — pull failed"))
+    (= (get before svc) (get after svc)) (log (str svc ": up-to-date"))
+    :else (log (str svc ": updated"))))
+
+;; No usable image -> restarting would fail or run a stale image. Bail out loudly
+;; with a non-zero exit so the caller (backup/CD) sees the failure.
+(when (seq missing)
+  (log (str "ABORT: missing image(s): " (str/join ", " missing) " — not restarting"))
+  (spit logfile "----------------------------------------\n" :append true)
+  (System/exit 1))
 
 (log "Restarting services")
-(sh ["docker" "compose" "-f" (str script-dir "/docker-compose.yml") "up" "-d"] {:dir script-dir})
+(def up-result (sh ["docker" "compose" "-f" compose-file "up" "-d"] {:dir script-dir}))
+(when-not (zero? (:exit up-result))
+  (log (str "ERROR: 'docker compose up -d' exited " (:exit up-result)
+            (let [err (str/trim (str (:err up-result)))]
+              (when (seq err) (str " — " err)))))
+  (spit logfile "----------------------------------------\n" :append true)
+  (System/exit 1))
 
 ;; ── Dashboard aktualisieren ──────────────────────────────────────────────────
 (defn update-dashboard! [path entry]
