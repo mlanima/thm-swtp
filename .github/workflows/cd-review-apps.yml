@@ -117,7 +117,7 @@ jobs:
             const hasFe = '${{ needs.build-frontend.result }}' === 'success';
 
             let body = '## 🚀 Review App\n\n';
-            body += '| | |\n|---|---|\n';
+            body += '| Service | URL |\n|---|---|\n';
             if (hasFe) body += `| **Frontend** | https://pr-${pr}.review.swtp-ss26.de |\n`;
             if (hasBe) body += `| **Backend** | https://pr-${pr}-api.review.swtp-ss26.de |\n`;
             body += `| **Logs** | https://pr-${pr}-logs.review.swtp-ss26.de |\n`;
