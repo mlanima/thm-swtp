@@ -16,6 +16,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
+      issues: write
       id-token: write
     steps:
       - uses: actions/checkout@v6
@@ -28,19 +29,94 @@ jobs:
           prompt: |
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ github.event.pull_request.number }}
+            HEAD SHA: ${{ github.event.pull_request.head.sha }}
 
-            Please review this pull request with a focus on:
-            - Code quality and best practices
-            - Potential bugs or issues
-            - Security implications
-            - Consistency with the existing code style in this repo
+            Reviewe diesen Pull Request mit Fokus auf:
+            - Codequalität und Best Practices
+            - mögliche Bugs oder Fehler
+            - Sicherheitsaspekte
+            - Konsistenz mit dem bestehenden Code-Stil im Repo
 
-            Note: The PR branch is already checked out in the current working directory.
+            Der PR-Branch ist bereits ausgecheckt. Nutze `gh pr diff` / `gh pr view`,
+            um ihn zu inspizieren.
 
-            Use `gh pr comment` for a top-level summary.
-            Use `mcp__github_inline_comment__create_inline_comment` (with `confirmed: true`)
-            to highlight specific lines that need attention.
-            Only post GitHub comments - don't submit review text as messages.
+            WICHTIG: Schreibe den gesamten Review auf Deutsch (Überschriften,
+            Beschreibungen, Anmerkungen). Code-Bezeichner bleiben natürlich englisch.
+
+            Severity-Ampel (Spalte "Ampel") — wähle pro Befund eines:
+            - 🔴 rot    = kritisch, muss vor dem Merge behoben werden (Bug, Security, Datenverlust)
+            - 🟠 orange = mittel, sollte behoben werden, aber nicht blockierend
+            - 🟡 gelb   = gering / Nit / Stil
+            - ⚪ grau   = zur Kenntnis: Kontext, den ein Reviewer kennen sollte
+                          (z.B. bewusste Verhaltensänderung, Abhängigkeit, unrelated
+                          Change im Diff). Neutral, keine Aktion gefordert.
+            - 🟢 grün   = nice, smart, clever oder anderweitig bemerkenswert, dabei
+                          aber völlig unkritisch.
+            Gibt es nichts Graues/Grünes, lass diese Zeilen einfach weg.
+
+            DB-Schema-Check: Dieses Projekt nutzt JPA mit `ddl-auto: update` (kein
+            Flyway/Liquibase) — Hibernate ergänzt nur neue Spalten/Tabellen, ändert
+            oder entfernt aber nichts Bestehendes. Wenn dieser PR das DB-Schema ändert
+            (geänderte `@Entity`-Klassen, neue/geänderte/entfernte `@Column`, `@Table`,
+            `@JoinColumn`, Relationen, Typänderungen, Constraints, persistierte Enums),
+            setze als ALLERLETZTE Zeile von `review.md` (nach den Anmerkungen) eine
+            Hinweiszeile genau so:
+              > ⚠️ @T0SCH **DB-Schema geändert:** <ein Satz, was sich in der DB ändert> — bitte das Schema der `swtp_template`-DB entsprechend manuell anpassen.
+            Ändert der PR das Schema nicht, lass diese Zeile komplett weg.
+
+            Poste KEINE GitHub-Kommentare und erstelle KEINE Inline-Review-Kommentare.
+            Schreibe stattdessen den vollständigen Review als Markdown in eine Datei
+            namens `review.md` im Repository-Root, mit folgender Struktur:
+
+              <1-3 Sätze Überblick>
+
+              ## Befunde
+              | Ampel | Ort | Befund |
+              |---|---|---|
+              | 🔴 / 🟠 / 🟡 / ⚪ / 🟢 | [`File.java:Zeile`](https://github.com/<REPO>/blob/<HEAD_SHA>/<voller/pfad>#L<zeile>) | <kurze Beschreibung> |
+
+              ## Anmerkungen
+              - <optionale weitere Hinweise>
+
+            Nutze die HEAD SHA oben für stabile Blob-Permalinks auf die exakten Zeilen
+            (Zeilenbereiche als `#L<start>-L<end>`).
+            WICHTIG: Der sichtbare Link-Text in der Spalte "Ort" darf NUR aus Dateiname
+            plus Zeile bestehen (z.B. `ProjectService.java:79-89`), niemals der volle
+            Pfad — das hält die Tabelle schmal und auch ohne Wide-Layout-Plugin lesbar.
+            Der volle Pfad gehört ausschließlich in die URL.
+            Füge KEINE eigene Top-Überschrift hinzu — Titel und Zeitstempel werden
+            automatisch ergänzt. Beginne direkt mit dem Überblick.
+            Wenn du nichts findest, schreibe eine kurze `review.md`, die das festhält.
+            Schreibe nur die Datei — poste nichts.
 
           claude_args: |
-            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"
+            --allowedTools "Write,Read,Glob,Grep,Bash(gh pr diff:*),Bash(gh pr view:*)"
+
+      # Upsert a single sticky comment with the review: find the marker-tagged
+      # comment and edit it in place, otherwise create it. No accumulation, no
+      # inline review wrappers, nothing to purge.
+      - name: Publish sticky review comment
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          MARKER="<!-- claude-sticky-review -->"
+          NOW="$(TZ=Europe/Berlin date '+%Y-%m-%d %H:%M:%S %Z')"
+          if [ -f review.md ]; then
+            CONTENT="$(cat review.md)"
+          else
+            # Review-Step abgebrochen/fehlgeschlagen: alte (jetzt veraltete) Summary
+            # nicht stehen lassen, sondern ehrlich markieren.
+            CONTENT="⚠️ Der Review für diesen Commit ist **nicht durchgelaufen** (abgebrochen oder fehlgeschlagen). Ein neuer Push startet ihn erneut."
+          fi
+          BODY="$MARKER"$'\n'"## 🔎 Review-Zusammenfassung"$'\n\n'"$CONTENT"$'\n\n'"---"$'\n'"*Aktualisiert: $NOW*"
+          id=$(gh api --paginate "repos/$REPO/issues/$PR/comments" \
+                 --jq ".[] | select(.user.login==\"github-actions[bot]\") | select(.body | contains(\"$MARKER\")) | .id" \
+               | head -n1)
+          if [ -n "$id" ]; then
+            jq -n --arg b "$BODY" '{body:$b}' | gh api -X PATCH "repos/$REPO/issues/comments/$id" --input -
+          else
+            jq -n --arg b "$BODY" '{body:$b}' | gh api -X POST "repos/$REPO/issues/$PR/comments" --input -
+          fi
