@@ -15,6 +15,12 @@ export class SuccessModal {
     this.closeModal.emit();
   }
 
+  @HostListener('document:keydown.enter', ['$event'])
+  handleEnter(event: Event) {
+    event.preventDefault();
+    this.close();
+  }
+
   @HostListener('document:keydown.escape', ['$event'])
   handleEscape(event: Event) {
     event.preventDefault();
