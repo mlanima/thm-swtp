@@ -52,14 +52,12 @@ jobs:
                           Change im Diff). Neutral, keine Aktion gefordert.
             - 🟢 grün   = bemerkenswert, aber unkritisch: etwas Auffälliges, das bewusst
                           oder sauber gelöst ist und der Reviewer NICHT prüfen muss.
-            Kein generisches Lob: 🟢 nur, wenn der Punkt konkret bemerkenswert ist.
             Gibt es nichts Graues/Grünes, lass diese Zeilen einfach weg.
 
             Poste KEINE GitHub-Kommentare und erstelle KEINE Inline-Review-Kommentare.
             Schreibe stattdessen den vollständigen Review als Markdown in eine Datei
             namens `review.md` im Repository-Root, mit folgender Struktur:
 
-              ## Zusammenfassung
               <1-3 Sätze Überblick>
 
               ## Befunde
@@ -76,6 +74,8 @@ jobs:
             plus Zeile bestehen (z.B. `ProjectService.java:79-89`), niemals der volle
             Pfad — das hält die Tabelle schmal und auch ohne Wide-Layout-Plugin lesbar.
             Der volle Pfad gehört ausschließlich in die URL.
+            Füge KEINE eigene Top-Überschrift hinzu — Titel und Zeitstempel werden
+            automatisch ergänzt. Beginne direkt mit dem Überblick.
             Wenn du nichts findest, schreibe eine kurze `review.md`, die das festhält.
             Schreibe nur die Datei — poste nichts.
 
@@ -93,10 +93,11 @@ jobs:
         run: |
           MARKER="<!-- claude-sticky-review -->"
           if [ ! -f review.md ]; then
-            echo "No review.md produced — nothing to publish."
+            echo "Keine review.md erzeugt — nichts zu veröffentlichen."
             exit 0
           fi
-          BODY="$MARKER"$'\n'"$(cat review.md)"
+          NOW="$(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          BODY="$MARKER"$'\n'"## 🔎 Review-Zusammenfassung"$'\n\n'"$(cat review.md)"$'\n\n'"---"$'\n'"*Aktualisiert: $NOW*"
           id=$(gh api --paginate "repos/$REPO/issues/$PR/comments" \
                  --jq ".[] | select(.user.login==\"github-actions[bot]\") | select(.body | contains(\"$MARKER\")) | .id" \
                | head -n1)
