@@ -1,9 +1,12 @@
-import {Component, Output, EventEmitter, Input, OnChanges,SimpleChanges, inject, OnDestroy, signal} from '@angular/core';
+import {Component, Output, EventEmitter, Input, OnChanges, SimpleChanges, inject, OnDestroy, signal} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {ProjectSettingsData, projectSettingsSchema} from '../schemas/project-create.schema';
+import {ProjectCreateData} from '../schemas/project-create.schema';
 import {FormErrors, mapZodErrors} from '../schemas/zod-error.helper';
-import { catchError, debounceTime, distinctUntilChanged, of, Subject, Subscription, switchMap, } from 'rxjs';
-import { ProjectService } from '../../project-site/project.service'
+import {catchError, debounceTime, distinctUntilChanged, of, Subject, Subscription, switchMap} from 'rxjs';
+import {ProjectService} from '../../project-site/project.service';
+import {generateProjectSlug} from '../project-url.utils';
+
 type SettingsFormFields = 'projectUrl' | 'isPrivateProject';
 
 @Component({
@@ -22,11 +25,11 @@ export class ProjectSettingsForm implements OnChanges, OnDestroy {
   private readonly projectUrlTerms = new Subject<string>();
   private readonly projectUrlSubscription: Subscription;
 
-  @Input() initialFormData?: Partial<ProjectSettingsData>;
+  @Input() initialFormData?: Partial<ProjectCreateData>;
   @Output() next = new EventEmitter<ProjectSettingsData>();
   @Output() back = new EventEmitter<ProjectSettingsData>();
 
-  formData = { projectUrl: '', isPrivateProject: false };
+  formData = {projectUrl: '', isPrivateProject: false};
   errors: FormErrors<SettingsFormFields> = {};
 
   isCheckingProjectUrl = signal(false);
@@ -34,21 +37,34 @@ export class ProjectSettingsForm implements OnChanges, OnDestroy {
   projectUrlExists = signal(false);
   projectUrlCheckError = signal<string | null>(null);
 
+  private urlManuallyChanged = false;
+
   constructor() {
     this.projectUrlSubscription = this.createProjectUrlSubscription();
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['initialFormData'] && this.initialFormData) {
+      const existingUrl = this.initialFormData.projectUrl ?? '';
+      const projectName = this.initialFormData.name ?? '';
+
       this.formData = {
-        projectUrl: this.initialFormData.projectUrl ?? '',
+        projectUrl: '',
         isPrivateProject: this.initialFormData.isPrivateProject ?? false,
       };
 
-      this.resetProjectUrlCheck();
+      this.urlManuallyChanged = false;
+
+      if (existingUrl) {
+        this.formData.projectUrl = existingUrl;
+        this.triggerUrlCheck(existingUrl);
+      } else if (projectName) {
+        const generatedUrl = generateProjectSlug(projectName);
+        this.formData.projectUrl = generatedUrl;
+        this.triggerUrlCheck(generatedUrl);
       }
     }
-
+  }
 
   ngOnDestroy() {
     this.projectUrlSubscription.unsubscribe();
@@ -79,8 +95,12 @@ export class ProjectSettingsForm implements OnChanges, OnDestroy {
   }
 
   onProjectUrlChange(projectUrl: string): void {
+    this.urlManuallyChanged = true;
     this.formData.projectUrl = projectUrl;
+    this.triggerUrlCheck(projectUrl);
+  }
 
+  private triggerUrlCheck(projectUrl: string): void {
     const cleanedUrl = projectUrl.trim();
 
     this.projectUrlExists.set(false);

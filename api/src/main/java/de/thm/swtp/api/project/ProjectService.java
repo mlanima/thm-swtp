@@ -79,11 +79,21 @@ public class ProjectService {
         UserProfile owner = userProfileRepository.findByUsername(username)
                 .orElseThrow(() -> new UserProfileNotFoundException(username));
 
+        String projectUrl;
+        if (request.projectUrl() == null || request.projectUrl().isBlank()) {
+            projectUrl = resolveUniqueUrl(ProjectUrlUtils.generateSlug(request.name()));
+        } else {
+            if (!ProjectUrlUtils.isValidUrl(request.projectUrl())) {
+                throw new InvalidProjectUrlException(request.projectUrl());
+            }
+            projectUrl = request.projectUrl();
+        }
+
         ProjectEntity project = ProjectEntity.builder()
                 .name(request.name())
                 .description(request.description())
                 .shortDescription(request.shortDescription())
-                .projectUrl(request.projectUrl())
+                .projectUrl(projectUrl)
                 .isPrivateProject(request.isPrivateProject())
                 .owner(owner)
                 .build();
@@ -93,6 +103,30 @@ public class ProjectService {
         createProjectInvites(saved, owner, request.memberIds());
 
         return toResponse(saved);
+    }
+
+    private String resolveUniqueUrl(String baseSlug) {
+        if (baseSlug == null || baseSlug.isBlank()) {
+            baseSlug = "projekt";
+        }
+        if (baseSlug.length() < 3) {
+            baseSlug = baseSlug + "-projekt";
+        }
+
+        if (!projectRepository.existsByProjectUrl(baseSlug)) {
+            return baseSlug;
+        }
+
+        int counter = 1;
+        String candidate;
+        do {
+            String suffix = "-" + counter;
+            int baseLength = Math.min(baseSlug.length(), 30 - suffix.length());
+            candidate = baseSlug.substring(0, baseLength) + suffix;
+            counter++;
+        } while (projectRepository.existsByProjectUrl(candidate) && counter <= 99);
+
+        return candidate;
     }
 
     @Transactional
@@ -197,6 +231,9 @@ public class ProjectService {
             project.setShortDescription(request.getShortDescription());
         }
         if (request.getProjectUrl() != null) {
+            if (!ProjectUrlUtils.isValidUrl(request.getProjectUrl())) {
+                throw new InvalidProjectUrlException(request.getProjectUrl());
+            }
             project.setProjectUrl(request.getProjectUrl());
         }
         project.setPrivateProject(request.isPrivateProject());
