@@ -96,18 +96,22 @@ jobs:
       # comment and edit it in place, otherwise create it. No accumulation, no
       # inline review wrappers, nothing to purge.
       - name: Publish sticky review comment
+        if: always()
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
           PR: ${{ github.event.pull_request.number }}
         run: |
           MARKER="<!-- claude-sticky-review -->"
-          if [ ! -f review.md ]; then
-            echo "Keine review.md erzeugt — nichts zu veröffentlichen."
-            exit 0
-          fi
           NOW="$(date -u '+%Y-%m-%d %H:%M:%S UTC')"
-          BODY="$MARKER"$'\n'"## 🔎 Review-Zusammenfassung"$'\n\n'"$(cat review.md)"$'\n\n'"---"$'\n'"*Aktualisiert: $NOW*"
+          if [ -f review.md ]; then
+            CONTENT="$(cat review.md)"
+          else
+            # Review-Step abgebrochen/fehlgeschlagen: alte (jetzt veraltete) Summary
+            # nicht stehen lassen, sondern ehrlich markieren.
+            CONTENT="⚠️ Der Review für diesen Commit ist **nicht durchgelaufen** (abgebrochen oder fehlgeschlagen). Ein neuer Push startet ihn erneut."
+          fi
+          BODY="$MARKER"$'\n'"## 🔎 Review-Zusammenfassung"$'\n\n'"$CONTENT"$'\n\n'"---"$'\n'"*Aktualisiert: $NOW*"
           id=$(gh api --paginate "repos/$REPO/issues/$PR/comments" \
                  --jq ".[] | select(.user.login==\"github-actions[bot]\") | select(.body | contains(\"$MARKER\")) | .id" \
                | head -n1)
