@@ -16,24 +16,12 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
+      issues: write
       id-token: write
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 1
-
-      # remove the previous Claude comments before each re-review so the PR
-      # history stays clean and resolved findings don't pile up.
-      - name: Purge previous Claude comments
-        env:
-          GH_TOKEN: ${{ github.token }}
-          REPO: ${{ github.repository }}
-          PR: ${{ github.event.pull_request.number }}
-        run: |
-          # Inline review comments from the Claude bot
-          gh api --paginate "repos/$REPO/pulls/$PR/comments" \
-            --jq '.[] | select(.user.login=="claude[bot]") | .id' \
-            | while read -r id; do gh api -X DELETE "repos/$REPO/pulls/comments/$id" || true; done
 
       - uses: anthropics/claude-code-action@v1
         with:
@@ -41,19 +29,58 @@ jobs:
           prompt: |
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ github.event.pull_request.number }}
+            HEAD SHA: ${{ github.event.pull_request.head.sha }}
 
-            Please review this pull request with a focus on:
+            Review this pull request with a focus on:
             - Code quality and best practices
             - Potential bugs or issues
             - Security implications
             - Consistency with the existing code style in this repo
 
-            Note: The PR branch is already checked out in the current working directory.
+            The PR branch is already checked out. Use `gh pr diff` / `gh pr view` to inspect it.
 
-            Use `gh pr comment` for a top-level summary.
-            Use `mcp__github_inline_comment__create_inline_comment` (with `confirmed: true`)
-            to highlight specific lines that need attention.
-            Only post GitHub comments - don't submit review text as messages.
+            Do NOT post any GitHub comments and do NOT create inline review comments.
+            Instead, write your complete review as Markdown to a file named `review.md`
+            in the repository root, using this structure:
+
+              ## Review summary
+              <1-3 sentence overview>
+
+              ## Findings
+              | Severity | Location | Issue |
+              |---|---|---|
+              | 🔴 / 🟡 / 🟣 | [`path:line`](https://github.com/<REPO>/blob/<HEAD_SHA>/<path>#L<line>) | <short description> |
+
+              ## Notes
+              - <optional further remarks>
+
+            Use the HEAD SHA above to build stable blob permalinks to the exact lines.
+            If you find no issues, write a short `review.md` that says so.
+            Write only the file — post nothing.
 
           claude_args: |
-            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"
+            --allowedTools "Write,Read,Glob,Grep,Bash(gh pr diff:*),Bash(gh pr view:*)"
+
+      # Upsert a single sticky comment with the review: find the marker-tagged
+      # comment and edit it in place, otherwise create it. No accumulation, no
+      # inline review wrappers, nothing to purge.
+      - name: Publish sticky review comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          MARKER="<!-- claude-sticky-review -->"
+          if [ ! -f review.md ]; then
+            echo "No review.md produced — nothing to publish."
+            exit 0
+          fi
+          BODY="$MARKER"$'\n'"$(cat review.md)"
+          id=$(gh api --paginate "repos/$REPO/issues/$PR/comments" \
+                 --jq ".[] | select(.user.login==\"github-actions[bot]\") | select(.body | contains(\"$MARKER\")) | .id" \
+               | head -n1)
+          if [ -n "$id" ]; then
+            jq -n --arg b "$BODY" '{body:$b}' | gh api -X PATCH "repos/$REPO/issues/comments/$id" --input -
+          else
+            jq -n --arg b "$BODY" '{body:$b}' | gh api -X POST "repos/$REPO/issues/$PR/comments" --input -
+          fi
