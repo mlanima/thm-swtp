@@ -20,3 +20,6 @@ spring:
         jwt:
           issuer-uri: https://auth.swtp-ss26.de/realms/swtp
 
+
+server:
+  forward-headers-strategy: framework

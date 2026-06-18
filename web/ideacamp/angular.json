@@ -39,7 +39,12 @@
             "server": "src/main.server.ts",
             "outputMode": "server",
             "security": {
-              "allowedHosts": ["localhost", "dev.swtp-ss26.de"]
+              "allowedHosts": [
+                "localhost",
+                "dev.swtp-ss26.de",
+                "www.swtp-ss26.de",
+                "*.review.swtp-ss26.de"
+              ]
             },
             "ssr": {
               "entry": "src/server.ts"
