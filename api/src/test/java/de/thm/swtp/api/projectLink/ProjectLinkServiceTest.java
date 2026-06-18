@@ -2,6 +2,7 @@ package de.thm.swtp.api.projectLink;
 
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectLinkAlreadyExistsException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectLinkNotFoundException;
+import de.thm.swtp.api.links.domain.LinkVisibility;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
 import de.thm.swtp.api.project.exception.ExceptionProjectEditNotAllowed;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -35,10 +37,12 @@ public class ProjectLinkServiceTest {
     private UUID ownerId;
     private UUID otherUserId;
     private UUID linkId;
+    private UUID memberId;
 
     private ProjectEntity project;
     private ProjectEntity otherProject;
     private UserProfile owner;
+    private UserProfile member;
 
     String url= "https://github.com/mlanima/thm-swtp";
     String label = "Github";
@@ -58,13 +62,19 @@ public class ProjectLinkServiceTest {
         ownerId = UUID.randomUUID();
         otherUserId = UUID.randomUUID();
         linkId = UUID.randomUUID();
+        memberId = UUID.randomUUID();
 
         owner = new UserProfile();
         owner.setKeycloakId(ownerId);
 
+        member = new UserProfile();
+        member.setKeycloakId(memberId);
+
         project = new ProjectEntity();
         project.setId(projectId);
         project.setOwner(owner);
+        project.setMembers(new HashSet<>());
+        project.getMembers().add(member);
 
         otherProject = new ProjectEntity();
         otherProject.setId(otherProjectId);
@@ -93,7 +103,8 @@ public class ProjectLinkServiceTest {
                 projectId,
                 ownerId,
                 label,
-                url
+                url,
+                LinkVisibility.PUBLIC
         );
 
         assertThat(result).isNotNull();
@@ -101,6 +112,7 @@ public class ProjectLinkServiceTest {
         assertThat(result.getProjectId()).isEqualTo(projectId);
         assertThat(result.getLabel()).isEqualTo(label);
         assertThat(result.getUrl()).isEqualTo(url);
+        assertThat(result.getVisibility()).isEqualTo(LinkVisibility.PUBLIC);
 
         verify(projectLinkRepository).save(any(ProjectLinkEntity.class));
     }
@@ -113,7 +125,8 @@ public class ProjectLinkServiceTest {
                 projectId,
                 ownerId,
                 label,
-                url
+                url,
+                LinkVisibility.PUBLIC
         )).isInstanceOf(ProjectNotFoundException.class);
 
         verify(projectLinkRepository, never()).save(any());
@@ -127,7 +140,8 @@ public class ProjectLinkServiceTest {
                 projectId,
                 otherUserId,
                 label,
-                url
+                url,
+                LinkVisibility.PUBLIC
         )).isInstanceOf(ExceptionProjectEditNotAllowed.class);
 
         verify(projectLinkRepository, never()).save(any());
@@ -145,44 +159,136 @@ public class ProjectLinkServiceTest {
                 projectId,
                 ownerId,
                 label,
-                url
+                url,
+                LinkVisibility.PUBLIC
         )).isInstanceOf(ProjectLinkAlreadyExistsException.class);
 
         verify(projectLinkRepository, never()).save(any());
     }
 
     @Test
-    void getProjectLinks_shouldReturnProjectLinks_whenProjectExists() {
-        ProjectLinkEntity link = ProjectLinkEntity.builder()
-                .id(linkId)
+    void getProjectLinks_shouldReturnAllLinks_whenCurrentUserIsProjectOwner() {
+        ProjectLinkEntity publicLink = ProjectLinkEntity.builder()
+                .id(UUID.randomUUID())
                 .project(project)
                 .label(label)
                 .url(url)
+                .visibility(LinkVisibility.PUBLIC)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        ProjectLinkEntity privateLink = ProjectLinkEntity.builder()
+                .id(UUID.randomUUID())
+                .project(project)
+                .label("Private Link")
+                .url("https://private-url-github.com")
+                .visibility(LinkVisibility.PRIVATE)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
 
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
         when(projectLinkRepository.findByProjectIdOrderByCreatedAtAsc(projectId))
-                .thenReturn(List.of(link));
+                .thenReturn(List.of(publicLink, privateLink));
 
-        List<ProjectLink> result = projectLinkService.getProjectLinks(projectId);
+        List<ProjectLink> result = projectLinkService.getProjectLinks(projectId, ownerId);
+
+        assertThat(result).hasSize(2);
+        assertThat(result)
+                .extracting(ProjectLink::getVisibility)
+                .containsExactly(LinkVisibility.PUBLIC, LinkVisibility.PRIVATE);
+
+        verify(projectLinkRepository).findByProjectIdOrderByCreatedAtAsc(projectId);
+        verify(projectLinkRepository, never()).findByProjectIdAndVisibilityOrderByCreatedAtAsc(any(), any());
+    }
+
+    @Test
+    void getProjectLinks_shouldReturnAllLinks_whenCurrentUserIsProjectMember() {
+        ProjectLinkEntity privateLink = ProjectLinkEntity.builder()
+                .id(linkId)
+                .project(project)
+                .label(label)
+                .url(url)
+                .visibility(LinkVisibility.PRIVATE)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(projectLinkRepository.findByProjectIdOrderByCreatedAtAsc(projectId))
+                .thenReturn(List.of(privateLink));
+
+        List<ProjectLink> result = projectLinkService.getProjectLinks(projectId, memberId);
 
         assertThat(result).hasSize(1);
-        assertThat(result.getFirst().getId()).isEqualTo(linkId);
-        assertThat(result.getFirst().getProjectId()).isEqualTo(projectId);
-        assertThat(result.getFirst().getLabel()).isEqualTo(label);
-        assertThat(result.getFirst().getUrl()).isEqualTo(url);
+        assertThat(result.getFirst().getVisibility()).isEqualTo(LinkVisibility.PRIVATE);
+
+        verify(projectLinkRepository).findByProjectIdOrderByCreatedAtAsc(projectId);
+        verify(projectLinkRepository, never()).findByProjectIdAndVisibilityOrderByCreatedAtAsc(any(), any());
+    }
+
+    @Test
+    void getProjectLinks_shouldReturnOnlyPublicLinks_whenCurrentUserIsNotProjectContributor() {
+        ProjectLinkEntity publicLink = ProjectLinkEntity.builder()
+                .id(linkId)
+                .project(project)
+                .label(label)
+                .url(url)
+                .visibility(LinkVisibility.PUBLIC)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(projectLinkRepository.findByProjectIdAndVisibilityOrderByCreatedAtAsc(
+                projectId,
+                LinkVisibility.PUBLIC
+        )).thenReturn(List.of(publicLink));
+
+        List<ProjectLink> result = projectLinkService.getProjectLinks(projectId, otherUserId);
+
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst().getVisibility()).isEqualTo(LinkVisibility.PUBLIC);
+
+        verify(projectLinkRepository).findByProjectIdAndVisibilityOrderByCreatedAtAsc(projectId, LinkVisibility.PUBLIC);
+        verify(projectLinkRepository, never()).findByProjectIdOrderByCreatedAtAsc(projectId);
     }
 
     @Test
     void getProjectLinks_shouldThrowProjectNotFound_whenProjectDoesNotExist() {
         when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> projectLinkService.getProjectLinks(projectId))
+        assertThatThrownBy(() -> projectLinkService.getProjectLinks(projectId, ownerId))
                 .isInstanceOf(ProjectNotFoundException.class);
 
         verify(projectLinkRepository, never()).findByProjectIdOrderByCreatedAtAsc(any());
+        verify(projectLinkRepository, never()).findByProjectIdAndVisibilityOrderByCreatedAtAsc(any(), any());
+    }
+
+    @Test
+    void createProjectLink_shouldDefaultToPublic_whenVisibilityIsNull() {
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(projectLinkRepository.existsByProjectIdAndUrlIgnoreCase(projectId, url)).thenReturn(false);
+
+        when(projectLinkRepository.save(any(ProjectLinkEntity.class)))
+                .thenAnswer(invocation -> {
+                    ProjectLinkEntity entity = invocation.getArgument(0);
+                    entity.setId(linkId);
+                    entity.setCreatedAt(LocalDateTime.now());
+                    entity.setUpdatedAt(LocalDateTime.now());
+                    return entity;
+                });
+
+        ProjectLink result = projectLinkService.createProjectLink(
+                projectId,
+                ownerId,
+                label,
+                url,
+                null
+        );
+
+        assertThat(result.getVisibility()).isEqualTo(LinkVisibility.PUBLIC);
     }
 
     @Test
@@ -192,6 +298,7 @@ public class ProjectLinkServiceTest {
                 .project(project)
                 .label(label)
                 .url(url)
+                .visibility(LinkVisibility.PUBLIC)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
@@ -205,6 +312,7 @@ public class ProjectLinkServiceTest {
                 ownerId,
                 linkId,
                 "New Label",
+                null,
                 null
         );
 
@@ -222,6 +330,7 @@ public class ProjectLinkServiceTest {
                 .project(project)
                 .label(label)
                 .url(url)
+                .visibility(LinkVisibility.PUBLIC)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
@@ -239,7 +348,8 @@ public class ProjectLinkServiceTest {
                 ownerId,
                 linkId,
                 null,
-                "https://github.com/new-project"
+                "https://github.com/new-project",
+                null
         );
 
         assertThat(result.getLabel()).isEqualTo(label);
@@ -259,6 +369,7 @@ public class ProjectLinkServiceTest {
                 .project(project)
                 .label(label)
                 .url(label)
+                .visibility(LinkVisibility.PUBLIC)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
@@ -276,7 +387,8 @@ public class ProjectLinkServiceTest {
                 ownerId,
                 linkId,
                 "New Label",
-                "https://github.com/new-project"
+                "https://github.com/new-project",
+                null
         );
 
         assertThat(result.getLabel()).isEqualTo("New Label");
@@ -291,9 +403,10 @@ public class ProjectLinkServiceTest {
 
         assertThatThrownBy(() -> projectLinkService.updateProjectLink(
                 projectId,
-                linkId,
                 otherUserId,
+                linkId,
                 "New Label",
+                null,
                 null
         )).isInstanceOf(ExceptionProjectEditNotAllowed.class);
 
@@ -311,11 +424,43 @@ public class ProjectLinkServiceTest {
                 ownerId,
                 linkId,
                 "New Label",
+                null,
                 null
         )).isInstanceOf(ProjectLinkNotFoundException.class);
 
         verify(projectLinkRepository, never()).save(any());
     }
+
+    @Test
+    void updateProjectLink_shouldUpdateVisibility_whenVisibilityIsProvided() {
+        ProjectLinkEntity link = ProjectLinkEntity.builder()
+                .id(linkId)
+                .project(project)
+                .label(label)
+                .url(url)
+                .visibility(LinkVisibility.PUBLIC)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(projectLinkRepository.findById(linkId)).thenReturn(Optional.of(link));
+        when(projectLinkRepository.save(link)).thenReturn(link);
+
+        ProjectLink result = projectLinkService.updateProjectLink(
+                projectId,
+                ownerId,
+                linkId,
+                null,
+                null,
+                LinkVisibility.PRIVATE
+        );
+
+        assertThat(result.getVisibility()).isEqualTo(LinkVisibility.PRIVATE);
+        verify(projectLinkRepository).save(link);
+    }
+
+
 
     @Test
     void deleteProjectLink_shouldDeleteLink_whenCurrentUserIsOwnerAndLinkBelongsToProject() {
@@ -324,6 +469,7 @@ public class ProjectLinkServiceTest {
                 .project(project)
                 .label(label)
                 .url(url)
+                .visibility(LinkVisibility.PUBLIC)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
@@ -342,8 +488,8 @@ public class ProjectLinkServiceTest {
 
         assertThatThrownBy(() -> projectLinkService.deleteProjectLink(
                 projectId,
-                linkId,
-                otherUserId
+                otherUserId,
+                linkId
         )).isInstanceOf(ExceptionProjectEditNotAllowed.class);
 
         verify(projectLinkRepository, never()).findById(any());

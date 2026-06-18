@@ -1,7 +1,8 @@
 package de.thm.swtp.api.links.controller;
 
-import de.thm.swtp.api.links.dto.CreateLinkRequest;
-import de.thm.swtp.api.links.dto.UpdateLinkRequest;
+
+import de.thm.swtp.api.links.dto.CreateUserProfileLinkRequest;
+import de.thm.swtp.api.links.dto.UpdateUserProfileLinkRequest;
 import de.thm.swtp.api.links.dto.UserProfileLinkResponse;
 import de.thm.swtp.api.links.service.UserProfileLinkService;
 import jakarta.validation.Valid;
@@ -31,20 +32,20 @@ public class UserProfileLinkController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public UserProfileLinkResponse createUserProfileLink(@PathVariable UUID userId, @AuthenticationPrincipal Jwt jwt,
-                                                 @Valid @RequestBody CreateLinkRequest createLinkRequest) {
+                                                         @Valid @RequestBody CreateUserProfileLinkRequest createUserProfileLinkRequest) {
         UUID currentUserId = getCurrentUserId(jwt);
 
         return UserProfileLinkResponse.toResponse(userProfileLinkService.createUserProfileLink(userId, currentUserId,
-                createLinkRequest.label(), createLinkRequest.url()));
+                createUserProfileLinkRequest.label(), createUserProfileLinkRequest.url()));
     }
 
     @PatchMapping("/{linkId}")
     public UserProfileLinkResponse updateUserProfileLink(@PathVariable UUID userId, @AuthenticationPrincipal Jwt jwt, @PathVariable UUID linkId,
-                                                 @Valid @RequestBody UpdateLinkRequest updateLinkRequest) {
+                                                 @Valid @RequestBody UpdateUserProfileLinkRequest updateUserProfileLinkRequest) {
         UUID currentUserId = getCurrentUserId(jwt);
 
         return UserProfileLinkResponse.toResponse(userProfileLinkService.updateUserProfileLink(userId, currentUserId,
-                linkId, updateLinkRequest.label(), updateLinkRequest.url()));
+                linkId, updateUserProfileLinkRequest.label(), updateUserProfileLinkRequest.url()));
     }
 
     @DeleteMapping("/{linkId}")
