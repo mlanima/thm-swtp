@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'app-success-modal',
@@ -13,5 +13,11 @@ export class SuccessModal {
 
   close(): void {
     this.closeModal.emit();
+  }
+
+  @HostListener('document:keydown.escape', ['$event'])
+  handleEscape(event: Event) {
+    event.preventDefault();
+    this.close();
   }
 }
