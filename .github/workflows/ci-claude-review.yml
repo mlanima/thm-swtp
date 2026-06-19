@@ -115,11 +115,15 @@ jobs:
             CONTENT="⚠️ Der Review für diesen Commit ist **nicht durchgelaufen** (abgebrochen oder fehlgeschlagen). Ein neuer Push startet ihn erneut."
           fi
           BODY="$MARKER"$'\n'"## 🔎 Review-Zusammenfassung"$'\n\n'"$CONTENT"$'\n\n'"---"$'\n'"*Aktualisiert: $NOW*"
-          id=$(gh api --paginate "repos/$REPO/issues/$PR/comments" \
-                 --jq ".[] | select(.user.login==\"github-actions[bot]\") | select(.body | contains(\"$MARKER\")) | .id" \
-               | head -n1)
-          if [ -n "$id" ]; then
-            jq -n --arg b "$BODY" '{body:$b}' | gh api -X PATCH "repos/$REPO/issues/comments/$id" --input -
+          # Alle Marker-Kommentare holen, aufsteigend nach id sortieren.
+          # Den ältesten updaten (positionsstabil), alle neueren Duplikate löschen.
+          mapfile -t ids < <(gh api --paginate "repos/$REPO/issues/$PR/comments" \
+            --jq "[ .[] | select(.user.login==\"github-actions[bot]\") | select(.body | contains(\"$MARKER\")) ] | sort_by(.id) | .[].id")
+          if [ ${#ids[@]} -gt 0 ]; then
+            jq -n --arg b "$BODY" '{body:$b}' | gh api -X PATCH "repos/$REPO/issues/comments/${ids[0]}" --input -
+            for dup_id in "${ids[@]:1}"; do
+              gh api -X DELETE "repos/$REPO/issues/comments/$dup_id"
+            done
           else
             jq -n --arg b "$BODY" '{body:$b}' | gh api -X POST "repos/$REPO/issues/$PR/comments" --input -
           fi
