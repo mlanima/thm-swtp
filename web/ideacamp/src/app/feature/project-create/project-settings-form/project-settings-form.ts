@@ -55,7 +55,7 @@ export class ProjectSettingsForm implements OnChanges, OnDestroy {
         this.formData.projectUrl = existingUrl;
         this.triggerUrlCheck(existingUrl);
       } else if (projectName) {
-        const generatedUrl = generateProjectUrl(projectName);
+        const generatedUrl = generateProjectUrl(projectName) || 'projekt';
         this.formData.projectUrl = generatedUrl;
         this.triggerUrlCheck(generatedUrl);
       }

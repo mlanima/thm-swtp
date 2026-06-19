@@ -86,6 +86,9 @@ public class ProjectService {
             if (!ProjectUrlUtils.isValidUrl(request.projectUrl())) {
                 throw new ExceptionInvalidProjectUrl(request.projectUrl());
             }
+            if (projectRepository.existsByProjectUrl(request.projectUrl())) {
+                throw new ExceptionProjectUrlAlreadyExists(request.projectUrl());
+            }
             projectUrl = request.projectUrl();
         }
 
@@ -127,7 +130,7 @@ public class ProjectService {
         } while (projectRepository.existsByProjectUrl(candidate) && counter <= 99);
 
         if (projectRepository.existsByProjectUrl(candidate)) {
-            throw new RuntimeException("Keine eindeutige Projekt-URL für \"" + baseSlug + "\" gefunden.");
+            throw new ExceptionProjectUrlGenerationFailed(baseSlug);
         }
 
         return candidate;

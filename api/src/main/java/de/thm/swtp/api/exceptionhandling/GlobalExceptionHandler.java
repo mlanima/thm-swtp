@@ -171,4 +171,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
     }
+
+    @ExceptionHandler(ExceptionProjectUrlGenerationFailed.class)
+    public ResponseEntity<ErrorResponse> handleProjectUrlGenerationFailed(ExceptionProjectUrlGenerationFailed ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ErrorResponse.of(500, "Internal Server Error", ex.getMessage()));
+    }
 }
