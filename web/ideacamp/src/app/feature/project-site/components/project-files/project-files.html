@@ -1,0 +1,82 @@
+<div class="rounded-2xl bg-white p-5 shadow-sm">
+  <div class="mb-4 flex items-center justify-between">
+    <h3 class="text-sm font-semibold text-slate-700">
+      Dateien
+    </h3>
+
+    @if (isOwner) {
+      <label
+        class="cursor-pointer rounded-md px-3 text-sm text-slate-500 transition hover:bg-slate-100 hover:text-lime-500">
+        + Hochladen
+        <input
+          type="file"
+          class="hidden"
+          accept=".pdf,.png,.jpg,.jpeg,.docx,.txt,.md"
+          (change)="onFileSelected($event)"
+        />
+      </label>
+    }
+  </div>
+
+  @if (errorMessage()) {
+    <div class="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  @if (isOwner) {
+    <div
+      class="mb-4 rounded-xl border-2 border-dashed border-slate-200 p-4 text-center text-sm text-slate-400 transition hover:border-lime-300 hover:text-lime-500"
+      (dragover)="onDragOver($event)"
+      (drop)="onDrop($event)">
+      @if (isUploading()) {
+        Wird hochgeladen…
+      } @else {
+        Datei hierher ziehen
+      }
+    </div>
+  }
+
+  @if (isLoading()) {
+    <p class="text-sm text-slate-500">
+      Dateien werden geladen...
+    </p>
+  } @else if (files().length === 0) {
+    <p class="text-sm text-slate-400">
+      Keine Dateien vorhanden.
+    </p>
+  } @else {
+    <div class="space-y-3 text-sm text-slate-600">
+      @for (file of files(); track file.id) {
+        <div class="group flex items-center justify-between gap-3 rounded-xl p-2 transition hover:bg-slate-50">
+          <div class="min-w-0 flex-1">
+            <p class="truncate font-medium">{{ file.originalName }}</p>
+            <p class="truncate text-xs text-slate-400">
+              {{ formatFileSize(file.sizeBytes) }} · {{ formatDate(file.createdAt) }}
+            </p>
+          </div>
+
+          <div class="flex shrink-0 gap-1 opacity-0 transition group-hover:opacity-100">
+            <a
+              [href]="downloadUrl(file.id)"
+              download
+              class="rounded-md px-2 py-1 text-sm text-slate-400 hover:bg-slate-100 hover:text-lime-500"
+              aria-label="Datei herunterladen">
+              ↓
+            </a>
+
+            @if (isOwner) {
+              <button
+                type="button"
+                (click)="deleteFile(file.id)"
+                class="rounded-md px-2 py-1 text-sm text-slate-400 hover:bg-red-50 hover:text-red-500"
+                aria-label="Datei löschen">
+                ×
+              </button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
