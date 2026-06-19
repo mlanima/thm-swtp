@@ -30,7 +30,7 @@
     class="relative z-10 inline-flex items-center gap-1.5 rounded-md px-4 py-1.5 text-sm font-medium transition-colors duration-300"
     [class]="activeFilter() === 'all' ? 'text-white' : 'text-slate-500 hover:text-slate-700'"
   >
-    Alle Projekte
+    {{ 'MYPROJECTS.FILTER_ALL' | translate }}
   </button>
   <button
     #btnMy
@@ -38,6 +38,6 @@
     class="relative z-10 inline-flex items-center rounded-md px-4 py-1.5 text-sm font-medium transition-colors duration-300"
     [class]="activeFilter() === 'my' ? 'text-white' : 'text-slate-500 hover:text-slate-700'"
   >
-    Im Besitz
+    {{ 'MYPROJECTS.FILTER_OWNED' | translate }}
   </button>
 </div>

@@ -1,9 +1,11 @@
 import { Component, input, output, ChangeDetectionStrategy } from '@angular/core';
 import { ProjectInviteResponse } from '../../../../models/project-invite.model';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-invitation-card',
   standalone: true,
+  imports: [TranslatePipe],
   templateUrl: './invitation-card.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

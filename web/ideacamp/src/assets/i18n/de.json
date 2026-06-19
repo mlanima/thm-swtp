@@ -13,7 +13,8 @@
     "EDIT": "Bearbeiten",
     "DELETE": "Löschen",
     "LOADING": "Wird geladen...",
-    "ERROR": "Fehler"
+    "ERROR": "Fehler",
+    "CONTINUE": "Weiter"
   },
   "LANGUAGE": {
     "GERMAN": "Deutsch",
@@ -23,5 +24,49 @@
     "H1": "Ideen teilen.\nTeams finden.\nProjekte verwirklichen.",
     "P": "Vernetze dich mit kreativen Köpfen und verwandle Ideen in erfolgreiche Zusammenarbeit.",
     "BUTTON": "Logge dich jetzt ein, um Projekte zu entdecken, dein Profil zu bearbeiten und eigene Ideen zu teilen."
+  },
+  "AUTH": {
+    "P1": "Erfolgreich!",
+    "H1": "Willkommen bei IdeaCamp",
+    "P2": "Was hast du heute vor? Erstelle dein erstes Projekt, entdecke spannende Ideen oder verbinde dich mit anderen kreativen Köpfen. Dein Abenteuer beginnt hier!"
+  },
+  "MYPROJECTS": {
+    "TITLE": "Meine Projekte",
+    "CREATE_PROJECT": "Projekt erstellen",
+    "PROJECTS": "Projekte",
+    "OWNED_PROJECTS_COUNT_LABEL": "Projekte im Besitz",
+
+    "INVITATIONS": "Projekteinladungen",
+    "INVITED_BY": "Eingeladen von:",
+    "ACCEPT": "Annehmen",
+    "DECLINE": "Ablehnen",
+
+    "NO_SHORT_DESCRIPTION": "Keine Kurzbeschreibung.",
+    "PRIVATE": "Privat",
+    "PUBLIC": "Öffentlich",
+    "OWNER": "Gründer",
+
+    "FILTER_ALL": "Alle Projekte",
+    "FILTER_OWNED": "Im Besitz",
+
+    "LOADING": "Deine Projekte werden geladen…",
+    "EMPTY_TITLE": "Noch keine Projekte",
+    "EMPTY_DESCRIPTION": "Sobald du dein erstes Projekt erstellst, erscheint es hier."
+  },
+  "USERPROFILE": {
+    "LOADING": "Profil lädt...",
+
+    "NO_TITLE": "Kein Titel vorhanden",
+    "NO_LOCATION": "Kein Standort vorhanden",
+
+    "PROFILE_INFORMATION": "Profilinformationen",
+    "EDIT_PROFILE_INFORMATION": "Profilinformationen bearbeiten",
+    "NO_INFORMATION": "Keine Informationen.",
+
+    "EXPERIENCE": "Erfahrung",
+    "EDIT_EXPERIENCE": "Erfahrung bearbeiten",
+    "NO_EXPERIENCE": "Keine Erfahrung.",
+
+    "PROFILE_UPDATED": "Profil erfolgreich geändert."
   }
 }

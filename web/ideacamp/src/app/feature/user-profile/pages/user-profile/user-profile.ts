@@ -3,6 +3,7 @@ import { Component, OnInit, OnDestroy, inject, PLATFORM_ID, signal } from '@angu
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe } from '@ngx-translate/core';
 
 import { ProfileInformation } from '../../components/profile-information/profile-information';
 import { ProfileBanner } from '../../components/profile-banner/profile-banner';
@@ -27,7 +28,7 @@ interface ProfileViewState {
 @Component({
   selector: 'app-user-profile',
   standalone: true,
-  imports: [ProfileInformation, ProfileBanner, FormsModule, ProfileTagListComponent, SuccessModal],
+  imports: [ProfileInformation, ProfileBanner, FormsModule, ProfileTagListComponent, SuccessModal, TranslatePipe],
   templateUrl: './user-profile.html',
 })
 export class UserProfile implements OnInit, OnDestroy {

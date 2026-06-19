@@ -2,11 +2,12 @@ import { Component, OnInit, signal, inject, ChangeDetectionStrategy } from '@ang
 import { ProjectInvitationService } from '../../services/project-invitation.service';
 import { ProjectInviteResponse } from '../../../../models/project-invite.model';
 import { InvitationCard } from '../invitation-card/invitation-card';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-invitations-section',
   standalone: true,
-  imports: [InvitationCard],
+  imports: [InvitationCard, TranslatePipe],
   templateUrl: './invitations-section.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: [`

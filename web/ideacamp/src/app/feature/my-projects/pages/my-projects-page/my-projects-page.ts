@@ -7,11 +7,12 @@ import { SearchService } from '../../../search/services/search.service';
 import { ProjectFilter } from '../../components/project-filter/project-filter';
 import { ProjectList } from '../../components/project-list/project-list';
 import { InvitationsSection } from '../../components/invitations-section/invitations-section';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-my-projects-page',
   standalone: true,
-  imports: [RouterLink, ProjectFilter, ProjectList, InvitationsSection],
+  imports: [RouterLink, ProjectFilter, ProjectList, InvitationsSection, TranslatePipe],
   templateUrl: './my-projects-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
