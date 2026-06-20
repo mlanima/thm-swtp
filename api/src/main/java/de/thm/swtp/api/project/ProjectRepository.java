@@ -33,4 +33,5 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, UUID> {
 
     boolean existsByProjectUrl(String projectUrl);
 
+    boolean existsByIdAndIsPrivateProjectFalse(UUID id);
 }

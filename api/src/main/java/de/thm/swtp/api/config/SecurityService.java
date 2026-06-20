@@ -37,7 +37,7 @@ public class SecurityService {
             return false;
         }
         UUID currentUserId = getCurrentUserId(authentication);
-        return projectRepository.existsByIdAndMembersKeycloakId(projectId,currentUserId);
+        return projectRepository.existsByIdAndOwnerKeycloakId(projectId,currentUserId);
     }
 
     public boolean isProjectMember(UUID projectId, Authentication authentication) {
@@ -48,9 +48,53 @@ public class SecurityService {
         return projectRepository.existsByIdAndMembersKeycloakId(projectId,currentUserId);
     }
 
-    public boolean isProjectContributer(UUID projectId, Authentication authentication) {
+    public boolean isProjectContributor(UUID projectId, Authentication authentication) {
         return isProjectOwner(projectId, authentication) || isProjectMember(projectId, authentication);
     }
+
+    // Check for project permissions
+
+    /** Allowed to create projects.*/
+    public boolean canCreateProject(Authentication authentication) {
+        return isUser(authentication) && !isAdmin(authentication);
+    }
+
+    /** Allowed to edit project information (e.g. privacy settings, allow join-requests, description, ...).*/
+    public boolean canEditProject(UUID projectId, Authentication authentication) {
+        return isProjectOwner(projectId, authentication);
+    }
+
+    /** Allowed to delete a project.*/
+    public boolean canDeleteProject(UUID projectId, Authentication authentication) {
+        if (!hasProjectContext(projectId, authentication)) {
+            return false;
+        }
+        return isProjectOwner(projectId, authentication) || isAdmin(authentication);
+    }
+
+    /** Allowed to see project members.*/
+    public boolean canViewProjectMembers(UUID projectId, Authentication authentication) {
+        if (!hasProjectContext(projectId, authentication)) {
+            return false;
+        }
+
+        return isAdmin(authentication) || isProjectContributor(projectId, authentication) || isPublicProject(projectId);
+    }
+
+    /** Allowed to remove project members.*/
+    public boolean canRemoveProjectMember(UUID projectId, UUID memberId, Authentication authentication) {
+        if (!hasProjectContext(projectId, authentication) || memberId == null) {
+            return false;
+        }
+
+        UUID currentUserId = getCurrentUserId(authentication);
+        return isProjectOwner(projectId,authentication) && !currentUserId.equals(memberId);
+    }
+
+
+
+
+
 
 
     private String getAuthority(UserRole role) {
@@ -78,6 +122,10 @@ public class SecurityService {
 
     private boolean hasUserContext(UUID userId, Authentication authentication) {
         return userId != null && authentication != null;
+    }
+
+    private boolean isPublicProject(UUID projectId) {
+        return projectRepository.existsByIdAndIsPrivateProjectFalse(projectId);
     }
 }
 
