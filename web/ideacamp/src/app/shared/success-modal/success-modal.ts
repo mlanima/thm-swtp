@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output} from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'app-success-modal',
@@ -13,5 +13,17 @@ import { Component, EventEmitter, Input, Output} from '@angular/core';
 
   close(): void {
     this.closeModal.emit();
+  }
+
+  @HostListener('document:keydown.enter', ['$event'])
+  handleEnter(event: Event) {
+    event.preventDefault();
+    this.close();
+  }
+
+  @HostListener('document:keydown.escape', ['$event'])
+  handleEscape(event: Event) {
+    event.preventDefault();
+    this.close();
   }
 }

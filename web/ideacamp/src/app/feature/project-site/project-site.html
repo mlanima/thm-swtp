@@ -46,52 +46,59 @@
           </div>
 
           @if (isEditing()) {
-            <div class="space-y-4">
+            <form class="space-y-4" (ngSubmit)="saveEdit()">
               <div>
                 <label for="editName" class="text-xs font-medium text-slate-500">{{ 'PROJECTCREATE.PROJECT_NAME' | translate }}</label>
                 <input
                   id="editName"
+                  name="editName"
                   [ngModel]="editName()"
                   (ngModelChange)="editName.set($event)"
                   class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:border-lime-400 focus:outline-none"
                 />
               </div>
+
               <div>
                 <label for="editShortDescription" class="text-xs font-medium text-slate-500">{{ 'PROJECTCREATE.SHORT_DESCRIPTION' | translate }}</label>
                 <input
                   id="editShortDescription"
+                  name="editShortDescription"
                   [ngModel]="editShortDescription()"
                   (ngModelChange)="editShortDescription.set($event)"
-                  rows="2"
                   class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:border-lime-400 focus:outline-none"
                 />
               </div>
+
               <div>
                 <label for="editDescription" class="text-xs font-medium text-slate-500">{{ 'PROJECTCREATE.DESCRIPTION' | translate }}</label>
                 <textarea
                   id="editDescription"
+                  name="editDescription"
                   [ngModel]="editDescription()"
                   (ngModelChange)="editDescription.set($event)"
                   rows="4"
                   class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:border-lime-400 focus:outline-none"
                 ></textarea>
               </div>
+
               <div class="flex gap-2">
                 <button
-                  (click)="saveEdit()"
+                  type="submit"
                   [disabled]="isSaving()"
                   class="rounded-md bg-lime-500 px-4 py-2 text-sm font-medium text-white hover:bg-lime-600 disabled:opacity-50"
                 >
                   {{ isSaving() ? ('COMMON.SAVE' | translate) + '…' : ('COMMON.SAVE' | translate) }}
                 </button>
+
                 <button
+                  type="button"
                   (click)="cancelEdit()"
                   class="rounded-md bg-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-300"
                 >
                   {{ 'COMMON.CANCEL' | translate }}
                 </button>
               </div>
-            </div>
+            </form>
           } @else {
             <app-info-card [project]="project()!" />
           }

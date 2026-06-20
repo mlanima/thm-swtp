@@ -1,4 +1,4 @@
-package de.thm.swtp.api.projectLinks.service;
+package de.thm.swtp.api.links.service;
 
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectLinkAlreadyExistsException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectLinkDoesNotBelongToProjectException;
@@ -7,10 +7,10 @@ import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
 import de.thm.swtp.api.project.exception.ExceptionProjectEditNotAllowed;
 import de.thm.swtp.api.project.exception.ProjectNotFoundException;
-import de.thm.swtp.api.projectLinks.repository.ProjectLinkRepository;
-import de.thm.swtp.api.projectLinks.domain.ProjectLink;
-import de.thm.swtp.api.projectLinks.entity.ProjectLinkEntity;
-import de.thm.swtp.api.projectLinks.mapper.ProjectLinkMapper;
+import de.thm.swtp.api.links.repository.ProjectLinkRepository;
+import de.thm.swtp.api.links.domain.ProjectLink;
+import de.thm.swtp.api.links.entity.ProjectLinkEntity;
+import de.thm.swtp.api.links.mapper.ProjectLinkMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,14 +41,19 @@ public class ProjectLinkService {
         ProjectEntity projectEntity = getProjectOrThrowError(projectId);
         checkProjectOwner(projectEntity, currentUserId);
 
-        if (projectLinkRepository.existsByProjectIdAndUrlIgnoreCase(projectEntity.getId(), url)) {
+        String cleanedLabel = label.trim();
+        String cleanedUrl = url.trim();
+
+        if (projectLinkRepository.existsByProjectIdAndUrlIgnoreCase(projectEntity.getId(), cleanedUrl)) {
             throw new ProjectLinkAlreadyExistsException();
         }
 
+
+
         ProjectLinkEntity projectLinkEntity = ProjectLinkEntity.builder()
                 .project(projectEntity)
-                .label(label)
-                .url(url)
+                .label(cleanedLabel)
+                .url(cleanedUrl)
                 .build();
 
         ProjectLinkEntity saved = projectLinkRepository.save(projectLinkEntity);
@@ -57,11 +62,12 @@ public class ProjectLinkService {
 
 
     @Transactional
-    public ProjectLink updateProjectLink(UUID projectId, UUID linkId, UUID currentUserId, String label, String url){
+    public ProjectLink updateProjectLink(UUID projectId, UUID currentUserId, UUID linkId, String label, String url){
         ProjectEntity projectEntity = getProjectOrThrowError(projectId);
         checkProjectOwner(projectEntity, currentUserId);
 
         ProjectLinkEntity projectLinkEntity = getProjectLinkOrThrowError(linkId);
+        checkLinkBelongsToProject(projectLinkEntity, projectId);
 
         if (label != null) {
             projectLinkEntity.setLabel(label.trim());

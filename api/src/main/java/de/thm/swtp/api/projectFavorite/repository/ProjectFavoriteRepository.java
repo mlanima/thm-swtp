@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -16,6 +17,17 @@ public interface ProjectFavoriteRepository extends JpaRepository<ProjectFavorite
     boolean existsByUserKeycloakIdAndProjectId(UUID userKeycloakId, UUID projectId);
 
     long countByProjectId(UUID projectId);
+
+    /**
+     * Returns the favorite count for each of the given projects.
+     * Projects with zero favorites are omitted from the result.
+     *
+     * @param projectIds project IDs to count favorites for
+     * @return projection of project ID to favorite count, one entry per project with at least one favorite
+     */
+    @Query("SELECT f.project.id AS projectId, COUNT(f) AS favoriteCount " +
+           "FROM ProjectFavoriteEntity f WHERE f.project.id IN :projectIds GROUP BY f.project.id")
+    List<ProjectFavoriteCount> countByProjectIdIn(@Param("projectIds") Collection<UUID> projectIds);
 
     Optional<ProjectFavoriteEntity> findByUserKeycloakIdAndProjectId(UUID userKeycloakId, UUID projectId);
 
@@ -28,4 +40,9 @@ public interface ProjectFavoriteRepository extends JpaRepository<ProjectFavorite
     @Modifying
     @Query("DELETE FROM ProjectFavoriteEntity f WHERE f.project.id = :projectId")
     void deleteByProjectId(@Param("projectId") UUID projectId);
+
+    interface ProjectFavoriteCount {
+        UUID getProjectId();
+        long getFavoriteCount();
+    }
 }

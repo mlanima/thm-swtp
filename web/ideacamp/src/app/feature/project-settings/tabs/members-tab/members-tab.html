@@ -38,8 +38,8 @@
     </div>
   }
   @if (!isLoading() && members().length > 0) {
-    <div class="mt-6 rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-      <table class="w-full text-sm">
+    <div class="mt-6 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
+      <table class="w-full min-w-[480px] text-sm">
         <thead>
           <tr class="border-b border-slate-100">
             <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">{{ 'PROJECTSETTINGS.MEMBERS.TABLE_MEMBER' | translate }}</th>
