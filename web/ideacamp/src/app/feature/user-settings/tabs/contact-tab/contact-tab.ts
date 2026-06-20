@@ -1,8 +1,10 @@
 import { Component, signal } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-contact-tab',
   standalone: true,
+  imports: [TranslatePipe],
   templateUrl: './contact-tab.html',
 })
 export class ContactTab {

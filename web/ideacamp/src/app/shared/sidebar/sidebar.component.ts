@@ -4,11 +4,12 @@ import { SidebarService } from './sidebar.service';
 import { MenuLinkComponent } from './menu-link/menu-link.component';
 import { AuthService } from '../../feature/auth/auth.service';
 import { RouterLink } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ProjectInvitationService } from '../../feature/my-projects/services/project-invitation.service';
 
 @Component({
   selector: 'app-sidebar',
-  imports: [MenuLinkComponent, RouterLink],
+  imports: [MenuLinkComponent, RouterLink, TranslatePipe],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.css',
 })

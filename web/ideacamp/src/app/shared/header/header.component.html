@@ -16,13 +16,13 @@
       <a routerLink="/my-projects">
         <app-feature>
           <i class="pi pi-home text-md"></i>
-          Home
+          {{ 'NAV.HOME' | translate }}
         </app-feature>
       </a>
       <a routerLink="/search">
         <app-feature>
           <i class="pi pi-compass text-md"></i>
-          Erkunden
+          {{ 'NAV.SEARCH' | translate }}
         </app-feature>
       </a>
 
@@ -36,13 +36,20 @@
       } @else {
         <div class="flex gap-1 items-center">
           <button (click)="auth.login()" class="group flex gap-2 items-center border border-slate-900 px-4 py-2 rounded-xl text-slate-900 transition-colors duration-300 ease-out hover:bg-slate-900 hover:shadow-lg hover:text-white">
-            Login
+            {{ 'NAV.LOGIN' | translate }}
             <i class="pi pi-sign-in transition-transform duration-300 ease-out group-hover:translate-x-1"></i>
           </button>
         </div>
       }
     </div>
   </div>
+
+  <button
+    type="button"
+    class="rounded-lg border border-slate-300 px-3 py-1 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+    (click)="changeLanguage(currentLanguage() === 'en' ? 'de' : 'en')">
+    {{ currentLanguage() === 'en' ? 'EN' : 'DE' }}
+  </button>
 
 
 </header>

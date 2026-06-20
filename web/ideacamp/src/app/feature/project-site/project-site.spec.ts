@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
-
+import { provideTranslateTesting } from '../../testing/translate-testing.provider';
 import { ProjectSite } from './project-site';
 import { ProjectService } from './project.service';
 import { AuthService } from '../auth/auth.service';
@@ -23,6 +23,7 @@ describe('ProjectSite', () => {
     await TestBed.configureTestingModule({
       imports: [ProjectSite],
       providers: [
+        provideTranslateTesting(),
         {
           provide: ActivatedRoute,
           useValue: {

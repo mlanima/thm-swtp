@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-
+import { TranslatePipe } from '@ngx-translate/core';
 @Component({
   selector: 'app-wizard-layout',
   standalone: true,
-  imports: [],
+  imports: [TranslatePipe],
   templateUrl: './wizard-layout.html',
 })
 export class WizardLayout {}

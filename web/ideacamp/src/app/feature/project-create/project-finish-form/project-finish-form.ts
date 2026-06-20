@@ -1,11 +1,12 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {ProjectCreateData} from '../schemas/project-create.schema';
 import { ProjectInviteMember } from '../../../models/project-invite-member.model';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-project-finish-form',
   standalone: true,
-  imports: [],
+  imports: [TranslatePipe],
   templateUrl: './project-finish-form.html',
 })
 

@@ -1,6 +1,7 @@
 import { Component, ElementRef, inject, OnInit, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { z } from 'zod';
 import {
   ProfessorRequestResponse,
@@ -32,12 +33,13 @@ type FormFields = keyof z.infer<typeof professorRequestSchema>;
 @Component({
   selector: 'app-professor-request-tab',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, TranslatePipe],
   templateUrl: './professor-request-tab.html',
 })
 export class ProfessorRequestTab implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly requestService = inject(ProfessorRequestService);
+  private readonly translate = inject(TranslateService);
 
   readonly isLoading = signal(true);
   readonly isSubmitting = signal(false);
@@ -64,7 +66,7 @@ export class ProfessorRequestTab implements OnInit {
     this.authService.waitUntilAuthReady().then(() => {
       const user = this.authService.user();
       if (!user) {
-        this.errorMessage.set('Benutzer konnte nicht geladen werden.');
+        this.errorMessage.set(this.translate.instant('PROFESSOR_REQUEST.ERROR_LOAD_USER'));
         this.isLoading.set(false);
         return;
       }
@@ -119,9 +121,7 @@ export class ProfessorRequestTab implements OnInit {
           this.showSuccess.set(true);
         },
         error: () => {
-          this.errorMessage.set(
-            'Deine Anfrage konnte nicht gesendet werden. Bitte versuche es später erneut.',
-          );
+          this.errorMessage.set(this.translate.instant('PROFESSOR_REQUEST.ERROR_SEND'));
           this.isSubmitting.set(false);
         },
       });

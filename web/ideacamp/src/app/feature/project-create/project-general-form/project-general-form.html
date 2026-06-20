@@ -2,7 +2,7 @@
 
   <div>
     <label for="project-name" class="mb-1 block text-sm font-medium text-gray-700">
-      Projektname
+      {{ 'PROJECTCREATE.PROJECT_NAME' | translate }}
     </label>
 
     <input
@@ -10,7 +10,7 @@
       type="text"
       name = "name"
       [(ngModel)]="formData.name"
-      placeholder="Gib den Projektnamen ein"
+      [placeholder]="'PROJECTCREATE.PROJECT_NAME_PLACEHOLDER' | translate"
       (keydown.enter)="$event.preventDefault(); focusShortDescriptionIfNameIsValid(shortDescriptionInput)"
       class="w-full rounded-lg border px-3 py-2 outline-none"
       [class.border-red-500]="errors.name"
@@ -20,14 +20,14 @@
 
     @if(errors.name){
       <p class="mt-1 text-sm text-red-600">
-        {{errors.name}}
+        {{errors.name | translate }}
       </p>
     }
   </div>
 
   <div>
     <label for="project-short-description" class="mb-1 block text-sm font-medium text-gray-700">
-      Kurzbeschreibung
+      {{ 'PROJECTCREATE.SHORT_DESCRIPTION' | translate }}
     </label>
 
     <input
@@ -36,7 +36,7 @@
       type="text"
       name="shortDescription"
       [(ngModel)]="formData.shortDescription"
-      placeholder="Beschreibe dein Projekt in ein bis zwei Sätzen"
+      [placeholder]="'PROJECTCREATE.SHORT_DESCRIPTION_PLACEHOLDER' | translate"
       maxlength="300"
       (keydown.enter)="$event.preventDefault(); descriptionTextarea.focus()"
       class="w-full rounded-lg border px-3 py-2 outline-none"
@@ -47,14 +47,14 @@
 
     @if(errors.shortDescription){
       <p class="mt-1 text-sm text-red-600">
-        {{errors.shortDescription}}
+        {{errors.shortDescription | translate }}
       </p>
     }
   </div>
 
   <div>
     <label for="project-description" class="mb-1 block text-sm font-medium text-gray-700">
-      Beschreibung
+      {{ 'PROJECTCREATE.DESCRIPTION' | translate }}
     </label>
 
     <textarea
@@ -63,7 +63,7 @@
       rows="4"
       name="description"
       [(ngModel)]="formData.description"
-      placeholder="Beschreibe dein Projekt ausführlich"
+      [placeholder]="'PROJECTCREATE.DESCRIPTION_PLACEHOLDER' | translate"
       class="w-full rounded-lg border px-3 py-2 outline-none"
       [class.border-red-500]="errors.description"
       [class.border-gray-300]="!errors.description"
@@ -72,7 +72,7 @@
 
     @if(errors.description){
       <p class="mt-1 text-sm text-red-600">
-        {{errors.description}}
+        {{errors.description | translate }}
       </p>
     }
   </div>
@@ -81,7 +81,7 @@
     <button
       type="submit"
       class="rounded-lg bg-lime-500 px-5 py-2 text-sm font-medium text-white hover:bg-lime-600">
-      Weiter
+      {{ 'COMMON.CONTINUE' | translate }}
     </button>
   </div>
 

@@ -5,13 +5,19 @@
 
   @if (isLoading()) {
     <p class="text-xs text-slate-500">
-      Tags werden geladen…
+      {{ 'PROJECTSITE.TAGS.LOADING' | translate }}
     </p>
   }
 
   @if (!isLoading() && errorMessage()) {
     <p class="mb-2 text-xs text-red-600">
       {{ errorMessage() }}
+    </p>
+  }
+
+  @if (!isLoading() && !errorMessage() && tags().length === 0 && !isAdding()) {
+    <p class="mb-3 text-xs text-slate-400">
+      {{ 'PROJECTSITE.TAGS.EMPTY' | translate }}
     </p>
   }
 
@@ -25,7 +31,7 @@
             (click)="deleteTag.emit(tag.name)"
             [disabled]="isDeleting() || isSaving()"
             class="inline-flex h-4 w-4 items-center justify-center rounded-full text-[10px] transition hover:bg-white/15 disabled:opacity-50"
-            aria-label="Tag löschen">
+            [attr.aria-label]="'PROJECTSITE.TAGS.DELETE_TAG' | translate">
             <i class="pi pi-times"></i>
           </button>
         }
@@ -44,7 +50,7 @@
           (keyup.escape)="cancelAdd()"
           (blur)="saveTag()"
           [disabled]="isSaving()"
-          placeholder="Neues Tag"
+          [placeholder]="'PROJECTSITE.TAGS.NEW_TAG' | translate"
           class="w-28 rounded-md border border-dashed border-slate-300 px-3 py-1 text-xs text-slate-700 placeholder:text-slate-400 focus:border-lime-400 focus:outline-none disabled:bg-slate-100"
         />
       } @else {
@@ -52,7 +58,7 @@
           type="button"
           (click)="startAdd()"
           class="rounded-md border border-dashed border-slate-300 px-3 py-1 text-xs font-semibold text-slate-500 hover:border-lime-400 hover:text-lime-600"
-          aria-label="Tag hinzufügen">
+          [attr.aria-label]="'PROJECTSITE.TAGS.ADD_TAG' | translate">
           +
         </button>
       }

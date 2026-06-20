@@ -1,19 +1,19 @@
 <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-  <h2 class="text-2xl font-bold text-slate-700">Impressum</h2>
-  <p class="mt-1 text-sm text-slate-500">Angaben gemäß § 5 TMG</p>
+  <h2 class="text-2xl font-bold text-slate-700">{{ 'IMPRESSUM.TITLE' | translate }}</h2>
+  <p class="mt-1 text-sm text-slate-500">{{ 'IMPRESSUM.SUBTITLE' | translate }}</p>
 
   <div class="mt-6 space-y-6">
 
     <div>
-      <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-500">Anbieter</h3>
+      <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-500">{{ 'IMPRESSUM.PROVIDER' | translate }}</h3>
       <div class="mt-2 space-y-1 text-sm text-slate-600">
-        <p>Technische Hochschule Mittelhessen (THM)<br />ideaCamp – Studentische Projektvermittlungsplattform</p>
-        <p>Wiesenstraße 14, 35390 Gießen</p>
+        <p>{{ 'IMPRESSUM.ORGANIZATION_VALUE' | translate }}<br />{{ 'IMPRESSUM.PROJECT_VALUE' | translate }}</p>
+        <p>{{ 'IMPRESSUM.ADDRESS_VALUE' | translate }}</p>
       </div>
     </div>
 
     <div>
-      <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-500">Kontakt</h3>
+      <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-500">{{ 'IMPRESSUM.CONTACT' | translate }}</h3>
       <p class="mt-2 text-sm text-slate-600">
         E-Mail:
         <a href="mailto:ideacamp.thm@protonmail.com" class="text-lime-600 hover:text-lime-700 hover:underline">
@@ -23,36 +23,35 @@
     </div>
 
     <div>
-      <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-500">Verantwortlich für den Inhalt</h3>
-      <p class="mt-1 text-xs text-slate-400">Gemäß § 18 Abs. 2 MStV</p>
+      <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-500">{{ 'IMPRESSUM.RESPONSIBLE' | translate }}</h3>
+      <p class="mt-1 text-xs text-slate-400">{{ 'IMPRESSUM.ACCORDING_TO' | translate }}</p>
       <p class="mt-1 text-sm text-slate-600">
-        Das ideaCamp-Entwicklungsteam<br />
-        Technische Hochschule Mittelhessen, Wiesenstraße 14, 35390 Gießen
+        {{ 'IMPRESSUM.RESPONSIBLE_VALUE' | translate }}
       </p>
     </div>
 
     <div>
-      <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-500">Haftungshinweis</h3>
+      <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-500">{{ 'IMPRESSUM.DISCLAIMER' | translate }}</h3>
       <p class="mt-2 text-sm leading-relaxed text-slate-600 max-w-[65ch]">
-        Trotz sorgfältiger inhaltlicher Kontrolle übernehmen wir keine Haftung für die Inhalte externer Links. Für den Inhalt der verlinkten Seiten sind ausschließlich deren Betreiber verantwortlich.
+        {{ 'IMPRESSUM.DISCLAIMER_TEXT' | translate }}
       </p>
     </div>
 
     <div>
-      <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-500">Datenschutz</h3>
+      <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-500">{{ 'IMPRESSUM.PRIVACY' | translate }}</h3>
       <p class="mt-2 text-sm leading-relaxed text-slate-600 max-w-[65ch]">
-        Da ideaCamp ein studentisches Hochschulprojekt ohne kommerzielle Ausrichtung ist, werden keine personenbezogenen Daten dauerhaft gespeichert oder an Dritte weitergegeben. Bei Fragen wende dich direkt per E-Mail an uns.
+        {{ 'IMPRESSUM.PRIVACY_TEXT' | translate }}
       </p>
     </div>
 
     <div>
-      <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-500">Hochschulprojekt</h3>
+      <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-500">{{ 'IMPRESSUM.UNIVERSITY_PROJECT' | translate }}</h3>
       <p class="mt-2 text-sm leading-relaxed text-slate-600 max-w-[65ch]">
-        ideaCamp ist ein studentisches Projekt im Rahmen eines Lehrveranstaltungsprojekts an der THM. Es handelt sich nicht um ein kommerzielles Angebot.
+        {{ 'IMPRESSUM.UNIVERSITY_PROJECT_TEXT' | translate }}
       </p>
     </div>
 
   </div>
 
-  <p class="mt-6 text-xs text-slate-400">&copy; {{ currentYear }} ideaCamp &middot; THM Gießen</p>
+  <p class="mt-6 text-xs text-slate-400">&copy; {{ currentYear }} {{ 'IMPRESSUM.FOOTER' | translate }}</p>
 </div>

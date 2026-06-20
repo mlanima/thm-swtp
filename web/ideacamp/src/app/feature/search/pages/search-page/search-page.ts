@@ -1,4 +1,5 @@
 import { Component, inject, OnDestroy, OnInit, signal, computed } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { Subject, takeUntil, forkJoin, debounceTime, distinctUntilChanged, switchMap, catchError, of } from 'rxjs';
 import { SearchService } from '../../services/search.service';
 import { ProjectSearchResult } from '../../models/project-search-result.model';
@@ -15,7 +16,7 @@ const PREVIEW_SIZE = 5;
 @Component({
   selector: 'app-search-page',
   standalone: true,
-  imports: [ProjectResultCard, UserResultCard, SearchInputComponent],
+  imports: [ProjectResultCard, UserResultCard, SearchInputComponent, TranslatePipe],
   templateUrl: './search-page.html',
 })
 export class SearchPage implements OnInit, OnDestroy {
@@ -27,6 +28,12 @@ export class SearchPage implements OnInit, OnDestroy {
 
   readonly activeTab = signal<Tab>('all');
   readonly errorMessage = signal('');
+
+  readonly projectResults = signal<ProjectSearchResult[]>([]);
+  readonly userResults = signal<UserSearchResult[]>([]);
+  readonly projects = this.projectResults;
+  readonly users = this.userResults;
+
   readonly isLoading = signal(false);
   readonly currentQueriesCount = signal(0);
 
@@ -79,7 +86,7 @@ export class SearchPage implements OnInit, OnDestroy {
             users: this.searchService.searchUsersPaged(queries, 0, PREVIEW_SIZE),
           }).pipe(
             catchError(() => {
-              this.errorMessage.set('Die Suche ist fehlgeschlagen. Bitte versuche es erneut..');
+              this.errorMessage.set('SEARCH.ERROR_FAILED');
               return of(null);
             })
           );
@@ -157,7 +164,7 @@ export class SearchPage implements OnInit, OnDestroy {
       this.searchService.searchProjectsPaged(this.currentQueries, page, PAGE_SIZE)
         .pipe(
           catchError(() => {
-            this.errorMessage.set('Die Suche ist fehlgeschlagen. Bitte versuche es erneut..');
+            this.errorMessage.set('SEARCH.ERROR_FAILED');
             return of(null);
           }),
           takeUntil(this.destroy$)
@@ -176,7 +183,7 @@ export class SearchPage implements OnInit, OnDestroy {
     this.searchService.searchUsersPaged(this.currentQueries, page, PAGE_SIZE)
       .pipe(
         catchError(() => {
-          this.errorMessage.set('Die Suche ist fehlgeschlagen. Bitte versuche es erneut..');
+          this.errorMessage.set('SEARCH.ERROR_FAILED');
           return of(null);
         }),
         takeUntil(this.destroy$)
