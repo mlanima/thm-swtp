@@ -1,0 +1,22 @@
+<div>
+  <h2 class="text-2xl font-bold text-slate-700">Kontakt</h2>
+  <p class="mt-1 text-sm text-slate-500">Bei Fragen oder Anliegen kannst du dich an uns wenden.</p>
+
+  <div class="mt-6 flex items-center gap-3">
+    <a
+      href="mailto:ideacamp.thm@protonmail.com"
+      class="inline-flex items-center gap-2 rounded-lg bg-lime-500 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-lime-600"
+    >
+      <i class="pi pi-envelope text-sm"></i>
+      E-Mail senden
+    </a>
+    <button
+      type="button"
+      (click)="copyMail()"
+      class="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+    >
+      <i class="pi pi-copy text-sm"></i>
+      {{ copied() ? 'Kopiert' : 'E-Mail kopieren' }}
+    </button>
+  </div>
+</div>

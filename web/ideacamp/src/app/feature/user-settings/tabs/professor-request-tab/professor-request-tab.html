@@ -1,0 +1,194 @@
+<div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+
+  @if (isLoading()) {
+    <div class="px-6 py-16 text-center">
+      <div class="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-slate-300 border-t-lime-500"></div>
+      <p class="mt-4 text-sm text-slate-500">Daten werden geladen</p>
+    </div>
+  } @else {
+
+    @if (errorMessage() && !existingRequest()) {
+      <div class="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    @if (existingRequest(); as req) {
+
+      @if (req.status === 'PENDING') {
+        <div class="rounded-xl border border-amber-200 bg-amber-50 p-8 text-center shadow-sm">
+          <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-amber-100">
+            <i class="pi pi-clock text-xl text-amber-700"></i>
+          </div>
+          <h2 class="text-xl font-semibold text-amber-800">Anfrage in Prüfung</h2>
+          <p class="mt-2 text-sm text-amber-700">
+            Deine Anfrage wurde eingereicht und wird derzeit bearbeitet. Du bekommst eine Rückmeldung, sobald eine Entscheidung getroffen wurde.
+          </p>
+          <span class="mt-4 inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-700">
+            Ausstehend
+          </span>
+          @if (req.text) {
+            <div class="mt-4 border-t border-amber-200 pt-4 text-left">
+              <p class="text-xs font-medium text-amber-700">Deine Nachricht</p>
+              <p class="mt-1 text-sm text-amber-600">{{ req.text }}</p>
+            </div>
+          }
+        </div>
+      }
+
+      @if (req.status === 'ACCEPTED') {
+        <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-8 text-center shadow-sm">
+          <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100">
+            <i class="pi pi-check text-xl text-emerald-700"></i>
+          </div>
+          <h2 class="text-xl font-semibold text-emerald-800">Anfrage bestätigt</h2>
+          <p class="mt-2 text-sm text-emerald-700">
+            Dein Antrag auf Professor:innen-Rechte wurde angenommen. Du hast jetzt Zugriff auf alle erweiterten Funktionen.
+          </p>
+          <span class="mt-4 inline-block rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">
+            Angenommen
+          </span>
+        </div>
+      }
+
+      @if (req.status === 'REJECTED') {
+        <div class="rounded-xl border border-red-200 bg-red-50 p-8 text-center shadow-sm">
+          <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-100">
+            <i class="pi pi-times text-xl text-red-700"></i>
+          </div>
+          <h2 class="text-xl font-semibold text-red-800">Anfrage abgelehnt</h2>
+          <p class="mt-2 text-sm text-red-700">
+            Deine Anfrage wurde leider abgelehnt. Du kannst jederzeit eine neue Anfrage stellen.
+          </p>
+          <button
+            type="button"
+            (click)="existingRequest.set(null)"
+            class="mt-5 rounded-lg bg-red-600 px-5 py-2 text-sm font-medium text-white transition hover:bg-red-700"
+          >
+            Neue Anfrage stellen
+          </button>
+        </div>
+      }
+
+    } @else {
+
+      <h2 class="text-2xl font-bold text-slate-700">Professor:in werden</h2>
+      <p class="mt-1 text-sm text-slate-500">
+        Erhalte Zugriff auf erweiterte Funktionen für deine Lehrtätigkeit.
+      </p>
+
+      <form (ngSubmit)="submitApplication()" class="mt-6 space-y-5">
+
+        <div>
+          <label for="profName" class="text-xs font-medium text-slate-500">Name *</label>
+          <input
+            id="profName"
+            name="profName"
+            [ngModel]="userName()"
+            (ngModelChange)="userName.set($event); formErrors.set({})"
+            placeholder="Dein vollständiger Name"
+            class="mt-1.5 block w-full rounded-lg border px-3.5 py-2.5 text-sm text-slate-700 placeholder-slate-400 transition outline-none"
+            [class.border-red-500]="formErrors().name"
+            [class.border-slate-200]="!formErrors().name"
+            [class.focus:border-lime-500]="!formErrors().name"
+            [class.focus:ring-2]="!formErrors().name"
+            [class.focus:ring-lime-100]="!formErrors().name"
+          />
+          @if (formErrors().name) {
+            <p class="mt-1 text-sm text-red-600">{{ formErrors().name }}</p>
+          }
+        </div>
+
+        <div>
+          <label for="profEmail" class="text-xs font-medium text-slate-500">E-Mail</label>
+          <input
+            id="profEmail"
+            name="profEmail"
+            type="email"
+            [ngModel]="userEmail()"
+            (ngModelChange)="userEmail.set($event); formErrors.set({})"
+            placeholder="deine@hochschule.de"
+            class="mt-1.5 block w-full rounded-lg border px-3.5 py-2.5 text-sm text-slate-700 placeholder-slate-400 transition outline-none"
+            [class.border-red-500]="formErrors().email"
+            [class.border-slate-200]="!formErrors().email"
+            [class.focus:border-lime-500]="!formErrors().email"
+            [class.focus:ring-2]="!formErrors().email"
+            [class.focus:ring-lime-100]="!formErrors().email"
+          />
+          @if (formErrors().email) {
+            <p class="mt-1 text-sm text-red-600">{{ formErrors().email }}</p>
+          }
+        </div>
+
+        <div>
+          <label for="profText" class="text-xs font-medium text-slate-500">Begründung *</label>
+          <textarea
+            id="profText"
+            name="profText"
+            [ngModel]="userText()"
+            (ngModelChange)="userText.set($event); formErrors.set({})"
+            rows="5"
+            placeholder="Erkläre, wofür du die erweiterten Rechte benötigst (z. B. Kurse erstellen, Studierende verwalten, ...)"
+            class="mt-1.5 block w-full rounded-lg border px-3.5 py-2.5 text-sm text-slate-700 placeholder-slate-400 transition outline-none resize-y"
+            [class.border-red-500]="formErrors().text"
+            [class.border-slate-200]="!formErrors().text"
+            [class.focus:border-lime-500]="!formErrors().text"
+            [class.focus:ring-2]="!formErrors().text"
+            [class.focus:ring-lime-100]="!formErrors().text"
+          ></textarea>
+          @if (formErrors().text) {
+            <p class="mt-1 text-sm text-red-600">{{ formErrors().text }}</p>
+          } @else {
+            <p class="mt-1 text-xs text-slate-400">{{ userText().length }} / 1000 Zeichen</p>
+          }
+        </div>
+
+        @if (errorMessage()) {
+          <div class="rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-sm text-red-700">
+            {{ errorMessage() }}
+          </div>
+        }
+
+        <button
+          type="submit"
+          [disabled]="isSubmitting()"
+          class="w-full rounded-lg bg-lime-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-lime-600 focus:outline-none focus:ring-2 focus:ring-lime-300 disabled:opacity-50"
+        >
+          @if (isSubmitting()) {
+            <span class="flex items-center justify-center gap-2">
+              <span class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+              Wird gesendet
+            </span>
+          } @else {
+            Anfrage senden
+          }
+        </button>
+      </form>
+    }
+  }
+</div>
+
+@if (showSuccess()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+    <div class="relative w-full max-w-md rounded-xl bg-white p-6 text-center shadow-xl">
+      <button
+        type="button"
+        class="absolute right-4 top-4 text-slate-400 hover:text-slate-700"
+        (click)="closeSuccess()">&#10005;</button>
+      <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
+        <span class="text-2xl font-bold text-green-600">&#10003;</span>
+      </div>
+      <p class="mb-1 text-lg font-semibold text-slate-900">Anfrage gesendet</p>
+      <p class="mb-5 text-sm text-slate-500">
+        Deine Anfrage auf Professor:innen-Rechte wurde erfolgreich übermittelt. Wir melden uns bei dir.
+      </p>
+      <button
+        type="button"
+        (click)="closeSuccess()"
+        class="rounded-lg bg-slate-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
+      >
+        Schließen
+      </button>
+    </div>
+  </div>
+}
