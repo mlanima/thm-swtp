@@ -1,6 +1,6 @@
-package de.thm.swtp.api.projectLinks.dto;
+package de.thm.swtp.api.links.dto;
 
-import de.thm.swtp.api.projectLinks.domain.ProjectLink;
+import de.thm.swtp.api.links.domain.ProjectLink;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

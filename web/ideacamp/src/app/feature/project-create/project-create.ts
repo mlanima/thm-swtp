@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, HostListener, ViewChild, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import {z} from 'zod';
 import {WizardLayout} from './wizard-layout/wizard-layout';
@@ -33,6 +33,8 @@ export class ProjectCreate {
   private readonly router = inject(Router);
   private readonly translateService = inject(TranslateService);
 
+  @ViewChild(ProjectMembersForm) membersForm?: ProjectMembersForm;
+
   isLoading = false;
   errorMessage: string | null = null;
   successMessage: string | null = null;
@@ -44,6 +46,32 @@ export class ProjectCreate {
    */
   projectData: Partial<ProjectCreateData> = {};
   invitedMembers: ProjectInviteMember[] = [];
+
+  @HostListener('window:keydown', ['$event'])
+  handleEnter(event: KeyboardEvent) {
+    if (event.key !== 'Enter') {
+      return;
+    }
+
+    if (this.currentStep === 2) {
+      if (this.membersForm?.isMemberDialogOpen) {
+        return;
+      }
+
+      event.preventDefault();
+      this.membersForm?.submit();
+      return;
+    }
+
+    if (this.currentStep === 3) {
+      if (this.isLoading) {
+        return;
+      }
+
+      event.preventDefault();
+      this.finishProjectCreation();
+    }
+  }
 
   nextStep() {
     if (this.currentStep < 3) {

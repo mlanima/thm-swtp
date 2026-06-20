@@ -2,7 +2,7 @@
   class="bg-linear-to-br from-slate-600 to-slate-800 px-6 py-8 text-white"
 >
   @if (project) {
-    <div class="mx-auto flex max-w-6xl justify-between">
+    <div class="mx-auto flex max-w-6xl flex-col gap-6 md:flex-row md:items-start md:justify-between">
       <div class="max-w-xl">
         <span class="rounded-full bg-lime-100 px-4 py-1 text-xs text-lime-700">
           ● {{ project.isPrivateProject ? ('COMMON.PRIVATE' | translate) : ('COMMON.PUBLIC' | translate) }}
@@ -50,7 +50,7 @@
 <!--        Anfragen (3)-->
 <!--      </button>-->
       </div>
-      <div class="hidden items-center justify-end md:flex">
+      <div class="flex flex-wrap items-center gap-3 md:justify-end">
         @if (showJoinButton) {
           <app-join-request-button [projectId]="project.id" [onDark]="true" [allowJoinRequests]="project.allowJoinRequests" />
         }
