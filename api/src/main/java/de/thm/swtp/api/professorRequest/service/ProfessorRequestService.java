@@ -3,6 +3,7 @@ package de.thm.swtp.api.professorRequest.service;
 import de.thm.swtp.api.professorRequest.domain.ProfessorRequest;
 import de.thm.swtp.api.professorRequest.domain.ProfessorRequestStatus;
 import de.thm.swtp.api.professorRequest.entity.ProfessorRequestEntity;
+import de.thm.swtp.api.professorRequest.exception.ProfessorRequestAlreadyExistsException;
 import de.thm.swtp.api.professorRequest.exception.ProfessorRequestInvalidStatusException;
 import de.thm.swtp.api.professorRequest.exception.ProfessorRequestNotFoundException;
 import de.thm.swtp.api.professorRequest.mapper.ProfessorRequestMapper;
@@ -28,6 +29,11 @@ public class ProfessorRequestService {
     /** Creates a new professor-rights request with status PENDING for the given user. */
     @Transactional
     public ProfessorRequest createProfessorRequest(UUID currentUserId, String name, String email, String text) {
+        if (professorRequestRepository.existsByRequestingUserKeycloakIdAndStatus(
+                currentUserId, ProfessorRequestStatus.PENDING)) {
+            throw new ProfessorRequestAlreadyExistsException(currentUserId);
+        }
+
         UserProfile requestingUser = userProfileRepository.findById(currentUserId)
                 .orElseThrow(() -> new UserProfileNotFoundException(currentUserId.toString()));
 
