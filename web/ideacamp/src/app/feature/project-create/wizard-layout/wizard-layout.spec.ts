@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { provideTranslateTesting } from '../../../testing/translate-testing.provider';
 import { WizardLayout } from './wizard-layout';
 
 describe('WizardLayout', () => {
@@ -9,6 +9,9 @@ describe('WizardLayout', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [WizardLayout],
+      providers: [
+        provideTranslateTesting(),
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(WizardLayout);
