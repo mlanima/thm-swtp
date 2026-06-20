@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 /** Service for managing professor-rights requests. */
@@ -55,7 +56,16 @@ public class ProfessorRequestService {
                 .map(ProfessorRequestMapper::toDomain);
     }
 
-    /** Accepts a professor-rights request by setting its status to ACCEPTED. */
+    /** Returns all requests for the given user, ordered by newest first. */
+    @Transactional(readOnly = true)
+    public List<ProfessorRequest> getRequestsByUser(UUID userId) {
+        return professorRequestRepository.findAllByRequestingUserKeycloakIdOrderByCreatedAtDesc(userId)
+                .stream()
+                .map(ProfessorRequestMapper::toDomain)
+                .toList();
+    }
+
+    /** Accepts a professor-rights request by setting its status to ACCEPTED and granting the professor role. */
     @Transactional
     public ProfessorRequest acceptProfessorRequest(UUID requestId) {
         ProfessorRequestEntity entity = professorRequestRepository.findById(requestId)
@@ -67,6 +77,7 @@ public class ProfessorRequestService {
         }
 
         entity.setStatus(ProfessorRequestStatus.ACCEPTED);
+        entity.getRequestingUser().setRole("PROFESSOR");
         ProfessorRequestEntity saved = professorRequestRepository.save(entity);
         return ProfessorRequestMapper.toDomain(saved);
     }

@@ -15,6 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 /** REST controller for managing professor-rights requests. */
@@ -32,6 +33,15 @@ public class ProfessorRequestController {
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return professorRequestService.getAllProfessorRequests(pageable)
                 .map(ProfessorRequestResponse::toResponse);
+    }
+
+    /** Returns all requests for a specific user. */
+    @GetMapping("/{userId}")
+    public List<ProfessorRequestResponse> getRequestsByUser(@PathVariable UUID userId) {
+        return professorRequestService.getRequestsByUser(userId)
+                .stream()
+                .map(ProfessorRequestResponse::toResponse)
+                .toList();
     }
 
     /** Creates a new professor-rights request for the authenticated user with status PENDING. */
