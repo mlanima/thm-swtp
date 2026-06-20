@@ -1,6 +1,8 @@
 package de.thm.swtp.api.exceptionhandling;
 
 import de.thm.swtp.api.exceptionhandling.exceptions.*;
+import de.thm.swtp.api.professorRequest.exception.ProfessorRequestInvalidStatusException;
+import de.thm.swtp.api.professorRequest.exception.ProfessorRequestNotFoundException;
 import de.thm.swtp.api.projectFavorite.exception.ProjectAlreadyFavoritedException;
 import de.thm.swtp.api.projectFavorite.exception.ProjectFavoriteNotFoundException;
 import de.thm.swtp.api.projectInvitation.exception.InvalidProjectInviteException;
@@ -182,5 +184,17 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleUserProfileLinkNotFound(UserProfileLinkNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ProfessorRequestNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleProfessorRequestNotFound(ProfessorRequestNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ProfessorRequestInvalidStatusException.class)
+    public ResponseEntity<ErrorResponse> handleProfessorRequestInvalidStatus(ProfessorRequestInvalidStatusException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
     }
 }

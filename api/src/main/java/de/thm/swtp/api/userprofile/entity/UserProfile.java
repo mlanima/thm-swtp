@@ -42,6 +42,9 @@ public class UserProfile {
     @Column(columnDefinition = "TEXT")
     private String experience;
 
+    // TODO: role is a placeholder until a proper role/authority system is implemented
+    private String role;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
