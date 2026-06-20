@@ -2,15 +2,15 @@
   <div class="mx-auto max-w-6xl">
 
     <div class="mb-6">
-      <h1 class="text-4xl font-bold text-slate-700">Suchen</h1>
-      <p class="mt-2 text-sm text-slate-500">Projekte und Nutzer auf der gesamten Plattform finden</p>
+      <h1 class="text-4xl font-bold text-slate-700">{{ 'SEARCH.TITLE' | translate }}</h1>
+      <p class="mt-2 text-sm text-slate-500">{{ 'SEARCH.SUBTITLE' | translate }}</p>
     </div>
 
     <!-- Search bar -->
     <app-search-input (searchChange)="onQueriesChange($event)"></app-search-input>
 
     @if (errorMessage()) {
-      <p class="mt-2 text-sm text-red-500">{{ errorMessage() }}</p>
+      <p class="mt-2 text-sm text-red-500">{{ errorMessage() | translate }}</p>
     }
 
     <!-- Tabs -->
@@ -23,7 +23,7 @@
         [class.text-green-600]="activeTab() === 'all'"
         [class.text-slate-500]="activeTab() !== 'all'"
       >
-        Alle
+        {{ 'SEARCH.TAB_ALL' | translate }}
       </button>
 
       <button
@@ -34,7 +34,7 @@
         [class.text-green-600]="activeTab() === 'projects'"
         [class.text-slate-500]="activeTab() !== 'projects'"
       >
-        Projekte @if (projectsTotalCount() > 0) { ({{ projectsTotalCount() }}) }
+        {{ 'SEARCH.TAB_PROJECTS' | translate }} @if (projects().length > 0) { ({{ projects().length }}) }
       </button>
 
       <button
@@ -45,7 +45,7 @@
         [class.text-green-600]="activeTab() === 'users'"
         [class.text-slate-500]="activeTab() !== 'users'"
       >
-        Nutzer @if (usersTotalCount() > 0) { ({{ usersTotalCount() }}) }
+        {{ 'SEARCH.TAB_USERS' | translate }} @if (users().length > 0) { ({{ users().length }}) }
       </button>
     </div>
 
@@ -53,7 +53,7 @@
     @if (currentQueriesCount() > 0 && !isLoading() && !errorMessage()) {
       <div class="mt-6">
         <h2 class="text-lg font-semibold text-slate-700">
-          Ergebnisse ({{ activeTab() === 'all' ? totalResults() : (activeTab() === 'projects' ? projectsTotalCount() : usersTotalCount()) }})
+          {{ 'SEARCH.RESULTS' | translate }} ({{ activeTab() === 'all' ? totalResults() : (activeTab() === 'projects' ? projects().length : users().length) }})
         </h2>
       </div>
     }
@@ -61,7 +61,7 @@
     <!-- Loading -->
     @if (isLoading()) {
       <div class="mt-8 flex justify-center">
-        <p class="text-sm text-slate-400">Suche...</p>
+        <p class="text-sm text-slate-400">{{ 'SEARCH.SEARCHING' | translate }}</p>
       </div>
     }
 
@@ -80,9 +80,9 @@
             <circle cx="126" cy="104" r="5" fill="#64748B" />
             <path d="M97 126C101 120 119 120 123 126" stroke="#64748B" stroke-width="4" stroke-linecap="round" />
           </svg>
-          <h3 class="text-3xl font-semibold text-slate-700">Keine Ergebnisse gefunden</h3>
+          <h3 class="text-3xl font-semibold text-slate-700">{{ 'SEARCH.NO_RESULTS_TITLE' | translate }}</h3>
           <p class="mt-3 max-w-xl text-sm leading-7 text-slate-500">
-            Es wurden keine passenden Ergebnisse gefunden. Bitte überprüfe die Schreibweise oder versuche es mit anderen Suchbegriffen.
+            {{ 'SEARCH.NO_RESULTS_DESCRIPTION' | translate }}
           </p>
         </div>
       }
@@ -92,8 +92,8 @@
     @if (!isLoading() && !errorMessage() && currentQueriesCount() > 0) {
       @if ((activeTab() === 'projects' || activeTab() === 'all') && displayedProjects().length > 0) {
         <div class="flex flex-col gap mt-6 space-y-4">
-          @if (activeTab() === 'all') { <h3 class="text-sm font-semibold tracking-wider text-slate-500 uppercase">Projekte</h3> }
-          @for (project of displayedProjects(); track project.projectUrl) {
+          @if (activeTab() === 'all') { <h3 class="text-sm font-semibold tracking-wider text-slate-500 uppercase">{{ 'SEARCH.PROJECTS_SECTION' | translate }}</h3> }
+          @for (project of projects(); track project.projectUrl) {
             <app-project-result-card [project]="project" [animationDelay]="$index * 50" />
           }
         </div>
@@ -106,8 +106,8 @@
 
       @if ((activeTab() === 'users' || activeTab() === 'all') && displayedUsers().length > 0) {
         <div class="flex flex-col gap mt-6 space-y-4">
-          @if (activeTab() === 'all') { <h3 class="text-sm font-semibold tracking-wider text-slate-500 uppercase">Nutzer</h3> }
-          @for (user of displayedUsers(); track user.keycloakId) {
+          @if (activeTab() === 'all') { <h3 class="text-sm font-semibold tracking-wider text-slate-500 uppercase">{{ 'SEARCH.USERS_SECTION' | translate }}</h3> }
+          @for (user of users(); track user.keycloakId) {
             <app-user-result-card [user]="user" />
           }
         </div>

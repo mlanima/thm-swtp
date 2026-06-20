@@ -16,13 +16,13 @@
       <a routerLink="/my-projects">
         <app-feature>
           <i class="pi pi-home text-md"></i>
-          Home
+          {{ 'NAV.HOME' | translate }}
         </app-feature>
       </a>
       <a routerLink="/search">
         <app-feature>
           <i class="pi pi-compass text-md"></i>
-          Erkunden
+          {{ 'NAV.SEARCH' | translate }}
         </app-feature>
       </a>
     </nav>
@@ -42,6 +42,13 @@
       }
     </div>
   </div>
+
+  <button
+    type="button"
+    class="rounded-lg border border-slate-300 px-3 py-1 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+    (click)="changeLanguage(currentLanguage() === 'en' ? 'de' : 'en')">
+    {{ currentLanguage() === 'en' ? 'EN' : 'DE' }}
+  </button>
 
 
 </header>

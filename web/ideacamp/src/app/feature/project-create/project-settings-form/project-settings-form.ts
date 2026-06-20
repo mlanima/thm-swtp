@@ -5,11 +5,11 @@ import {FormErrors, mapZodErrors} from '../schemas/zod-error.helper';
 import { catchError, debounceTime, distinctUntilChanged, of, Subject, Subscription, switchMap, } from 'rxjs';
 import { ProjectService } from '../../project-site/project.service'
 type SettingsFormFields = 'projectUrl' | 'isPrivateProject';
-
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 @Component({
   selector: 'app-project-settings-form',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, TranslatePipe],
   templateUrl: './project-settings-form.html',
 })
 
@@ -21,6 +21,7 @@ export class ProjectSettingsForm implements OnChanges, OnDestroy {
   private readonly projectService = inject(ProjectService);
   private readonly projectUrlTerms = new Subject<string>();
   private readonly projectUrlSubscription: Subscription;
+  private readonly translateService = inject(TranslateService);
 
   @Input() initialFormData?: Partial<ProjectSettingsData>;
   @Output() next = new EventEmitter<ProjectSettingsData>();
@@ -124,7 +125,7 @@ export class ProjectSettingsForm implements OnChanges, OnDestroy {
 
     return this.projectService.projectUrlExists(cleanedUrl).pipe(
       catchError(() => {
-        this.projectUrlCheckError.set('Projekt-URL konnte nicht geprüft werden.');
+        this.projectUrlCheckError.set(this.translateService.instant('PROJECTCREATE.PROJECT_URL_CHECK_ERROR'));
         return of(null);
       }),
     );

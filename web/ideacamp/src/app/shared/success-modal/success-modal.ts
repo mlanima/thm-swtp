@@ -5,9 +5,9 @@ import { Component, EventEmitter, HostListener, Input, Output } from '@angular/c
   standalone: true,
   templateUrl: './success-modal.html',
 })
-export class SuccessModal {
-  @Input() message = 'Erfolgreich aktualisiert.';
-  @Input() buttonText = 'Weiter';
+  export class SuccessModal {
+  @Input() message = '';
+  @Input() buttonText = '';
 
   @Output() closeModal = new EventEmitter<void>();
 

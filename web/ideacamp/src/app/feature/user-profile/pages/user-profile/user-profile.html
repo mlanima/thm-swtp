@@ -6,13 +6,13 @@
       @if (state.isLoading) {
         <section class="rounded-xl bg-white p-6 shadow-lg">
           <p class="text-sm text-slate-600">
-            Profil lädt...
+            {{ 'USERPROFILE.LOADING' | translate }}
           </p>
         </section>
       } @else if (state.errorMessage) {
         <section class="rounded-xl border border-red-200 bg-red-50 p-6 shadow-lg">
           <h2 class="text-lg font-bold text-red-700">
-            Fehler
+            {{ 'COMMON.ERROR' | translate }}
           </h2>
 
           <p class="mt-2 text-sm text-red-600">
@@ -36,7 +36,7 @@
             @if (isOwner && editingSection === 'about') {
               <section class="rounded-xl bg-white p-6 shadow-lg">
                 <h2 class="mb-5 text-xl font-bold text-slate-800">
-                  Profilinformationen
+                  {{ 'USERPROFILE.EDIT_PROFILE_INFORMATION' | translate }}
                 </h2>
 
                 <textarea
@@ -52,9 +52,9 @@
                     [disabled]="isSaving"
                     (click)="saveProfile(state.profile)">
                     @if (isSaving) {
-                      Speichern...
+                      {{ 'COMMON.SAVE' | translate }}...
                     } @else {
-                      Speichern
+                      {{ 'COMMON.SAVE' | translate }}
                     }
                   </button>
 
@@ -63,14 +63,14 @@
                     class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:opacity-50"
                     [disabled]="isSaving"
                     (click)="cancelEditing()">
-                    Abbrechen
+                    {{ 'COMMON.CANCEL' | translate }}
                   </button>
                 </div>
               </section>
             } @else {
               <app-profile-information
-                title="Profilinformationen"
-                [text]="state.profile.about || 'Keine Informationen.'"
+                [title]="'USERPROFILE.PROFILE_INFORMATION' | translate"
+                [text]="state.profile.about || ('USERPROFILE.NO_INFORMATION' | translate)"
                 [isOwnProfile]="isOwner"
                 (edit)="isOwner && startEditing(state.profile, 'about')">
               </app-profile-information>
@@ -79,7 +79,7 @@
             @if (isOwner && editingSection === 'experience') {
               <section class="rounded-xl bg-white p-6 shadow-lg">
                 <h2 class="mb-5 text-xl font-bold text-slate-800">
-                  Erfahrung bearbeiten
+                  {{ 'USERPROFILE.EDIT_EXPERIENCE' | translate }}
                 </h2>
 
                 <textarea
@@ -95,9 +95,9 @@
                     [disabled]="isSaving"
                     (click)="saveProfile(state.profile)">
                     @if (isSaving) {
-                      Speichern...
+                      {{ 'COMMON.SAVE' | translate }}...
                     } @else {
-                      Speichern
+                      {{ 'COMMON.SAVE' | translate }}
                     }
                   </button>
 
@@ -106,14 +106,14 @@
                     class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:opacity-50"
                     [disabled]="isSaving"
                     (click)="cancelEditing()">
-                    Abbrechen
+                    {{ 'COMMON.CANCEL' | translate }}
                   </button>
                 </div>
               </section>
             } @else {
               <app-profile-information
-                title="Erfahrung"
-                [text]="state.profile.experience || 'Keine Erfahrung.'"
+                [title]="'USERPROFILE.EXPERIENCE' | translate"
+                [text]="state.profile.experience || ('USERPROFILE.NO_EXPERIENCE' | translate)"
                 [isOwnProfile]="isOwner"
                 (edit)="isOwner && startEditing(state.profile, 'experience')">
               </app-profile-information>
@@ -132,8 +132,8 @@
 
   @if (showSuccessModal) {
     <app-success-modal
-      message="Profil erfolgreich geändert."
-      buttonText="Weiter"
+      [message]="'USERPROFILE.PROFILE_UPDATED' | translate"
+      [buttonText]="'COMMON.CONTINUE' | translate"
       (closeModal)="closeSuccessModal()">
     </app-success-modal>
   }

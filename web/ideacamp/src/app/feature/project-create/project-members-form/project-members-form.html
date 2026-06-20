@@ -2,7 +2,7 @@
 
   <div>
     <h3 class="mb-3 block text-sm font-medium text-slate-700">
-      Projektmitglieder
+      {{ 'PROJECTCREATE.MEMBERS' | translate }}
     </h3>
 
     @if (members.length > 0) {
@@ -36,7 +36,7 @@
         type="button"
         (click)="openDialog()"
         class="flex w-full items-center justify-center rounded-lg border border-dashed border-slate-700 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50">
-        + Mitglied hinzufügen
+        + {{ 'PROJECTCREATE.ADD_MEMBER' | translate }}
       </button>
     </div>
 
@@ -47,13 +47,13 @@
       type="button"
       (click)="goBack()"
       class="text-sm text-slate-500 hover:text-slate-800">
-      Zurück
+      {{ 'COMMON.BACK' | translate }}
     </button>
 
     <button
       type="submit"
       class="rounded-lg bg-lime-500 px-5 py-2 text-sm font-semibold text-white hover:bg-lime-600">
-      Weiter
+      {{ 'COMMON.CONTINUE' | translate }}
     </button>
   </div>
 </form>
@@ -66,11 +66,11 @@
       <div class="mb-5 flex items-start justify-between">
         <div>
           <h2 class="text-sm font-bold text-slate-900">
-            Füge Personen zu deinem Projekt hinzu
+            {{ 'PROJECTCREATE.MEMBER_DIALOG_TITLE' | translate }}
           </h2>
 
           <p class="mt-1 text-xs text-slate-500">
-            Suche nach Nutzername
+            {{ 'PROJECTCREATE.MEMBER_DIALOG_SUBTITLE' | translate }}
           </p>
         </div>
 
@@ -86,8 +86,8 @@
         <app-user-search-pick
           #userSearchPick
           [excludedUserIds]="excludedUserIds"
-          placeholder="Nutzer finden"
-          emptyMessagePrefix="Keine passenden User gefunden"
+          [placeholder]="'PROJECTCREATE.USER_SEARCH_PLACEHOLDER'"
+          emptyMessagePrefix="'PROJECTCREATE.USER_SEARCH_EMPTY_PREFIX'"
           (userSelected)="selectUser($event)">
         </app-user-search-pick>
       }
@@ -114,7 +114,7 @@
               type="button"
               (click)="closeDialog()"
               class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">
-              Abbrechen
+              {{ 'COMMON.CANCEL' | translate }}
             </button>
 
             <button
@@ -122,7 +122,7 @@
               (click)="addSelectedUser()"
               (keydown.enter)="addSelectedUser()"
               class="rounded-lg bg-lime-500 px-4 py-2 text-sm font-semibold text-white hover:bg-lime-600">
-              {{ selectedUser.username }} Hinzufügen
+              {{ selectedUser.username }} {{ 'PROJECTCREATE.ADD' | translate }}
             </button>
           </div>
         </div>
