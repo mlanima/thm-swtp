@@ -2,10 +2,10 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { Subject, of } from 'rxjs';
 import { OAuthService } from 'angular-oauth2-oidc';
-
 import { App } from './app';
 import { AuthService } from './feature/auth/auth.service';
 import { ProjectInvitationService } from './feature/my-projects/services/project-invitation.service';
+import { provideTranslateTesting } from './testing/translate-testing.provider';
 
 describe('App', () => {
   const events$ = new Subject<void>();
@@ -16,6 +16,7 @@ describe('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       providers: [
+        provideTranslateTesting(),
         provideRouter([]),
         { provide: OAuthService, useValue: oauthServiceMock },
         {

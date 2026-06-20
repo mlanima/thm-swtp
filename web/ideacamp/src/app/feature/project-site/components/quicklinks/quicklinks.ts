@@ -1,5 +1,6 @@
 import { Component, Input, OnChanges, SimpleChanges, inject, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ProjectLinkModel} from '../../../../models/project-link.model';
 import { ProjectLinkService } from '../../services/project-link.service';
 import { createProjectLinkSchema, updateProjectLinkSchema, CreateProjectLinkRequest, UpdateProjectLinkRequest} from '../../schemas/project-link.schema';
@@ -7,12 +8,13 @@ import { createProjectLinkSchema, updateProjectLinkSchema, CreateProjectLinkRequ
 @Component({
   selector: 'app-quicklinks',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, TranslatePipe],
   templateUrl: './quicklinks.html',
 })
 export class Quicklinks implements OnChanges {
   private readonly projectLinkService = inject(ProjectLinkService);
   private readonly changeDetectorRef = inject(ChangeDetectorRef);
+  private readonly translateService = inject(TranslateService);
 
   @Input({ required: true }) projectId!: string;
   @Input() isOwner = false;
@@ -78,7 +80,7 @@ export class Quicklinks implements OnChanges {
         this.changeDetectorRef.markForCheck();
       },
       error: () => {
-        this.errorMessage = 'Links konnten nicht geladen werden.';
+        this.errorMessage = this.translateService.instant('PROJECTSITE.QUICKLINKS.ERROR_LOAD');
         this.isLoading = false;
         this.changeDetectorRef.markForCheck();
       },
@@ -98,7 +100,7 @@ export class Quicklinks implements OnChanges {
         this.changeDetectorRef.markForCheck();
       },
       error: () => {
-        this.errorMessage = 'Link konnte nicht hinzugefügt werden.';
+        this.errorMessage = this.translateService.instant('PROJECTSITE.QUICKLINKS.ERROR_ADD');
       },
     });
   }
@@ -116,7 +118,7 @@ export class Quicklinks implements OnChanges {
         this.changeDetectorRef.markForCheck();
       },
       error: () => {
-        this.errorMessage = 'Link konnte nicht aktualisiert werden.';
+        this.errorMessage = this.translateService.instant('PROJECTSITE.QUICKLINKS.ERROR_UPDATE');
       },
     });
   }
@@ -128,7 +130,7 @@ export class Quicklinks implements OnChanges {
         this.changeDetectorRef.markForCheck();
       },
       error: () => {
-        this.errorMessage = 'Link konnte nicht gelöscht werden.';
+        this.errorMessage = this.translateService.instant('PROJECTSITE.QUICKLINKS.ERROR_DELETE');
       },
     });
   }
@@ -172,7 +174,7 @@ export class Quicklinks implements OnChanges {
   }
 
   private setValidationError(message?: string): void {
-    this.errorMessage = message ?? 'Ungültige Linkdaten.';
+    this.errorMessage = this.translateService.instant(message ?? 'PROJECTSITE.QUICKLINKS.ERROR_INVALID');
   }
 
   private addCreatedProjectLink(link: ProjectLinkModel) {

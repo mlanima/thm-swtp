@@ -2,11 +2,12 @@ import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { UserProfileService } from '../../../services/user-profile.service';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-success',
   standalone: true,
-  imports: [],
+  imports: [TranslatePipe],
   templateUrl: './success.component.html',
 })
 export class SuccessComponent implements OnInit {

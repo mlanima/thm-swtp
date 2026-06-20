@@ -1,11 +1,12 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ProjectSettingsStore } from '../../project-settings.store';
 import { ProjectService } from '../../../project-site/project.service';
 
 @Component({
   selector: 'app-privacy-tab',
   standalone: true,
-  imports: [],
+  imports: [TranslatePipe],
   templateUrl: './privacy-tab.html',
 })
 export class PrivacyTab implements OnInit {

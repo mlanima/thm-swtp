@@ -7,11 +7,12 @@ import { SearchService } from '../../../search/services/search.service';
 import { ProjectFilter } from '../../components/project-filter/project-filter';
 import { ProjectList } from '../../components/project-list/project-list';
 import { InvitationsSection } from '../../components/invitations-section/invitations-section';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-my-projects-page',
   standalone: true,
-  imports: [RouterLink, ProjectFilter, ProjectList, InvitationsSection],
+  imports: [RouterLink, ProjectFilter, ProjectList, InvitationsSection, TranslatePipe],
   templateUrl: './my-projects-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -20,7 +21,7 @@ export class MyProjectsPage implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly searchService = inject(SearchService);
   private readonly destroyRef = inject(DestroyRef);
-
+  private readonly translateService = inject(TranslateService);
   readonly projects = signal<ProjectResponse[]>([]);
   readonly isLoading = signal(true);
   readonly isFiltering = signal(false);
@@ -45,7 +46,7 @@ export class MyProjectsPage implements OnInit {
     const username = this.authService.username();
 
     if (!username) {
-      this.errorMessage.set('Dein Benutzername konnte nicht geladen werden.');
+      this.errorMessage.set(this.translateService.instant('MYPROJECTS.ERROR_LOAD_USERNAME'));
       this.isLoading.set(false);
       this.isFiltering.set(false);
       return;
@@ -64,7 +65,7 @@ export class MyProjectsPage implements OnInit {
     };
 
     const onError = () => {
-      this.errorMessage.set('Deine Projekte konnten nicht geladen werden.');
+      this.errorMessage.set(this.translateService.instant('MYPROJECTS.ERROR_LOAD_PROJECTS'));
       this.isLoading.set(false);
       this.isFiltering.set(false);
     };

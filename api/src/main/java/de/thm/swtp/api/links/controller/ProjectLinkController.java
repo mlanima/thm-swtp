@@ -1,9 +1,9 @@
-package de.thm.swtp.api.projectLinks.controller;
+package de.thm.swtp.api.links.controller;
 
-import de.thm.swtp.api.projectLinks.dto.CreateProjectLinkRequest;
-import de.thm.swtp.api.projectLinks.dto.ProjectLinkResponse;
-import de.thm.swtp.api.projectLinks.dto.UpdateProjectLinkRequest;
-import de.thm.swtp.api.projectLinks.service.ProjectLinkService;
+import de.thm.swtp.api.links.dto.CreateLinkRequest;
+import de.thm.swtp.api.links.dto.ProjectLinkResponse;
+import de.thm.swtp.api.links.dto.UpdateLinkRequest;
+import de.thm.swtp.api.links.service.ProjectLinkService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -31,20 +31,20 @@ public class ProjectLinkController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ProjectLinkResponse createProjectLink(@PathVariable UUID projectId, @AuthenticationPrincipal Jwt jwt,
-                                                 @Valid @RequestBody CreateProjectLinkRequest createProjectLinkRequest) {
+                                                 @Valid @RequestBody CreateLinkRequest createLinkRequest) {
         UUID currentUserId = getCurrentUserId(jwt);
 
         return ProjectLinkResponse.toResponse(projectLinkService.createProjectLink(projectId, currentUserId,
-                createProjectLinkRequest.label(), createProjectLinkRequest.url()));
+                createLinkRequest.label(), createLinkRequest.url()));
     }
 
     @PatchMapping("/{linkId}")
-    public ProjectLinkResponse updateProjectLink(@PathVariable UUID projectId, @PathVariable UUID linkId, @AuthenticationPrincipal Jwt jwt,
-                                                 @Valid @RequestBody UpdateProjectLinkRequest updateProjectLinkRequest) {
+    public ProjectLinkResponse updateProjectLink(@PathVariable UUID projectId, @AuthenticationPrincipal Jwt jwt, @PathVariable UUID linkId,
+                                                 @Valid @RequestBody UpdateLinkRequest updateLinkRequest) {
         UUID currentUserId = getCurrentUserId(jwt);
 
-        return ProjectLinkResponse.toResponse(projectLinkService.updateProjectLink(projectId, linkId,
-                currentUserId, updateProjectLinkRequest.label(), updateProjectLinkRequest.url()));
+        return ProjectLinkResponse.toResponse(projectLinkService.updateProjectLink(projectId, currentUserId,
+                linkId, updateLinkRequest.label(), updateLinkRequest.url()));
     }
 
     @DeleteMapping("/{linkId}")

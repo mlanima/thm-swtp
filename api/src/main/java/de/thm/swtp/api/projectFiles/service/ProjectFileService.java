@@ -110,7 +110,10 @@ public class ProjectFileService {
         try {
             return ProjectFileMapper.toDomain(projectFileRepository.save(entity));
         } catch (Exception e) {
-            try { Files.deleteIfExists(filePath); } catch (IOException ignored) { }
+            try {
+                Files.deleteIfExists(filePath);
+            } catch (IOException ignored) {
+            }
             throw e;
         }
     }

@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
-
+import { provideTranslateTesting } from '../../../../testing/translate-testing.provider';
 import { TagList } from './tag-list';
 import { ProjectTagService } from '../../services/project-tag.service';
 
@@ -25,7 +25,7 @@ describe('TagList', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [TagList],
-      providers: [{ provide: ProjectTagService, useClass: MockProjectTagService }],
+      providers: [provideTranslateTesting(), { provide: ProjectTagService, useClass: MockProjectTagService }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(TagList);

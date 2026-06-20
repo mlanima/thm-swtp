@@ -1,11 +1,12 @@
 import { Component, input, ChangeDetectionStrategy } from '@angular/core';
 import { ProjectResponse } from '../../../../models/project.model';
 import { ProjectCard } from '../project-card/project-card';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-project-list',
   standalone: true,
-  imports: [ProjectCard],
+  imports: [ProjectCard, TranslatePipe],
   templateUrl: './project-list.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
