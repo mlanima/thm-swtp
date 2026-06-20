@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, ElementRef, inject, OnInit, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { z } from 'zod';
@@ -13,25 +13,17 @@ const professorRequestSchema = z.object({
   name: z
     .string()
     .trim()
-    .min(1, 'Bitte gib deinen Namen ein.')
+    .min(1, 'Bitte geben Sie Ihren Namen ein.')
     .max(100, 'Name darf höchstens 100 Zeichen lang sein.'),
   email: z
     .string()
     .trim()
-    .max(200, 'E-Mail darf höchstens 200 Zeichen lang sein.')
-    .optional()
-    .or(z.literal(''))
-    .pipe(
-      z
-        .string()
-        .email('Bitte gib eine gültige E-Mail-Adresse ein.')
-        .optional()
-        .or(z.literal('')),
-    ),
+    .min(1, 'Bitte geben Sie Ihre E-Mail-Adresse ein.')
+    .email('Bitte geben Sie eine gültige E-Mail-Adresse ein.'),
   text: z
     .string()
     .trim()
-    .min(1, 'Bitte gib eine Begründung ein.')
+    .min(1, 'Bitte geben Sie eine Begründung ein.')
     .max(1000, 'Begründung darf höchstens 1000 Zeichen lang sein.'),
 });
 
@@ -58,6 +50,15 @@ export class ProfessorRequestTab implements OnInit {
   readonly userText = signal('');
 
   readonly formErrors = signal<FormErrors<FormFields>>({});
+
+  readonly profTextRef = viewChild<ElementRef<HTMLTextAreaElement>>('profText');
+
+  autoResize(): void {
+    const el = this.profTextRef()?.nativeElement;
+    if (!el) return;
+    el.style.height = '0';
+    el.style.height = el.scrollHeight + 2 + 'px';
+  }
 
   ngOnInit(): void {
     this.authService.waitUntilAuthReady().then(() => {
