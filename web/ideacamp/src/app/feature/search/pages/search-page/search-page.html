@@ -34,7 +34,7 @@
         [class.text-green-600]="activeTab() === 'projects'"
         [class.text-slate-500]="activeTab() !== 'projects'"
       >
-        Projekte @if (projects().length > 0) { ({{ projects().length }}) }
+        Projekte @if (projectsTotalCount() > 0) { ({{ projectsTotalCount() }}) }
       </button>
 
       <button
@@ -45,7 +45,7 @@
         [class.text-green-600]="activeTab() === 'users'"
         [class.text-slate-500]="activeTab() !== 'users'"
       >
-        Nutzer @if (users().length > 0) { ({{ users().length }}) }
+        Nutzer @if (usersTotalCount() > 0) { ({{ usersTotalCount() }}) }
       </button>
     </div>
 
@@ -53,7 +53,7 @@
     @if (currentQueriesCount() > 0 && !isLoading() && !errorMessage()) {
       <div class="mt-6">
         <h2 class="text-lg font-semibold text-slate-700">
-          Ergebnisse ({{ activeTab() === 'all' ? totalResults() : (activeTab() === 'projects' ? projects().length : users().length) }})
+          Ergebnisse ({{ activeTab() === 'all' ? totalResults() : (activeTab() === 'projects' ? projectsTotalCount() : usersTotalCount()) }})
         </h2>
       </div>
     }
@@ -68,9 +68,9 @@
     <!-- No results -->
     @if (!isLoading() && currentQueriesCount() > 0 && !errorMessage()) {
       @if (
-        (activeTab() === 'all' && projects().length === 0 && users().length === 0) ||
-        (activeTab() === 'projects' && projects().length === 0) ||
-        (activeTab() === 'users' && users().length === 0)
+        (activeTab() === 'all' && projectsTotalCount() === 0 && usersTotalCount() === 0) ||
+        (activeTab() === 'projects' && projectsTotalCount() === 0) ||
+        (activeTab() === 'users' && usersTotalCount() === 0)
       ) {
         <div class="mt-8 flex flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white px-6 py-16 text-center shadow-sm">
           <svg class="mx-auto h-56 w-56" viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -90,21 +90,65 @@
 
     <!-- Results -->
     @if (!isLoading() && !errorMessage() && currentQueriesCount() > 0) {
-      @if ((activeTab() === 'projects' || activeTab() === 'all') && projects().length > 0) {
+      @if ((activeTab() === 'projects' || activeTab() === 'all') && displayedProjects().length > 0) {
         <div class="flex flex-col gap mt-6 space-y-4">
-          @if (activeTab() === 'all') { <h3 class="text-sm font-semibold tracking-wider text-slate-500 uppercase">Projects</h3> }
-          @for (project of projects(); track project.projectUrl) {
+          @if (activeTab() === 'all') { <h3 class="text-sm font-semibold tracking-wider text-slate-500 uppercase">Projekte</h3> }
+          @for (project of displayedProjects(); track project.projectUrl) {
             <app-project-result-card [project]="project" [animationDelay]="$index * 50" />
           }
         </div>
+        @if (activeTab() === 'all' && projectsTotalCount() > displayedProjects().length) {
+          <button (click)="setTab('projects')" class="mt-3 text-sm font-medium text-green-600 hover:underline">
+            Alle {{ projectsTotalCount() }} Projekte anzeigen
+          </button>
+        }
       }
 
-      @if ((activeTab() === 'users' || activeTab() === 'all') && users().length > 0) {
+      @if ((activeTab() === 'users' || activeTab() === 'all') && displayedUsers().length > 0) {
         <div class="flex flex-col gap mt-6 space-y-4">
-          @if (activeTab() === 'all') { <h3 class="text-sm font-semibold tracking-wider text-slate-500 uppercase">Users</h3> }
-          @for (user of users(); track user.keycloakId) {
+          @if (activeTab() === 'all') { <h3 class="text-sm font-semibold tracking-wider text-slate-500 uppercase">Nutzer</h3> }
+          @for (user of displayedUsers(); track user.keycloakId) {
             <app-user-result-card [user]="user" />
           }
+        </div>
+        @if (activeTab() === 'all' && usersTotalCount() > displayedUsers().length) {
+          <button (click)="setTab('users')" class="mt-3 text-sm font-medium text-green-600 hover:underline">
+            Alle {{ usersTotalCount() }} Nutzer anzeigen
+          </button>
+        }
+      }
+
+      <!-- Pagination -->
+      @if (activeTab() !== 'all' && currentTotalPages() > 1) {
+        <div class="mt-8 flex items-center justify-center gap-2">
+          <button
+            (click)="goToPage(currentPage() - 1)"
+            [disabled]="currentPage() === 0"
+            class="rounded-lg px-3 py-2 text-sm font-medium text-slate-500 transition hover:text-green-600 disabled:opacity-40 disabled:hover:text-slate-500"
+          >
+            Zurück
+          </button>
+
+          @for (p of pageNumbers(); track p) {
+            <button
+              (click)="goToPage(p)"
+              class="h-9 w-9 rounded-lg text-sm font-medium transition"
+              [class.bg-green-500]="currentPage() === p"
+              [class.text-white]="currentPage() === p"
+              [class.text-slate-500]="currentPage() !== p"
+              [class.hover:bg-slate-200]="currentPage() !== p"
+            >
+              {{ p + 1 }}
+            </button>
+          }
+
+          <button
+            (click)="goToPage(currentPage() + 1)"
+            [disabled]="currentPage() + 1 >= currentTotalPages()"
+            class="rounded-lg px-3 py-2 text-sm font-medium text-slate-500 transition hover:text-green-600 disabled:opacity-40 disabled:hover:text-slate-500"
+          >
+            Weiter
+          </button>
         </div>
       }
     }
