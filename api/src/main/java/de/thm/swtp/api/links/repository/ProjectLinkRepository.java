@@ -1,6 +1,6 @@
-package de.thm.swtp.api.projectLinks.repository;
+package de.thm.swtp.api.links.repository;
 
-import de.thm.swtp.api.projectLinks.entity.ProjectLinkEntity;
+import de.thm.swtp.api.links.entity.ProjectLinkEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

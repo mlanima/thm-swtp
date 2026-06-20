@@ -1,4 +1,4 @@
-package de.thm.swtp.api.projectLinks.entity;
+package de.thm.swtp.api.links.entity;
 
 import de.thm.swtp.api.project.ProjectEntity;
 import jakarta.persistence.*;

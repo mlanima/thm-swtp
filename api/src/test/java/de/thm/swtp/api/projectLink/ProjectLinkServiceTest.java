@@ -6,10 +6,10 @@ import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
 import de.thm.swtp.api.project.exception.ExceptionProjectEditNotAllowed;
 import de.thm.swtp.api.project.exception.ProjectNotFoundException;
-import de.thm.swtp.api.projectLinks.domain.ProjectLink;
-import de.thm.swtp.api.projectLinks.entity.ProjectLinkEntity;
-import de.thm.swtp.api.projectLinks.repository.ProjectLinkRepository;
-import de.thm.swtp.api.projectLinks.service.ProjectLinkService;
+import de.thm.swtp.api.links.domain.ProjectLink;
+import de.thm.swtp.api.links.entity.ProjectLinkEntity;
+import de.thm.swtp.api.links.repository.ProjectLinkRepository;
+import de.thm.swtp.api.links.service.ProjectLinkService;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -202,8 +202,8 @@ public class ProjectLinkServiceTest {
 
         ProjectLink result = projectLinkService.updateProjectLink(
                 projectId,
-                linkId,
                 ownerId,
+                linkId,
                 "New Label",
                 null
         );
@@ -236,8 +236,8 @@ public class ProjectLinkServiceTest {
 
         ProjectLink result = projectLinkService.updateProjectLink(
                 projectId,
-                linkId,
                 ownerId,
+                linkId,
                 null,
                 "https://github.com/new-project"
         );
@@ -273,8 +273,8 @@ public class ProjectLinkServiceTest {
 
         ProjectLink result = projectLinkService.updateProjectLink(
                 projectId,
-                linkId,
                 ownerId,
+                linkId,
                 "New Label",
                 "https://github.com/new-project"
         );
@@ -308,8 +308,8 @@ public class ProjectLinkServiceTest {
 
         assertThatThrownBy(() -> projectLinkService.updateProjectLink(
                 projectId,
-                linkId,
                 ownerId,
+                linkId,
                 "New Label",
                 null
         )).isInstanceOf(ProjectLinkNotFoundException.class);
