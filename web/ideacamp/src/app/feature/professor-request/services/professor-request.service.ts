@@ -26,20 +26,11 @@ export class ProfessorRequestService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/v1/professor-requests`;
 
-  getAll(): Observable<ProfessorRequestResponse[]> {
-    return this.http
-      .get<{ content: ProfessorRequestResponse[] }>(this.baseUrl, {
-        params: { size: '100' },
-      })
-      .pipe(map((page) => page.content));
-  }
-
   getMyRequest(userId: string): Observable<ProfessorRequestResponse | null> {
-    return this.getAll().pipe(
+    return this.http.get<ProfessorRequestResponse[]>(`${this.baseUrl}/${userId}`).pipe(
       map((requests) => {
-        const mine = requests.filter((r) => r.requestingUserId === userId);
-        if (mine.length === 0) return null;
-        return mine.sort(
+        if (requests.length === 0) return null;
+        return requests.sort(
           (a, b) =>
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
         )[0];
