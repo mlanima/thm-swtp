@@ -7,6 +7,9 @@ services:
       SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
       SPRING_PROFILES_ACTIVE: mysql
+      APP_UPLOADS_DIR: /app/uploads
+    volumes:
+      - swtp-main-uploads:/app/uploads
     labels:
       - traefik.enable=true
       - traefik.docker.network=traefik-net
@@ -59,3 +62,6 @@ networks:
     external: true
   app_internal:
     external: true
+
+volumes:
+  swtp-main-uploads:
