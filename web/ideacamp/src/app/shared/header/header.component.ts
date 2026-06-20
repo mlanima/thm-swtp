@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { LogoComponent } from './logo/logo.component';
 import { FeatureComponent } from './feature/feature.component';
 import { AuthPanelComponent } from './auth-panel/auth-panel.component';

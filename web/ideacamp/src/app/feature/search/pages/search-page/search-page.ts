@@ -23,8 +23,10 @@ export class SearchPage implements OnInit, OnDestroy {
 
   readonly activeTab = signal<Tab>('all');
   readonly errorMessage = signal('');
-  readonly projects = signal<ProjectSearchResult[]>([]);
-  readonly users = signal<UserSearchResult[]>([]);
+  readonly projectResults = signal<ProjectSearchResult[]>([]);
+  readonly userResults = signal<UserSearchResult[]>([]);
+  readonly projects = this.projectResults;
+  readonly users = this.userResults;
   readonly isLoading = signal(false);
   readonly currentQueriesCount = signal(0);
 
