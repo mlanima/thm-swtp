@@ -1,10 +1,15 @@
 package de.thm.swtp.api.search.service;
 
 import de.thm.swtp.api.project.ProjectEntity;
+import de.thm.swtp.api.projectFavorite.repository.ProjectFavoriteRepository;
 import de.thm.swtp.api.search.repository.ProjectSearchRepository;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProjectSearchService {
 
     private final ProjectSearchRepository projectSearchRepository;
+    private final ProjectFavoriteRepository projectFavoriteRepository;
     private final SearchService searchService;
 
     /**
@@ -49,7 +55,8 @@ public class ProjectSearchService {
      * <p>
      * Each term is matched case-insensitively against the project name
      * and its tags. Only non-deleted projects are considered.
-     * Multiple terms are combined with AND logic.
+     * Multiple terms are combined with AND logic. Results are ordered by
+     * favorite count, most favorited first.
      *
      * @param queries  one or more search terms
      * @param pageable pagination and sorting information
@@ -61,7 +68,17 @@ public class ProjectSearchService {
                 queries,
                 projectSearchRepository::searchIdsByQuery,
                 projectSearchRepository::findAllWithTagsById,
-                pageable
+                pageable,
+                this::favoriteCountsByProjectId,
+                ProjectEntity::getId
         );
+    }
+
+    private Map<UUID, Long> favoriteCountsByProjectId(Collection<UUID> projectIds) {
+        return projectFavoriteRepository.countByProjectIdIn(projectIds).stream()
+                .collect(Collectors.toMap(
+                        ProjectFavoriteRepository.ProjectFavoriteCount::getProjectId,
+                        ProjectFavoriteRepository.ProjectFavoriteCount::getFavoriteCount
+                ));
     }
 }

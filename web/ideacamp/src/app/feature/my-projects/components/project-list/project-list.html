@@ -2,7 +2,7 @@
   <div
     class="mt-6 rounded-2xl border border-slate-200 bg-white px-6 py-12 text-center shadow-sm"
   >
-    <p class="text-sm text-slate-500">Deine Projekte werden geladen…</p>
+    <p class="text-sm text-slate-500">{{ 'MYPROJECTS.LOADING' | translate }}</p>
   </div>
 } @else if (errorMessage()) {
   <div
@@ -19,9 +19,9 @@
     >
       <i class="pi pi-folder text-2xl"></i>
     </div>
-    <h3 class="mt-5 text-2xl font-semibold text-slate-700">Noch keine Projekte</h3>
+    <h3 class="mt-5 text-2xl font-semibold text-slate-700">{{ 'MYPROJECTS.EMPTY_TITLE' | translate }}</h3>
     <p class="mt-2 text-sm text-slate-500">
-      Sobald du dein erstes Projekt erstellst, erscheint es hier.
+      {{ 'MYPROJECTS.EMPTY_DESCRIPTION' | translate }}
     </p>
   </div>
 } @else {

@@ -3,7 +3,7 @@
 
     <div class="flex flex-1 gap-4 items-center">
       @if (isAuthenticated()) {
-        <button (click)="sidebarService.open()">
+        <button (click)="sidebarService.open()" class="-ml-2 p-2" aria-label="Menü öffnen">
           <i class="pi pi-bars text-xl text-slate-900"> </i>
         </button>
       }
@@ -16,20 +16,20 @@
       <a routerLink="/my-projects">
         <app-feature>
           <i class="pi pi-home text-md"></i>
-          Home
+          {{ 'NAV.HOME' | translate }}
         </app-feature>
       </a>
       <a routerLink="/search">
         <app-feature>
           <i class="pi pi-compass text-md"></i>
-          Erkunden
+          {{ 'NAV.SEARCH' | translate }}
         </app-feature>
       </a>
     </nav>
 
-    <div class="hidden md:flex justify-end flex-1">
+    <div class="flex justify-end flex-1">
       @if (isAuthenticated()) {
-        <a [routerLink]="['/profiles', auth.username()]">
+        <a [routerLink]="['/profiles', auth.username()]" class="hidden md:block">
           <app-auth-panel [user]="{ username: auth.username(), id: auth.user()?.id ?? '' }"/>
         </a>
       } @else {
@@ -42,6 +42,13 @@
       }
     </div>
   </div>
+
+  <button
+    type="button"
+    class="rounded-lg border border-slate-300 px-3 py-1 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+    (click)="changeLanguage(currentLanguage() === 'en' ? 'de' : 'en')">
+    {{ currentLanguage() === 'en' ? 'EN' : 'DE' }}
+  </button>
 
 
 </header>

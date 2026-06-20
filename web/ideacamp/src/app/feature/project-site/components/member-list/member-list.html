@@ -1,8 +1,8 @@
 <div class="rounded-2xl bg-linear-to-br from-slate-600 to-slate-800 p-5 text-white shadow-sm">
-  <h3 class="mb-4 text-sm font-semibold">Mitglieder</h3>
+  <h3 class="mb-4 text-sm font-semibold">{{ 'PROJECTSETTINGS.TABS.MEMBERS' | translate }}</h3>
 
   @if (isLoading()) {
-    <p class="text-xs text-slate-400">Lade Mitglieder...</p>
+    <p class="text-xs text-slate-400">{{ 'PROJECTSETTINGS.MEMBERS.LOADING' | translate }}</p>
   }
 
   @if (!isLoading() && errorMessage()) {
@@ -10,7 +10,7 @@
   }
 
   @if (!isLoading() && !errorMessage() && members().length === 0) {
-    <p class="text-xs text-slate-400">Noch keine Mitglieder.</p>
+    <p class="text-xs text-slate-400">{{ 'PROJECTSITE.MEMBERS.NO_MEMBERS' | translate }}</p>
   }
 
   @if (!isLoading() && members().length > 0) {
@@ -34,7 +34,7 @@
             </div>
             @if (member.isOwner) {
               <span class="rounded-full border border-lime-400/30 bg-lime-500/20 px-2 py-0.5 text-xs font-medium text-lime-400">
-                Inhaber
+                {{ 'MYPROJECTS.OWNER' | translate }}
               </span>
             }
           </div>
@@ -81,7 +81,7 @@
         <i class="pi pi-times text-sm"></i>
       </button>
 
-      <h2 class="mb-4 text-sm font-semibold">Alle Mitglieder</h2>
+      <h2 class="mb-4 text-sm font-semibold">{{ 'PROJECTSITE.MEMBERS.ALL_MEMBERS' | translate }}</h2>
 
       <div class="space-y-2">
         @for (member of members(); track member.id) {
@@ -103,7 +103,7 @@
               </div>
               @if (member.isOwner) {
                 <span class="rounded-full border border-lime-400/30 bg-lime-500/20 px-2 py-0.5 text-xs font-medium text-lime-400">
-                  Inhaber
+                  {{ 'MYPROJECTS.OWNER' | translate }}
                 </span>
               }
             </div>

@@ -1,4 +1,5 @@
 import { Component, Input, OnInit, inject, signal } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ProjectJoinRequestService } from '../../services/project-join-request.service';
 
 type JoinButtonStatus = 'loading' | 'idle' | 'pending';
@@ -6,6 +7,7 @@ type JoinButtonStatus = 'loading' | 'idle' | 'pending';
 @Component({
   selector: 'app-join-request-button',
   standalone: true,
+  imports: [TranslatePipe],
   templateUrl: './join-request-button.html',
 })
 export class JoinRequestButton implements OnInit {

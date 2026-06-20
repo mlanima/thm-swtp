@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideTranslateTesting } from '../../../testing/translate-testing.provider';
 
 import { Stepper } from './stepper';
 
@@ -9,6 +10,9 @@ describe('Stepper', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [Stepper],
+      providers: [
+        provideTranslateTesting(),
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(Stepper);

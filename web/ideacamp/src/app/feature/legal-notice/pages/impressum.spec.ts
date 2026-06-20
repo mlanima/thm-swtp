@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
-
+import { provideTranslateTesting } from '../../../testing/translate-testing.provider';
 import { Impressum } from './impressum';
 
 describe('Impressum', () => {
@@ -10,7 +10,7 @@ describe('Impressum', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [Impressum],
-      providers: [{ provide: ActivatedRoute, useValue: {} }],
+      providers: [provideTranslateTesting(), { provide: ActivatedRoute, useValue: {} }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(Impressum);
