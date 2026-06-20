@@ -1,4 +1,5 @@
 import { Component, inject, OnDestroy, OnInit, signal, computed } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { Subject, takeUntil, forkJoin, debounceTime, distinctUntilChanged, switchMap, catchError, of } from 'rxjs';
 import { SearchService } from '../../services/search.service';
 import { ProjectSearchResult } from '../../models/project-search-result.model';
@@ -12,7 +13,7 @@ type Tab = 'all' | 'projects' | 'users';
 @Component({
   selector: 'app-search-page',
   standalone: true,
-  imports: [ProjectResultCard, UserResultCard, SearchInputComponent],
+  imports: [ProjectResultCard, UserResultCard, SearchInputComponent, TranslatePipe],
   templateUrl: './search-page.html',
 })
 export class SearchPage implements OnInit, OnDestroy {
@@ -44,7 +45,7 @@ export class SearchPage implements OnInit, OnDestroy {
             users: this.searchService.searchUsers(queries),
           }).pipe(
             catchError(() => {
-              this.errorMessage.set('Die Suche ist fehlgeschlagen. Bitte versuche es erneut..');
+              this.errorMessage.set('SEARCH.ERROR_FAILED');
               return of(null);
             })
           );

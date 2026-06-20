@@ -3,7 +3,7 @@ import { Component, OnInit, OnDestroy, inject, PLATFORM_ID, signal } from '@angu
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { FormsModule } from '@angular/forms';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { ProfileInformation } from '../../components/profile-information/profile-information';
 import { ProfileBanner } from '../../components/profile-banner/profile-banner';
@@ -43,6 +43,8 @@ export class UserProfile implements OnInit, OnDestroy {
 
   /** Auth service used to determine whether the viewer is the profile owner. */
   private readonly authService = inject(AuthService);
+
+  private readonly translateService = inject(TranslateService);
 
   /** Username read from the route parameter :username. */
   routeUsername = '';
@@ -101,7 +103,7 @@ export class UserProfile implements OnInit, OnDestroy {
       this.routeUsername = params.get('username') ?? '';
 
       if (!this.routeUsername) {
-        this.profileState.set({ isLoading: false, profile: null, errorMessage: 'Nutzer nicht gefunden.' });
+        this.profileState.set({ isLoading: false, profile: null, errorMessage: this.translateService.instant('USERPROFILE.ERROR_NOT_FOUND') });
         return;
       }
 
@@ -136,10 +138,10 @@ export class UserProfile implements OnInit, OnDestroy {
       error: (error) => {
         const errorMessage =
           error.status === 401 || error.status === 403
-            ? 'Bitte melde dich an, um dieses Profil anzuzeigen.'
+            ? this.translateService.instant('USERPROFILE.ERROR_AUTH_REQUIRED')
             : error.status === 404
-              ? 'Nutzer nicht gefunden.'
-              : 'Profilinformationen konnten nicht geladen werden. Bitte versuche es später erneut.';
+              ? this.translateService.instant('USERPROFILE.ERROR_NOT_FOUND')
+              : this.translateService.instant('USERPROFILE.ERROR_LOAD_PROFILE');
 
         this.profileState.set({
           isLoading: false,
@@ -203,8 +205,8 @@ export class UserProfile implements OnInit, OnDestroy {
         error: (error) => {
           const errorMessage =
             error.status === 401 || error.status === 403
-              ? 'Du bist nicht berechtigt, dieses Profil zu bearbeiten.'
-              : 'Das Profil konnte nicht aktualisiert werden. Bitte versuche es später erneut.';
+              ? this.translateService.instant('USERPROFILE.ERROR_EDIT_FORBIDDEN')
+              : this.translateService.instant('USERPROFILE.ERROR_UPDATE_PROFILE');
 
           this.profileState.set({
             isLoading: false,

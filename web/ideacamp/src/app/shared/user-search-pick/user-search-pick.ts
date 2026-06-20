@@ -1,5 +1,6 @@
 import { ChangeDetectorRef, Component, ElementRef, OnDestroy, ViewChild, inject, input, output, signal, AfterViewInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe } from '@ngx-translate/core';
 import { Subject, Subscription, catchError, debounceTime, distinctUntilChanged, of, switchMap } from 'rxjs';
 import { SearchService } from '../../feature/search/services/search.service';
 import { UserSearchResult } from '../../feature/search/models/user-search-result.model';
@@ -7,7 +8,7 @@ import { UserSearchResult } from '../../feature/search/models/user-search-result
 @Component({
   selector: 'app-user-search-pick',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, TranslatePipe],
   templateUrl: './user-search-pick.html',
 })
 export class UserSearchPick implements OnDestroy, AfterViewInit {
@@ -17,8 +18,8 @@ export class UserSearchPick implements OnDestroy, AfterViewInit {
   private readonly searchSubscription: Subscription;
 
   excludedUserIds = input<string[]>([]);
-  placeholder = input('Nutzer finden')
-  emptyMessage = input('Keine Nutzer gefunden');
+  placeholder = input('PROJECTCREATE.USER_SEARCH_PLACEHOLDER');
+  emptyMessage = input('USER_SEARCH.EMPTY');
 
   userSelected = output<UserSearchResult>();
 

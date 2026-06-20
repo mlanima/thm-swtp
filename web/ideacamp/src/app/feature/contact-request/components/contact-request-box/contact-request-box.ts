@@ -1,9 +1,11 @@
 import { Component, Input,Output, EventEmitter } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import {ContactRequest} from '../contact-request.model'
+
 @Component({
   selector: 'app-contact-request-box',
   standalone: true,
-  imports: [],
+  imports: [TranslatePipe],
   templateUrl: './contact-request-box.html',
 })
 export class ContactRequestBox {

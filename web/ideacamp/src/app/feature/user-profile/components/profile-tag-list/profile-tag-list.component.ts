@@ -1,4 +1,5 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges, inject, signal } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { EditableTagListComponent } from '../../../../shared/tags/tag-list/editable-tag-list.component';
 import { UserProfileTagService, TagResponse } from '../../services/user-profile-tag.service'
 
@@ -10,6 +11,7 @@ import { UserProfileTagService, TagResponse } from '../../services/user-profile-
 })
 export class ProfileTagListComponent implements OnInit, OnChanges {
   private readonly userProfileTagService = inject(UserProfileTagService);
+  private readonly translateService = inject(TranslateService);
 
   @Input({ required: true }) username?: string;
   @Input() isOwner = false;
@@ -47,7 +49,7 @@ export class ProfileTagListComponent implements OnInit, OnChanges {
         const existing = this.tags().some((item) => item.name.toLowerCase() === lower);
 
         if (existing) {
-          this.errorMessage.set('Tag bereits vorhanden.');
+          this.errorMessage.set(this.translateService.instant('PROJECTSITE.TAGS.ERROR_DUPLICATE'));
           setTimeout(() => {
             this.errorMessage.set(null);
           }, 3000);
@@ -60,7 +62,7 @@ export class ProfileTagListComponent implements OnInit, OnChanges {
         this.isSaving.set(false);
       },
       error: () => {
-        this.errorMessage.set('Tag zu lang!');
+        this.errorMessage.set(this.translateService.instant('PROJECTSITE.TAGS.ERROR_TOO_LONG'));
         setTimeout(() => {
           this.errorMessage.set(null);
         }, 3000);
@@ -86,7 +88,7 @@ export class ProfileTagListComponent implements OnInit, OnChanges {
         this.isDeleting.set(false);
       },
       error: () => {
-        this.errorMessage.set('Tag konnte nicht gelöscht werden.');
+        this.errorMessage.set(this.translateService.instant('PROJECTSITE.TAGS.ERROR_DELETE'));
         setTimeout(() => {
           this.errorMessage.set(null);
         }, 3000);
@@ -109,7 +111,7 @@ export class ProfileTagListComponent implements OnInit, OnChanges {
         this.isLoading.set(false);
       },
       error: () => {
-        this.errorMessage.set('Tags konnten nicht geladen werden.');
+        this.errorMessage.set(this.translateService.instant('PROJECTSITE.TAGS.ERROR_LOAD'));
         this.isLoading.set(false);
       },
     });

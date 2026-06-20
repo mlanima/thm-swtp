@@ -2,15 +2,15 @@
 
   @if (isLoading()) {
     <div class="flex items-center justify-center py-20">
-      <p class="text-slate-500">Projekt wird geladen…</p>
+      <p class="text-slate-500">{{ 'PROJECTSITE.LOADING' | translate }}</p>
     </div>
   }
 
   @if (!isLoading() && errorMessage()) {
     <div class="mx-auto max-w-6xl px-6 py-10">
       <div class="rounded-xl bg-red-50 border border-red-200 p-6 text-red-700">
-        <p class="font-semibold">Fehler</p>
-        <p class="mt-1 text-sm">{{ errorMessage() }}</p>
+        <p class="font-semibold">{{ 'COMMON.ERROR' | translate }}</p>
+        <p class="mt-1 text-sm">{{ errorMessage()! | translate }}</p>
       </div>
     </div>
   }
@@ -27,7 +27,7 @@
         <div class="rounded-2xl bg-white p-6 shadow-sm">
           <div class="mb-4 flex items-center justify-between">
             <h2 class="text-lg font-semibold text-slate-700">
-              Projektinformationen
+              {{ 'PROJECTSITE.INFORMATION' | translate }}
             </h2>
 
             @if (isOwner) {
@@ -48,7 +48,7 @@
           @if (isEditing()) {
             <div class="space-y-4">
               <div>
-                <label for="editName" class="text-xs font-medium text-slate-500">Projektname</label>
+                <label for="editName" class="text-xs font-medium text-slate-500">{{ 'PROJECTCREATE.PROJECT_NAME' | translate }}</label>
                 <input
                   id="editName"
                   [ngModel]="editName()"
@@ -57,7 +57,7 @@
                 />
               </div>
               <div>
-                <label for="editShortDescription" class="text-xs font-medium text-slate-500">Kurzbeschreibung</label>
+                <label for="editShortDescription" class="text-xs font-medium text-slate-500">{{ 'PROJECTCREATE.SHORT_DESCRIPTION' | translate }}</label>
                 <input
                   id="editShortDescription"
                   [ngModel]="editShortDescription()"
@@ -67,7 +67,7 @@
                 />
               </div>
               <div>
-                <label for="editDescription" class="text-xs font-medium text-slate-500">Beschreibung</label>
+                <label for="editDescription" class="text-xs font-medium text-slate-500">{{ 'PROJECTCREATE.DESCRIPTION' | translate }}</label>
                 <textarea
                   id="editDescription"
                   [ngModel]="editDescription()"
@@ -82,13 +82,13 @@
                   [disabled]="isSaving()"
                   class="rounded-md bg-lime-500 px-4 py-2 text-sm font-medium text-white hover:bg-lime-600 disabled:opacity-50"
                 >
-                  {{ isSaving() ? 'Speichern…' : 'Speichern' }}
+                  {{ isSaving() ? ('COMMON.SAVE' | translate) + '…' : ('COMMON.SAVE' | translate) }}
                 </button>
                 <button
                   (click)="cancelEdit()"
                   class="rounded-md bg-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-300"
                 >
-                  Abbrechen
+                  {{ 'COMMON.CANCEL' | translate }}
                 </button>
               </div>
             </div>
@@ -106,8 +106,8 @@
 
   @if (showSuccessModal()) {
     <app-success-modal
-      message="Projekt erfolgreich geändert."
-      buttonText="Weiter"
+      [message]="'PROJECTSITE.PROJECT_UPDATED' | translate"
+      [buttonText]="'COMMON.CONTINUE' | translate"
       (closeModal)="closeSuccessModal()">
     </app-success-modal>
   }

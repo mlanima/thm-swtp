@@ -29,7 +29,7 @@ export class HeaderComponent {
 
   private readonly languageService = inject(LanguageService);
 
-  currentLanguage = signal<AppLanguage>(this.languageService.getCurrentLanguage());
+  currentLanguage = this.languageService.currentLanguage;
 
   changeLanguage(language: AppLanguage): void {
     this.languageService.changeLanguage(language);

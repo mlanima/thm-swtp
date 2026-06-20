@@ -1,18 +1,20 @@
 import { Component, signal, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ProjectSettingsService } from '../../services/project-settings.service';
 import { ProjectSettingsStore } from '../../project-settings.store';
 
 @Component({
   selector: 'app-danger-zone-tab',
   standalone: true,
-  imports: [],
+  imports: [TranslatePipe],
   templateUrl: './danger-zone-tab.html',
 })
 export class DangerZoneTab {
   private readonly store = inject(ProjectSettingsStore);
   private readonly settingsService = inject(ProjectSettingsService);
   private readonly router = inject(Router);
+  private readonly translateService = inject(TranslateService);
 
   showDeleteModal = signal(false);
   deleteConfirmInput = signal('');
@@ -42,7 +44,7 @@ export class DangerZoneTab {
     this.settingsService.deleteProject(this.projectId()).subscribe({
       next: () => this.router.navigateByUrl('/my-projects'),
       error: () => {
-        this.deleteError.set('Projekt konnte nicht gelöscht werden.');
+        this.deleteError.set(this.translateService.instant('PROJECTSETTINGS.DANGER.ERROR_DELETE_PROJECT'));
         this.isDeleting.set(false);
       },
     });

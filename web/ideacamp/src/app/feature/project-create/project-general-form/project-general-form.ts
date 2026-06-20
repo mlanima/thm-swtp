@@ -1,6 +1,6 @@
 import {Component, Output, EventEmitter, Input, OnChanges,SimpleChanges} from '@angular/core';
 import {FormsModule} from '@angular/forms';
-
+import { TranslatePipe } from '@ngx-translate/core';
 import {ProjectGeneralData, projectGeneralSchema} from '../schemas/project-create.schema';
 import {FormErrors, mapZodErrors} from '../schemas/zod-error.helper';
 
@@ -10,7 +10,7 @@ type GeneralFormFields = 'name' | 'shortDescription' | 'description';
 @Component({
   selector: 'app-project-general-form',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, TranslatePipe],
   templateUrl: './project-general-form.html',
 })
 

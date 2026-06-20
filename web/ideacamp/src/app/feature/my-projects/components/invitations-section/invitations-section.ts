@@ -2,7 +2,7 @@ import { Component, OnInit, signal, inject, ChangeDetectionStrategy } from '@ang
 import { ProjectInvitationService } from '../../services/project-invitation.service';
 import { ProjectInviteResponse } from '../../../../models/project-invite.model';
 import { InvitationCard } from '../invitation-card/invitation-card';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-invitations-section',
@@ -32,7 +32,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 })
 export class InvitationsSection implements OnInit {
   private readonly invitationService = inject(ProjectInvitationService);
-
+  private readonly translateService = inject(TranslateService);
   readonly invitations = signal<ProjectInviteResponse[]>([]);
   readonly isLoading = signal(false);
   readonly errorMessage = signal('');
@@ -71,7 +71,7 @@ export class InvitationsSection implements OnInit {
         this.isLoading.set(false);
       },
       error: () => {
-        this.errorMessage.set('Einladungen konnten nicht geladen werden.');
+        this.errorMessage.set(this.translateService.instant('MYPROJECTS.ERROR_LOAD_INVITATIONS'));
         this.isLoading.set(false);
       },
     });

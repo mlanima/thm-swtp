@@ -14,7 +14,12 @@
     "DELETE": "Delete",
     "LOADING": "Loading...",
     "ERROR": "Error",
-    "CONTINUE": "Continue"
+    "CONTINUE": "Continue",
+    "PROJECT": "Project",
+    "BACK": "Back",
+    "FINISH": "Finish",
+    "PRIVATE": "Private",
+    "PUBLIC": "Public"
   },
   "LANGUAGE": {
     "GERMAN": "German",
@@ -31,43 +36,314 @@
     "P2": "What are your plans for today? Create your first project, discover exciting ideas, or connect with other creative minds. Your adventure starts here!"
   },
   "MYPROJECTS": {
-    "TITLE": "My Projects",
+    "TITLE": "My projects",
     "CREATE_PROJECT": "Create project",
     "PROJECTS": "Projects",
     "PROJECTS_COUNT_LABEL": "Projects",
     "OWNED_PROJECTS_COUNT_LABEL": "Owned projects",
-
     "INVITATIONS": "Project invitations",
     "INVITED_BY": "Invited by:",
     "ACCEPT": "Accept",
     "DECLINE": "Decline",
-
     "NO_SHORT_DESCRIPTION": "No short description.",
     "PRIVATE": "Private",
     "PUBLIC": "Public",
     "OWNER": "Owner",
-
     "FILTER_ALL": "All projects",
     "FILTER_OWNED": "Owned",
-
     "LOADING": "Your projects are loading…",
     "EMPTY_TITLE": "No projects yet",
-    "EMPTY_DESCRIPTION": "Once you create your first project, it will appear here."
+    "EMPTY_DESCRIPTION": "Once you create your first project, it will appear here.",
+    "ERROR_LOAD_INVITATIONS": "Invitations could not be loaded.",
+    "ERROR_LOAD_USERNAME": "Your username could not be loaded.",
+    "ERROR_LOAD_PROJECTS": "Your projects could not be loaded.",
+    "TIME": {
+      "JUST_NOW": "just now",
+      "MINUTE_AGO": "{{ count }} minute ago",
+      "MINUTES_AGO": "{{ count }} minutes ago",
+      "HOUR_AGO": "{{ count }} hour ago",
+      "HOURS_AGO": "{{ count }} hours ago",
+      "YESTERDAY": "yesterday",
+      "DAYS_AGO": "{{ count }} days ago"
+    }
   },
   "USERPROFILE": {
     "LOADING": "Profile is loading...",
-
     "NO_TITLE": "No title available",
     "NO_LOCATION": "No location available",
-
     "PROFILE_INFORMATION": "Profile information",
     "EDIT_PROFILE_INFORMATION": "Edit profile information",
     "NO_INFORMATION": "No information.",
-
     "EXPERIENCE": "Experience",
     "EDIT_EXPERIENCE": "Edit experience",
     "NO_EXPERIENCE": "No experience.",
-
-    "PROFILE_UPDATED": "Profile updated successfully."
+    "PROFILE_UPDATED": "Profile updated successfully.",
+    "ERROR_NOT_FOUND": "User not found.",
+    "ERROR_AUTH_REQUIRED": "Please log in to view this profile.",
+    "ERROR_LOAD_PROFILE": "Profile information could not be loaded. Please try again later.",
+    "ERROR_EDIT_FORBIDDEN": "You are not authorized to edit this profile.",
+    "ERROR_UPDATE_PROFILE": "The profile could not be updated. Please try again later."
+  },
+  "CONTACT-REQUESTS": {
+    "CONTACT": "Contact Requests",
+    "CONTACT-PROJECT": "Manage contact requests for my project",
+    "OPEN-REQUEST": "Open Inquiries",
+    "COMPLETED": "Completed Requests"
+  },
+  "FAVORITE": {
+    "TITLE": "My Favorites",
+    "LOADING": "Your favorites are loading…",
+    "EMPTY": "No favorites yet",
+    "EMPTY_DESCRIPTION": "Once you favorite a project, it will appear here.",
+    "PRIVATE": "Private",
+    "PUBLIC": "Public",
+    "NO_DESCRIPTION": "No description available.",
+    "OPEN_PROJECT": "Open project",
+    "ERROR_LOAD": "Your favorites could not be loaded."
+  },
+  "SIDEBAR": {
+    "MYPROJECTS": "My projects",
+    "FAVORITE": "Favorites",
+    "PROFILE": "My profile",
+    "IMPRESSUM": "Legal notice",
+    "MENU": "Menu"
+  },
+  "PROJECTCREATE": {
+    "PAGE_TITLE": "Create a new project",
+    "CREATING": "Project is being created…",
+    "PROJECT_NAME": "Project name",
+    "PROJECT_NAME_PLACEHOLDER": "Enter the project name",
+    "NO_PROJECT_NAME": "No project name",
+    "SHORT_DESCRIPTION": "Short description",
+    "SHORT_DESCRIPTION_PLACEHOLDER": "Describe your project in one or two sentences",
+    "NO_SHORT_DESCRIPTION": "No short description",
+    "DESCRIPTION": "Description",
+    "DESCRIPTION_PLACEHOLDER": "Describe your project in detail",
+    "NO_DESCRIPTION": "No project description",
+    "PROJECT_URL": "Project URL",
+    "PROJECT_URL_LABEL": "Project URL (Your project will be available at /project/your-input)",
+    "PROJECT_URL_PLACEHOLDER": "e.g. my-project",
+    "NO_PROJECT_URL": "No project URL",
+    "CHECKING_PROJECT_URL": "Checking project URL...",
+    "PROJECT_URL_EXISTS": "This project URL is already taken.",
+    "PROJECT_URL_AVAILABLE": "This project URL is available.",
+    "PRIVATE": "Private",
+    "PUBLIC": "Public",
+    "PRIVATE_DESCRIPTION": "Only invited users will be able to see the project",
+    "MEMBERS": "Project members",
+    "ADD_MEMBER": "Add member",
+    "ADD": "Add",
+    "INVITED_MEMBERS": "Invited members",
+    "NO_MEMBERS_INVITED": "No members invited",
+    "MEMBER_DIALOG_TITLE": "Add people to your project",
+    "MEMBER_DIALOG_SUBTITLE": "Search by username",
+    "USER_SEARCH_PLACEHOLDER": "Find user",
+    "USER_SEARCH_EMPTY_PREFIX": "No matching users found",
+    "FINISH_TITLE": "Finish",
+    "FINISH_DESCRIPTION": "Review all entries to complete your project.",
+    "STATUS": "Status",
+    "STEPS": {
+      "GENERAL": "General",
+      "SETTINGS": "Settings",
+      "MEMBERS": "Members",
+      "FINISH": "Finish"
+    },
+    "PROJECT_URL_CHECK_ERROR": "Project URL could not be checked.",
+    "SUCCESS_CREATED": "Project created successfully!",
+    "SUCCESS_CREATED_WITH_INVITES": "Project created successfully and invitations sent!",
+    "ERROR_CREATE_PROJECT": "Project could not be created. Please try again.",
+    "VALIDATION": {
+      "NAME_MIN": "Project name must be at least 3 characters long.",
+      "NAME_MAX": "Project name must not be longer than 20 characters.",
+      "NAME_NO_QUOTES": "Project name must not contain quotation marks.",
+      "SHORT_DESCRIPTION_MAX": "Short description must not be longer than 200 characters.",
+      "SHORT_DESCRIPTION_NO_QUOTES": "Short description must not contain quotation marks.",
+      "DESCRIPTION_MAX": "Project description must not be longer than 500 characters.",
+      "DESCRIPTION_NO_QUOTES": "Project description must not contain quotation marks.",
+      "PROJECT_URL_MIN": "Project URL must be at least 3 characters long.",
+      "PROJECT_URL_MAX": "Project URL must not be longer than 30 characters.",
+      "PROJECT_URL_FORMAT": "Use only lowercase letters, numbers and hyphens. Hyphens are not allowed at the beginning or end."
+    }
+  },
+  "SEARCH": {
+    "TITLE": "Search",
+    "SUBTITLE": "Find projects and users across the platform",
+    "TAB_ALL": "All",
+    "TAB_PROJECTS": "Projects",
+    "TAB_USERS": "Users",
+    "RESULTS": "Results",
+    "SEARCHING": "Searching...",
+    "NO_RESULTS_TITLE": "No results found",
+    "NO_RESULTS_DESCRIPTION": "No matching results were found. Please check the spelling or try different search terms.",
+    "PROJECTS_SECTION": "Projects",
+    "USERS_SECTION": "Users",
+    "ADD_SEARCH_INPUT": "Add search input",
+    "INPUT_PLACEHOLDER": "Search for users or projects...",
+    "ERROR_FAILED": "The search failed. Please try again."
+  },
+  "IMPRESSUM": {
+    "BADGE": "Legal information",
+    "TITLE": "Legal notice",
+    "SUBTITLE": "Information according to Section 5 TMG",
+    "PROVIDER": "Provider",
+    "ORGANIZATION": "Organization",
+    "PROJECT": "Project",
+    "ADDRESS": "Address",
+    "ORGANIZATION_VALUE": "University of Applied Sciences Mittelhessen (THM)",
+    "PROJECT_VALUE": "IdeaCamp – Student project matching platform",
+    "ADDRESS_VALUE": "Wiesenstraße 14\n35390 Giessen, Germany",
+    "CONTACT": "Contact",
+    "EMAIL": "Email",
+    "RESPONSIBLE": "Responsible for content",
+    "ACCORDING_TO": "According to Section 18 (2) MStV",
+    "RESPONSIBLE_VALUE": "The IdeaCamp development team\nUniversity of Applied Sciences Mittelhessen\nWiesenstraße 14, 35390 Giessen, Germany",
+    "DISCLAIMER": "Disclaimer",
+    "DISCLAIMER_TEXT": "Despite careful content control, we assume no liability for the content of external links. The operators of the linked pages are solely responsible for their content.",
+    "PRIVACY": "Privacy",
+    "PRIVACY_TEXT": "Since IdeaCamp is a student university project without commercial orientation, no personal data is permanently stored or shared with third parties. If you have any questions, please contact us directly by email.",
+    "UNIVERSITY_PROJECT": "University project",
+    "UNIVERSITY_PROJECT_TEXT": "IdeaCamp is a student project as part of a university course project at THM. It is not a commercial offering.",
+    "FOOTER": "IdeaCamp · THM Giessen"
+  },
+  "PROJECTSETTINGS": {
+    "TITLE": "Project settings",
+    "BACK_TO_PROJECT": "Back to project",
+    "UNEXPECTED_ERROR": "An unexpected error occurred",
+    "TABS": {
+      "JOIN_REQUESTS": "Join requests",
+      "MEMBERS": "Members",
+      "PRIVACY": "Privacy",
+      "DANGER_ZONE": "Danger zone"
+    },
+    "ERRORS": {
+      "NO_PROJECT_URL": "No project URL provided.",
+      "LOAD_PROJECT": "Project could not be loaded."
+    },
+    "PRIVACY": {
+      "SUBTITLE": "Control project visibility and joining",
+      "PUBLIC_VISIBILITY": "Public visibility",
+      "PUBLIC_VISIBLE_DESCRIPTION": "This project is publicly visible and can be found by anyone.",
+      "PRIVATE_VISIBLE_DESCRIPTION": "This project is private and does not appear in search.",
+      "ALLOW_JOIN_REQUESTS": "Allow join requests",
+      "ALLOW_JOIN_REQUESTS_DESCRIPTION": "Users can request to join the project. Project owners can accept or decline requests."
+    },
+    "MEMBERS": {
+      "SUBTITLE": "Manage which members have access to the project.",
+      "INVITE_MEMBER": "Invite member",
+      "LOADING": "Loading members...",
+      "EMPTY": "This project does not have any members yet.",
+      "TABLE_MEMBER": "Member",
+      "TABLE_ROLE": "Role",
+      "ROLE_MEMBER": "Member",
+      "DELETE_MEMBER": "Delete member",
+      "REMOVE_MEMBER": "Remove member",
+      "REMOVE_ACCESS": "Access to the project will be removed",
+      "REMOVE_CONFIRM_START": "Are you sure you want to remove",
+      "REMOVE_CONFIRM_MIDDLE": "from the project?",
+      "REMOVE_CONFIRM_END": "This member will lose all permissions for the project!",
+      "INVITE_SUBTITLE": "Search for a user",
+      "USER_SEARCH_PLACEHOLDER": "Search user",
+      "USER_SEARCH_EMPTY": "No users found for",
+      "MESSAGE_OPTIONAL": "Optional message",
+      "MESSAGE_PLACEHOLDER": "Add an optional message...",
+      "INVITING": "Inviting...",
+      "INVITE": "Invite",
+      "ERROR_DELETE_MEMBER": "Member could not be deleted. Please try again shortly.",
+      "ERROR_LOAD_MEMBERS": "Members could not be loaded. Please try again later.",
+      "ERROR_INVITE": "Invitation could not be created. Please try again.",
+      "INVITE_SUCCESS": "Invitation was successfully sent to {{ username }}."
+    },
+    "JOIN_REQUESTS": {
+      "SUBTITLE": "Manage join requests for this project.",
+      "LOADING": "Join requests are loading…",
+      "EMPTY_TITLE": "No join requests",
+      "EMPTY_DESCRIPTION": "Once someone submits a request, it will appear here."
+    },
+    "DANGER": {
+      "TITLE": "Delete project",
+      "SUBTITLE": "This action cannot be undone.",
+      "DESCRIPTION": "This project and all related data will be permanently deleted!",
+      "MODAL_SUBTITLE": "This is an irreversible action",
+      "DELETE_TEXT_START": "If you permanently delete",
+      "DELETE_TEXT_END": "all ideas, members and settings will be deleted. The data cannot be restored.",
+      "CONFIRM_TYPE_START": "To confirm this action, please type",
+      "CONFIRM_TYPE_END": ".",
+      "DELETING": "Deleting…",
+      "ERROR_DELETE_PROJECT": "Project could not be deleted."
+    }
+  },
+  "PROJECTSITE": {
+    "LOADING": "Project is loading…",
+    "INFORMATION": "Project information",
+    "PROJECT_UPDATED": "Project updated successfully.",
+    "ERRORS": {
+      "NO_PROJECT_URL": "No project URL provided.",
+      "LOAD_PROJECT": "Project data could not be loaded.",
+      "SAVE_PROJECT": "Project could not be saved."
+    },
+    "INFO": {
+      "VISIBILITY": "Visibility",
+      "CONTRIBUTORS": "Contributors",
+      "VIEWS": "Views",
+      "LIKES": "Likes",
+      "OPEN_POSITIONS": "Open positions"
+    },
+    "HEADER": {
+      "SETTINGS": "Settings"
+    },
+    "MEMBERS": {
+      "ALL_MEMBERS": "All members",
+      "NO_MEMBERS": "No members yet."
+    },
+    "QUICKLINKS": {
+      "TITLE": "Links",
+      "ADD": "Add",
+      "LABEL": "Label",
+      "LABEL_PLACEHOLDER": "Example page",
+      "URL_PLACEHOLDER": "e.g. example.com",
+      "LOADING": "Links are loading...",
+      "EMPTY": "No public links available.",
+      "EDIT_LINK": "Edit link",
+      "DELETE_LINK": "Delete link",
+      "ERROR_LOAD": "Links could not be loaded.",
+      "ERROR_ADD": "Link could not be added.",
+      "ERROR_UPDATE": "Link could not be updated.",
+      "ERROR_DELETE": "Link could not be deleted.",
+      "ERROR_INVALID": "Invalid link data.",
+      "VALIDATION_LABEL_REQUIRED": "Label is required.",
+      "VALIDATION_LABEL_TOO_LONG": "The label must not be longer than 100 characters.",
+      "VALIDATION_LABEL_NO_QUOTES": "The label must not contain quotation marks.",
+      "VALIDATION_URL_REQUIRED": "URL is required.",
+      "VALIDATION_URL_TOO_LONG": "The URL must not be longer than 300 characters.",
+      "VALIDATION_URL_INVALID": "The URL must be valid."
+    },
+    "TAGS": {
+      "ERROR_INVALID_CHARS": "Tag contains invalid characters. Allowed: letters, numbers, spaces, hyphen and dot.",
+      "ERROR_DUPLICATE": "Tag is already included in this project.",
+      "ERROR_TOO_LONG": "Tag is too long.",
+      "ERROR_DELETE": "Tag could not be deleted.",
+      "ERROR_LOAD": "Tags could not be loaded.",
+      "LOADING": "Tags are loading…",
+      "NEW_TAG": "New tag",
+      "ADD_TAG": "Add tag",
+      "DELETE_TAG": "Delete tag",
+      "EMPTY": "No tags yet."
+    },
+    "OPEN_POSITIONS": {
+      "TITLE": "Open positions"
+    }
+  },
+  "JOIN_REQUEST": {
+    "PENDING_TITLE": "Request pending",
+    "REQUEST_TITLE": "Request to join"
+  },
+  "USER": {
+    "VALIDATION": {
+      "USERNAME_REQUIRED": "Username is required.",
+      "ID_REQUIRED": "ID is required."
+    }
+  },
+  "USER_SEARCH": {
+    "EMPTY": "No users found"
   }
 }
