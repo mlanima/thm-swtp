@@ -5,10 +5,13 @@ import de.thm.swtp.api.projectFiles.dto.ProjectFileResponse;
 import de.thm.swtp.api.projectFiles.service.ProjectFileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
+import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+
+import java.nio.charset.StandardCharsets;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
@@ -50,7 +53,9 @@ public class ProjectFileController {
                 .contentType(MediaType.parseMediaType(download.file().getMimeType()))
                 .contentLength(download.file().getSizeBytes())
                 .header(HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=\"" + download.file().getOriginalName() + "\"")
+                        ContentDisposition.builder("attachment")
+                                .filename(download.file().getOriginalName(), StandardCharsets.UTF_8)
+                                .build().toString())
                 .body(download.resource());
     }
 

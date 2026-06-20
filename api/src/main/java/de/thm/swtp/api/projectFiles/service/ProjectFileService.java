@@ -86,9 +86,10 @@ public class ProjectFileService {
             throw new ProjectFileUploadLimitExceededException(MAX_FILES_PER_PROJECT);
         }
 
-        String originalName = StringUtils.hasText(file.getOriginalFilename())
+        String rawName = StringUtils.hasText(file.getOriginalFilename())
                 ? file.getOriginalFilename()
                 : "file";
+        String originalName = rawName.length() > 255 ? rawName.substring(0, 255) : rawName;
         String extension = getExtension(originalName);
         String storageName = UUID.randomUUID() + (extension.isEmpty() ? "" : "." + extension);
         Path filePath = uploadDir.resolve(storageName);
@@ -173,6 +174,10 @@ public class ProjectFileService {
 
     private String getExtension(String filename) {
         int dotIndex = filename.lastIndexOf('.');
-        return dotIndex >= 0 ? filename.substring(dotIndex + 1) : "";
+        if (dotIndex < 0) {
+            return "";
+        }
+        String ext = filename.substring(dotIndex + 1);
+        return ext.matches("[A-Za-z0-9]{1,10}") ? ext : "";
     }
 }
