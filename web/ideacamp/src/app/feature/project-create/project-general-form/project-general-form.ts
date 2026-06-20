@@ -48,4 +48,24 @@ export class ProjectGeneralForm implements OnChanges {
     this.next.emit(res.data)
   }
 
+  focusShortDescriptionIfNameIsValid(shortDescriptionInput: HTMLInputElement) {
+    const res = projectGeneralSchema.pick({ name: true }).safeParse({
+      name: this.formData.name,
+    });
+
+    if (!res.success) {
+      this.errors = {
+        ...this.errors,
+        ...mapZodErrors<GeneralFormFields>(res.error),
+      };
+      return;
+    }
+
+    this.errors = {
+      ...this.errors,
+      name: undefined,
+    };
+
+    shortDescriptionInput.focus();
+  }
 }

@@ -168,12 +168,32 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ProjectPostAccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleProjectPostAccessDenied(ProjectPostAccessDeniedException ex) {
+
+    @ExceptionHandler(UserProfileLinkAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleUserProfileLinkAlreadyExists(UserProfileLinkAlreadyExistsException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
+    }
+
+    @ExceptionHandler(UserProfileLinkDoesNotBelongToProfileException.class)
+    public ResponseEntity<ErrorResponse> handleUserProfileLinkDoesNotBelongToProfile(UserProfileLinkDoesNotBelongToProfileException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
+    }
+
+    @ExceptionHandler(UserProfileLinkEditNotAllowedException.class)
+    public ResponseEntity<ErrorResponse> handleUserProfileLinkEditNotAllowed(UserProfileLinkEditNotAllowedException ex) {
+
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(ErrorResponse.of(403, "Forbidden", ex.getMessage()));
     }
 
     @ExceptionHandler(ProjectPostNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleProjectPostNotFound(ProjectPostNotFoundException ex) {
+
+    @ExceptionHandler(UserProfileLinkNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleUserProfileLinkNotFound(UserProfileLinkNotFoundException ex) {
+
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
     }

@@ -1,9 +1,11 @@
 # Stage 1: Build
 FROM node:24-alpine AS builder
 WORKDIR /app
+ARG API_URL=https://api.swtp-ss26.de/api
 COPY package.json package-lock.json ./
 RUN npm ci --ignore-scripts
 COPY . .
+RUN sed -i "s|__API_URL__|${API_URL}|g" src/app/enviroments/enviroment.prod.ts
 RUN npm run build -- --configuration=production
 
 # Stage 2: Runtime

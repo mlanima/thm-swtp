@@ -48,6 +48,11 @@ export const serverRoutes: ServerRoute[] = [
   },
 
   {
+    path: 'favorites',
+    renderMode: RenderMode.Client,
+  },
+
+  {
     path: '**',
     renderMode: RenderMode.Prerender,
   }
