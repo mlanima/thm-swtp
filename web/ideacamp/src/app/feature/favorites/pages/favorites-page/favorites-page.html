@@ -1,12 +1,12 @@
 <section class="min-h-screen bg-slate-100 px-6 py-8 text-slate-700">
   <div class="mx-auto max-w-6xl">
     <header class="flex flex-col gap-2">
-      <h1 class="text-4xl font-bold text-slate-700">Meine Favoriten</h1>
+      <h1 class="text-4xl font-bold text-slate-700">{{ 'FAVORITE.TITLE' | translate }}</h1>
     </header>
 
     @if (isLoading()) {
       <div class="mt-8 rounded-2xl border border-slate-200 bg-white px-6 py-12 text-center shadow-sm">
-        <p class="text-sm text-slate-500">Deine Favoriten werden geladen…</p>
+        <p class="text-sm text-slate-500">{{ 'FAVORITE.LOADING' | translate }}</p>
       </div>
     } @else if (errorMessage()) {
       <div class="mt-8 rounded-2xl border border-red-200 bg-red-50 px-6 py-12 text-center shadow-sm">
@@ -17,9 +17,9 @@
         <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-slate-500">
           <i class="pi pi-heart text-2xl"></i>
         </div>
-        <h2 class="mt-5 text-2xl font-semibold text-slate-700">Noch keine Favoriten</h2>
+        <h2 class="mt-5 text-2xl font-semibold text-slate-700">{{ 'FAVORITE.EMPTY' | translate }}</h2>
         <p class="mt-2 text-sm text-slate-500">
-          Sobald du ein Projekt favorisierst, erscheint es hier.
+          {{ 'FAVORITE.EMPTY_DESCRIPTION' | translate }}
         </p>
       </div>
     } @else {
@@ -35,12 +35,12 @@
                         [class.text-emerald-700]="!project.isPrivateProject"
                         [class.bg-amber-100]="project.isPrivateProject"
                         [class.text-amber-700]="project.isPrivateProject">
-                    {{ project.isPrivateProject ? 'Privat' : 'Öffentlich' }}
+                    {{ project.isPrivateProject ? ('COMMON.PRIVATE' | translate) : ('COMMON.PUBLIC' | translate) }}
                   </span>
                 </div>
 
                 <p class="max-w-3xl text-sm leading-6 text-slate-500">
-                  {{ project.description || 'Keine Beschreibung vorhanden.' }}
+                  {{ project.description || ('FAVORITE.NO_DESCRIPTION' | translate) }}
                 </p>
 
                 <p class="text-xs text-slate-400">URL: /project/{{ project.projectUrl }}</p>
@@ -51,7 +51,7 @@
                 <a
                   [routerLink]="['/project', project.projectUrl]"
                   class="inline-flex items-center justify-center rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
-                  Projekt öffnen
+                  {{ 'FAVORITE.OPEN_PROJECT' | translate }}
                 </a>
               </div>
             </div>

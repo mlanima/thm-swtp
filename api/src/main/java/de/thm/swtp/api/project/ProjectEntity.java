@@ -1,7 +1,7 @@
 package de.thm.swtp.api.project;
 
 import de.thm.swtp.api.projectInvitation.entity.ProjectInviteEntity;
-import de.thm.swtp.api.projectLinks.entity.ProjectLinkEntity;
+import de.thm.swtp.api.links.entity.ProjectLinkEntity;
 import de.thm.swtp.api.tag.entity.TagEntity;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import jakarta.persistence.*;
