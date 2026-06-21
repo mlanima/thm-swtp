@@ -63,7 +63,11 @@ public class ProjectEntity {
     @JoinTable(
             name = "project_members",
             joinColumns = @JoinColumn(name = "project_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_profile_keycloak_id")
+            inverseJoinColumns = @JoinColumn(name = "user_profile_keycloak_id"),
+            uniqueConstraints = @UniqueConstraint(
+                    name = "UK_project_members",
+                    columnNames = {"project_id", "user_profile_keycloak_id"}
+            )
     )
     @Builder.Default
     private Set<UserProfile> members = new HashSet<>();
