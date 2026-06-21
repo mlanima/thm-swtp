@@ -108,14 +108,20 @@ public class ProjectFileService {
         try {
             String detectedMime = TIKA.detect(filePath);
             if (!ALLOWED_MIME_TYPES.contains(detectedMime)) {
-                try { Files.deleteIfExists(filePath); } catch (IOException ignored) {}
+                try {
+                    Files.deleteIfExists(filePath);
+                } catch (IOException ignored) {
+                }
                 throw new ProjectFileTypeNotAllowedException(detectedMime);
             }
             mimeType = detectedMime;
         } catch (ProjectFileTypeNotAllowedException e) {
             throw e;
         } catch (IOException e) {
-            try { Files.deleteIfExists(filePath); } catch (IOException ignored) {}
+            try {
+                Files.deleteIfExists(filePath);
+            } catch (IOException ignored) {
+            }
             throw new RuntimeException("Failed to detect MIME type", e);
         }
 
@@ -189,7 +195,9 @@ public class ProjectFileService {
     }
 
     private void checkProjectAccess(ProjectEntity project, UUID currentUserId) {
-        if (!project.isPrivateProject()) return;
+        if (!project.isPrivateProject()) {
+            return;
+        }
         boolean isOwner = project.getOwner().getKeycloakId().equals(currentUserId);
         boolean isMember = project.getMembers().stream()
                 .anyMatch(m -> m.getKeycloakId().equals(currentUserId));
