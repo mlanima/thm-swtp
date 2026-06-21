@@ -11,6 +11,7 @@ import de.thm.swtp.api.projectFiles.entity.ProjectFileEntity;
 import de.thm.swtp.api.projectFiles.mapper.ProjectFileMapper;
 import de.thm.swtp.api.projectFiles.repository.ProjectFileRepository;
 import jakarta.annotation.PostConstruct;
+import org.apache.tika.Tika;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
@@ -49,6 +50,8 @@ public class ProjectFileService {
     private String uploadDirPath;
 
     private Path uploadDir;
+
+    private static final Tika TIKA = new Tika();
 
     private final ProjectFileRepository projectFileRepository;
     private final ProjectRepository projectRepository;
@@ -99,6 +102,21 @@ public class ProjectFileService {
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             throw new RuntimeException("Failed to write file to storage", e);
+        }
+
+        // verify actual MIME type via magic bytes — client-supplied Content-Type is not trusted
+        try {
+            String detectedMime = TIKA.detect(filePath);
+            if (!ALLOWED_MIME_TYPES.contains(detectedMime)) {
+                try { Files.deleteIfExists(filePath); } catch (IOException ignored) {}
+                throw new ProjectFileTypeNotAllowedException(detectedMime);
+            }
+            mimeType = detectedMime;
+        } catch (ProjectFileTypeNotAllowedException e) {
+            throw e;
+        } catch (IOException e) {
+            try { Files.deleteIfExists(filePath); } catch (IOException ignored) {}
+            throw new RuntimeException("Failed to detect MIME type", e);
         }
 
         ProjectFileEntity entity = ProjectFileEntity.builder()
