@@ -23,6 +23,7 @@ export class FollowButton implements OnInit, OnChanges, OnDestroy {
   displayCount = signal(0);
 
   ngOnInit(): void {
+    this.displayCount.set(this.count);
     this.loadState();
   }
 
