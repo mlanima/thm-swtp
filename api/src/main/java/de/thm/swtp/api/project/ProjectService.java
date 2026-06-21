@@ -2,7 +2,6 @@ package de.thm.swtp.api.project;
 
 
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectMemberNotFoundException;
-import de.thm.swtp.api.exceptionhandling.exceptions.ProjectOwnerCannotBeRemovedException;
 import de.thm.swtp.api.project.dto.request.*;
 import de.thm.swtp.api.project.dto.response.*;
 import de.thm.swtp.api.project.exception.*;

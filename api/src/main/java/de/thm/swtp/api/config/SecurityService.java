@@ -87,7 +87,7 @@ public class SecurityService {
         }
 
         UUID currentUserId = getCurrentUserId(authentication);
-        return isProjectOwner(projectId,authentication) && !currentUserId.equals(memberId);
+        return isProjectOwner(projectId, authentication) && !currentUserId.equals(memberId);
     }
 
     // Project invitation permissions
@@ -175,7 +175,7 @@ public class SecurityService {
         return projectPostRepository.findByIdAndProjectId(postId, projectId)
                 .map(post -> switch (post.getStatus()){
                     case DRAFT -> isProjectPostAuthor(projectId, postId, authentication);
-                    case ARCHIVED, PUBLISHED -> isProjectOwner(projectId,authentication) || isProjectPostAuthor(projectId, postId, authentication);
+                    case ARCHIVED, PUBLISHED -> isProjectOwner(projectId, authentication) || isProjectPostAuthor(projectId, postId, authentication);
                 })
                 .orElse(false);
     }
@@ -306,7 +306,7 @@ public class SecurityService {
             return false;
         }
         UUID currentUserId = getCurrentUserId(authentication);
-        return projectRepository.existsByIdAndMembersKeycloakId(projectId,currentUserId);
+        return projectRepository.existsByIdAndMembersKeycloakId(projectId, currentUserId);
     }
 
     private boolean isProjectContributor(UUID projectId, Authentication authentication) {

@@ -5,7 +5,6 @@ import de.thm.swtp.api.exceptionhandling.exceptions.ProjectLinkDoesNotBelongToPr
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectLinkNotFoundException;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
-import de.thm.swtp.api.project.exception.ExceptionProjectEditNotAllowed;
 import de.thm.swtp.api.project.exception.ProjectNotFoundException;
 import de.thm.swtp.api.links.repository.ProjectLinkRepository;
 import de.thm.swtp.api.links.domain.ProjectLink;
