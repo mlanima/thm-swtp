@@ -14,6 +14,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
+import org.springframework.dao.DataIntegrityViolationException;
+
 import java.util.Optional;
 import java.util.UUID;
 
@@ -52,12 +55,12 @@ class UserFollowServiceTest {
 
         when(userFollowRepository.existsByFollowerKeycloakIdAndFollowingKeycloakId(followerId, followingId))
                 .thenReturn(false);
-        when(userProfileRepository.getReferenceById(followerId)).thenReturn(follower);
-        when(userProfileRepository.getReferenceById(followingId)).thenReturn(following);
+        when(userProfileRepository.findById(followerId)).thenReturn(Optional.of(follower));
+        when(userProfileRepository.findById(followingId)).thenReturn(Optional.of(following));
 
         userFollowService.follow(followerId, followingId);
 
-        verify(userFollowRepository).save(any(UserFollowEntity.class));
+        verify(userFollowRepository).saveAndFlush(any(UserFollowEntity.class));
         verify(userProfileRepository).incrementFollowers(followingId);
     }
 
@@ -69,6 +72,39 @@ class UserFollowServiceTest {
                 .isInstanceOf(CannotFollowYourselfException.class);
 
         verify(userFollowRepository, never()).save(any(UserFollowEntity.class));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenFollowerProfileNotFound() {
+        UUID followerId = UUID.randomUUID();
+        UUID followingId = UUID.randomUUID();
+
+        when(userFollowRepository.existsByFollowerKeycloakIdAndFollowingKeycloakId(followerId, followingId))
+                .thenReturn(false);
+        when(userProfileRepository.findById(followerId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> userFollowService.follow(followerId, followingId))
+                .isInstanceOf(UserProfileNotFoundException.class)
+                .hasMessageContaining(followerId.toString());
+    }
+
+    @Test
+    void shouldThrowUserAlreadyFollowingWhenConstraintViolated() {
+        UUID followerId = UUID.randomUUID();
+        UUID followingId = UUID.randomUUID();
+
+        UserProfile follower = UserProfile.builder().keycloakId(followerId).username("follower").email("follower@mni.thm.de").build();
+        UserProfile following = UserProfile.builder().keycloakId(followingId).username("following").email("following@mni.thm.de").build();
+
+        when(userFollowRepository.existsByFollowerKeycloakIdAndFollowingKeycloakId(followerId, followingId))
+                .thenReturn(false);
+        when(userProfileRepository.findById(followerId)).thenReturn(Optional.of(follower));
+        when(userProfileRepository.findById(followingId)).thenReturn(Optional.of(following));
+        when(userFollowRepository.saveAndFlush(any(UserFollowEntity.class)))
+                .thenThrow(new DataIntegrityViolationException("unique constraint"));
+
+        assertThatThrownBy(() -> userFollowService.follow(followerId, followingId))
+                .isInstanceOf(UserAlreadyFollowingException.class);
     }
 
     @Test

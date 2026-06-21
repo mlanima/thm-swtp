@@ -6,8 +6,10 @@ import de.thm.swtp.api.userFollow.exception.UserAlreadyFollowingException;
 import de.thm.swtp.api.userFollow.exception.UserFollowNotFoundException;
 import de.thm.swtp.api.userFollow.repository.UserFollowRepository;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
+import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,15 +33,21 @@ public class UserFollowService {
             throw new UserAlreadyFollowingException();
         }
 
-        UserProfile follower = userProfileRepository.getReferenceById(followerId);
-        UserProfile following = userProfileRepository.getReferenceById(followingId);
+        UserProfile follower = userProfileRepository.findById(followerId)
+                .orElseThrow(() -> new UserProfileNotFoundException(followerId.toString()));
+        UserProfile following = userProfileRepository.findById(followingId)
+                .orElseThrow(() -> new UserProfileNotFoundException(followingId.toString()));
 
-        userFollowRepository.save(
-                UserFollowEntity.builder()
-                        .follower(follower)
-                        .following(following)
-                        .build()
-        );
+        try {
+            userFollowRepository.saveAndFlush(
+                    UserFollowEntity.builder()
+                            .follower(follower)
+                            .following(following)
+                            .build()
+            );
+        } catch (DataIntegrityViolationException e) {
+            throw new UserAlreadyFollowingException();
+        }
 
         userProfileRepository.incrementFollowers(followingId);
     }
