@@ -127,7 +127,9 @@ export class ProjectCreate {
     this.projectService.createProject({ ...res.data, shortDescription: res.data.shortDescription ?? null, description: res.data.description ?? null,memberIds: this.invitedMembers.map(member => member.keycloakId), tagIds: [] }).subscribe({
       next: (project) => {
         this.isLoading = false;
-        this.successMessage = this.invitedMembers.length > 0 ? 'PROJECTCREATE.SUCCESS_CREATED_WITH_INVITES' : 'PROJECTCREATE.SUCCESS_CREATED';
+        this.successMessage = this.translateService.instant(
+          this.invitedMembers.length > 0 ? 'PROJECTCREATE.SUCCESS_CREATED_WITH_INVITES' : 'PROJECTCREATE.SUCCESS_CREATED',
+        );
         setTimeout(() => {
           this.router.navigate(['/project', project.projectUrl]);
         }, 1500);
