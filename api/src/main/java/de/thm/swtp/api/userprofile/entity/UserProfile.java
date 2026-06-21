@@ -1,7 +1,7 @@
 package de.thm.swtp.api.userprofile.entity;
 
+import de.thm.swtp.api.userAccount.entity.UserAccountEntity;
 import de.thm.swtp.api.tag.entity.TagEntity;
-import de.thm.swtp.api.userprofile.domain.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -55,8 +55,8 @@ public class UserProfile {
     @JoinTable(name = "user_profile_tags", joinColumns = @JoinColumn(name = "user_profile_keycloak_id"), inverseJoinColumns = @JoinColumn(name = "tag_name"))
     private Set<TagEntity> tags = new HashSet<>();
 
-    @Builder.Default
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private UserRole role = UserRole.USER;
+    @MapsId
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "keycloak_id")
+    private UserAccountEntity userAccount;
 }

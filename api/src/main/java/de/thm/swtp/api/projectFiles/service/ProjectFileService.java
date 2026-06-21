@@ -3,7 +3,6 @@ package de.thm.swtp.api.projectFiles.service;
 import de.thm.swtp.api.exceptionhandling.exceptions.*;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
-import de.thm.swtp.api.project.exception.ExceptionProjectEditNotAllowed;
 import de.thm.swtp.api.project.exception.ProjectNotFoundException;
 import de.thm.swtp.api.projectFiles.domain.ProjectFile;
 import de.thm.swtp.api.projectFiles.domain.ProjectFileDownload;
@@ -67,9 +66,8 @@ public class ProjectFileService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProjectFile> getProjectFiles(UUID projectId, UUID currentUserId) {
-        ProjectEntity project = getProjectOrThrow(projectId);
-        checkProjectAccess(project, currentUserId);
+    public List<ProjectFile> getProjectFiles(UUID projectId) {
+        getProjectOrThrow(projectId);
         return projectFileRepository.findByProjectIdOrderByCreatedAtAsc(projectId)
                 .stream()
                 .map(ProjectFileMapper::toDomain)
@@ -77,9 +75,8 @@ public class ProjectFileService {
     }
 
     @Transactional
-    public ProjectFile uploadFile(UUID projectId, UUID currentUserId, MultipartFile file) {
+    public ProjectFile uploadFile(UUID projectId, MultipartFile file) {
         ProjectEntity project = getProjectOrThrow(projectId);
-        checkProjectOwner(project, currentUserId);
 
         String mimeType = file.getContentType();
         if (mimeType == null || !ALLOWED_MIME_TYPES.contains(mimeType)) {
@@ -145,9 +142,8 @@ public class ProjectFileService {
     }
 
     @Transactional(readOnly = true)
-    public ProjectFileDownload prepareDownload(UUID projectId, UUID fileId, UUID currentUserId) {
-        ProjectEntity project = getProjectOrThrow(projectId);
-        checkProjectAccess(project, currentUserId);
+    public ProjectFileDownload prepareDownload(UUID projectId, UUID fileId) {
+        getProjectOrThrow(projectId);
         ProjectFileEntity fileEntity = getFileOrThrow(fileId);
         checkFileBelongsToProject(fileEntity, projectId);
 
@@ -160,9 +156,8 @@ public class ProjectFileService {
     }
 
     @Transactional
-    public void deleteFile(UUID projectId, UUID currentUserId, UUID fileId) {
-        ProjectEntity project = getProjectOrThrow(projectId);
-        checkProjectOwner(project, currentUserId);
+    public void deleteFile(UUID projectId, UUID fileId) {
+        getProjectOrThrow(projectId);
 
         ProjectFileEntity fileEntity = getFileOrThrow(fileId);
         checkFileBelongsToProject(fileEntity, projectId);
@@ -188,23 +183,6 @@ public class ProjectFileService {
                 .orElseThrow(() -> new ProjectFileNotFoundException(fileId));
     }
 
-    private void checkProjectOwner(ProjectEntity project, UUID currentUserId) {
-        if (!project.getOwner().getKeycloakId().equals(currentUserId)) {
-            throw new ExceptionProjectEditNotAllowed(currentUserId, project.getId());
-        }
-    }
-
-    private void checkProjectAccess(ProjectEntity project, UUID currentUserId) {
-        if (!project.isPrivateProject()) {
-            return;
-        }
-        boolean isOwner = project.getOwner().getKeycloakId().equals(currentUserId);
-        boolean isMember = project.getMembers().stream()
-                .anyMatch(m -> m.getKeycloakId().equals(currentUserId));
-        if (!isOwner && !isMember) {
-            throw new ExceptionProjectEditNotAllowed(currentUserId, project.getId());
-        }
-    }
 
     private void checkFileBelongsToProject(ProjectFileEntity file, UUID projectId) {
         if (!file.getProject().getId().equals(projectId)) {

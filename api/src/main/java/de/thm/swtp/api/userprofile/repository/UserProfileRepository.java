@@ -9,5 +9,6 @@ import java.util.UUID;
 public interface UserProfileRepository extends JpaRepository<UserProfile, UUID> {
 
     Optional<UserProfile> findByUsername(String username);
+    boolean existsByUsernameAndKeycloakId(String username, UUID keycloakId);
 
 }

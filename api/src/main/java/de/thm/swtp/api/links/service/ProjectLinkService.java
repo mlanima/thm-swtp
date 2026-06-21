@@ -37,9 +37,8 @@ public class ProjectLinkService {
     }
 
     @Transactional
-    public ProjectLink createProjectLink(UUID projectId, UUID currentUserId, String label, String url){
+    public ProjectLink createProjectLink(UUID projectId, String label, String url){
         ProjectEntity projectEntity = getProjectOrThrowError(projectId);
-        checkProjectOwner(projectEntity, currentUserId);
 
         String cleanedLabel = label.trim();
         String cleanedUrl = url.trim();
@@ -62,9 +61,8 @@ public class ProjectLinkService {
 
 
     @Transactional
-    public ProjectLink updateProjectLink(UUID projectId, UUID currentUserId, UUID linkId, String label, String url){
+    public ProjectLink updateProjectLink(UUID projectId, UUID linkId, String label, String url){
         ProjectEntity projectEntity = getProjectOrThrowError(projectId);
-        checkProjectOwner(projectEntity, currentUserId);
 
         ProjectLinkEntity projectLinkEntity = getProjectLinkOrThrowError(linkId);
         checkLinkBelongsToProject(projectLinkEntity, projectId);
@@ -90,23 +88,13 @@ public class ProjectLinkService {
     }
 
     @Transactional
-    public void deleteProjectLink(UUID projectId, UUID currentUserId, UUID linkId){
-        ProjectEntity projectEntity = getProjectOrThrowError(projectId);
-        checkProjectOwner(projectEntity, currentUserId);
+    public void deleteProjectLink(UUID projectId, UUID linkId){
 
         ProjectLinkEntity projectLinkEntity = getProjectLinkOrThrowError(linkId);
         checkLinkBelongsToProject(projectLinkEntity, projectId);
         projectLinkRepository.delete(projectLinkEntity);
     }
 
-
-    private void checkProjectOwner(ProjectEntity projectEntity, UUID currentUserId){
-        UUID ownerId = projectEntity.getOwner().getKeycloakId();
-
-        if (!ownerId.equals(currentUserId)){
-            throw new ExceptionProjectEditNotAllowed(currentUserId, projectEntity.getId());
-        }
-    }
 
     private ProjectEntity getProjectOrThrowError(UUID projectId){
         return projectRepository.findById(projectId)

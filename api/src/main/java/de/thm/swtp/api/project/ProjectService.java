@@ -264,8 +264,7 @@ public class ProjectService {
                 .forEach(userId -> projectInviteService.createProjectInvite(
                         project.getId(),
                         userId,
-                        PROJECT_CREATION_INVITE_MESSAGE,
-                        owner.getKeycloakId()
+                        PROJECT_CREATION_INVITE_MESSAGE
                 ));
     }
 }

@@ -36,6 +36,7 @@ public class ProjectController {
     }
 
     @GetMapping("/{projectId}")
+    @PreAuthorize("@security.canViewProject(#projectId, authentication)")
     public ResponseEntity<ProjectResponse> getProject(
             @PathVariable UUID projectId) {
         ProjectResponse response = projectService.getProject(projectId);
@@ -43,6 +44,7 @@ public class ProjectController {
     }
 
     @GetMapping("/by-url/{projectUrl}")
+    @PreAuthorize("@security.canViewProjectByUrl(#projectUrl, authentication)")
     public ResponseEntity<ProjectResponse> getProjectByUrl(
             @PathVariable String projectUrl) {
         ProjectResponse response = projectService.getProjectByUrl(projectUrl);

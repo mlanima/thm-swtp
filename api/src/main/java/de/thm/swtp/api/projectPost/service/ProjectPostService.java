@@ -1,7 +1,6 @@
 package de.thm.swtp.api.projectPost.service;
 
 import de.thm.swtp.api.exceptionhandling.exceptions.InvalidProjectPostException;
-import de.thm.swtp.api.exceptionhandling.exceptions.ProjectPostAccessDeniedException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectPostNotFoundException;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
@@ -33,12 +32,8 @@ public class ProjectPostService {
 
 
     @Transactional(readOnly = true)
-    public List<ProjectPost> getPublishedPostsForProject(UUID projectId, UUID currentUserId) {
-        ProjectEntity projectEntity = getProjectOrThrowError(projectId);
-
-        if (projectEntity.isPrivateProject() && !isProjectContributor(projectEntity, currentUserId)) {
-            throw new ProjectPostAccessDeniedException("You are not allowed to view posts of private projects.");
-        }
+    public List<ProjectPost> getPublishedPostsForProject(UUID projectId) {
+        getProjectOrThrowError(projectId);
 
         return projectPostRepository.findAllByProjectIdAndStatusOrderByPublishedAtDesc(projectId, ProjectPostStatus.PUBLISHED)
                 .stream()
@@ -55,8 +50,6 @@ public class ProjectPostService {
         ProjectEntity projectEntity = getProjectOrThrowError(projectId);
         UserProfile author = getUserOrThrowError(authorId);
 
-        checkCanCreatePost(projectEntity, authorId);
-
         ProjectPostEntity projectPostEntity = ProjectPostEntity.builder()
                 .project(projectEntity)
                 .author(author)
@@ -71,21 +64,13 @@ public class ProjectPostService {
     }
 
     @Transactional
-    public ProjectPost publishProjectPost(UUID projectId, UUID postId, UUID currentUserId){
+    public ProjectPost publishProjectPost(UUID projectId, UUID postId){
         ProjectPostEntity postEntity = getPostOrThrowError(postId);
 
         assertPostBelongsToProject(postEntity, projectId);
 
-        switch (postEntity.getStatus()) {
-            case DRAFT -> checkCanPublishDraft(postEntity, currentUserId);
-            case ARCHIVED -> checkCanPublishArchivedPost(postEntity, currentUserId);
-            case PUBLISHED -> {
-                if (!isProjectOwnerOrPostAuthor(postEntity, currentUserId)) {
-                    throw new ProjectPostAccessDeniedException("Only the project owner or post author may access this post.");
-                }
-                return ProjectPostMapper.toDomain(postEntity);
-            }
-            default -> throw new InvalidProjectPostException("Invalid post status");
+        if (postEntity.getStatus() == ProjectPostStatus.PUBLISHED) {
+            return ProjectPostMapper.toDomain(postEntity);
         }
 
         postEntity.setStatus(ProjectPostStatus.PUBLISHED);
@@ -99,12 +84,10 @@ public class ProjectPostService {
     }
 
     @Transactional
-    public ProjectPost archiveProjectPost(UUID projectId, UUID postId, UUID currentUserId) {
+    public ProjectPost archiveProjectPost(UUID projectId, UUID postId) {
         ProjectPostEntity postEntity = getPostOrThrowError(postId);
 
         assertPostBelongsToProject(postEntity, projectId);
-
-        checkCanArchivePost(postEntity, currentUserId);
 
         if (postEntity.getStatus().equals(ProjectPostStatus.ARCHIVED)) {
             return ProjectPostMapper.toDomain(postEntity);
@@ -117,12 +100,10 @@ public class ProjectPostService {
     }
 
     @Transactional
-    public void deleteProjectPost(UUID projectId, UUID postId, UUID currentUserId) {
+    public void deleteProjectPost(UUID projectId, UUID postId) {
         ProjectPostEntity postEntity = getPostOrThrowError(postId);
-
         assertPostBelongsToProject(postEntity, projectId);
 
-        checkCanDeletePost(postEntity, currentUserId);
         projectPostRepository.delete(postEntity);
 
     }
@@ -144,62 +125,6 @@ public class ProjectPostService {
     private ProjectPostEntity getPostOrThrowError(UUID postId) {
         return projectPostRepository.findById(postId)
                 .orElseThrow(() -> new ProjectPostNotFoundException(postId));
-    }
-
-    private boolean isProjectOwner(ProjectEntity project, UUID userId) {
-        return project.getOwner().getKeycloakId().equals(userId);
-    }
-
-    private boolean isProjectMember(ProjectEntity project, UUID userId) {
-        return project.getMembers()
-                .stream()
-                .anyMatch(member -> member.getKeycloakId().equals(userId));
-    }
-
-    private boolean isPostAuthor(ProjectPostEntity post, UUID userId) {
-        return post.getAuthor().getKeycloakId().equals(userId);
-    }
-
-    private boolean isProjectContributor(ProjectEntity project, UUID userId) {
-        if (userId == null) {
-            return false;
-        }
-
-        return isProjectOwner(project, userId) || isProjectMember(project, userId);
-    }
-
-    private boolean isProjectOwnerOrPostAuthor(ProjectPostEntity post, UUID userId) {
-        return isProjectOwner(post.getProject(), userId) || isPostAuthor(post, userId);
-    }
-
-    private void checkCanCreatePost(ProjectEntity project, UUID userId) {
-        if (!isProjectContributor(project, userId)) {
-            throw new ProjectPostAccessDeniedException("Only project members or owners can create posts.");
-        }
-    }
-
-    private void checkCanDeletePost(ProjectPostEntity post, UUID userId) {
-        if (!isProjectOwnerOrPostAuthor(post, userId)) {
-            throw new ProjectPostAccessDeniedException("Only the project owner or the post author is allowed to delete posts.");
-        }
-    }
-
-    private void checkCanPublishDraft(ProjectPostEntity post, UUID userId) {
-        if (!isPostAuthor(post, userId)) {
-            throw new ProjectPostAccessDeniedException("Only the post author is allowed to publish drafts.");
-        }
-    }
-
-    private void checkCanPublishArchivedPost(ProjectPostEntity post, UUID userId) {
-        if (!isProjectOwnerOrPostAuthor(post, userId)) {
-            throw new ProjectPostAccessDeniedException("Only the project owner or the post author is allowed to publish archived posts.");
-        }
-    }
-
-    private void checkCanArchivePost(ProjectPostEntity post, UUID userId) {
-        if (!isProjectOwnerOrPostAuthor(post, userId)) {
-            throw new ProjectPostAccessDeniedException("Only the project owner or the post author is allowed to archive posts.");
-        }
     }
 
 

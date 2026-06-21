@@ -227,4 +227,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
                 .body(ErrorResponse.of(422, "Unprocessable Entity", ex.getMessage()));
     }
+
+    @ExceptionHandler(UserProfileNotAllowedException.class)
+    public ResponseEntity<ErrorResponse> handleUserProfileNotAllowed(UserProfileNotAllowedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ErrorResponse.of(403, "Forbidden", ex.getMessage()));
+    }
 }
