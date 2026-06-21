@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NgClass } from '@angular/common';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ProjectService } from '../project-site/project.service';
 import { AuthService } from '../auth/auth.service';
 import { ProjectSettingsStore } from './project-settings.store';
@@ -14,7 +15,7 @@ type Tab = 'join-requests' | 'members' | 'privacy' | 'danger-zone';
 @Component({
   selector: 'app-project-settings',
   standalone: true,
-  imports: [NgClass, RouterLink, JoinRequestsTab, MembersTab, PrivacyTab, DangerZoneTab],
+  imports: [NgClass, RouterLink, JoinRequestsTab, MembersTab, PrivacyTab, DangerZoneTab, TranslatePipe],
   templateUrl: './project-settings.html',
 })
 export class ProjectSettings implements OnInit {
@@ -27,16 +28,16 @@ export class ProjectSettings implements OnInit {
   activeTab = signal<Tab>('join-requests');
 
   readonly tabs: { id: Tab; label: string; icon: string }[] = [
-    { id: 'join-requests', label: 'Beitrittsanfragen', icon: 'pi-user-plus' },
-    { id: 'members',       label: 'Mitglieder',       icon: 'pi-user'      },
-    { id: 'privacy',       label: 'Privatsphäre',      icon: 'pi-lock'      },
-    { id: 'danger-zone',   label: 'Projekt Löschen',   icon: 'pi-trash'     },
+    { id: 'join-requests', label: 'PROJECTSETTINGS.TABS.JOIN_REQUESTS', icon: 'pi-user-plus' },
+    { id: 'members', label: 'PROJECTSETTINGS.TABS.MEMBERS', icon: 'pi-user' },
+    { id: 'privacy', label: 'PROJECTSETTINGS.TABS.PRIVACY', icon: 'pi-lock' },
+    { id: 'danger-zone', label: 'PROJECTSETTINGS.TABS.DANGER_ZONE', icon: 'pi-trash' },
   ];
 
   ngOnInit(): void {
     const projectUrl = this.route.snapshot.paramMap.get('projectUrl');
     if (!projectUrl) {
-      this.store.setError('Keine Projekt URL gegeben.');
+      this.store.setError('PROJECTSETTINGS.ERRORS.NO_PROJECT_URL');
       this.store.setLoading(false);
       return;
     }
@@ -52,7 +53,7 @@ export class ProjectSettings implements OnInit {
         this.store.setLoading(false);
       },
       error: () => {
-        this.store.setError('Projekt konnte nicht geladen werden.');
+        this.store.setError('PROJECTSETTINGS.ERRORS.LOAD_PROJECT');
         this.store.setLoading(false);
       },
     });

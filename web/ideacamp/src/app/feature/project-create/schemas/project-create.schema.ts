@@ -14,21 +14,21 @@ const containsNoQuotes = (value:string) => !value.includes('"') && !value.includ
 export const projectGeneralSchema = z.object({
   name: z.string()
     .trim()
-    .min(3, 'Projektname muss mindestens 3 Zeichen lang sein.')
-    .max(20, 'Projektname darf höchstens 20 Zeichen lang sein.')
-    .refine(containsNoQuotes, 'Projektname darf keine Anführungszeichen beinhalten.'),
+    .min(3, 'PROJECTCREATE.VALIDATION.NAME_MIN')
+    .max(20, 'PROJECTCREATE.VALIDATION.NAME_MAX')
+    .refine(containsNoQuotes, 'PROJECTCREATE.VALIDATION.NAME_NO_QUOTES'),
 
   shortDescription: z.string()
     .trim()
-    .max(200, 'Kurzbeschreibung darf höchstens 200 Zeichen lang sein.')
-    .refine(containsNoQuotes, 'Kurzbeschreibung darf keine Anführungszeichen beinhalten.')
+    .max(200, 'PROJECTCREATE.VALIDATION.SHORT_DESCRIPTION_MAX')
+    .refine(containsNoQuotes, 'PROJECTCREATE.VALIDATION.SHORT_DESCRIPTION_NO_QUOTES')
     .optional()
     .or(z.literal('')),
 
   description: z.string()
     .trim()
-    .max(500, 'Projektbeschreibung darf höchstens 500 Zeichen lang sein.')
-    .refine(containsNoQuotes, 'Projektbeschreibung darf keine Anführungszeichen beinhalten.')
+    .max(500, 'PROJECTCREATE.VALIDATION.DESCRIPTION_MAX')
+    .refine(containsNoQuotes, 'PROJECTCREATE.VALIDATION.DESCRIPTION_NO_QUOTES')
     .optional()
     .or(z.literal('')),
 });
@@ -41,9 +41,9 @@ export const projectGeneralSchema = z.object({
 export const projectSettingsSchema = z.object({
   projectUrl: z.string()
     .trim()
-    .min(3, 'Projekt URL muss mindestens 3 Zeichen lang sein.')
-    .max(30, 'Projekt URL darf höchstens 30 Zeichen lang sein')
-    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/,'Verwende ausschließlich Kleinbuchstaben, Zahlen und Bindestriche. Bindestriche sind am Anfang und am Ende nicht zulässig.'),
+    .min(3, 'PROJECTCREATE.VALIDATION.PROJECT_URL_MIN')
+    .max(30, 'PROJECTCREATE.VALIDATION.PROJECT_URL_MAX')
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/,'PROJECTCREATE.VALIDATION.PROJECT_URL_FORMAT'),
 
   isPrivateProject: z.boolean(),
 });

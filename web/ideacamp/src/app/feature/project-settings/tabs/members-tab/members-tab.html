@@ -1,14 +1,14 @@
 <div>
   <div class="flex items-start justify-between">
     <div>
-      <h1 class="text-2xl font-semibold text-slate-800">Mitglieder</h1>
-      <p class="mt-1 text-sm text-slate-500">Verwalte welche Mitglieder zugriff zum Projekt haben.</p>
+      <h1 class="text-2xl font-semibold text-slate-800">{{ 'PROJECTSETTINGS.TABS.MEMBERS' | translate }}</h1>
+      <p class="mt-1 text-sm text-slate-500">{{ 'PROJECTSETTINGS.MEMBERS.SUBTITLE' | translate }}</p>
     </div>
     <button
       type="button"
       (click)="openInviteModal()"
       class="cursor-pointer rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700">
-      Mitglied einladen
+      {{ 'PROJECTSETTINGS.MEMBERS.INVITE_MEMBER' | translate }}
     </button>
   </div>
 
@@ -20,7 +20,7 @@
 
   @if (isLoading()) {
     <p class="mt-6 text-sm text-slate-500">
-      Lade Mitglieder..
+      {{ 'PROJECTSETTINGS.MEMBERS.LOADING' | translate }}
     </p>
   }
 
@@ -33,7 +33,7 @@
   @if (!isLoading() && !errorMessage() && members().length === 0) {
     <div class="mt-6 rounded-xl border border-dashed border-slate-200 bg-white p-6 text-center">
       <p class="mt-1 text-xs text-slate-400">
-        Dieses Projekt hat noch keine Mitgleider.
+        {{ 'PROJECTSETTINGS.MEMBERS.EMPTY' | translate }}
       </p>
     </div>
   }
@@ -42,8 +42,8 @@
       <table class="w-full min-w-[480px] text-sm">
         <thead>
           <tr class="border-b border-slate-100">
-            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">Mitglied</th>
-            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">Rolle</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">{{ 'PROJECTSETTINGS.MEMBERS.TABLE_MEMBER' | translate }}</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">{{ 'PROJECTSETTINGS.MEMBERS.TABLE_ROLE' | translate }}</th>
             <th class="px-4 py-3"></th>
           </tr>
         </thead>
@@ -67,11 +67,11 @@
               <td class="px-4 py-3">
                 @if (member.role === 'Owner') {
                   <span class="rounded-full border border-lime-200 bg-lime-50 px-2.5 py-0.5 text-xs font-medium text-lime-700">
-                    Gründer
+                    {{ 'MYPROJECTS.OWNER' | translate }}
                   </span>
                 } @else {
                   <span class="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-xs font-medium text-slate-600">
-                    Mitglied
+                    {{ 'PROJECTSETTINGS.MEMBERS.ROLE_MEMBER' | translate }}
                   </span>
                 }
               </td>
@@ -82,7 +82,7 @@
                     [disabled]="isDeleting()"
                     class="cursor-pointer text-sm text-slate-400 hover:text-red-500"
                   >
-                    Löschen
+                    {{ 'COMMON.DELETE' | translate }}
                   </button>
                 }
               </td>
@@ -110,8 +110,8 @@
           <i class="pi pi-user-minus text-sm text-red-500"></i>
         </div>
         <div>
-          <h2 class="font-semibold text-slate-800">Mitglied löschen</h2>
-          <p class="text-xs text-slate-400">Zugriff zum Projekt wird entfernt</p>
+          <h2 class="font-semibold text-slate-800">{{ 'PROJECTSETTINGS.MEMBERS.DELETE_MEMBER' | translate }}</h2>
+          <p class="text-xs text-slate-400">{{ 'PROJECTSETTINGS.MEMBERS.REMOVE_ACCESS' | translate }}</p>
         </div>
       </div>
 
@@ -129,8 +129,11 @@
       </div>
 
       <p class="mt-4 text-sm text-slate-600">
-        Bist du sicher, dass du <strong>{{ memberToRemove()!.name }}</strong> vom Projekt entfernen möchtest?
-        <br>Das Mitglied <strong>{{ memberToRemove()!.name }}</strong> wird all seine Berechtigung zum Projekt verlieren!
+        {{ 'PROJECTSETTINGS.MEMBERS.REMOVE_CONFIRM_START' | translate }}
+        <strong>{{ memberToRemove()!.name }}</strong>
+        {{ 'PROJECTSETTINGS.MEMBERS.REMOVE_CONFIRM_MIDDLE' | translate }}
+        <br>
+        {{ 'PROJECTSETTINGS.MEMBERS.REMOVE_CONFIRM_END' | translate }}
       </p>
 
       <div class="mt-5 flex gap-3">
@@ -139,7 +142,7 @@
           [disabled]="isDeleting()"
           class="flex-1 cursor-pointer rounded-lg border border-slate-200 bg-white py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
         >
-          Abbrechen
+          {{ 'COMMON.CANCEL' | translate }}
         </button>
         <button
           (click)="confirmRemove()"
@@ -147,9 +150,9 @@
           class="flex-1 cursor-pointer rounded-lg bg-red-500 py-2 text-sm font-medium text-white hover:bg-red-600"
         >
           @if (isDeleting()){
-            Löschen...
+            {{ 'COMMON.DELETE' | translate }}...
           } @else {
-            Mitglied löschen
+            {{ 'PROJECTSETTINGS.MEMBERS.DELETE_MEMBER' | translate }}
           }
 
         </button>
@@ -164,11 +167,11 @@
       <div class="mb-5 flex items-start justify-between">
         <div>
           <h2 class="text-sm font-bold text-slate-900">
-            Mitglied einladen
+            {{ 'PROJECTSETTINGS.MEMBERS.INVITE_MEMBER' | translate }}
           </h2>
 
           <p class="mt-1 text-xs text-slate-500">
-            Suche nach einem Nutzer
+            {{ 'PROJECTSETTINGS.MEMBERS.INVITE_SUBTITLE' | translate }}
           </p>
         </div>
 
@@ -184,8 +187,8 @@
       @if (!selectedUserToInvite()) {
         <app-user-search-pick
           [excludedUserIds]="excludedUserIds()"
-          placeholder="Nutzer suchen"
-          emptyMessage="Keine Nutzer gefunden für"
+          [placeholder]="'PROJECTSETTINGS.MEMBERS.USER_SEARCH_PLACEHOLDER' | translate"
+          [emptyMessage]="'PROJECTSETTINGS.MEMBERS.USER_SEARCH_EMPTY' | translate"
           (userSelected)="selectUserToInvite($event)">
         </app-user-search-pick>
       }
@@ -208,7 +211,7 @@
 
           <label class="mt-5 block w-full text-left">
             <span class="text-xs font-medium text-slate-500">
-              Nachricht optional
+              {{ 'PROJECTSETTINGS.MEMBERS.MESSAGE_OPTIONAL' | translate }}
             </span>
 
             <textarea
@@ -216,7 +219,7 @@
               maxlength="500"
               [ngModel]="inviteMessage()"
               (ngModelChange)="inviteMessage.set($event)"
-              placeholder="Optionale Nachricht hinzufügen..."
+              [placeholder]="'PROJECTSETTINGS.MEMBERS.MESSAGE_PLACEHOLDER' | translate"
               class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:border-lime-400 focus:outline-none">
             </textarea>
             <p class="mt-1 text-right text-xs text-slate-400">
@@ -236,7 +239,7 @@
               (click)="closeInviteModal()"
               [disabled]="isInviting()"
               class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50">
-              Abbrechen
+              {{ 'COMMON.CANCEL' | translate }}
             </button>
 
             <button
@@ -245,9 +248,9 @@
               [disabled]="isInviting()"
               class="rounded-lg bg-lime-500 px-4 py-2 text-sm font-semibold text-white hover:bg-lime-600 disabled:opacity-50">
               @if (isInviting()) {
-                Wird eingeladen...
+                {{ 'PROJECTSETTINGS.MEMBERS.INVITING' | translate }}
               } @else {
-                Einladen
+                {{ 'PROJECTSETTINGS.MEMBERS.INVITE' | translate }}
               }
             </button>
           </div>

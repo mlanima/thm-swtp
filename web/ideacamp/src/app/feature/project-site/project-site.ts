@@ -2,6 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import{CommonModule} from '@angular/common';
 import{FormsModule} from '@angular/forms';
+import { TranslatePipe } from '@ngx-translate/core';
 import {ProjectService} from './project.service';
 import {ProjectResponse } from '../../models/project.model';
 import { ProjectHeader } from './components/project-header/project-header';
@@ -14,7 +15,7 @@ import { ProjectPosts } from './components/project-posts/project-posts';
 @Component({
   selector: 'app-project-site',
   standalone: true,
-  imports: [ProjectHeader, InfoCard, ProjectSidebar, FormsModule, CommonModule, SuccessModal, ProjectPosts],
+  imports: [ProjectHeader, InfoCard, ProjectSidebar, FormsModule, CommonModule, SuccessModal, TranslatePipe, ProjectPosts],
   templateUrl: './project-site.html',
 })
 export class ProjectSite  implements OnInit {
@@ -54,7 +55,7 @@ export class ProjectSite  implements OnInit {
   ngOnInit(): void {
     const projectUrl = this.route.snapshot.paramMap.get('projectUrl');
     if (!projectUrl) {
-      this.errorMessage.set('Keine Projekt-URL angegeben.');
+      this.errorMessage.set('PROJECTSITE.ERRORS.NO_PROJECT_URL');
       this.isLoading.set(false);
       return;
     }
@@ -65,7 +66,7 @@ export class ProjectSite  implements OnInit {
         this.isLoading.set(false);
       },
       error: () => {
-        this.errorMessage.set('Projektdaten konnten nicht abgerufen werden.');
+        this.errorMessage.set('PROJECTSITE.ERRORS.LOAD_PROJECT');
         this.isLoading.set(false);
       },
     });
@@ -120,7 +121,7 @@ export class ProjectSite  implements OnInit {
           this.showSuccessModal.set(true);
         },
         error: () => {
-          this.errorMessage.set('Projekt konnte nicht gespeichert werden.');
+          this.errorMessage.set('PROJECTSITE.ERRORS.SAVE_PROJECT');
           this.isSaving.set(false);
         },
       });

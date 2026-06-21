@@ -17,8 +17,8 @@
               type="text"
               class="mt-2 w-full max-w-sm rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700 outline-none focus:border-slate-500"
               [(ngModel)]="editForm.title"
+              [placeholder]="'USERPROFILE.NO_TITLE' | translate">
               (keydown.enter)="!isSaving && save.emit()"
-              placeholder="Kein Titel vorhanden">
 
             <div class="mt-3 flex flex-wrap items-center justify-center gap-5 text-sm text-slate-500 sm:justify-start">
               <div class="flex w-full max-w-sm items-center gap-1.5">
@@ -28,8 +28,8 @@
                   type="text"
                   class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700 outline-none focus:border-slate-500"
                   [(ngModel)]="editForm.location"
+                  [placeholder]="'USERPROFILE.NO_LOCATION' | translate">
                   (keydown.enter)="!isSaving && save.emit()"
-                  placeholder="Kein Standort vorhanden">
               </div>
 
               <div class="flex items-center gap-1.5">
@@ -46,7 +46,7 @@
               </p>
             } @else {
               <p class="mt-2 text-sm text-slate-400">
-                Kein Titel vorhanden
+                {{ 'USERPROFILE.NO_TITLE' | translate }}
               </p>
             }
 
@@ -54,7 +54,7 @@
               <div class="flex items-center gap-1.5">
                 <app-location-icon></app-location-icon>
                 <span>
-                  {{ profile.location || 'Kein Standort vorhanden' }}
+                  {{ profile.location || ('USERPROFILE.NO_LOCATION' | translate) }}
                 </span>
               </div>
 
@@ -81,9 +81,9 @@
             [disabled]="isSaving"
             (click)="save.emit()">
             @if (isSaving) {
-              Speichern...
+              {{ 'COMMON.SAVE' | translate }}...
             } @else {
-              Speichern
+              {{ 'COMMON.SAVE' | translate }}
             }
           </button>
           <button
@@ -91,7 +91,7 @@
             class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:opacity-50"
             [disabled]="isSaving"
             (click)="cancelEdit.emit()">
-            Abbrechen
+            {{ 'COMMON.CANCEL' | translate }}
           </button>
         </div>
       } @else {

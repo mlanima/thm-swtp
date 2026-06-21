@@ -2,7 +2,7 @@
   <div class="flex items-center gap-2">
     <div class="flex flex-col items-end">
       <div class="font-semibold">{{ username }}</div>
-      <div class="status text-xs">Eingeloggt</div>
+      <div class="status text-xs">{{ 'NAV.AUTH' | translate }}</div>
     </div>
 
     <a [routerLink]="['/profiles', username]" class="block self-stretch">

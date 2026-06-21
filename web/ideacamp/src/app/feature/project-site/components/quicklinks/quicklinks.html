@@ -1,7 +1,7 @@
 <div class="rounded-2xl bg-white p-5 shadow-sm">
   <div class="mb-4 flex items-center justify-between">
     <h3 class="text-sm font-semibold text-slate-700">
-      Links
+      {{ 'PROJECTSITE.QUICKLINKS.TITLE' | translate }}
     </h3>
 
     @if (isOwner) {
@@ -9,7 +9,7 @@
         type="button"
         (click)="startAdd()"
         class="rounded-md px-3 text-sm text-slate-500 transition hover:bg-slate-100 hover:text-lime-500">
-        + Hinzufügen
+        + {{ 'PROJECTSITE.QUICKLINKS.ADD' | translate }}
       </button>
     }
   </div>
@@ -25,7 +25,7 @@
       <div class="space-y-3">
         <div>
           <label class="text-xs font-medium text-slate-500" for="new-link-label">
-            Bezeichnung
+            {{ 'PROJECTSITE.QUICKLINKS.LABEL' | translate }}
           </label>
 
           <input
@@ -33,7 +33,7 @@
             type="text"
             [ngModel]="newLabel"
             (ngModelChange)="newLabel = $event"
-            placeholder="Beispielseite"
+            [placeholder]="'PROJECTSITE.QUICKLINKS.LABEL_PLACEHOLDER' | translate"
             class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:border-lime-400 focus:outline-none"
           />
         </div>
@@ -48,7 +48,7 @@
             type="url"
             [ngModel]="newUrl"
             (ngModelChange)="newUrl = $event"
-            placeholder="e.g. beispiel.com"
+            [placeholder]="'PROJECTSITE.QUICKLINKS.URL_PLACEHOLDER' | translate"
             class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:border-lime-400 focus:outline-none"
           />
         </div>
@@ -58,14 +58,14 @@
             type="button"
             (click)="addLink()"
             class="rounded-md bg-lime-500 px-3 py-2 text-sm font-medium text-white hover:bg-lime-600">
-            Speichern
+            {{ 'COMMON.SAVE' | translate }}
           </button>
 
           <button
             type="button"
             (click)="cancelAdd()"
             class="rounded-md bg-slate-200 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-300">
-            Abbrechen
+            {{ 'COMMON.CANCEL' | translate }}
           </button>
         </div>
       </div>
@@ -74,11 +74,11 @@
 
   @if (isLoading) {
     <p class="text-sm text-slate-500">
-      Links werden geladen...
+      {{ 'PROJECTSITE.QUICKLINKS.LOADING' | translate }}
     </p>
   } @else if (links.length === 0 && !isAdding) {
     <p class="text-sm text-slate-400">
-      Keine öffentlichen Links verfügbar.
+      {{ 'PROJECTSITE.QUICKLINKS.EMPTY' | translate }}
     </p>
   } @else {
     <div class="space-y-3 text-sm text-slate-600">
@@ -89,7 +89,7 @@
               <div class="space-y-3">
                 <div>
                   <label class="text-xs font-medium text-slate-500" for="update-link-label">
-                    Bezeichnung
+                    {{ 'PROJECTSITE.QUICKLINKS.LABEL' | translate }}
                   </label>
 
                   <input
@@ -120,14 +120,14 @@
                     type="button"
                     (click)="updateLink(link.id)"
                     class="rounded-md bg-lime-500 px-3 py-2 text-sm font-medium text-white hover:bg-lime-600">
-                    Speichern
+                    {{ 'COMMON.SAVE' | translate }}
                   </button>
 
                   <button
                     type="button"
                     (click)="cancelEdit()"
                     class="rounded-md bg-slate-200 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-300">
-                    Abbrechen
+                    {{ 'COMMON.CANCEL' | translate }}
                   </button>
                 </div>
               </div>
@@ -153,7 +153,7 @@
                     type="button"
                     (click)="startEdit(link)"
                     class="rounded-md px-2 py-1 text-sm text-slate-400 hover:bg-slate-100 hover:text-lime-500"
-                    aria-label="Edit link">
+                    [attr.aria-label]="'PROJECTSITE.QUICKLINKS.EDIT_LINK' | translate">
                     ✎
                   </button>
 
@@ -161,7 +161,7 @@
                     type="button"
                     (click)="deleteLink(link.id)"
                     class="rounded-md px-2 py-1 text-sm text-slate-400 hover:bg-red-50 hover:text-red-500"
-                    aria-label="Delete link">
+                    [attr.aria-label]="'PROJECTSITE.QUICKLINKS.DELETE_LINK' | translate">
                     ×
                   </button>
                 </div>
