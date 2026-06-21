@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import {UserSearchPick} from './user-search-pick';
+import { provideTranslateTesting } from '../../testing/translate-testing.provider';
 
 describe('UserSearchPickComponent', () => {
   let component: UserSearchPick;
@@ -8,6 +9,9 @@ describe('UserSearchPickComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [UserSearchPick],
+      providers: [
+        provideTranslateTesting(),
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(UserSearchPick);

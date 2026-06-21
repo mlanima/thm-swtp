@@ -9,7 +9,7 @@
     <div class="flex-1">
       <h3 class="text-base font-semibold text-slate-700">{{ invite().projectName }}</h3>
       <p class="mt-0.5 text-sm text-slate-400">
-        Eingeladen von:
+        {{ 'MYPROJECTS.INVITED_BY' | translate }}
         <span class="font-medium text-slate-600">{{ invite().invitedByUsername }}</span>
         · {{ timeAgo(invite().createdAt) }}
       </p>
@@ -23,13 +23,13 @@
           (click)="accept.emit(invite())"
           class="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-700"
         >
-          <i class="pi pi-check text-xs"></i> Annehmen
+          <i class="pi pi-check text-xs"></i> {{ 'MYPROJECTS.ACCEPT' | translate }}
         </button>
         <button
           (click)="decline.emit(invite())"
           class="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
         >
-          <i class="pi pi-times text-xs"></i> Ablehnen
+          <i class="pi pi-times text-xs"></i> {{ 'MYPROJECTS.DECLINE' | translate }}
         </button>
       </div>
     </div>

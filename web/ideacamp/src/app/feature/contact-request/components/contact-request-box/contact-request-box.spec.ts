@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { provideTranslateTesting } from '../../../../testing/translate-testing.provider';
 import { ContactRequestBox } from './contact-request-box';
 
 describe('ContactRequestBox', () => {
@@ -9,6 +9,9 @@ describe('ContactRequestBox', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ContactRequestBox],
+      providers: [
+        provideTranslateTesting(),
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(ContactRequestBox);

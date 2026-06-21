@@ -1,4 +1,5 @@
 import { Component, input, output, signal, ElementRef, ViewChild } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { FormsModule } from '@angular/forms';
 
 
@@ -10,7 +11,7 @@ export interface TagModel {
 @Component({
   selector: 'app-editable-tag-list',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, TranslatePipe],
   templateUrl: './editable-tag-list.component.html',
 })
 export class EditableTagListComponent {

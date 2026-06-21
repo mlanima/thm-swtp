@@ -16,7 +16,7 @@
       </div>
 
       <p class="mt-1 text-sm text-slate-500">
-        Projekt: {{ request.projectName }}
+        {{ 'COMMON.PROJECT' | translate }}: {{ request.projectName }}
       </p>
     </div>
 
@@ -36,14 +36,14 @@
         type="button"
         (click)="accept.emit(request.id)"
         class="rounded-lg border bg-lime-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-lime-700">
-        ✓ Annehmen
+        ✓ {{ 'MYPROJECTS.ACCEPT' | translate }}
       </button>
 
       <button
         type="button"
         (click)="reject.emit(request.id)"
         class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-red-800 hover:text-white">
-        × Ablehnen
+        × {{ 'MYPROJECTS.DECLINE' | translate }}
       </button>
     </div>
   }

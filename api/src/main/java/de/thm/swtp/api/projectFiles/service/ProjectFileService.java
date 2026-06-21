@@ -11,6 +11,7 @@ import de.thm.swtp.api.projectFiles.entity.ProjectFileEntity;
 import de.thm.swtp.api.projectFiles.mapper.ProjectFileMapper;
 import de.thm.swtp.api.projectFiles.repository.ProjectFileRepository;
 import jakarta.annotation.PostConstruct;
+import org.apache.tika.Tika;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
@@ -50,6 +51,8 @@ public class ProjectFileService {
 
     private Path uploadDir;
 
+    private static final Tika TIKA = new Tika();
+
     private final ProjectFileRepository projectFileRepository;
     private final ProjectRepository projectRepository;
 
@@ -64,8 +67,9 @@ public class ProjectFileService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProjectFile> getProjectFiles(UUID projectId) {
-        getProjectOrThrow(projectId);
+    public List<ProjectFile> getProjectFiles(UUID projectId, UUID currentUserId) {
+        ProjectEntity project = getProjectOrThrow(projectId);
+        checkProjectAccess(project, currentUserId);
         return projectFileRepository.findByProjectIdOrderByCreatedAtAsc(projectId)
                 .stream()
                 .map(ProjectFileMapper::toDomain)
@@ -86,9 +90,10 @@ public class ProjectFileService {
             throw new ProjectFileUploadLimitExceededException(MAX_FILES_PER_PROJECT);
         }
 
-        String originalName = StringUtils.hasText(file.getOriginalFilename())
+        String rawName = StringUtils.hasText(file.getOriginalFilename())
                 ? file.getOriginalFilename()
                 : "file";
+        String originalName = rawName.length() > 255 ? rawName.substring(0, 255) : rawName;
         String extension = getExtension(originalName);
         String storageName = UUID.randomUUID() + (extension.isEmpty() ? "" : "." + extension);
         Path filePath = uploadDir.resolve(storageName);
@@ -97,6 +102,27 @@ public class ProjectFileService {
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             throw new RuntimeException("Failed to write file to storage", e);
+        }
+
+        // verify actual MIME type via magic bytes — client-supplied Content-Type is not trusted
+        try {
+            String detectedMime = TIKA.detect(filePath);
+            if (!ALLOWED_MIME_TYPES.contains(detectedMime)) {
+                try {
+                    Files.deleteIfExists(filePath);
+                } catch (IOException ignored) {
+                }
+                throw new ProjectFileTypeNotAllowedException(detectedMime);
+            }
+            mimeType = detectedMime;
+        } catch (ProjectFileTypeNotAllowedException e) {
+            throw e;
+        } catch (IOException e) {
+            try {
+                Files.deleteIfExists(filePath);
+            } catch (IOException ignored) {
+            }
+            throw new RuntimeException("Failed to detect MIME type", e);
         }
 
         ProjectFileEntity entity = ProjectFileEntity.builder()
@@ -110,14 +136,18 @@ public class ProjectFileService {
         try {
             return ProjectFileMapper.toDomain(projectFileRepository.save(entity));
         } catch (Exception e) {
-            try { Files.deleteIfExists(filePath); } catch (IOException ignored) { }
+            try {
+                Files.deleteIfExists(filePath);
+            } catch (IOException ignored) {
+            }
             throw e;
         }
     }
 
     @Transactional(readOnly = true)
-    public ProjectFileDownload prepareDownload(UUID projectId, UUID fileId) {
-        getProjectOrThrow(projectId);
+    public ProjectFileDownload prepareDownload(UUID projectId, UUID fileId, UUID currentUserId) {
+        ProjectEntity project = getProjectOrThrow(projectId);
+        checkProjectAccess(project, currentUserId);
         ProjectFileEntity fileEntity = getFileOrThrow(fileId);
         checkFileBelongsToProject(fileEntity, projectId);
 
@@ -137,13 +167,15 @@ public class ProjectFileService {
         ProjectFileEntity fileEntity = getFileOrThrow(fileId);
         checkFileBelongsToProject(fileEntity, projectId);
 
-        // Delete from disk before DB so that a disk failure rolls back the DB delete too
+        // DB first: a DB failure rolls back cleanly; disk is untouched.
+        // Disk second: a disk failure leaves an orphaned file (wasted space),
+        // but never a DB record pointing to a missing file (unrecoverable crash on next download).
+        projectFileRepository.delete(fileEntity);
         try {
             Files.deleteIfExists(uploadDir.resolve(fileEntity.getStorageName()));
         } catch (IOException e) {
             throw new RuntimeException("Failed to delete file from storage", e);
         }
-        projectFileRepository.delete(fileEntity);
     }
 
     private ProjectEntity getProjectOrThrow(UUID projectId) {
@@ -162,6 +194,18 @@ public class ProjectFileService {
         }
     }
 
+    private void checkProjectAccess(ProjectEntity project, UUID currentUserId) {
+        if (!project.isPrivateProject()) {
+            return;
+        }
+        boolean isOwner = project.getOwner().getKeycloakId().equals(currentUserId);
+        boolean isMember = project.getMembers().stream()
+                .anyMatch(m -> m.getKeycloakId().equals(currentUserId));
+        if (!isOwner && !isMember) {
+            throw new ExceptionProjectEditNotAllowed(currentUserId, project.getId());
+        }
+    }
+
     private void checkFileBelongsToProject(ProjectFileEntity file, UUID projectId) {
         if (!file.getProject().getId().equals(projectId)) {
             throw new ProjectFileDoesNotBelongToProjectException();
@@ -170,6 +214,10 @@ public class ProjectFileService {
 
     private String getExtension(String filename) {
         int dotIndex = filename.lastIndexOf('.');
-        return dotIndex >= 0 ? filename.substring(dotIndex + 1) : "";
+        if (dotIndex < 0) {
+            return "";
+        }
+        String ext = filename.substring(dotIndex + 1);
+        return ext.matches("[A-Za-z0-9]{1,10}") ? ext : "";
     }
 }

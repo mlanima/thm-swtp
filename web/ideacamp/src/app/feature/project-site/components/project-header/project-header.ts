@@ -1,4 +1,5 @@
 import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ProjectResponse } from '../../../../models/project.model';
 import { AuthService } from '../../../auth/auth.service';
 import { RouterLink } from '@angular/router';
@@ -8,7 +9,7 @@ import { JoinRequestButton } from '../../../../shared/join-request-button/join-r
 @Component({
   selector: 'app-project-header',
   standalone: true,
-  imports: [FavoriteButton, JoinRequestButton, RouterLink],
+  imports: [FavoriteButton, JoinRequestButton, RouterLink, TranslatePipe],
   templateUrl: './project-header.html'
 })
 export class ProjectHeader {

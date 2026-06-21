@@ -1,9 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component, HostListener, ViewChild, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import {z} from 'zod';
 import {WizardLayout} from './wizard-layout/wizard-layout';
 import {Stepper} from './stepper/stepper';
-
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {ProjectGeneralForm} from './project-general-form/project-general-form';
 import {ProjectSettingsForm} from './project-settings-form/project-settings-form';
 import {ProjectMembersForm} from './project-members-form/project-members-form';
@@ -23,6 +23,7 @@ import {ProjectInviteMember } from '../../models/project-invite-member.model';
     ProjectSettingsForm,
     ProjectMembersForm,
     ProjectFinishForm,
+    TranslatePipe
   ],
   templateUrl: './project-create.html',
 })
@@ -30,6 +31,9 @@ export class ProjectCreate {
 
   private readonly projectService = inject(ProjectService);
   private readonly router = inject(Router);
+  private readonly translateService = inject(TranslateService);
+
+  @ViewChild(ProjectMembersForm) membersForm?: ProjectMembersForm;
 
   isLoading = false;
   errorMessage: string | null = null;
@@ -42,6 +46,32 @@ export class ProjectCreate {
    */
   projectData: Partial<ProjectCreateData> = {};
   invitedMembers: ProjectInviteMember[] = [];
+
+  @HostListener('window:keydown', ['$event'])
+  handleEnter(event: KeyboardEvent) {
+    if (event.key !== 'Enter') {
+      return;
+    }
+
+    if (this.currentStep === 2) {
+      if (this.membersForm?.isMemberDialogOpen) {
+        return;
+      }
+
+      event.preventDefault();
+      this.membersForm?.submit();
+      return;
+    }
+
+    if (this.currentStep === 3) {
+      if (this.isLoading) {
+        return;
+      }
+
+      event.preventDefault();
+      this.finishProjectCreation();
+    }
+  }
 
   nextStep() {
     if (this.currentStep < 3) {
@@ -97,14 +127,16 @@ export class ProjectCreate {
     this.projectService.createProject({ ...res.data, shortDescription: res.data.shortDescription ?? null, description: res.data.description ?? null,memberIds: this.invitedMembers.map(member => member.keycloakId), tagIds: [] }).subscribe({
       next: (project) => {
         this.isLoading = false;
-        this.successMessage = this.invitedMembers.length > 0 ? 'Projekt erfolgreich erstellt und Einladungen gesendet!' : 'Projekt erfolgreich erstellt!';
+        this.successMessage = this.translateService.instant(
+          this.invitedMembers.length > 0 ? 'PROJECTCREATE.SUCCESS_CREATED_WITH_INVITES' : 'PROJECTCREATE.SUCCESS_CREATED',
+        );
         setTimeout(() => {
           this.router.navigate(['/project', project.projectUrl]);
         }, 1500);
       },
       error: () => {
         this.isLoading = false;
-        this.errorMessage = 'Projekt konnte nicht erstellt werden. Bitte versuche es erneut.';
+        this.errorMessage = this.translateService.instant('PROJECTCREATE.ERROR_CREATE_PROJECT');
       },
     });
   }

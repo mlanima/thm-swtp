@@ -9,21 +9,32 @@ import {
   ProjectSearchResultSchema,
 } from '../models/project-search-result.model';
 import { UserSearchResult, UserSearchResultSchema } from '../models/user-search-result.model';
+import { Page, PageSchema } from '../models/page.model';
 
 @Injectable({ providedIn: 'root' })
 export class SearchService {
   private readonly http = inject(HttpClient);
 
-  searchProjects(queries: string[]): Observable<ProjectSearchResult[]> {
-    return this.http
-      .get<unknown>(`${environment.apiUrl}/search/projects`, { params: { q: queries } })
-      .pipe(map((data) => z.array(ProjectSearchResultSchema).parse(data)));
-  }
-
   searchUsers(queries: string[]): Observable<UserSearchResult[]> {
     return this.http
       .get<unknown>(`${environment.apiUrl}/search/users`, { params: { q: queries } })
       .pipe(map((data) => z.array(UserSearchResultSchema).parse(data)));
+  }
+
+  searchProjectsPaged(queries: string[], page: number, size = 20): Observable<Page<ProjectSearchResult>> {
+    return this.http
+      .get<unknown>(`${environment.apiUrl}/search/projects/paged`, {
+        params: { q: queries, page: page.toString(), size: size.toString() },
+      })
+      .pipe(map((data) => PageSchema(ProjectSearchResultSchema).parse(data)));
+  }
+
+  searchUsersPaged(queries: string[], page: number, size = 20): Observable<Page<UserSearchResult>> {
+    return this.http
+      .get<unknown>(`${environment.apiUrl}/search/users/paged`, {
+        params: { q: queries, page: page.toString(), size: size.toString() },
+      })
+      .pipe(map((data) => PageSchema(UserSearchResultSchema).parse(data)));
   }
 
   searchTags(query: string, limit = 32): Observable<string[]> {

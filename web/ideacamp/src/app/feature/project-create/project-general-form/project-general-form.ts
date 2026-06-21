@@ -1,6 +1,6 @@
 import {Component, Output, EventEmitter, Input, OnChanges,SimpleChanges} from '@angular/core';
 import {FormsModule} from '@angular/forms';
-
+import { TranslatePipe } from '@ngx-translate/core';
 import {ProjectGeneralData, projectGeneralSchema} from '../schemas/project-create.schema';
 import {FormErrors, mapZodErrors} from '../schemas/zod-error.helper';
 
@@ -10,7 +10,7 @@ type GeneralFormFields = 'name' | 'shortDescription' | 'description';
 @Component({
   selector: 'app-project-general-form',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, TranslatePipe],
   templateUrl: './project-general-form.html',
 })
 
@@ -48,4 +48,24 @@ export class ProjectGeneralForm implements OnChanges {
     this.next.emit(res.data)
   }
 
+  focusShortDescriptionIfNameIsValid(shortDescriptionInput: HTMLInputElement) {
+    const res = projectGeneralSchema.pick({ name: true }).safeParse({
+      name: this.formData.name,
+    });
+
+    if (!res.success) {
+      this.errors = {
+        ...this.errors,
+        ...mapZodErrors<GeneralFormFields>(res.error),
+      };
+      return;
+    }
+
+    this.errors = {
+      ...this.errors,
+      name: undefined,
+    };
+
+    shortDescriptionInput.focus();
+  }
 }
