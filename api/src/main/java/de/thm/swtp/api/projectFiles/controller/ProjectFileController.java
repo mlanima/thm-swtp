@@ -28,8 +28,9 @@ public class ProjectFileController {
     private final ProjectFileService projectFileService;
 
     @GetMapping
-    public List<ProjectFileResponse> getProjectFiles(@PathVariable UUID projectId) {
-        return projectFileService.getProjectFiles(projectId)
+    public List<ProjectFileResponse> getProjectFiles(@PathVariable UUID projectId,
+                                                     @AuthenticationPrincipal Jwt jwt) {
+        return projectFileService.getProjectFiles(projectId, getCurrentUserId(jwt))
                 .stream()
                 .map(ProjectFileResponse::toResponse)
                 .toList();
@@ -46,8 +47,9 @@ public class ProjectFileController {
 
     @GetMapping("/{fileId}/download")
     public ResponseEntity<Resource> downloadFile(@PathVariable UUID projectId,
-                                                 @PathVariable UUID fileId) {
-        ProjectFileDownload download = projectFileService.prepareDownload(projectId, fileId);
+                                                 @PathVariable UUID fileId,
+                                                 @AuthenticationPrincipal Jwt jwt) {
+        ProjectFileDownload download = projectFileService.prepareDownload(projectId, fileId, getCurrentUserId(jwt));
 
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(download.file().getMimeType()))

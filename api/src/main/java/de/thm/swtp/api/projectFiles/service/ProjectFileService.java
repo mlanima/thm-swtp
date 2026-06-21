@@ -64,8 +64,9 @@ public class ProjectFileService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProjectFile> getProjectFiles(UUID projectId) {
-        getProjectOrThrow(projectId);
+    public List<ProjectFile> getProjectFiles(UUID projectId, UUID currentUserId) {
+        ProjectEntity project = getProjectOrThrow(projectId);
+        checkProjectAccess(project, currentUserId);
         return projectFileRepository.findByProjectIdOrderByCreatedAtAsc(projectId)
                 .stream()
                 .map(ProjectFileMapper::toDomain)
@@ -120,8 +121,9 @@ public class ProjectFileService {
     }
 
     @Transactional(readOnly = true)
-    public ProjectFileDownload prepareDownload(UUID projectId, UUID fileId) {
-        getProjectOrThrow(projectId);
+    public ProjectFileDownload prepareDownload(UUID projectId, UUID fileId, UUID currentUserId) {
+        ProjectEntity project = getProjectOrThrow(projectId);
+        checkProjectAccess(project, currentUserId);
         ProjectFileEntity fileEntity = getFileOrThrow(fileId);
         checkFileBelongsToProject(fileEntity, projectId);
 
@@ -164,6 +166,16 @@ public class ProjectFileService {
 
     private void checkProjectOwner(ProjectEntity project, UUID currentUserId) {
         if (!project.getOwner().getKeycloakId().equals(currentUserId)) {
+            throw new ExceptionProjectEditNotAllowed(currentUserId, project.getId());
+        }
+    }
+
+    private void checkProjectAccess(ProjectEntity project, UUID currentUserId) {
+        if (!project.isPrivateProject()) return;
+        boolean isOwner = project.getOwner().getKeycloakId().equals(currentUserId);
+        boolean isMember = project.getMembers().stream()
+                .anyMatch(m -> m.getKeycloakId().equals(currentUserId));
+        if (!isOwner && !isMember) {
             throw new ExceptionProjectEditNotAllowed(currentUserId, project.getId());
         }
     }
