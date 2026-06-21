@@ -1,8 +1,10 @@
 # Frontend (web/ideacamp/)
 
-Angular 21 app (SSR via Angular Universal/Express), TypeScript.
+Angular 21 app (SSR via `@angular/ssr` + Express), TypeScript.
 
 - Auth: `angular-oauth2-oidc` (Keycloak).
+- i18n: `@ngx-translate/core` + `@ngx-translate/http-loader`. Use `TranslateService.instant()`
+  to resolve keys — never assign raw translation keys to template-bound properties.
 - Validation: `zod`.
 - Icons: `primeicons`.
 - Linting: ESLint with `@angular-eslint` + `typescript-eslint` (see `eslint.config.js`).

@@ -326,6 +326,34 @@ CREATE INDEX `FKk0hohbcaqex7k6jxa1ir8vh72` ON `user_profile_tags` (`tag_name` AS
 
 SHOW WARNINGS;
 
+-- -----------------------------------------------------
+-- Table `project_files`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `project_files` ;
+
+SHOW WARNINGS;
+CREATE TABLE IF NOT EXISTS `project_files` (
+  `id` BINARY(16) NOT NULL,
+  `project_id` BINARY(16) NOT NULL,
+  `original_name` VARCHAR(255) NOT NULL,
+  `storage_name` VARCHAR(255) NOT NULL,
+  `mime_type` VARCHAR(100) NOT NULL,
+  `size_bytes` BIGINT NOT NULL,
+  `created_at` DATETIME NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `storage_name_UNIQUE` (`storage_name` ASC) VISIBLE,
+  CONSTRAINT `FK_project_files_project`
+    FOREIGN KEY (`project_id`)
+    REFERENCES `projects` (`id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+SHOW WARNINGS;
+CREATE INDEX `FK_project_files_project_idx` ON `project_files` (`project_id` ASC) VISIBLE;
+
+SHOW WARNINGS;
+
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
