@@ -141,13 +141,15 @@ public class ProjectFileService {
         ProjectFileEntity fileEntity = getFileOrThrow(fileId);
         checkFileBelongsToProject(fileEntity, projectId);
 
-        // Delete from disk before DB so that a disk failure rolls back the DB delete too
+        // DB first: a DB failure rolls back cleanly; disk is untouched.
+        // Disk second: a disk failure leaves an orphaned file (wasted space),
+        // but never a DB record pointing to a missing file (unrecoverable crash on next download).
+        projectFileRepository.delete(fileEntity);
         try {
             Files.deleteIfExists(uploadDir.resolve(fileEntity.getStorageName()));
         } catch (IOException e) {
             throw new RuntimeException("Failed to delete file from storage", e);
         }
-        projectFileRepository.delete(fileEntity);
     }
 
     private ProjectEntity getProjectOrThrow(UUID projectId) {
