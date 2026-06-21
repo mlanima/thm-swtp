@@ -38,11 +38,94 @@
       </div>
 
       <div>
+        <p class="text-xs font-medium text-slate-500">
+          Format
+        </p>
+
+        <div class="mt-2 flex gap-2">
+          <button
+            type="button"
+            class="rounded-md border px-3 py-1 text-xs font-medium transition"
+            [class.border-lime-500]="contentFormat() === 'MARKDOWN'"
+            [class.bg-lime-50]="contentFormat() === 'MARKDOWN'"
+            [class.text-lime-700]="contentFormat() === 'MARKDOWN'"
+            [class.border-slate-200]="contentFormat() !== 'MARKDOWN'"
+            [class.text-slate-500]="contentFormat() !== 'MARKDOWN'"
+            (click)="setContentFormat('MARKDOWN')">
+            Markdown
+          </button>
+
+          <button
+            type="button"
+            class="rounded-md border px-3 py-1 text-xs font-medium transition"
+            [class.border-lime-500]="contentFormat() === 'PLAIN_TEXT'"
+            [class.bg-lime-50]="contentFormat() === 'PLAIN_TEXT'"
+            [class.text-lime-700]="contentFormat() === 'PLAIN_TEXT'"
+            [class.border-slate-200]="contentFormat() !== 'PLAIN_TEXT'"
+            [class.text-slate-500]="contentFormat() !== 'PLAIN_TEXT'"
+            (click)="setContentFormat('PLAIN_TEXT')">
+            {{ 'PROJECTPOSTS.PLAIN_TEXT' | translate }}
+          </button>
+        </div>
+      </div>
+
+      <div>
         <label for="postContent" class="text-xs font-medium text-slate-500">
           {{ 'PROJECTPOSTS.CONTENT_LABEL' | translate }}
         </label>
 
+        @if (contentFormat() === 'MARKDOWN') {
+          <div class="mt-2 flex flex-wrap gap-2">
+            <button
+              type="button"
+              class="rounded-md border border-slate-200 px-2 py-1 text-xs text-slate-500 hover:bg-slate-100"
+              (click)="insertMarkdown('**', '**')">
+              {{ 'PROJECTPOSTS.TOOLBAR.BOLD' | translate }}
+            </button>
+
+            <button
+              type="button"
+              class="rounded-md border border-slate-200 px-2 py-1 text-xs text-slate-500 hover:bg-slate-100"
+              (click)="insertMarkdown('*', '*')">
+              {{ 'PROJECTPOSTS.TOOLBAR.ITALIC' | translate }}
+            </button>
+
+            <button
+              type="button"
+              class="rounded-md border border-slate-200 px-2 py-1 text-xs text-slate-500 hover:bg-slate-100"
+              (click)="insertMarkdownLine('## ')">
+              {{ 'PROJECTPOSTS.TOOLBAR.HEADING' | translate }}
+            </button>
+
+            <button
+              type="button"
+              class="rounded-md border border-slate-200 px-2 py-1 text-xs text-slate-500 hover:bg-slate-100"
+              (click)="insertMarkdownLine('- ')">
+              {{ 'PROJECTPOSTS.TOOLBAR.LIST' | translate }}
+            </button>
+
+            <button
+              type="button"
+              class="rounded-md border border-slate-200 px-2 py-1 text-xs text-slate-500 hover:bg-slate-100"
+              (click)="insertMarkdown('[', '](https://example.com)', 'Link')">
+              {{ 'PROJECTPOSTS.TOOLBAR.LINK' | translate }}
+            </button>
+
+            <button
+              type="button"
+              class="rounded-md border border-slate-200 px-2 py-1 text-xs text-slate-500 hover:bg-slate-100"
+              (click)="insertMarkdownLine('> ')">
+              {{ 'PROJECTPOSTS.TOOLBAR.QUOTE' | translate }}
+            </button>
+          </div>
+
+          <p class="mt-2 text-xs text-slate-400">
+            {{ 'PROJECTPOSTS.MARKDOWN_HINT' | translate }}
+          </p>
+        }
+
         <textarea
+          #postContentInput
           id="postContent"
           name="postContent"
           rows="4"
@@ -100,9 +183,16 @@
             }
           </div>
 
-          <p class="mt-4 whitespace-pre-line text-sm leading-6 text-slate-500">
-            {{ post.content }}
-          </p>
+          @if (post.contentFormat === 'MARKDOWN') {
+            <div
+              class="mt-4"
+              [innerHTML]="post.content | markdown">
+            </div>
+          } @else {
+            <p class="mt-4 whitespace-pre-line text-sm leading-6 text-slate-500">
+              {{ post.content }}
+            </p>
+          }
         </article>
       }
     </div>

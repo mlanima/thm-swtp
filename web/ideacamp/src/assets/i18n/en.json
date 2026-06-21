@@ -364,6 +364,16 @@
       "LOAD": "Posts could not be loaded.",
       "EMPTY_FIELDS": "Title and content must not be empty.",
       "CREATE": "Post could not be created."
+    },
+    "PLAIN_TEXT": "Plain text",
+    "MARKDOWN_HINT": "You can use Markdown, e.g. headings, lists, links and emphasis.",
+    "TOOLBAR": {
+      "BOLD": "Bold",
+      "ITALIC": "Italic",
+      "HEADING": "Heading",
+      "LIST": "List",
+      "LINK": "Link",
+      "QUOTE": "Quote"
     }
   }
 }
