@@ -52,12 +52,13 @@ class UserFollowServiceTest {
 
         when(userFollowRepository.existsByFollowerKeycloakIdAndFollowingKeycloakId(followerId, followingId))
                 .thenReturn(false);
-        when(userProfileRepository.findById(followerId)).thenReturn(Optional.of(follower));
-        when(userProfileRepository.findById(followingId)).thenReturn(Optional.of(following));
+        when(userProfileRepository.getReferenceById(followerId)).thenReturn(follower);
+        when(userProfileRepository.getReferenceById(followingId)).thenReturn(following);
 
         userFollowService.follow(followerId, followingId);
 
         verify(userFollowRepository).save(any(UserFollowEntity.class));
+        verify(userProfileRepository).incrementFollowers(followingId);
     }
 
     @Test
@@ -89,16 +90,8 @@ class UserFollowServiceTest {
         UUID followerId = UUID.randomUUID();
         UUID followingId = UUID.randomUUID();
 
-        UserProfile following = UserProfile.builder()
-                .keycloakId(followingId)
-                .username("following")
-                .email("following@mni.thm.de")
-                .followers(1)
-                .build();
-
         UserFollowEntity follow = UserFollowEntity.builder()
                 .id(UUID.randomUUID())
-                .following(following)
                 .build();
 
         when(userFollowRepository.findByFollowerKeycloakIdAndFollowingKeycloakId(followerId, followingId))
@@ -107,7 +100,7 @@ class UserFollowServiceTest {
         userFollowService.unfollow(followerId, followingId);
 
         verify(userFollowRepository).delete(follow);
-        verify(userProfileRepository).save(following);
+        verify(userProfileRepository).decrementFollowers(followingId);
     }
 
     @Test

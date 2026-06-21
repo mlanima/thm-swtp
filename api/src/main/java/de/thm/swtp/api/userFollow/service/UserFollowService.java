@@ -6,7 +6,6 @@ import de.thm.swtp.api.userFollow.exception.UserAlreadyFollowingException;
 import de.thm.swtp.api.userFollow.exception.UserFollowNotFoundException;
 import de.thm.swtp.api.userFollow.repository.UserFollowRepository;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
-import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,11 +31,8 @@ public class UserFollowService {
             throw new UserAlreadyFollowingException();
         }
 
-        UserProfile follower = userProfileRepository.findById(followerId)
-                .orElseThrow(() -> new UserProfileNotFoundException(followerId.toString()));
-
-        UserProfile following = userProfileRepository.findById(followingId)
-                .orElseThrow(() -> new UserProfileNotFoundException(followingId.toString()));
+        UserProfile follower = userProfileRepository.getReferenceById(followerId);
+        UserProfile following = userProfileRepository.getReferenceById(followingId);
 
         userFollowRepository.save(
                 UserFollowEntity.builder()
@@ -45,8 +41,7 @@ public class UserFollowService {
                         .build()
         );
 
-        following.setFollowers(following.getFollowers() + 1);
-        userProfileRepository.save(following);
+        userProfileRepository.incrementFollowers(followingId);
     }
 
     @Transactional
@@ -56,10 +51,7 @@ public class UserFollowService {
                 .orElseThrow(UserFollowNotFoundException::new);
 
         userFollowRepository.delete(follow);
-
-        UserProfile following = follow.getFollowing();
-        following.setFollowers(Math.max(0, following.getFollowers() - 1));
-        userProfileRepository.save(following);
+        userProfileRepository.decrementFollowers(followingId);
     }
 
     @Transactional(readOnly = true)
