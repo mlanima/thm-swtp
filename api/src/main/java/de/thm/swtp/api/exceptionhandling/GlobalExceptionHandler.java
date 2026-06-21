@@ -207,6 +207,30 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
     }
 
+    @ExceptionHandler(ProjectFileNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleProjectFileNotFound(ProjectFileNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ProjectFileDoesNotBelongToProjectException.class)
+    public ResponseEntity<ErrorResponse> handleProjectFileDoesNotBelongToProject(ProjectFileDoesNotBelongToProjectException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ProjectFileTypeNotAllowedException.class)
+    public ResponseEntity<ErrorResponse> handleProjectFileTypeNotAllowed(ProjectFileTypeNotAllowedException ex) {
+        return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+                .body(ErrorResponse.of(415, "Unsupported Media Type", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ProjectFileUploadLimitExceededException.class)
+    public ResponseEntity<ErrorResponse> handleProjectFileUploadLimitExceeded(ProjectFileUploadLimitExceededException ex) {
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(ErrorResponse.of(422, "Unprocessable Entity", ex.getMessage()));
+    }
+
     @ExceptionHandler(CannotFollowYourselfException.class)
     public ResponseEntity<ErrorResponse> handleCannotFollowYourself(CannotFollowYourselfException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)

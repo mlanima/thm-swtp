@@ -3,6 +3,7 @@
 ;;
 ;; Features:
 ;; - clones the template DB into a per-PR schema
+;; - provisions a per-PR upload directory from the upload template
 ;; - spins up per-PR containers (web + api + dozzle) routed via Traefik
 ;; - registers the PR's redirect URI and web origin in Keycloak
 ;; - registers the PR in active-prs.txt for backup-restart tracking
@@ -210,6 +211,21 @@
     (log "DB clone done")))
 
 ;; =============================================================================
+;; Upload dir provisioning (uploads/template -> uploads/pr-<n>)
+;; =============================================================================
+(defn- provision-upload-dir!
+  "Copies the upload template into a fresh per-PR upload directory."
+  []
+  (let [template "/opt/stacks/swtp-infra/uploads/template"
+        dir      (str "/opt/stacks/swtp-infra/uploads/pr-" *pr-num*)]
+    (log (str "Provisioning upload dir from template -> " dir " ..."))
+    (let [{:keys [exit err]} (sh ["sudo" "cp" "-r" template dir])]
+      (when-not (zero? exit)
+        (throw (ex-info (str "Upload dir provisioning FAILED: " err) {:dir dir}))))
+    (log "Upload dir provisioned")
+    dir))
+
+;; =============================================================================
 ;; Container deploy (concrete)
 ;; =============================================================================
 (defn- deploy-web
@@ -227,7 +243,8 @@
   "Deploys the backend container for this PR (review_net + review.env)."
   [org db-name]
   (let [container-name (str "swtp-api-pr-" *pr-num*)
-        host           (subdomain *pr-num* "api")]
+        host           (subdomain *pr-num* "api")
+        upload-dir     (provision-upload-dir!)]
     (deploy-service!
       {:container-name container-name
        :host           host
@@ -235,6 +252,8 @@
        :port           8080
        :extra-opts     ["--network"  "review_net"
                         "--env-file" "/opt/stacks/swtp-infra/review.env"
+                        "-v"         (str upload-dir ":/app/uploads")
+                        "-e"         "APP_UPLOADS_DIR=/app/uploads"
                         "-e"         (str "SPRING_DATASOURCE_URL=jdbc:mysql://swtp-db:3306/" db-name)]})
     (log (str "Backend live -> https://" host))))
 
