@@ -1,0 +1,121 @@
+<section class="rounded-2xl bg-white p-6 shadow-sm">
+  <div class="mb-5 flex items-center justify-between gap-4">
+    <div>
+      <h2 class="text-lg font-semibold text-slate-700">
+        Posts
+      </h2>
+      <p class="mt-1 text-sm text-slate-400">
+        Neuigkeiten und Updates zu diesem Projekt.
+      </p>
+    </div>
+
+    @if (canCreatePosts) {
+      <button
+        type="button"
+        class="rounded-md bg-lime-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-lime-600"
+        (click)="toggleCreateForm()"
+      >
+        {{ showCreateForm() ? 'Abbrechen' : 'Post hinzufügen' }}
+      </button>
+    }
+  </div>
+
+  @if (showCreateForm()) {
+    <form class="mb-6 space-y-4 rounded-xl border border-slate-200 bg-slate-50 p-4" (ngSubmit)="createPost()">
+      <div>
+        <label for="postTitle" class="text-xs font-medium text-slate-500">
+          Titel
+        </label>
+
+        <input
+          id="postTitle"
+          name="postTitle"
+          [ngModel]="title()"
+          (ngModelChange)="title.set($event)"
+          class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:border-lime-400 focus:outline-none"
+          placeholder="Titel des Posts"
+        />
+      </div>
+
+      <div>
+        <label for="postContent" class="text-xs font-medium text-slate-500">
+          Inhalt
+        </label>
+
+        <textarea
+          id="postContent"
+          name="postContent"
+          rows="4"
+          [ngModel]="content()"
+          (ngModelChange)="content.set($event)"
+          class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:border-lime-400 focus:outline-none"
+          placeholder="Was gibt es Neues?"
+        ></textarea>
+      </div>
+
+      <button
+        type="submit"
+        [disabled]="isCreating()"
+        class="rounded-md bg-lime-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-lime-600 disabled:opacity-50"
+      >
+        {{ isCreating() ? 'Wird erstellt…' : 'Veröffentlichen' }}
+      </button>
+    </form>
+  }
+
+  @if (errorMessage()) {
+    <div class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  @if (isLoading()) {
+    <p class="text-sm text-slate-400">
+      Posts werden geladen…
+    </p>
+  } @else if (posts().length === 0) {
+    <p class="rounded-xl border border-dashed border-slate-200 p-6 text-center text-sm text-slate-400">
+      Für dieses Projekt gibt es noch keine Posts.
+    </p>
+  } @else {
+    <div class="space-y-4">
+      @for (post of visiblePosts; track post.id) {
+        <article class="rounded-xl border border-slate-200 p-4">
+          <div class="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <h3 class="font-semibold text-slate-700">
+                {{ post.title }}
+              </h3>
+
+              <p class="mt-1 text-xs text-slate-400">
+                Von {{ post.authorName || 'Unbekannt' }}
+              </p>
+            </div>
+
+            @if (post.publishedAt) {
+              <p class="text-xs text-slate-400">
+                {{ post.publishedAt | date:'dd.MM.yyyy HH:mm' }}
+              </p>
+            }
+          </div>
+
+          <p class="mt-4 whitespace-pre-line text-sm leading-6 text-slate-500">
+            {{ post.content }}
+          </p>
+        </article>
+      }
+    </div>
+
+    @if (canLoadMore) {
+      <div class="mt-6 flex justify-center">
+        <button
+          type="button"
+          class="rounded-md bg-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-300"
+          (click)="loadMore()"
+        >
+          Mehr laden
+        </button>
+      </div>
+    }
+  }
+</section>

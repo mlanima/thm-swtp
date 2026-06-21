@@ -110,6 +110,10 @@
             <app-info-card [project]="project()!" />
           }
         </div>
+        <app-project-posts
+          [project]="project()!"
+          [canCreatePosts]="canCreatePosts">
+        </app-project-posts>
 <!--        TODO: not implemented yet-->
 <!--        <app-open-position-card />-->
       </section>
