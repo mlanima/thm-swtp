@@ -23,7 +23,7 @@ public class UserFollowController {
     private final UserProfileService userProfileService;
     private final UserProfileMapper userProfileMapper;
 
-    @PostMapping("/{username}/follow")
+    @PostMapping("/{username}/followers")
     public ResponseEntity<Void> follow(
             @PathVariable String username,
             @AuthenticationPrincipal Jwt jwt) {
@@ -33,7 +33,7 @@ public class UserFollowController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @DeleteMapping("/{username}/follow")
+    @DeleteMapping("/{username}/followers")
     public ResponseEntity<Void> unfollow(
             @PathVariable String username,
             @AuthenticationPrincipal Jwt jwt) {
@@ -43,7 +43,7 @@ public class UserFollowController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{username}/follow")
+    @GetMapping("/{username}/followers/me")
     public ResponseEntity<Void> isFollowing(
             @PathVariable String username,
             @AuthenticationPrincipal Jwt jwt) {
