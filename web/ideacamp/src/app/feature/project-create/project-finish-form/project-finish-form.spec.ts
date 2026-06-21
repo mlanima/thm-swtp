@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { provideTranslateTesting } from '../../../testing/translate-testing.provider';
 import { ProjectFinishForm } from './project-finish-form';
 
 describe('ProjectFinishForm', () => {
@@ -9,6 +9,9 @@ describe('ProjectFinishForm', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ProjectFinishForm],
+      providers: [
+        provideTranslateTesting(),
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(ProjectFinishForm);

@@ -5,28 +5,28 @@ const containsNoQuotes = (value : string) => !value.includes('"') && !value.incl
 export const createProjectLinkSchema = z.object({
   label: z.string()
     .trim()
-    .min(1, "Bezeichnung erforderlich.")
-    .max(100, "Die Bezeichnung darf nicht länger als 100 Zeichen sein.")
-    .refine(containsNoQuotes, "Die Bezeichnung darf keine Anführungszeichen enthalten."),
+    .min(1, 'PROJECTSITE.QUICKLINKS.VALIDATION_LABEL_REQUIRED')
+    .max(100, 'PROJECTSITE.QUICKLINKS.VALIDATION_LABEL_TOO_LONG')
+    .refine(containsNoQuotes, 'PROJECTSITE.QUICKLINKS.VALIDATION_LABEL_NO_QUOTES'),
 
   url: z.string()
     .trim()
-    .min(1, "URL erforderlich.")
-    .max(300, "Die URL darf nicht länger als 300 Zeichen sein.")
-    .url("Die URL muss gültig sein."),
+    .min(1, 'PROJECTSITE.QUICKLINKS.VALIDATION_URL_REQUIRED')
+    .max(300, 'PROJECTSITE.QUICKLINKS.VALIDATION_URL_TOO_LONG')
+    .url('PROJECTSITE.QUICKLINKS.VALIDATION_URL_INVALID'),
 });
 
 export const updateProjectLinkSchema = z.object({
   label: z.string()
     .trim()
-    .max(100, 'Die Bezeichnung darf nicht länger als 100 Zeichen sein.')
-    .refine(containsNoQuotes, 'Die Bezeichnung darf keine Anführungszeichen enthalten.')
+    .max(100, 'PROJECTSITE.QUICKLINKS.VALIDATION_LABEL_TOO_LONG')
+    .refine(containsNoQuotes, 'PROJECTSITE.QUICKLINKS.VALIDATION_LABEL_NO_QUOTES')
     .optional(),
 
   url: z.string()
     .trim()
-    .max(300, 'Die URL darf nicht länger als 300 Zeichen sein.')
-    .url('Die URL muss gültig sein.')
+    .max(300, 'PROJECTSITE.QUICKLINKS.VALIDATION_URL_TOO_LONG')
+    .url('PROJECTSITE.QUICKLINKS.VALIDATION_URL_INVALID')
     .optional(),
 });
 

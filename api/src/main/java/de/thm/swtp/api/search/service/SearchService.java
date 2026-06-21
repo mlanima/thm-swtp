@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Generic search engine that intersects multiple query terms using ID-based set operations,
@@ -79,13 +80,51 @@ public class SearchService {
             Function<Collection<UUID>, List<T>> findAllById,
             Pageable pageable
     ) {
+        return search(queries, searchIdsByQuery, findAllById, pageable, null, null);
+    }
+
+    /**
+     * Executes a paginated multi-term search with AND semantics, ordering results
+     * by a custom ranking score rather than by raw ID.
+     *
+     * @param <T>             the entity type being searched
+     * @param queries         search terms; each term is matched case-insensitively against
+     *                        the entity's name/username field and its assigned tags
+     * @param searchIdsByQuery function that runs a single-term query and returns matching
+     *                         entity IDs (lightweight, avoids loading full entities)
+     * @param findAllById     function that batch-fetches entities by their IDs
+     * @param pageable        pagination and sorting information
+     * @param sortKeyLookup   optional function returning a ranking score per ID (higher first);
+     *                        IDs missing from the result default to 0. If {@code null}, results
+     *                        are ordered by raw ID.
+     * @param idExtractor     optional function extracting the ID from a fetched entity, used to
+     *                        restore the ranked order after {@code findAllById} (whose result
+     *                        order is not guaranteed). Required if {@code sortKeyLookup} is given.
+     * @return a {@link Page} of entities matching all query terms, never {@code null}
+     */
+    public <T> Page<T> search(
+            List<String> queries,
+            Function<String, List<UUID>> searchIdsByQuery,
+            Function<Collection<UUID>, List<T>> findAllById,
+            Pageable pageable,
+            Function<Collection<UUID>, Map<UUID, Long>> sortKeyLookup,
+            Function<T, UUID> idExtractor
+    ) {
         Set<UUID> ids = intersectIds(queries, searchIdsByQuery);
         if (ids.isEmpty()) {
-            return Page.empty();
+            return Page.empty(pageable);
         }
 
         List<UUID> sortedIds = new ArrayList<>(ids);
-        sortedIds.sort(UUID::compareTo);
+        if (sortKeyLookup != null) {
+            Map<UUID, Long> sortKeys = sortKeyLookup.apply(ids);
+            sortedIds.sort(
+                    Comparator.comparingLong((UUID id) -> sortKeys.getOrDefault(id, 0L)).reversed()
+                            .thenComparing(Comparator.naturalOrder())
+            );
+        } else {
+            sortedIds.sort(UUID::compareTo);
+        }
 
         int total = sortedIds.size();
         int start = (int) pageable.getOffset();
@@ -97,6 +136,11 @@ public class SearchService {
 
         List<UUID> pageIds = sortedIds.subList(start, end);
         List<T> content = findAllById.apply(pageIds);
+
+        if (idExtractor != null) {
+            Map<UUID, T> byId = content.stream().collect(Collectors.toMap(idExtractor, Function.identity()));
+            content = pageIds.stream().map(byId::get).filter(Objects::nonNull).toList();
+        }
 
         return new PageImpl<>(content, pageable, total);
     }

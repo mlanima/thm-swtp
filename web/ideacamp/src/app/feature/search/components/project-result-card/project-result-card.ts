@@ -1,5 +1,6 @@
 import { Component, input, signal, inject, DestroyRef, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ProjectSearchResult } from '../../models/project-search-result.model';
 import { SearchService } from '../../services/search.service';
 import { FavoriteButton } from '../../../../shared/favorite-button/favorite-button';
@@ -7,7 +8,7 @@ import { FavoriteButton } from '../../../../shared/favorite-button/favorite-butt
 @Component({
   selector: 'app-project-result-card',
   standalone: true,
-  imports: [RouterLink, FavoriteButton],
+  imports: [RouterLink, FavoriteButton, TranslatePipe],
   templateUrl: './project-result-card.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: [

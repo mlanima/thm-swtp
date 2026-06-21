@@ -1,4 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ProjectJoinRequestService, JoinRequestResponse } from '../../../../services/project-join-request.service';
 import { ProjectSettingsStore } from '../../project-settings.store';
 
@@ -13,12 +14,13 @@ interface DisplayRequest {
 @Component({
   selector: 'app-join-requests-tab',
   standalone: true,
-  imports: [],
+  imports: [TranslatePipe],
   templateUrl: './join-requests-tab.html',
 })
 export class JoinRequestsTab implements OnInit {
   private readonly store = inject(ProjectSettingsStore);
   private readonly joinRequestService = inject(ProjectJoinRequestService);
+  private readonly translateService = inject(TranslateService);
 
   requests = signal<DisplayRequest[]>([]);
   loading = signal(true);
@@ -54,7 +56,7 @@ export class JoinRequestsTab implements OnInit {
       initials: r.requestingUsername.substring(0, 2).toUpperCase(),
       username: r.requestingUsername,
       message: r.message ?? '',
-      requestDate: new Date(r.createdAt).toLocaleDateString('de-DE'),
+      requestDate: new Date(r.createdAt).toLocaleDateString(this.translateService.getCurrentLang() === 'en' ? 'en-US' : 'de-DE'),
     };
   }
 }

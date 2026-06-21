@@ -1,4 +1,5 @@
 import { Component, ElementRef, output, viewChild, signal, computed, inject, DestroyRef } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { FormsModule } from '@angular/forms';
 import { Subject, debounceTime, distinctUntilChanged, switchMap, catchError, of } from 'rxjs';
 import { SearchService } from '../../services/search.service';
@@ -8,7 +9,7 @@ const SUGGESTED_TAGS_LIMIT = 32;
 @Component({
   selector: 'app-search-input',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, TranslatePipe],
   templateUrl: './search-input.html'
 })
 export class SearchInputComponent {

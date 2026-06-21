@@ -4,6 +4,7 @@ import { LocationIcon } from '../../../../shared/icons/location-icon/location-ic
 import { FollowersIcon } from '../../../../shared/icons/followers-icon/followers-icon';
 import { UserProfileModel } from '../../../../models/user-profile.model';
 import { EditButton } from '../../../../shared/edit-button/edit-button';
+import { TranslatePipe } from '@ngx-translate/core';
 
 /** Displays the profile banner of the user
  *
@@ -13,7 +14,7 @@ import { EditButton } from '../../../../shared/edit-button/edit-button';
 @Component({
   selector: 'app-profile-banner',
   standalone: true,
-  imports: [LocationIcon, FollowersIcon, EditButton, FormsModule],
+  imports: [LocationIcon, FollowersIcon, EditButton, FormsModule, TranslatePipe],
   templateUrl: './profile-banner.html',
 })
 export class ProfileBanner {

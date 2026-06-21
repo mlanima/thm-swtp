@@ -10,6 +10,7 @@
 ;; - removes the per-PR web / api / dozzle containers
 ;; - removes the per-PR images to free disk space
 ;; - drops the per-PR database (swtp_pr_<n>)
+;; - removes the per-PR upload directory (uploads/pr-<n>)
 ;; - removes the PR's redirect URI + web origin from Keycloak
 ;; - removes the PR from active-prs.txt
 ;; - removes the PR entry from the dashboard JSON
@@ -165,6 +166,18 @@
     (log (str "Image cleanup attempted: " image))))
 
 ;; =============================================================================
+;; Upload dir cleanup (uploads/pr-<n>)
+;; =============================================================================
+(defn- remove-upload-dir!
+  "Removes the per-PR upload directory from the host."
+  []
+  (let [dir            (str "/opt/stacks/swtp-infra/uploads/pr-" *pr-num*)
+        {:keys [exit err]} (sh ["sudo" "rm" "-rf" dir])]
+    (if (zero? exit)
+      (log (str "Upload dir removed: " dir))
+      (throw (ex-info (str "Upload dir removal FAILED: " err) {:dir dir})))))
+
+;; =============================================================================
 ;; DB drop (swtp_pr_<n>)
 ;; =============================================================================
 (defn- drop-db!
@@ -282,6 +295,7 @@
         (attempt "container removal"  remove-containers!)
         (attempt "image cleanup"      #(remove-images! org))
         (attempt "DB drop"            #(drop-db! db-name (env-get @env "MYSQL_ROOT_PASSWORD")))
+        (attempt "upload dir cleanup" remove-upload-dir!)
         (attempt "Keycloak cleanup"   #(remove-pr-redirect!
                                          (env-get @env "KC_ADMIN")
                                          (env-get @env "KC_ADMIN_PASSWORD")

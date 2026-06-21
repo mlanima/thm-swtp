@@ -1,6 +1,7 @@
 import { Component, computed, Input, OnChanges, SimpleChanges, inject, signal } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ProjectSettingsService } from '../../../project-settings/services/project-settings.service';
 import { ProjectMemberResponse } from '../../../project-settings/models/project-settings.model';
 
@@ -15,11 +16,12 @@ interface MemberDisplay {
 @Component({
   selector: 'app-member-list',
   standalone: true,
-  imports: [NgClass, RouterLink],
+  imports: [NgClass, RouterLink, TranslatePipe],
   templateUrl: './member-list.html',
 })
 export class MemberList implements OnChanges {
   private readonly projectSettingsService = inject(ProjectSettingsService);
+  private readonly translateService = inject(TranslateService);
 
   @Input({ required: true }) projectId!: string;
   @Input() ownerId = '';
@@ -67,7 +69,7 @@ export class MemberList implements OnChanges {
         this.isLoading.set(false);
       },
       error: () => {
-        this.errorMessage.set('Mitglieder konnten nicht geladen werden.');
+        this.errorMessage.set(this.translateService.instant('PROJECTSETTINGS.MEMBERS.ERROR_LOAD_MEMBERS'));
         this.isLoading.set(false);
       },
     });

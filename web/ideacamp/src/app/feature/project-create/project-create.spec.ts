@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { provideTranslateTesting } from '../../testing/translate-testing.provider';
 import { ProjectCreate } from './project-create';
 
 describe('ProjectCreate', () => {
@@ -9,6 +9,9 @@ describe('ProjectCreate', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ProjectCreate],
+      providers: [
+        provideTranslateTesting(),
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(ProjectCreate);
