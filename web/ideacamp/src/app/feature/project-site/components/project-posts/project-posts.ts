@@ -3,11 +3,12 @@ import { Component, Input, OnChanges, SimpleChanges, inject, signal } from '@ang
 import { FormsModule } from '@angular/forms';
 import { ProjectPostResponse, ProjectResponse } from '../../../../models/project.model';
 import { ProjectService } from '../../project.service';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-project-posts',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './project-posts.html',
 })
 export class ProjectPosts implements OnChanges {
@@ -15,6 +16,7 @@ export class ProjectPosts implements OnChanges {
   @Input() canCreatePosts = false;
 
   private readonly projectService = inject(ProjectService);
+  private readonly translateService = inject(TranslateService);
 
   posts = signal<ProjectPostResponse[]>([]);
   isLoading = signal(false);
@@ -52,7 +54,7 @@ export class ProjectPosts implements OnChanges {
         this.isLoading.set(false);
       },
       error: () => {
-        this.errorMessage.set('Posts konnten nicht geladen werden.');
+        this.errorMessage.set(this.translateService.instant('PROJECTPOSTS.ERRORS.LOAD'));
         this.isLoading.set(false);
       },
     });
@@ -72,7 +74,7 @@ export class ProjectPosts implements OnChanges {
     const content = this.content().trim();
 
     if (!title || !content) {
-      this.errorMessage.set('Titel und Inhalt dürfen nicht leer sein.');
+      this.errorMessage.set(this.translateService.instant('PROJECTPOSTS.ERRORS.EMPTY_FIELDS'));
       return;
     }
 
@@ -93,7 +95,7 @@ export class ProjectPosts implements OnChanges {
         this.isCreating.set(false);
       },
       error: () => {
-        this.errorMessage.set('Post konnte nicht erstellt werden.');
+        this.errorMessage.set(this.translateService.instant('PROJECTPOSTS.ERRORS.CREATE'));
         this.isCreating.set(false);
       },
     });

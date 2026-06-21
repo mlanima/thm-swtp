@@ -345,5 +345,25 @@
   },
   "USER_SEARCH": {
     "EMPTY": "No users found"
+  },
+  "PROJECTPOSTS": {
+    "SUBTITLE": "News and updates for this project.",
+    "ADD_POST": "Add post",
+    "TITLE_LABEL": "Title",
+    "TITLE_PLACEHOLDER": "Post title",
+    "CONTENT_LABEL": "Content",
+    "CONTENT_PLACEHOLDER": "What is new?",
+    "CREATING": "Creating…",
+    "PUBLISH": "Publish",
+    "LOADING": "Posts are loading…",
+    "EMPTY": "There are no posts for this project yet.",
+    "AUTHOR_PREFIX": "By",
+    "UNKNOWN_AUTHOR": "Unknown",
+    "LOAD_MORE": "Load more",
+    "ERRORS": {
+      "LOAD": "Posts could not be loaded.",
+      "EMPTY_FIELDS": "Title and content must not be empty.",
+      "CREATE": "Post could not be created."
+    }
   }
 }

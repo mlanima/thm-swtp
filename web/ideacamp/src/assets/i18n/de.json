@@ -338,5 +338,25 @@
   },
   "USER_SEARCH": {
     "EMPTY": "Keine Nutzer gefunden"
+  },
+  "PROJECTPOSTS": {
+    "SUBTITLE": "Neuigkeiten und Updates zu diesem Projekt.",
+    "ADD_POST": "Post hinzufügen",
+    "TITLE_LABEL": "Titel",
+    "TITLE_PLACEHOLDER": "Titel des Posts",
+    "CONTENT_LABEL": "Inhalt",
+    "CONTENT_PLACEHOLDER": "Was gibt es Neues?",
+    "CREATING": "Wird erstellt…",
+    "PUBLISH": "Veröffentlichen",
+    "LOADING": "Posts werden geladen…",
+    "EMPTY": "Für dieses Projekt gibt es noch keine Posts.",
+    "AUTHOR_PREFIX": "Von",
+    "UNKNOWN_AUTHOR": "Unbekannt",
+    "LOAD_MORE": "Mehr laden",
+    "ERRORS": {
+      "LOAD": "Posts konnten nicht geladen werden.",
+      "EMPTY_FIELDS": "Titel und Inhalt dürfen nicht leer sein.",
+      "CREATE": "Post konnte nicht erstellt werden."
+    }
   }
 }

@@ -5,7 +5,7 @@
         Posts
       </h2>
       <p class="mt-1 text-sm text-slate-400">
-        Neuigkeiten und Updates zu diesem Projekt.
+        {{ 'PROJECTPOSTS.SUBTITLE' | translate }}
       </p>
     </div>
 
@@ -15,7 +15,7 @@
         class="rounded-md bg-lime-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-lime-600"
         (click)="toggleCreateForm()"
       >
-        {{ showCreateForm() ? 'Abbrechen' : 'Post hinzufügen' }}
+        {{ showCreateForm() ? ('COMMON.CANCEL' | translate) : ('PROJECTPOSTS.ADD_POST' | translate) }}
       </button>
     }
   </div>
@@ -24,7 +24,7 @@
     <form class="mb-6 space-y-4 rounded-xl border border-slate-200 bg-slate-50 p-4" (ngSubmit)="createPost()">
       <div>
         <label for="postTitle" class="text-xs font-medium text-slate-500">
-          Titel
+          {{ 'PROJECTPOSTS.TITLE_LABEL' | translate }}
         </label>
 
         <input
@@ -33,13 +33,13 @@
           [ngModel]="title()"
           (ngModelChange)="title.set($event)"
           class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:border-lime-400 focus:outline-none"
-          placeholder="Titel des Posts"
+          [placeholder]="'PROJECTPOSTS.TITLE_PLACEHOLDER' | translate"
         />
       </div>
 
       <div>
         <label for="postContent" class="text-xs font-medium text-slate-500">
-          Inhalt
+          {{ 'PROJECTPOSTS.CONTENT_LABEL' | translate }}
         </label>
 
         <textarea
@@ -49,7 +49,7 @@
           [ngModel]="content()"
           (ngModelChange)="content.set($event)"
           class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:border-lime-400 focus:outline-none"
-          placeholder="Was gibt es Neues?"
+          [placeholder]="'PROJECTPOSTS.CONTENT_PLACEHOLDER' | translate"
         ></textarea>
       </div>
 
@@ -58,7 +58,7 @@
         [disabled]="isCreating()"
         class="rounded-md bg-lime-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-lime-600 disabled:opacity-50"
       >
-        {{ isCreating() ? 'Wird erstellt…' : 'Veröffentlichen' }}
+        {{ isCreating() ? ('PROJECTPOSTS.CREATING' | translate) : ('PROJECTPOSTS.PUBLISH' | translate) }}
       </button>
     </form>
   }
@@ -71,11 +71,11 @@
 
   @if (isLoading()) {
     <p class="text-sm text-slate-400">
-      Posts werden geladen…
+      {{ 'PROJECTPOSTS.LOADING' | translate }}
     </p>
   } @else if (posts().length === 0) {
     <p class="rounded-xl border border-dashed border-slate-200 p-6 text-center text-sm text-slate-400">
-      Für dieses Projekt gibt es noch keine Posts.
+      {{ 'PROJECTPOSTS.EMPTY' | translate }}
     </p>
   } @else {
     <div class="space-y-4">
@@ -88,7 +88,8 @@
               </h3>
 
               <p class="mt-1 text-xs text-slate-400">
-                Von {{ post.authorName || 'Unbekannt' }}
+                {{ 'PROJECTPOSTS.AUTHOR_PREFIX' | translate }}
+                {{ post.authorName || ('PROJECTPOSTS.UNKNOWN_AUTHOR' | translate) }}
               </p>
             </div>
 
@@ -113,7 +114,7 @@
           class="rounded-md bg-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-300"
           (click)="loadMore()"
         >
-          Mehr laden
+          {{ 'PROJECTPOSTS.LOAD_MORE' | translate }}
         </button>
       </div>
     }
