@@ -8,7 +8,9 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "user_profile_links")
+@Table(name = "user_profile_links", uniqueConstraints = {
+        @UniqueConstraint(name = "UK_user_profile_links_profile_url", columnNames = {"user_profile_keycloak_id", "url"})
+})
 @Getter
 @Setter
 @Builder
