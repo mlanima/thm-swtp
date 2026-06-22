@@ -13,7 +13,10 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Entity(name = "projects")
-@Table(name = "projects")
+@Table(name = "projects", uniqueConstraints = {
+        @UniqueConstraint(name = "UK_projects_name",        columnNames = {"name"}),
+        @UniqueConstraint(name = "UK_projects_project_url", columnNames = {"project_url"})
+})
 @Getter
 @Setter
 @Builder
@@ -60,7 +63,11 @@ public class ProjectEntity {
     @JoinTable(
             name = "project_members",
             joinColumns = @JoinColumn(name = "project_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_profile_keycloak_id")
+            inverseJoinColumns = @JoinColumn(name = "user_profile_keycloak_id"),
+            uniqueConstraints = @UniqueConstraint(
+                    name = "UK_project_members",
+                    columnNames = {"project_id", "user_profile_keycloak_id"}
+            )
     )
     @Builder.Default
     private Set<UserProfile> members = new HashSet<>();
