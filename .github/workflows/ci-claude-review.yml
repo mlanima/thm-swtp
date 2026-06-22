@@ -54,16 +54,6 @@ jobs:
                           aber völlig unkritisch.
             Gibt es nichts Graues/Grünes, lass diese Zeilen einfach weg.
 
-            DB-Schema-Check: Dieses Projekt nutzt JPA mit `ddl-auto: update` (kein
-            Flyway/Liquibase) — Hibernate ergänzt nur neue Spalten/Tabellen, ändert
-            oder entfernt aber nichts Bestehendes. Wenn dieser PR das DB-Schema ändert
-            (geänderte `@Entity`-Klassen, neue/geänderte/entfernte `@Column`, `@Table`,
-            `@JoinColumn`, Relationen, Typänderungen, Constraints, persistierte Enums),
-            setze als ALLERLETZTE Zeile von `review.md` (nach den Anmerkungen) eine
-            Hinweiszeile genau so:
-              > ⚠️ @T0SCH **DB-Schema geändert:** <ein Satz, was sich in der DB ändert> — bitte das Schema der `swtp_template`-DB entsprechend manuell anpassen.
-            Ändert der PR das Schema nicht, lass diese Zeile komplett weg.
-
             Poste KEINE GitHub-Kommentare und erstelle KEINE Inline-Review-Kommentare.
             Schreibe stattdessen den vollständigen Review als Markdown in eine Datei
             namens `review.md` im Repository-Root, mit folgender Struktur:
