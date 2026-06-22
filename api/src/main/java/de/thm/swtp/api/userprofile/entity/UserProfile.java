@@ -1,6 +1,5 @@
 package de.thm.swtp.api.userprofile.entity;
 
-import de.thm.swtp.api.userAccount.entity.UserAccountEntity;
 import de.thm.swtp.api.tag.entity.TagEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -43,6 +42,10 @@ public class UserProfile {
     @Column(columnDefinition = "TEXT")
     private String experience;
 
+    @Builder.Default
+    @Column(name = "is_professor", nullable = false)
+    private boolean isProfessor = false;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -54,9 +57,4 @@ public class UserProfile {
     @ManyToMany
     @JoinTable(name = "user_profile_tags", joinColumns = @JoinColumn(name = "user_profile_keycloak_id"), inverseJoinColumns = @JoinColumn(name = "tag_name"))
     private Set<TagEntity> tags = new HashSet<>();
-
-    @MapsId
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "keycloak_id")
-    private UserAccountEntity userAccount;
 }

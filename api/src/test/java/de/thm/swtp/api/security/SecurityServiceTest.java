@@ -8,7 +8,6 @@ import de.thm.swtp.api.projectJoinRequest.repository.ProjectJoinRequestRepositor
 import de.thm.swtp.api.projectPost.domain.ProjectPostStatus;
 import de.thm.swtp.api.projectPost.entity.ProjectPostEntity;
 import de.thm.swtp.api.projectPost.repository.ProjectPostRepository;
-import de.thm.swtp.api.userAccount.domain.UserRole;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,7 +20,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -59,11 +58,12 @@ class SecurityServiceTest {
         resourceId = UUID.randomUUID();
     }
 
-    private Authentication authentication(UserRole... roles) {
-        List<GrantedAuthority> authorities = Arrays.stream(roles)
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
-                .map(GrantedAuthority.class::cast)
-                .toList();
+    private Authentication authentication(String... extraRoles) {
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+        for (String role : extraRoles) {
+            authorities.add(new SimpleGrantedAuthority(role));
+        }
 
         return new UsernamePasswordAuthenticationToken(
                 userId.toString(), null, authorities);
@@ -73,7 +73,7 @@ class SecurityServiceTest {
     void canViewProject_returnsTrue_forPublicProject() {
         when(projectRepository.existsByIdAndIsPrivateProjectFalse(projectId)).thenReturn(true);
 
-        assertThat(securityService.canViewProject(projectId, authentication(UserRole.USER)))
+        assertThat(securityService.canViewProject(projectId, authentication()))
                 .isTrue();
     }
 
@@ -81,19 +81,19 @@ class SecurityServiceTest {
     void canViewProject_returnsTrue_forProjectMember() {
         when(projectRepository.existsByIdAndMembersKeycloakId(projectId, userId)).thenReturn(true);
 
-        assertThat(securityService.canViewProject(projectId, authentication(UserRole.USER)))
+        assertThat(securityService.canViewProject(projectId, authentication()))
                 .isTrue();
     }
 
     @Test
-    void canViewProject_returnsTrue_forAdmin() {
-        assertThat(securityService.canViewProject(projectId, authentication(UserRole.ADMIN)))
+    void canViewProject_returnsTrue_forModerator() {
+        assertThat(securityService.canViewProject(projectId, authentication("ROLE_MODERATOR")))
                 .isTrue();
     }
 
     @Test
     void canViewProject_returnsFalse_forPrivateProjectAndStranger() {
-        assertThat(securityService.canViewProject(projectId, authentication(UserRole.USER)))
+        assertThat(securityService.canViewProject(projectId, authentication()))
                 .isFalse();
     }
 
@@ -110,34 +110,34 @@ class SecurityServiceTest {
         when(projectRepository.findByProjectUrl("demo")).thenReturn(Optional.of(project));
         when(projectRepository.existsByIdAndIsPrivateProjectFalse(projectId)).thenReturn(true);
 
-        assertThat(securityService.canViewProjectByUrl("demo", authentication(UserRole.USER)))
+        assertThat(securityService.canViewProjectByUrl("demo", authentication()))
                 .isTrue();
     }
 
     @Test
-    void canCreateProject_allowsRegularUser_butNotAdmin() {
-        assertThat(securityService.canCreateProject(authentication(UserRole.USER))).isTrue();
-        assertThat(securityService.canCreateProject(authentication(UserRole.ADMIN))).isFalse();
-        assertThat(securityService.canCreateProject(authentication(UserRole.USER, UserRole.ADMIN))).isFalse();
+    void canCreateProject_allowsRegularUser_butNotModerator() {
+        assertThat(securityService.canCreateProject(authentication())).isTrue();
+        assertThat(securityService.canCreateProject(authentication("ROLE_MODERATOR"))).isFalse();
+        assertThat(securityService.canCreateProject(authentication("ROLE_MODERATOR"))).isFalse();
     }
 
     @Test
     void canEditProject_allowsOwner() {
         when(projectRepository.existsByIdAndOwnerKeycloakId(projectId, userId)).thenReturn(true);
 
-        assertThat(securityService.canEditProject(projectId, authentication(UserRole.USER)))
+        assertThat(securityService.canEditProject(projectId, authentication()))
                 .isTrue();
     }
 
     @Test
     void canEditProject_deniesNonOwner() {
-        assertThat(securityService.canEditProject(projectId, authentication(UserRole.USER)))
+        assertThat(securityService.canEditProject(projectId, authentication()))
                 .isFalse();
     }
 
     @Test
-    void canDeleteProject_allowsAdmin() {
-        assertThat(securityService.canDeleteProject(projectId, authentication(UserRole.ADMIN)))
+    void canDeleteProject_allowsModerator() {
+        assertThat(securityService.canDeleteProject(projectId, authentication("ROLE_MODERATOR")))
                 .isTrue();
     }
 
@@ -145,7 +145,7 @@ class SecurityServiceTest {
     void canViewProjectMembers_usesProjectVisibility() {
         when(projectRepository.existsByIdAndIsPrivateProjectFalse(projectId)).thenReturn(true);
 
-        assertThat(securityService.canViewProjectMembers(projectId, authentication(UserRole.USER)))
+        assertThat(securityService.canViewProjectMembers(projectId, authentication()))
                 .isTrue();
     }
 
@@ -155,7 +155,7 @@ class SecurityServiceTest {
         when(projectRepository.existsByIdAndOwnerKeycloakId(projectId, userId)).thenReturn(true);
 
         assertThat(securityService.canRemoveProjectMember(
-                projectId, memberId, authentication(UserRole.USER))).isTrue();
+                projectId, memberId, authentication())).isTrue();
     }
 
     @Test
@@ -163,7 +163,7 @@ class SecurityServiceTest {
         when(projectRepository.existsByIdAndOwnerKeycloakId(projectId, userId)).thenReturn(true);
 
         assertThat(securityService.canRemoveProjectMember(
-                projectId, userId, authentication(UserRole.USER))).isFalse();
+                projectId, userId, authentication())).isFalse();
     }
 
     @Test
@@ -171,7 +171,7 @@ class SecurityServiceTest {
         when(projectRepository.existsByIdAndOwnerKeycloakId(projectId, userId)).thenReturn(true);
 
         assertThat(securityService.canCreateProjectInvitation(
-                projectId, authentication(UserRole.USER))).isTrue();
+                projectId, authentication())).isTrue();
     }
 
 
@@ -181,7 +181,7 @@ class SecurityServiceTest {
                 .thenReturn(true);
 
         assertThat(securityService.canRespondToProjectInvite(
-                resourceId, authentication(UserRole.USER))).isTrue();
+                resourceId, authentication())).isTrue();
     }
 
     @Test
@@ -189,13 +189,13 @@ class SecurityServiceTest {
         when(projectRepository.existsByIdAndOwnerKeycloakId(projectId, userId)).thenReturn(true);
 
         assertThat(securityService.canViewProjectJoinRequests(
-                projectId, authentication(UserRole.USER))).isTrue();
+                projectId, authentication())).isTrue();
     }
 
     @Test
     void canCreateProjectJoinRequest_allowsRegularNonContributor() {
         assertThat(securityService.canCreateProjectJoinRequest(
-                projectId, authentication(UserRole.USER))).isTrue();
+                projectId, authentication())).isTrue();
     }
 
     @Test
@@ -203,7 +203,7 @@ class SecurityServiceTest {
         when(projectRepository.existsByIdAndMembersKeycloakId(projectId, userId)).thenReturn(true);
 
         assertThat(securityService.canCreateProjectJoinRequest(
-                projectId, authentication(UserRole.USER))).isFalse();
+                projectId, authentication())).isFalse();
     }
 
     @Test
@@ -212,7 +212,7 @@ class SecurityServiceTest {
                 .thenReturn(true);
 
         assertThat(securityService.canManageProjectJoinRequests(
-                resourceId, authentication(UserRole.USER))).isTrue();
+                resourceId, authentication())).isTrue();
     }
 
     @Test
@@ -220,7 +220,7 @@ class SecurityServiceTest {
         when(projectRepository.existsByIdAndMembersKeycloakId(projectId, userId)).thenReturn(true);
 
         assertThat(securityService.canCreateProjectPost(
-                projectId, authentication(UserRole.USER))).isTrue();
+                projectId, authentication())).isTrue();
     }
 
     @Test
@@ -229,7 +229,7 @@ class SecurityServiceTest {
                 resourceId, projectId, userId)).thenReturn(true);
 
         assertThat(securityService.canArchiveProjectPost(
-                projectId, resourceId, authentication(UserRole.USER))).isTrue();
+                projectId, resourceId, authentication())).isTrue();
     }
 
     @Test
@@ -244,7 +244,7 @@ class SecurityServiceTest {
                 resourceId, projectId, userId)).thenReturn(true);
 
         assertThat(securityService.canPublishProjectPost(
-                projectId, resourceId, authentication(UserRole.USER))).isTrue();
+                projectId, resourceId, authentication())).isTrue();
     }
 
     @Test
@@ -259,7 +259,7 @@ class SecurityServiceTest {
                 .thenReturn(true);
 
         assertThat(securityService.canPublishProjectPost(
-                projectId, resourceId, authentication(UserRole.USER))).isFalse();
+                projectId, resourceId, authentication())).isFalse();
     }
 
     @Test
@@ -273,7 +273,7 @@ class SecurityServiceTest {
         when(projectRepository.existsByIdAndOwnerKeycloakId(projectId, userId)).thenReturn(true);
 
         assertThat(securityService.canPublishProjectPost(
-                projectId, resourceId, authentication(UserRole.USER))).isTrue();
+                projectId, resourceId, authentication())).isTrue();
     }
 
     @Test
@@ -281,7 +281,7 @@ class SecurityServiceTest {
         when(projectRepository.existsByIdAndOwnerKeycloakId(projectId, userId)).thenReturn(true);
 
         assertThat(securityService.canDeleteProjectPost(
-                projectId, resourceId, authentication(UserRole.USER))).isTrue();
+                projectId, resourceId, authentication())).isTrue();
     }
 
     @Test
@@ -289,15 +289,15 @@ class SecurityServiceTest {
         when(userProfileRepository.existsByUsernameAndKeycloakId("Chris", userId))
                 .thenReturn(true);
 
-        assertThat(securityService.canViewUserProjects("Chris", authentication(UserRole.USER)))
+        assertThat(securityService.canViewUserProjects("Chris", authentication()))
                 .isTrue();
-        assertThat(securityService.canEditUserProfile("Chris", authentication(UserRole.USER)))
+        assertThat(securityService.canEditUserProfile("Chris", authentication()))
                 .isTrue();
     }
     @Test
-    void canDeleteUserProfile_allowsAdmin() {
+    void canDeleteUserProfile_allowsModerator() {
         assertThat(securityService.canDeleteUserProfile(
-                "Chris", authentication(UserRole.ADMIN))).isTrue();
+                "Chris", authentication("ROLE_MODERATOR"))).isTrue();
     }
 
     @Test
@@ -305,18 +305,18 @@ class SecurityServiceTest {
         when(projectRepository.existsByIdAndIsPrivateProjectFalse(projectId)).thenReturn(true);
 
         assertThat(securityService.canFavoriteProject(
-                projectId, authentication(UserRole.USER))).isTrue();
+                projectId, authentication())).isTrue();
     }
 
     @Test
-    void canFavoriteProject_deniesAdmin() {
+    void canFavoriteProject_deniesModerator() {
         assertThat(securityService.canFavoriteProject(
-                projectId, authentication(UserRole.ADMIN))).isFalse();
+                projectId, authentication("ROLE_MODERATOR"))).isFalse();
     }
 
     @Test
     void profileLinkPermissions_allowOwner() {
-        Authentication auth = authentication(UserRole.USER);
+        Authentication auth = authentication();
 
         assertThat(securityService.canCreateUserProfileLinks(userId, auth)).isTrue();
         assertThat(securityService.canEditUserProfileLinks(userId, auth)).isTrue();

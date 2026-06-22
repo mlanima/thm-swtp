@@ -4,13 +4,12 @@ import de.thm.swtp.api.project.ProjectRepository;
 import de.thm.swtp.api.projectInvitation.repository.ProjectInviteRepository;
 import de.thm.swtp.api.projectJoinRequest.repository.ProjectJoinRequestRepository;
 import de.thm.swtp.api.projectPost.repository.ProjectPostRepository;
-import de.thm.swtp.api.userAccount.domain.UserRole;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
-import java.util.Objects;
 import java.util.UUID;
 
 /** Authorization service.
@@ -37,7 +36,7 @@ public class SecurityService {
         if (!hasAuthenticationContext(projectId, authentication)) {
             return false;
         }
-        return hasAdminRole(authentication) || isProjectContributor(projectId, authentication) || isPublicProject(projectId);
+        return hasModeratorRole(authentication) || isProjectContributor(projectId, authentication) || isPublicProject(projectId);
     }
 
     /** Allowed to see project by url.*/
@@ -65,7 +64,7 @@ public class SecurityService {
         if (!hasAuthenticationContext(projectId, authentication)) {
             return false;
         }
-        return isProjectOwner(projectId, authentication) || hasAdminRole(authentication);
+        return isProjectOwner(projectId, authentication) || hasModeratorRole(authentication);
     }
 
     /** Allowed to see project members.*/
@@ -74,7 +73,7 @@ public class SecurityService {
             return false;
         }
 
-        return hasAdminRole(authentication) || isProjectContributor(projectId, authentication) || isPublicProject(projectId);
+        return hasModeratorRole(authentication) || isProjectContributor(projectId, authentication) || isPublicProject(projectId);
     }
 
     /** Allowed to remove project members.
@@ -206,7 +205,7 @@ public class SecurityService {
         if (!hasAuthenticationContext(username, authentication)) {
             return false;
         }
-        return hasAdminRole(authentication) || isProfileOwnerByUsername(username, authentication);
+        return hasModeratorRole(authentication) || isProfileOwnerByUsername(username, authentication);
     }
 
     /** Allowed to edit the user profile.*/
@@ -222,7 +221,7 @@ public class SecurityService {
         if (!hasAuthenticationContext(username, authentication)) {
             return false;
         }
-       return hasAdminRole(authentication) || isProfileOwnerByUsername(username, authentication);
+       return hasModeratorRole(authentication) || isProfileOwnerByUsername(username, authentication);
     }
 
 
@@ -257,40 +256,32 @@ public class SecurityService {
 
     // Authorization checks
 
-    private String getAuthority(UserRole role) {
-        return "ROLE_" + role.name();
-    }
-
     private UUID getCurrentUserId(Authentication authentication) {
         return UUID.fromString(authentication.getName());
     }
 
-    private boolean hasRole(Authentication authentication, UserRole role) {
-        if (authentication == null || !authentication.isAuthenticated() || role == null) {
+    private boolean hasAuthority(Authentication authentication, String authority) {
+        if (authentication == null || !authentication.isAuthenticated() || authority == null) {
             return false;
         }
-
-        String authority = getAuthority(role);
-
         return authentication.getAuthorities()
-                .stream()
-                .anyMatch(grantedAuthority -> Objects.equals(grantedAuthority.getAuthority(), authority));
+                .contains(new SimpleGrantedAuthority(authority));
     }
 
     private boolean hasAuthenticationContext(Object object, Authentication authentication) {
         return object != null && authentication != null && authentication.isAuthenticated();
     }
 
-    private boolean hasAdminRole(Authentication authentication) {
-        return hasRole(authentication, UserRole.ADMIN);
+    public boolean hasModeratorRole(Authentication authentication) {
+        return hasAuthority(authentication, "ROLE_MODERATOR");
     }
 
     private boolean hasUserRole(Authentication authentication) {
-        return hasRole(authentication, UserRole.USER);
+        return hasAuthority(authentication, "ROLE_USER");
     }
 
     private boolean isRegularUser(Authentication authentication) {
-        return hasUserRole(authentication) && !hasAdminRole(authentication);
+        return hasUserRole(authentication) && !hasModeratorRole(authentication);
     }
 
     private boolean isProjectOwner(UUID projectId, Authentication authentication) {

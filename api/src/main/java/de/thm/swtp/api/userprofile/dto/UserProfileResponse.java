@@ -13,5 +13,6 @@ public record UserProfileResponse(
         String location,
         int followers,
         String about,
-        String experience
+        String experience,
+        boolean isProfessor
 ) {}
