@@ -363,7 +363,8 @@
     "ERRORS": {
       "LOAD": "Posts could not be loaded.",
       "EMPTY_FIELDS": "Title and content must not be empty.",
-      "CREATE": "Post could not be created."
+      "CREATE": "Post could not be created.",
+      "DELETE": "Post could not be deleted."
     },
     "PLAIN_TEXT": "Plain text",
     "MARKDOWN_HINT": "You can use Markdown, e.g. headings, lists, links and emphasis.",
@@ -374,6 +375,9 @@
       "LIST": "List",
       "LINK": "Link",
       "QUOTE": "Quote"
-    }
+    },
+    "DELETE_POST": "Delete post",
+    "DELETING": "Deleting…",
+    "DELETE_SUCCESS": "Post deleted successfully."
   }
 }

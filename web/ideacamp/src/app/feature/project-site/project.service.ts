@@ -60,4 +60,8 @@ export class ProjectService {
   createProjectPost(projectId: string, request: CreateProjectPostRequest): Observable<ProjectPostResponse> {
     return this.http.post<ProjectPostResponse>(`${this.baseUrl1}/${projectId}/posts`, request);
   }
+
+  deleteProjectPost(projectId: string, postId: string) {
+    return this.http.delete<void>(`${this.baseUrl1}/${projectId}/posts/${postId}`);
+  }
 }

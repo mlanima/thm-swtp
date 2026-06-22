@@ -5,13 +5,14 @@ import { ProjectPostResponse, ProjectResponse } from '../../../../models/project
 import { ProjectService } from '../../project.service';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MarkdownPipe } from '../../../../shared/pipes/markdown.pipe';
+import { SuccessModal } from '../../../../shared/success-modal/success-modal';
 
 type ProjectPostContentFormat = 'PLAIN_TEXT' | 'MARKDOWN';
 
 @Component({
   selector: 'app-project-posts',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslatePipe, MarkdownPipe],
+  imports: [CommonModule, FormsModule, TranslatePipe, MarkdownPipe, SuccessModal],
   templateUrl: './project-posts.html',
 })
 
@@ -34,6 +35,8 @@ export class ProjectPosts implements OnChanges {
   showCreateForm = signal(false);
 
   contentFormat = signal<ProjectPostContentFormat>('MARKDOWN');
+  deletingPostId = signal<string | null>(null);
+  showDeleteSuccessModal = signal(false);
 
   @ViewChild('postContentInput')
   postContentInput?: ElementRef<HTMLTextAreaElement>;
@@ -168,5 +171,32 @@ export class ProjectPosts implements OnChanges {
       const cursorPosition = before.length + insertValue.length;
       textarea?.setSelectionRange(cursorPosition, cursorPosition);
     });
+  }
+
+  deletePost(postId: string): void {
+    if (this.deletingPostId()) {
+      return;
+    }
+
+    this.deletingPostId.set(postId);
+    this.errorMessage.set(null);
+
+    this.projectService.deleteProjectPost(this.project.id, postId).subscribe({
+      next: () => {
+        this.posts.update((posts) => posts.filter((post) => post.id !== postId));
+        this.deletingPostId.set(null);
+        this.showDeleteSuccessModal.set(true);
+      },
+      error: () => {
+        this.errorMessage.set(
+          this.translateService.instant('PROJECTPOSTS.ERRORS.DELETE')
+        );
+        this.deletingPostId.set(null);
+      },
+    });
+  }
+
+  closeDeleteSuccessModal(): void {
+    this.showDeleteSuccessModal.set(false);
   }
 }

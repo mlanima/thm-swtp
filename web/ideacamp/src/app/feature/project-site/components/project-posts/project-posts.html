@@ -176,11 +176,29 @@
               </p>
             </div>
 
-            @if (post.publishedAt) {
-              <p class="text-xs text-slate-400">
-                {{ post.publishedAt | date:'dd.MM.yyyy HH:mm' }}
-              </p>
-            }
+            <div class="flex items-center gap-3">
+              @if (post.publishedAt) {
+                <p class="text-xs text-slate-400">
+                  {{ post.publishedAt | date:'dd.MM.yyyy HH:mm' }}
+                </p>
+              }
+
+              @if (canCreatePosts) {
+                <button
+                  type="button"
+                  class="rounded-md p-1 text-slate-400 transition hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-50"
+                  [disabled]="deletingPostId() === post.id"
+                  [attr.aria-label]="'PROJECTPOSTS.DELETE_POST' | translate"
+                  [title]="'PROJECTPOSTS.DELETE_POST' | translate"
+                  (click)="deletePost(post.id)">
+                  @if (deletingPostId() === post.id) {
+                    <span class="text-xs"> {{ 'PROJECTPOSTS.DELETING' | translate }} </span>
+                  } @else {
+                    <i class="pi pi-trash"></i>
+                  }
+                </button>
+              }
+            </div>
           </div>
 
           @if (post.contentFormat === 'MARKDOWN') {
@@ -208,5 +226,12 @@
         </button>
       </div>
     }
+  }
+  @if (showDeleteSuccessModal()) {
+    <app-success-modal
+      [message]="'PROJECTPOSTS.DELETE_SUCCESS' | translate"
+      [buttonText]="'COMMON.CONTINUE' | translate"
+      (closeModal)="closeDeleteSuccessModal()">
+    </app-success-modal>
   }
 </section>
