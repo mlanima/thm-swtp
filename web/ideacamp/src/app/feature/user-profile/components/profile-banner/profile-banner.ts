@@ -1,9 +1,10 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { LocationIcon } from '../../../../shared/icons/location-icon/location-icon';
 import { FollowersIcon } from '../../../../shared/icons/followers-icon/followers-icon';
 import { UserProfileModel } from '../../../../models/user-profile.model';
 import { EditButton } from '../../../../shared/edit-button/edit-button';
+import { FollowButton } from '../../../../shared/follow-button/follow-button';
 import { TranslatePipe } from '@ngx-translate/core';
 
 /** Displays the profile banner of the user
@@ -14,10 +15,10 @@ import { TranslatePipe } from '@ngx-translate/core';
 @Component({
   selector: 'app-profile-banner',
   standalone: true,
-  imports: [LocationIcon, FollowersIcon, EditButton, FormsModule, TranslatePipe],
+  imports: [LocationIcon, FollowersIcon, EditButton, FollowButton, FormsModule, TranslatePipe],
   templateUrl: './profile-banner.html',
 })
-export class ProfileBanner {
+export class ProfileBanner implements OnChanges {
   /**
    * Profile data displayed inside the banner
    *
@@ -45,6 +46,14 @@ export class ProfileBanner {
   @Output() save = new EventEmitter<void>();
 
   @Output() cancelEdit = new EventEmitter<void>();
+
+  readonly followerCount = signal(0);
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['profile']) {
+      this.followerCount.set(this.profile.followers);
+    }
+  }
 
   /**
    * First uppercase letter of the username

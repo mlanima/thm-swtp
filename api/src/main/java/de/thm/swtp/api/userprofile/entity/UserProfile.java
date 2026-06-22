@@ -32,7 +32,6 @@ public class UserProfile {
 
     private String location;
 
-    // TODO: followers is not implemented yet — placeholder until a follow system is built
     @Column(columnDefinition = "INTEGER DEFAULT 0")
     private int followers;
 
