@@ -37,7 +37,7 @@ public class ProjectEntity {
     @Column(name = "short_description", length = 200)
     private String shortDescription;
 
-    @Column(name = "project_url", nullable = false, length = 30)
+    @Column(name = "project_url", nullable = false, unique = true, length = 30)
     private String projectUrl;
 
     @Column(name = "is_private", nullable = false)
