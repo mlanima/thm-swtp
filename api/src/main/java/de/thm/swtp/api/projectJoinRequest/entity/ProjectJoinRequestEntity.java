@@ -12,7 +12,10 @@ import java.util.UUID;
 /** JPA entity representing a join-request to a project. */
 
 @Entity
-@Table(name="project_join_requests")
+@Table(name = "project_join_requests", uniqueConstraints = {
+        @UniqueConstraint(name = "UK_join_requests_project_user_status",
+                columnNames = {"project_id", "requesting_user_id", "status"})
+})
 @Getter
 @Setter
 @Builder

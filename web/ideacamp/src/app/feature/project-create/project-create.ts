@@ -11,6 +11,7 @@ import {ProjectFinishForm} from './project-finish-form/project-finish-form';
 import { ProjectService } from '../project-site/project.service';
 
 import {ProjectGeneralData, ProjectSettingsData, ProjectCreateData, projectCreateSchema} from './schemas/project-create.schema';
+import {generateProjectUrl} from './project-url.utils';
 import {ProjectInviteMember } from '../../models/project-invite-member.model';
 
 @Component({
@@ -86,7 +87,14 @@ export class ProjectCreate {
 
   /** Saves the validated general-form data and goes to the next wizard step.*/
   saveGeneralFormAndContinue(data: ProjectGeneralData) {
-    this.projectData = { ...this.projectData, ...data };
+    const oldName = this.projectData.name;
+    const currentUrl = this.projectData.projectUrl ?? '';
+    if (oldName && data.name !== oldName && currentUrl === generateProjectUrl(oldName)) {
+      this.projectData = { ...this.projectData, ...data, projectUrl: '' };
+    } else {
+      this.projectData = { ...this.projectData, ...data };
+    }
+
     this.nextStep();
   }
 

@@ -249,4 +249,21 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
     }
 
+    @ExceptionHandler(ExceptionInvalidProjectUrl.class)
+    public ResponseEntity<ErrorResponse> handleInvalidProjectUrl(ExceptionInvalidProjectUrl ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ExceptionProjectUrlAlreadyExists.class)
+    public ResponseEntity<ErrorResponse> handleProjectUrlAlreadyExists(ExceptionProjectUrlAlreadyExists ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ExceptionProjectUrlGenerationFailed.class)
+    public ResponseEntity<ErrorResponse> handleProjectUrlGenerationFailed(ExceptionProjectUrlGenerationFailed ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ErrorResponse.of(500, "Internal Server Error", ex.getMessage()));
+    }
 }
