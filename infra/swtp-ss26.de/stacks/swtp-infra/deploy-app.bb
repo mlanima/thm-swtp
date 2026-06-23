@@ -13,6 +13,7 @@
                        "keycloak"   "https://auth.swtp-ss26.de"
                        "maildev"    "https://mail.swtp-ss26.de"
                        "hoppscotch" "https://restclient.swtp-ss26.de"
+                       "github"     "https://github.com/mlanima/thm-swtp"
                        "logs"       "https://logs.swtp-ss26.de"}}
    "dev"  {:tag       "dev"
            :dashboard {"fe"   "https://dev.swtp-ss26.de"
