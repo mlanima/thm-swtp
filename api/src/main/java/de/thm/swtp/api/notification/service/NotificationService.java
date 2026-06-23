@@ -55,10 +55,14 @@ public class NotificationService {
         String template = new ClassPathResource("templates/emails/invite.html")
                 .getContentAsString(StandardCharsets.UTF_8);
 
+        String messageBlock = (invite.getMessage() != null && !invite.getMessage().isBlank())
+                ? "<div class=\"message-box\">" + invite.getMessage() + "</div>"
+                : "";
+
         String html = template
                 .replace("{greeting}", greeting)
                 .replace("{body}", body)
-                .replace("{message}", invite.getMessage() != null ? invite.getMessage() : "")
+                .replace("{message-block}", messageBlock)
                 .replace("{cta}", cta)
                 .replace("{ctaUrl}", ctaUrl)
                 .replace("{hint}", hint)
