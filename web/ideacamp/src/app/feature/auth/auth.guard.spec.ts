@@ -1,8 +1,11 @@
 import { TestBed } from '@angular/core/testing';
-import { Router, provideRouter } from '@angular/router';
+import { ActivatedRouteSnapshot, Router, RouterStateSnapshot, provideRouter } from '@angular/router';
 import { AuthService } from './auth.service';
 import { authGuard } from './auth.guard';
 import { vi } from 'vitest';
+
+const mockRoute = {} as ActivatedRouteSnapshot;
+const mockState = {} as RouterStateSnapshot;
 
 describe('authGuard', () => {
   let router: Router;
@@ -33,7 +36,7 @@ describe('authGuard', () => {
     authServiceMock.isAuthenticated.mockReturnValue(true);
     authServiceMock.isModerator.mockReturnValue(false);
 
-    const result = await TestBed.runInInjectionContext(() => authGuard({} as any, {} as any));
+    const result = await TestBed.runInInjectionContext(() => authGuard(mockRoute, mockState));
     expect(result).toBe(true);
   });
 
@@ -41,21 +44,21 @@ describe('authGuard', () => {
     authServiceMock.isAuthenticated.mockReturnValue(true);
     authServiceMock.isModerator.mockReturnValue(true);
 
-    const result = await TestBed.runInInjectionContext(() => authGuard({} as any, {} as any));
+    const result = await TestBed.runInInjectionContext(() => authGuard(mockRoute, mockState));
     expect(result).toEqual(router.parseUrl('/moderator'));
   });
 
   it('should redirect to /impressum when logging out', async () => {
     authServiceMock.isLoggingOut.mockReturnValue(true);
 
-    const result = await TestBed.runInInjectionContext(() => authGuard({} as any, {} as any));
+    const result = await TestBed.runInInjectionContext(() => authGuard(mockRoute, mockState));
     expect(result).toEqual(router.parseUrl('/impressum'));
   });
 
   it('should call login when not authenticated', async () => {
     authServiceMock.isAuthenticated.mockReturnValue(false);
 
-    const result = await TestBed.runInInjectionContext(() => authGuard({} as any, {} as any));
+    const result = await TestBed.runInInjectionContext(() => authGuard(mockRoute, mockState));
     expect(authServiceMock.login).toHaveBeenCalled();
     expect(result).toBe(false);
   });

@@ -1,8 +1,11 @@
 import { TestBed } from '@angular/core/testing';
-import { Router, provideRouter } from '@angular/router';
+import { ActivatedRouteSnapshot, Router, RouterStateSnapshot, provideRouter } from '@angular/router';
 import { AuthService } from './auth.service';
 import { moderatorGuard } from './moderator.guard';
 import { vi } from 'vitest';
+
+const mockRoute = {} as ActivatedRouteSnapshot;
+const mockState = {} as RouterStateSnapshot;
 
 describe('moderatorGuard', () => {
   let router: Router;
@@ -29,7 +32,7 @@ describe('moderatorGuard', () => {
     authServiceMock.isAuthenticated.mockReturnValue(true);
     authServiceMock.isModerator.mockReturnValue(true);
 
-    const result = await TestBed.runInInjectionContext(() => moderatorGuard({} as any, {} as any));
+    const result = await TestBed.runInInjectionContext(() => moderatorGuard(mockRoute, mockState));
     expect(result).toBe(true);
   });
 
@@ -37,14 +40,14 @@ describe('moderatorGuard', () => {
     authServiceMock.isAuthenticated.mockReturnValue(true);
     authServiceMock.isModerator.mockReturnValue(false);
 
-    const result = await TestBed.runInInjectionContext(() => moderatorGuard({} as any, {} as any));
+    const result = await TestBed.runInInjectionContext(() => moderatorGuard(mockRoute, mockState));
     expect(result).toEqual(router.parseUrl('/landing'));
   });
 
   it('should call login when not authenticated', async () => {
     authServiceMock.isAuthenticated.mockReturnValue(false);
 
-    const result = await TestBed.runInInjectionContext(() => moderatorGuard({} as any, {} as any));
+    const result = await TestBed.runInInjectionContext(() => moderatorGuard(mockRoute, mockState));
     expect(authServiceMock.login).toHaveBeenCalled();
     expect(result).toBe(false);
   });
