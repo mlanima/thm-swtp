@@ -1,5 +1,6 @@
 package de.thm.swtp.api.userprofile.service;
 
+import de.thm.swtp.api.common.TxLogger;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
@@ -40,7 +41,7 @@ public class UserProfileService {
                                     .email(email)
                                     .build()
                     );
-                    log.info("Profile created: user={}", username);
+                    TxLogger.afterCommit(log, "Profile created: user={}", username);
                     return created;
                 });
     }
@@ -53,7 +54,7 @@ public class UserProfileService {
         profile.setAbout(about);
         profile.setExperience(experience);
         UserProfile saved = userProfileRepository.save(profile);
-        log.info("Profile updated: user={}", username);
+        TxLogger.afterCommit(log, "Profile updated: user={}", username);
         return saved;
     }
 
@@ -62,7 +63,7 @@ public class UserProfileService {
         UserProfile profile = findOrThrow(username);
         // TODO: will throw FK constraint violation if the user owns projects — handle cascade or block deletion first
         userProfileRepository.delete(profile);
-        log.info("Profile deleted: user={}", username);
+        TxLogger.afterCommit(log, "Profile deleted: user={}", username);
     }
 
     private UserProfile findOrThrow(String username) {

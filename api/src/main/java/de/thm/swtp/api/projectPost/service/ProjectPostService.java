@@ -1,5 +1,6 @@
 package de.thm.swtp.api.projectPost.service;
 
+import de.thm.swtp.api.common.TxLogger;
 import de.thm.swtp.api.exceptionhandling.exceptions.InvalidProjectPostException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectPostNotFoundException;
 import de.thm.swtp.api.project.ProjectEntity;
@@ -63,7 +64,7 @@ public class ProjectPostService {
                 .build();
 
         ProjectPost post = ProjectPostMapper.toDomain(projectPostRepository.saveAndFlush(projectPostEntity));
-        log.info("Post created: project={}, post={}, author={}", projectId, post.getId(), authorId);
+        TxLogger.afterCommit(log, "Post created: project={}, post={}, author={}", projectId, post.getId(), authorId);
         return post;
     }
 
@@ -85,7 +86,7 @@ public class ProjectPostService {
         postEntity.setArchivedAt(null);
 
         ProjectPost post = ProjectPostMapper.toDomain(projectPostRepository.save(postEntity));
-        log.info("Post published: project={}, post={}", projectId, postId);
+        TxLogger.afterCommit(log, "Post published: project={}, post={}", projectId, postId);
         return post;
     }
 
@@ -103,7 +104,7 @@ public class ProjectPostService {
         postEntity.setArchivedAt(LocalDateTime.now());
 
         ProjectPost post = ProjectPostMapper.toDomain(projectPostRepository.save(postEntity));
-        log.info("Post archived: project={}, post={}", projectId, postId);
+        TxLogger.afterCommit(log, "Post archived: project={}, post={}", projectId, postId);
         return post;
     }
 
@@ -113,7 +114,7 @@ public class ProjectPostService {
         assertPostBelongsToProject(postEntity, projectId);
 
         projectPostRepository.delete(postEntity);
-        log.info("Post deleted: project={}, post={}", projectId, postId);
+        TxLogger.afterCommit(log, "Post deleted: project={}, post={}", projectId, postId);
     }
 
 

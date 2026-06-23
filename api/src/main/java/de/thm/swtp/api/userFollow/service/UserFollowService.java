@@ -1,5 +1,6 @@
 package de.thm.swtp.api.userFollow.service;
 
+import de.thm.swtp.api.common.TxLogger;
 import de.thm.swtp.api.userFollow.entity.UserFollowEntity;
 import de.thm.swtp.api.userFollow.exception.CannotFollowYourselfException;
 import de.thm.swtp.api.userFollow.exception.UserAlreadyFollowingException;
@@ -52,7 +53,7 @@ public class UserFollowService {
         }
 
         userProfileRepository.incrementFollowers(followingId);
-        log.info("Follow: follower={}, following={}", followerId, followingId);
+        TxLogger.afterCommit(log, "Follow: follower={}, following={}", followerId, followingId);
     }
 
     @Transactional
@@ -63,7 +64,7 @@ public class UserFollowService {
 
         userFollowRepository.delete(follow);
         userProfileRepository.decrementFollowers(followingId);
-        log.info("Unfollow: follower={}, following={}", followerId, followingId);
+        TxLogger.afterCommit(log, "Unfollow: follower={}, following={}", followerId, followingId);
     }
 
     @Transactional(readOnly = true)

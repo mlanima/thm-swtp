@@ -1,5 +1,6 @@
 package de.thm.swtp.api.projectJoinRequest.service;
 
+import de.thm.swtp.api.common.TxLogger;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectJoinRequestAccessDeniedException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectJoinRequestAlreadyExistsException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectJoinRequestInvalidStatusForEditException;
@@ -63,7 +64,7 @@ public class ProjectJoinRequestService {
                 .build();
 
         ProjectJoinRequestEntity saved =  projectJoinRequestRepository.save(joinRequestEntity);
-        log.info("Join request created: request={}, project={}, by={}",
+        TxLogger.afterCommit(log, "Join request created: request={}, project={}, by={}",
                 saved.getId(), projectId, currentUserId);
         return ProjectJoinRequestMapper.toDomain(saved);
     }
@@ -86,7 +87,7 @@ public class ProjectJoinRequestService {
 
         projectEntity.getMembers().add(joinRequestEntity.getRequestingUser());
         ProjectJoinRequestEntity saved = projectJoinRequestRepository.save(joinRequestEntity);
-        log.info("Join request accepted: request={}, project={}, user={}",
+        TxLogger.afterCommit(log, "Join request accepted: request={}, project={}, user={}",
                 saved.getId(), projectEntity.getId(), joinRequestEntity.getRequestingUser().getKeycloakId());
 
         return ProjectJoinRequestMapper.toDomain(saved);
@@ -107,7 +108,7 @@ public class ProjectJoinRequestService {
 
         joinRequestEntity.setStatus(ProjectJoinRequestStatus.REJECTED);
         ProjectJoinRequestEntity saved = projectJoinRequestRepository.save(joinRequestEntity);
-        log.info("Join request rejected: request={}, project={}",
+        TxLogger.afterCommit(log, "Join request rejected: request={}, project={}",
                 saved.getId(), joinRequestEntity.getProject().getId());
 
         return ProjectJoinRequestMapper.toDomain(saved);

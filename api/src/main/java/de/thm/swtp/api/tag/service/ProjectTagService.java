@@ -1,5 +1,6 @@
 package de.thm.swtp.api.tag.service;
 
+import de.thm.swtp.api.common.TxLogger;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
 import de.thm.swtp.api.project.exception.ProjectNotFoundException;
@@ -45,7 +46,7 @@ public class ProjectTagService {
         TagEntity tagEntity = getOrCreateTag(tagName);
         project.getTags().add(tagEntity);
 
-        log.info("Tag added to project: project={}, tag={}", projectId, tagEntity.getName());
+        TxLogger.afterCommit(log, "Tag added to project: project={}, tag={}", projectId, tagEntity.getName());
         return TagMapper.toDomain(tagEntity);
     }
 
@@ -58,7 +59,7 @@ public class ProjectTagService {
         tagRepository.findByNameIgnoreCase(tagName.trim())
                 .ifPresent(tag -> {
                     project.getTags().remove(tag);
-                    log.info("Tag removed from project: project={}, tag={}", projectId, tag.getName());
+                    TxLogger.afterCommit(log, "Tag removed from project: project={}, tag={}", projectId, tag.getName());
                 });
     }
 

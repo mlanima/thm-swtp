@@ -1,6 +1,7 @@
 package de.thm.swtp.api.project;
 
 
+import de.thm.swtp.api.common.TxLogger;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectMemberNotFoundException;
 import de.thm.swtp.api.project.dto.request.*;
 import de.thm.swtp.api.project.dto.response.*;
@@ -106,7 +107,7 @@ public class ProjectService {
 
         createProjectInvites(saved, owner, request.memberIds());
 
-        log.info("Project created: project={}, owner={}", saved.getId(), currentUserId);
+        TxLogger.afterCommit(log, "Project created: project={}, owner={}", saved.getId(), currentUserId);
         return toResponse(saved);
     }
 
@@ -152,7 +153,7 @@ public class ProjectService {
         projectViewRepository.deleteByProjectId(projectId);
         projectRepository.delete(project);
 
-        log.info("Project deleted: project={}", projectId);
+        TxLogger.afterCommit(log, "Project deleted: project={}", projectId);
         return DeleteProjectResponse.builder()
                 .projectId(projectId)
                 .message("Projekt erfolgreich gelöscht.")
@@ -240,7 +241,7 @@ public class ProjectService {
 
         ProjectEntity saved = projectRepository.save(project);
 
-        log.info("Project updated: project={}", projectId);
+        TxLogger.afterCommit(log, "Project updated: project={}", projectId);
         return toResponse(saved);
     }
 
@@ -272,7 +273,7 @@ public class ProjectService {
 
         project.setAllowJoinRequests(allow);
         ProjectResponse saved = toResponse(projectRepository.save(project));
-        log.info("AllowJoinRequests updated: project={}, allow={}", projectId, allow);
+        TxLogger.afterCommit(log, "AllowJoinRequests updated: project={}, allow={}", projectId, allow);
         return saved;
     }
 
@@ -304,7 +305,7 @@ public class ProjectService {
 
         projectEntity.getMembers().remove(member);
         projectRepository.save(projectEntity);
-        log.info("Project member removed: project={}, member={}", projectId, memberId);
+        TxLogger.afterCommit(log, "Project member removed: project={}, member={}", projectId, memberId);
     }
 
 

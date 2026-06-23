@@ -1,5 +1,6 @@
 package de.thm.swtp.api.projectFavorite.service;
 
+import de.thm.swtp.api.common.TxLogger;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
 import de.thm.swtp.api.project.exception.ExceptionProjectAlreadyDeleted;
@@ -50,7 +51,7 @@ public class ProjectFavoriteService {
                         .project(project)
                         .build()
         );
-        log.info("Favorite added: project={}, user={}", projectId, userId);
+        TxLogger.afterCommit(log, "Favorite added: project={}, user={}", projectId, userId);
     }
 
     @Transactional
@@ -61,7 +62,7 @@ public class ProjectFavoriteService {
 
         ProjectEntity project = favorite.getProject();
         projectFavoriteRepository.delete(favorite);
-        log.info("Favorite removed: project={}, user={}", projectId, userId);
+        TxLogger.afterCommit(log, "Favorite removed: project={}, user={}", projectId, userId);
     }
 
     @Transactional(readOnly = true)

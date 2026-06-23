@@ -1,6 +1,7 @@
 package de.thm.swtp.api.tag.service;
 
 
+import de.thm.swtp.api.common.TxLogger;
 import de.thm.swtp.api.tag.domain.Tag;
 import de.thm.swtp.api.tag.entity.TagEntity;
 import de.thm.swtp.api.tag.mapper.TagMapper;
@@ -46,7 +47,7 @@ public class ProfileTagService {
         TagEntity tag = getOrCreateTag(tagName);
         profile.getTags().add(tag);
 
-        log.info("Tag added to profile: user={}, tag={}", userId, tag.getName());
+        TxLogger.afterCommit(log, "Tag added to profile: user={}, tag={}", userId, tag.getName());
         return TagMapper.toDomain(tag);
     }
 
@@ -59,7 +60,7 @@ public class ProfileTagService {
         tagRepository.findByNameIgnoreCase(tagName.trim())
                 .ifPresent(tag -> {
                     profile.getTags().remove(tag);
-                    log.info("Tag removed from profile: user={}, tag={}", userId, tag.getName());
+                    TxLogger.afterCommit(log, "Tag removed from profile: user={}, tag={}", userId, tag.getName());
                 });
     }
 

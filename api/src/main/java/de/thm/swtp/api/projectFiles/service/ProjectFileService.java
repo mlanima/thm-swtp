@@ -1,5 +1,6 @@
 package de.thm.swtp.api.projectFiles.service;
 
+import de.thm.swtp.api.common.TxLogger;
 import de.thm.swtp.api.exceptionhandling.exceptions.*;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
@@ -135,7 +136,7 @@ public class ProjectFileService {
 
         try {
             ProjectFile saved = ProjectFileMapper.toDomain(projectFileRepository.save(entity));
-            log.info("Upload: project={}, file={}, bytes={}, mime={}",
+            TxLogger.afterCommit(log, "Upload: project={}, file={}, bytes={}, mime={}",
                     projectId, originalName, file.getSize(), mimeType);
             return saved;
         } catch (Exception e) {
@@ -178,7 +179,7 @@ public class ProjectFileService {
                 log.warn("Delete: file missing on disk, DB record removed: project={}, file={}",
                         projectId, fileId);
             } else {
-                log.info("Delete: project={}, file={}, storage={}",
+                TxLogger.afterCommit(log, "Delete: project={}, file={}, storage={}",
                         projectId, fileId, fileEntity.getStorageName());
             }
         } catch (IOException e) {
