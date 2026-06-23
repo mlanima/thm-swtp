@@ -33,6 +33,13 @@ Unlike the old `ADMIN` role, `MODERATOR` accounts **can** create and own user
 profiles, but they are excluded from most project-contributor and
 profile-owner operations.
 
+> **Frontend note (since 2026-06-23):** The success page (`/success`) checks
+> `isModerator()` and skips the `getMyProfile()` call for moderators, so no
+> `UserProfile` is created when a moderator logs in. Moderators therefore have
+> **no profile** in the application database. This is intentional — the moderator page
+> (`/moderator`) is their landing page, and they do not need a profile for moderation
+> tasks.
+
 ## Roles and Relationships
 
 | Term           | Meaning                                                                                                       |
@@ -137,9 +144,12 @@ Authorship takes precedence for drafts: a project owner cannot publish another u
 | Edit the profile                                           | `canEditUserProfile`   | Denied                     | Allowed                    | Denied                              |
 | Delete the profile                                         | `canDeleteUserProfile` | Denied                     | Allowed                    | Allowed                             |
 
-Moderators can create their own profile (the old ADMIN block was removed), but
-cannot edit it because profile-owner checks require `isRegularUser`. Deleting a
-profile no longer touches any user-account table.
+Moderators **could** create their own profile (the old ADMIN block was removed),
+but cannot edit it because profile-owner checks require `isRegularUser`. As of
+2026-06-23 the frontend skips profile creation for moderators entirely (see
+`success.component.ts`), so moderators do **not** have a profile in the
+application database. Deleting a profile no longer touches any user-account
+table.
 
 ## User Profile Links
 
