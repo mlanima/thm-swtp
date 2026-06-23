@@ -14,6 +14,8 @@ import de.thm.swtp.api.projectInvitation.repository.ProjectInviteRepository;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
+import de.thm.swtp.api.notification.event.ProjectInviteCreatedEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,7 @@ public class ProjectInviteService {
     private final ProjectInviteRepository projectInviteRepository;
     private final ProjectRepository projectRepository;
     private final UserProfileRepository userProfileRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     /** Creates a new project invitation. Only the project owner is allowed to send an invitation.*/
     @Transactional
@@ -45,7 +48,13 @@ public class ProjectInviteService {
         ProjectInviteEntity projectInviteEntity = createPendingInvite(projectEntity, invitedUserEntity, message);
 
         ProjectInviteEntity saved = projectInviteRepository.save(projectInviteEntity);
-        return ProjectInviteMapper.toDomain(saved);
+        ProjectInvite invite = ProjectInviteMapper.toDomain(saved);
+
+        if (invitedUserEntity.getEmail() != null) {
+            eventPublisher.publishEvent(new ProjectInviteCreatedEvent(invite, invitedUserEntity.getEmail()));
+        }
+
+        return invite;
     }
 
     /** Returns all invitations that were sent to the given user.*/
