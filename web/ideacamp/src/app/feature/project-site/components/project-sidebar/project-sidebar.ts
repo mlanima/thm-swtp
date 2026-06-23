@@ -5,11 +5,12 @@ import { LinkManagerComponent } from '../../../../shared/link-manager/link-manag
 import { LinkManagerDataSource } from '../../../../shared/link-manager/link-manager.types';
 import { ProjectLinkModel } from '../../../../models/project-link.model';
 import { ProjectLinkService } from '../../services/project-link.service';
+import { ProjectFiles } from '../project-files/project-files';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [TagList, LinkManagerComponent, MemberList],
+  imports: [TagList, LinkManagerComponent, MemberList, ProjectFiles],
   templateUrl: './project-sidebar.html',
 })
 export class ProjectSidebar {
