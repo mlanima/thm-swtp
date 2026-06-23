@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
+import org.springframework.web.util.HtmlUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -41,11 +42,14 @@ public class NotificationService {
         ProjectInvite invite = event.invite();
         Locale locale = Locale.forLanguageTag(mailLanguage);
 
+        String safeProjectName  = HtmlUtils.htmlEscape(invite.getProjectName());
+        String safeInviterName  = HtmlUtils.htmlEscape(invite.getInvitedByUsername());
+
         String subject = messageSource.getMessage("mail.invite.subject",
-                new Object[]{invite.getProjectName()}, locale);
+                new Object[]{safeProjectName}, locale);
         String greeting = messageSource.getMessage("mail.invite.greeting", null, locale);
         String body = messageSource.getMessage("mail.invite.body",
-                new Object[]{invite.getInvitedByUsername(), invite.getProjectName()}, locale);
+                new Object[]{safeInviterName, safeProjectName}, locale);
         String cta = messageSource.getMessage("mail.invite.cta", null, locale);
         String hint = messageSource.getMessage("mail.invite.hint", null, locale);
         String footer = messageSource.getMessage("mail.invite.footer", null, locale);
@@ -56,7 +60,7 @@ public class NotificationService {
                 .getContentAsString(StandardCharsets.UTF_8);
 
         String messageBlock = (invite.getMessage() != null && !invite.getMessage().isBlank())
-                ? "<div class=\"message-box\">" + invite.getMessage() + "</div>"
+                ? "<div class=\"message-box\">" + HtmlUtils.htmlEscape(invite.getMessage()) + "</div>"
                 : "";
 
         String html = template
