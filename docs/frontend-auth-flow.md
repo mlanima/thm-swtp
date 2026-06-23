@@ -21,18 +21,23 @@ The `AuthService` is the central service for OIDC authentication via Keycloak.
 ### Role Detection
 
 The `isModerator` signal is updated in `updateState()` by decoding the JWT access token extracted
-via `getAccessToken()`. The token's base64-decoded payload is parsed for
+via `getAccessToken()`. The token's base64url payload is parsed for
 `realm_access.roles`, and `isModerator` is set to `true` if the array includes `"MODERATOR"`.
 
+A shared `decodeJwtPayload` helper in `jwt-utils.ts` handles the base64url-to-base64
+conversion (`-` → `+`, `_` → `/`, correct padding) and is used by both the auth service
+and the HTTP interceptor.
+
 ```typescript
-private hasModeratorRole(token: string): boolean {
+export function decodeJwtPayload(token: string): Record<string, unknown> | null {
   try {
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    const realmAccess = payload['realm_access'];
-    const roles: string[] = realmAccess?.['roles'] ?? [];
-    return roles.includes('MODERATOR');
+    const base64 = token.split('.')[1]
+      .replace(/-/g, '+')
+      .replace(/_/g, '/');
+    const padded = base64.padEnd(base64.length + (4 - base64.length % 4) % 4, '=');
+    return JSON.parse(atob(padded));
   } catch {
-    return false;
+    return null;
   }
 }
 ```

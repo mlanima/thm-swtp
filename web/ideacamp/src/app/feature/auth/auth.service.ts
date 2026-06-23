@@ -1,4 +1,5 @@
 import { Injectable, signal, WritableSignal, inject, PLATFORM_ID, ApplicationRef, NgZone } from '@angular/core';
+import { decodeJwtPayload } from './jwt-utils';
 import { isPlatformBrowser } from '@angular/common';
 import { filter, take } from 'rxjs';
 import { OAuthService, AuthConfig } from 'angular-oauth2-oidc';
@@ -193,14 +194,13 @@ export class AuthService {
 
   /** Decodes the access token and returns true if the MODERATOR realm role is present. */
   private hasModeratorRole(token: string): boolean {
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      const realmAccess = payload['realm_access'];
-      const roles: string[] = realmAccess?.['roles'] ?? [];
-      return roles.includes('MODERATOR');
-    } catch {
+    const payload = decodeJwtPayload(token);
+    if (!payload) {
       return false;
     }
+    const realmAccess = payload['realm_access'] as Record<string, unknown> | undefined;
+    const roles: string[] = (realmAccess?.['roles'] as string[]) ?? [];
+    return roles.includes('MODERATOR');
   }
 
   /**
