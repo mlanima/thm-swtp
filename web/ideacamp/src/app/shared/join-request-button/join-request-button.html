@@ -2,7 +2,7 @@
   <button
     (click)="send($event)"
     [disabled]="status() === 'pending'"
-    [title]="status() === 'pending' ? 'Anfrage ausstehend' : 'Beitreten beantragen'"
+    [title]="status() === 'pending' ? ('JOIN_REQUEST.PENDING_TITLE' | translate) : ('JOIN_REQUEST.REQUEST_TITLE' | translate)"
     class="group flex items-center gap-1.5 rounded-full p-3 transition"
     [class]="status() === 'pending' ? 'cursor-default opacity-50' : (onDark ? 'hover:bg-white/20' : 'hover:bg-slate-100')"
   >

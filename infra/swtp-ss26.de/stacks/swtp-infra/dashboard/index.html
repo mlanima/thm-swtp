@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SWTP · Environments</title>
+<style>
+  :root {
+    --bg: #0b0e14;
+    --bg-glow: #1a1f2e;
+    --bg-card: #151a24;
+    --border: #232938;
+    --fg: #e6e9f0;
+    --fg-dim: #8b94a8;
+    --accent: #7c5cff;
+    --accent2: #00d9c0;
+    --ok: #3ddc97;
+    --link-bg: rgba(255,255,255,.03);
+    --card-glow: rgba(124,92,255,.08);
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f4f5f9;
+      --bg-glow: #ffffff;
+      --bg-card: #ffffff;
+      --border: #dde1ea;
+      --fg: #1a1f2e;
+      --fg-dim: #6b7385;
+      --accent: #6a4cf5;
+      --accent2: #00a896;
+      --ok: #1f9d6f;
+      --link-bg: rgba(0,0,0,.03);
+      --card-glow: rgba(124,92,255,.06);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: radial-gradient(circle at top left, var(--bg-glow) 0%, var(--bg) 60%);
+    color: var(--fg);
+    min-height: 100vh;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+  header { text-align: center; margin-bottom: 2.5rem; }
+  header h1 {
+    font-size: 2.4rem;
+    margin: 0 0 .4rem;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    letter-spacing: .5px;
+  }
+  header p { color: var(--fg-dim); margin: 0; font-size: .95rem; }
+
+  .section { max-width: 1100px; margin: 0 auto 2.5rem; }
+  .section h2 {
+    font-size: 1.05rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--fg-dim);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: .5rem;
+    margin-bottom: 1.2rem;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.1rem;
+  }
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.2rem 1.3rem;
+    position: relative;
+    overflow: hidden;
+    transition: transform .15s ease, border-color .15s ease;
+  }
+  .card:hover {
+    transform: translateY(-3px);
+    border-color: var(--accent);
+  }
+  .card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--card-glow), transparent 60%);
+    pointer-events: none;
+  }
+  .card h3 {
+    margin: 0 0 .9rem;
+    font-size: 1.15rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
+  .badge {
+    display: inline-block;
+    font-size: .65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: .15rem .5rem;
+    border-radius: 999px;
+    background: rgba(61, 220, 151, .15);
+    color: var(--ok);
+  }
+  .links { display: flex; flex-direction: column; gap: .5rem; margin-bottom: .8rem; }
+  .links a {
+    color: var(--fg);
+    text-decoration: none;
+    font-size: .9rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .35rem .6rem;
+    border-radius: 8px;
+    background: var(--link-bg);
+    transition: background .15s ease, color .15s ease;
+  }
+  .links a:hover { background: rgba(124,92,255,.15); color: var(--accent2); }
+  .links a .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .dot.fe { background: var(--accent); }
+  .dot.be { background: var(--accent2); }
+  .dot.keycloak { background: #e8872a; }
+  .dot.maildev { background: #3ddc97; }
+  .dot.hoppscotch { background: #ff7272; }
+  .dot.github { background: #8b87ff; }
+  .dot.logs { background: var(--fg-dim); }
+  .dot.pr_url { background: var(--fg-dim); }
+  .meta {
+    font-size: .75rem;
+    color: var(--fg-dim);
+    border-top: 1px solid var(--border);
+    padding-top: .6rem;
+    display: flex;
+    justify-content: space-between;
+    gap: .5rem;
+    flex-wrap: wrap;
+  }
+  .empty {
+    text-align: center;
+    color: var(--fg-dim);
+    font-size: .9rem;
+    padding: 1.5rem;
+    border: 1px dashed var(--border);
+    border-radius: 14px;
+  }
+  footer {
+    text-align: center;
+    color: var(--fg-dim);
+    font-size: .8rem;
+    margin-top: 3rem;
+  }
+</style>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%237c5cff'/><text x='16' y='23' text-anchor='middle' font-size='22' font-weight='700' fill='white' font-family='sans-serif'>?</text></svg>">
+</head>
+<body>
+<header>
+  <h1>SWTP · IdeaCamp</h1>
+  <p>Links zu allen Umgebungen — Main, Dev &amp; Review-Apps</p>
+</header>
+
+<div id="content"></div>
+
+<footer id="footer"></footer>
+
+<script>
+const ICONS = {
+  fe:         "🖥",
+  be:         "⚙",
+  keycloak:   "🔐",
+  maildev:    "📬",
+  hoppscotch: "🚀",
+  github:     "🐙",
+  logs:       "📜",
+  pr_url:     "🔗"
+};
+const LABELS = {
+  fe:         "Frontend",
+  be:         "Backend",
+  keycloak:   "Keycloak",
+  maildev:    "Maildev",
+  hoppscotch: "Hoppscotch",
+  github:     "GitHub",
+  logs:       "Dozzle",
+  pr_url:     "Pull Request"
+};
+const KEY_ORDER = ["fe", "be", "keycloak", "maildev", "hoppscotch", "github", "logs", "pr_url"];
+
+function linkRow(kind, url) {
+  if (!url) return "";
+  return `<a href="${url}" target="_blank" rel="noopener">
+    <span class="dot ${kind}"></span>${ICONS[kind] || "↗"} ${LABELS[kind] || kind}
+  </a>`;
+}
+
+function card(title, env) {
+  if (!env) return "";
+  const links = KEY_ORDER.map(k => linkRow(k, env[k])).join("");
+  const updated = env.updated_at ? `Stand: ${env.updated_at}` : "";
+  return `<div class="card">
+    <h3>${title} <span class="badge">live</span></h3>
+    <div class="links">${links || '<span style="color:var(--fg-dim);font-size:.85rem">keine Links hinterlegt</span>'}</div>
+    <div class="meta"><span>${updated}</span></div>
+  </div>`;
+}
+
+function section(title, html) {
+  return `<div class="section"><h2>${title}</h2><div class="grid">${html}</div></div>`;
+}
+
+function updateFavicon(count) {
+  const size = 32;
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext("2d");
+
+  // rounded rect background
+  ctx.beginPath();
+  ctx.roundRect(0, 0, size, size, 8);
+  ctx.fillStyle = "#7c5cff";
+  ctx.fill();
+
+  // count text
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "bold 20px -apple-system, BlinkMacSystemFont, sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  const text = count > 99 ? "99+" : String(count);
+  ctx.fillText(text, size / 2, size / 2 + 1);
+
+  // update favicon link
+  let link = document.querySelector("link[rel=icon]");
+  if (!link) {
+    link = document.createElement("link");
+    link.rel = "icon";
+    document.head.appendChild(link);
+  }
+  link.href = canvas.toDataURL("image/png");
+}
+
+function refresh() {
+  fetch("data.json?_=" + Date.now())
+    .then(r => r.json())
+    .then(data => {
+      let out = "";
+
+      out += section("Hauptumgebungen", [
+        card("Main", data.main),
+        card("Dev", data.dev)
+      ].filter(Boolean).join(""));
+
+      const prs = Object.entries(data.prs || {})
+        .sort((a, b) => Number(b[0]) - Number(a[0]));
+
+      const prCount = prs.length;
+      updateFavicon(prCount);
+
+      if (prs.length) {
+        out += section("Review-Apps", prs.map(([num, env]) => card(env.pr_title ? `${env.pr_title} <span style="font-weight:400;color:var(--fg-dim);font-size:.85rem">#${num}</span>` : `PR #${num}`, env)).join(""));
+      } else {
+        out += section("Review-Apps", `<div class="empty">Aktuell keine offenen Review-Apps</div>`);
+      }
+
+      document.getElementById("content").innerHTML = out;
+      document.getElementById("footer").textContent =
+        "Stand: " + new Date().toLocaleString("de-DE");
+    })
+    .catch(err => {
+      document.getElementById("content").innerHTML =
+        `<div class="empty">data.json konnte nicht geladen werden (${err})</div>`;
+    });
+}
+
+refresh();
+setInterval(refresh, 60000);
+</script>
+</body>
+</html>

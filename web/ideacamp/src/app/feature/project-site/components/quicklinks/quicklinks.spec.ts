@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { provideTranslateTesting } from '../../../../testing/translate-testing.provider';
 import { Quicklinks } from './quicklinks';
 
 describe('Quicklinks', () => {
@@ -9,6 +9,9 @@ describe('Quicklinks', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [Quicklinks],
+      providers: [
+        provideTranslateTesting(),
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(Quicklinks);

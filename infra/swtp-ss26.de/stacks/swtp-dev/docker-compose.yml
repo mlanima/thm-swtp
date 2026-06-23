@@ -1,0 +1,67 @@
+services:
+  swtp-dev-api:
+    image: ghcr.io/${GHCR_NAMESPACE:-mlanima}/swtp-api:dev
+    container_name: swtp-dev-api
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://swtp-db:3306/swtp_dev
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      SPRING_PROFILES_ACTIVE: mysql
+      APP_UPLOADS_DIR: /app/uploads
+      SPRING_MAIL_HOST: maildev
+      SPRING_MAIL_PORT: "1025"
+      APP_FRONTEND_URL: https://dev.swtp-ss26.de
+    volumes:
+      - ./uploads:/app/uploads
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-net
+      - traefik.http.routers.swtp-dev-api.rule=Host(`api.dev.swtp-ss26.de`)
+      - traefik.http.routers.swtp-dev-api.entrypoints=websecure
+      - traefik.http.routers.swtp-dev-api.tls.certresolver=letsencrypt-inwx
+      - traefik.http.routers.swtp-dev-api.service=swtp-dev-api
+      - traefik.http.services.swtp-dev-api.loadbalancer.server.port=8080
+    networks:
+      - traefik-net
+      - app_internal
+    restart: unless-stopped
+
+  swtp-dev-web:
+    image: ghcr.io/${GHCR_NAMESPACE:-mlanima}/swtp-web:dev
+    container_name: swtp-dev-web
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-net
+      - traefik.http.routers.swtp-dev-web.rule=Host(`dev.swtp-ss26.de`)
+      - traefik.http.routers.swtp-dev-web.entrypoints=websecure
+      - traefik.http.routers.swtp-dev-web.tls.certresolver=letsencrypt-inwx
+      - traefik.http.routers.swtp-dev-web.service=swtp-dev-web
+      - traefik.http.services.swtp-dev-web.loadbalancer.server.port=4000
+    networks:
+      - traefik-net
+    restart: unless-stopped
+
+  swtp-dev-dozzle:
+    image: amir20/dozzle:latest
+    container_name: swtp-dev-dozzle
+    environment:
+      DOZZLE_FILTER: name=swtp-dev
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-net
+      - traefik.http.routers.swtp-dev-dozzle.rule=Host(`logs.dev.swtp-ss26.de`)
+      - traefik.http.routers.swtp-dev-dozzle.entrypoints=websecure
+      - traefik.http.routers.swtp-dev-dozzle.tls.certresolver=letsencrypt-inwx
+      - traefik.http.routers.swtp-dev-dozzle.service=swtp-dev-dozzle
+      - traefik.http.services.swtp-dev-dozzle.loadbalancer.server.port=8080
+    networks:
+      - traefik-net
+    restart: unless-stopped
+
+networks:
+  traefik-net:
+    external: true
+  app_internal:
+    external: true

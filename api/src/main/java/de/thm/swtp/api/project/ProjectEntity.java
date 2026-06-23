@@ -1,7 +1,7 @@
 package de.thm.swtp.api.project;
 
 import de.thm.swtp.api.projectInvitation.entity.ProjectInviteEntity;
-import de.thm.swtp.api.projectLinks.entity.ProjectLinkEntity;
+import de.thm.swtp.api.links.entity.ProjectLinkEntity;
 import de.thm.swtp.api.tag.entity.TagEntity;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import jakarta.persistence.*;
@@ -13,7 +13,10 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Entity(name = "projects")
-@Table(name = "projects")
+@Table(name = "projects", uniqueConstraints = {
+        @UniqueConstraint(name = "UK_projects_name",        columnNames = {"name"}),
+        @UniqueConstraint(name = "UK_projects_project_url", columnNames = {"project_url"})
+})
 @Getter
 @Setter
 @Builder
@@ -34,7 +37,7 @@ public class ProjectEntity {
     @Column(name = "short_description", length = 200)
     private String shortDescription;
 
-    @Column(name = "project_url", nullable = false, length = 30)
+    @Column(name = "project_url", nullable = false, unique = true, length = 30)
     private String projectUrl;
 
     @Column(name = "is_private", nullable = false)
@@ -60,7 +63,11 @@ public class ProjectEntity {
     @JoinTable(
             name = "project_members",
             joinColumns = @JoinColumn(name = "project_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_profile_keycloak_id")
+            inverseJoinColumns = @JoinColumn(name = "user_profile_keycloak_id"),
+            uniqueConstraints = @UniqueConstraint(
+                    name = "UK_project_members",
+                    columnNames = {"project_id", "user_profile_keycloak_id"}
+            )
     )
     @Builder.Default
     private Set<UserProfile> members = new HashSet<>();

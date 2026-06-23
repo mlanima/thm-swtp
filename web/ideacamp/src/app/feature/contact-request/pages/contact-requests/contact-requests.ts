@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import {ContactRequestBox} from '../../components/contact-request-box/contact-request-box'
 import {ContactRequest} from '../../components/contact-request.model';
 @Component({
   selector: 'app-contact-request',
   standalone: true,
-  imports: [ContactRequestBox],
+  imports: [ContactRequestBox, TranslatePipe],
   templateUrl: './contact-requests.html',
 })
 export class ContactRequests {

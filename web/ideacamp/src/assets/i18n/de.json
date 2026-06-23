@@ -1,0 +1,367 @@
+{
+  "NAV": {
+    "HOME": "Startseite",
+    "PROJECTS": "Projekte",
+    "PROFILE": "Profil",
+    "LOGOUT": "Abmelden",
+    "SEARCH": "Erkunden",
+    "AUTH": "Eingeloggt"
+  },
+  "COMMON": {
+    "SAVE": "Speichern",
+    "CANCEL": "Abbrechen",
+    "EDIT": "Bearbeiten",
+    "DELETE": "Löschen",
+    "LOADING": "Wird geladen...",
+    "ERROR": "Fehler",
+    "CONTINUE": "Weiter",
+    "PROJECT": "Projekt",
+    "BACK": "Zurück",
+    "FINISH": "Fertig",
+    "PRIVATE": "Privat",
+    "PUBLIC": "Öffentlich",
+    "QUICKLINKS": {
+      "TITLE": "Links",
+      "ADD": "Hinzufügen",
+      "LABEL": "Bezeichnung",
+      "LABEL_PLACEHOLDER": "Beispielseite",
+      "URL_PLACEHOLDER": "z.B. beispiel.com",
+      "LOADING": "Links werden geladen...",
+      "EMPTY": "Keine öffentlichen Links verfügbar.",
+      "EDIT_LINK": "Link bearbeiten",
+      "DELETE_LINK": "Link löschen",
+      "VISIBILITY": "Sichtbarkeit",
+      "PUBLIC": "Öffentlich",
+      "PRIVATE": "Privat",
+      "ERROR_LOAD": "Links konnten nicht geladen werden.",
+      "ERROR_ADD": "Link konnte nicht hinzugefügt werden.",
+      "ERROR_UPDATE": "Link konnte nicht aktualisiert werden.",
+      "ERROR_DELETE": "Link konnte nicht gelöscht werden.",
+      "ERROR_INVALID": "Ungültige Linkdaten.",
+      "VALIDATION_LABEL_REQUIRED": "Bezeichnung erforderlich.",
+      "VALIDATION_LABEL_TOO_LONG": "Die Bezeichnung darf nicht länger als 100 Zeichen sein.",
+      "VALIDATION_LABEL_NO_QUOTES": "Die Bezeichnung darf keine Anführungszeichen enthalten.",
+      "VALIDATION_URL_REQUIRED": "URL erforderlich.",
+      "VALIDATION_URL_TOO_LONG": "Die URL darf nicht länger als 300 Zeichen sein.",
+      "VALIDATION_URL_INVALID": "Die URL muss gültig sein."
+    }
+  },
+  "LANGUAGE": {
+    "GERMAN": "Deutsch",
+    "ENGLISH": "Englisch"
+  },
+  "LANDING": {
+    "H1": "Ideen teilen.\nTeams finden.\nProjekte verwirklichen.",
+    "P": "Vernetze dich mit kreativen Köpfen und verwandle Ideen in erfolgreiche Zusammenarbeit.",
+    "BUTTON": "Logge dich jetzt ein, um Projekte zu entdecken, dein Profil zu bearbeiten und eigene Ideen zu teilen."
+  },
+  "AUTH": {
+    "P1": "Erfolgreich!",
+    "H1": "Willkommen bei IdeaCamp",
+    "P2": "Was hast du heute vor? Erstelle dein erstes Projekt, entdecke spannende Ideen oder verbinde dich mit anderen kreativen Köpfen. Dein Abenteuer beginnt hier!"
+  },
+  "MYPROJECTS": {
+    "TITLE": "Meine Projekte",
+    "CREATE_PROJECT": "Projekt erstellen",
+    "PROJECTS": "Projekte",
+    "OWNED_PROJECTS_COUNT_LABEL": "Projekte im Besitz",
+    "INVITATIONS": "Projekteinladungen",
+    "INVITED_BY": "Eingeladen von:",
+    "ACCEPT": "Annehmen",
+    "DECLINE": "Ablehnen",
+    "NO_SHORT_DESCRIPTION": "Keine Kurzbeschreibung.",
+    "OWNER": "Gründer",
+    "FILTER_ALL": "Alle Projekte",
+    "FILTER_OWNED": "Im Besitz",
+    "LOADING": "Deine Projekte werden geladen…",
+    "EMPTY_TITLE": "Noch keine Projekte",
+    "EMPTY_DESCRIPTION": "Sobald du dein erstes Projekt erstellst, erscheint es hier.",
+    "ERROR_LOAD_INVITATIONS": "Einladungen konnten nicht geladen werden.",
+    "ERROR_LOAD_USERNAME": "Dein Benutzername konnte nicht geladen werden.",
+    "ERROR_LOAD_PROJECTS": "Deine Projekte konnten nicht geladen werden.",
+    "TIME": {
+      "JUST_NOW": "gerade eben",
+      "MINUTE_AGO": "vor {{ count }} Minute",
+      "MINUTES_AGO": "vor {{ count }} Minuten",
+      "HOUR_AGO": "vor {{ count }} Stunde",
+      "HOURS_AGO": "vor {{ count }} Stunden",
+      "YESTERDAY": "gestern",
+      "DAYS_AGO": "vor {{ count }} Tagen"
+    }
+  },
+  "USERPROFILE": {
+    "LOADING": "Profil lädt...",
+    "NO_TITLE": "Kein Titel vorhanden",
+    "NO_LOCATION": "Kein Standort vorhanden",
+    "PROFILE_INFORMATION": "Profilinformationen",
+    "EDIT_PROFILE_INFORMATION": "Profilinformationen bearbeiten",
+    "NO_INFORMATION": "Keine Informationen.",
+    "EXPERIENCE": "Erfahrung",
+    "EDIT_EXPERIENCE": "Erfahrung bearbeiten",
+    "NO_EXPERIENCE": "Keine Erfahrung.",
+    "PROFILE_UPDATED": "Profil erfolgreich geändert.",
+    "ERROR_NOT_FOUND": "Nutzer nicht gefunden.",
+    "ERROR_AUTH_REQUIRED": "Bitte melde dich an, um dieses Profil anzuzeigen.",
+    "ERROR_LOAD_PROFILE": "Profilinformationen konnten nicht geladen werden. Bitte versuche es später erneut.",
+    "ERROR_EDIT_FORBIDDEN": "Du bist nicht berechtigt, dieses Profil zu bearbeiten.",
+    "ERROR_UPDATE_PROFILE": "Das Profil konnte nicht aktualisiert werden. Bitte versuche es später erneut.",
+    "FOLLOWERS": "Follower",
+    "FOLLOW": "Folgen",
+    "FOLLOWING": "Folge ich",
+    "UNFOLLOW": "Entfolgen",
+    "INVITE": "Einladen"
+  },
+  "CONTACT-REQUESTS": {
+    "CONTACT": "Kontaktanfragen",
+    "CONTACT-PROJECT": "Kontaktanfragen für mein Projekt verwalten",
+    "OPEN-REQUEST": "Offene Anfragen",
+    "COMPLETED": "Abgeschlossene Anfragen"
+  },
+  "FAVORITE": {
+    "TITLE": "Meine Favoriten",
+    "LOADING": "Deine Favoriten werden geladen…",
+    "EMPTY": "Noch keine Favoriten",
+    "EMPTY_DESCRIPTION": "Sobald du ein Projekt favorisierst, erscheint es hier.",
+    "NO_DESCRIPTION": "Keine Beschreibung vorhanden.",
+    "OPEN_PROJECT": "Projekt öffnen",
+    "ERROR_LOAD": "Deine Favoriten konnten nicht geladen werden."
+  },
+  "SIDEBAR": {
+    "MYPROJECTS": "Meine Projekte",
+    "FAVORITE": "Favoriten",
+    "PROFILE": "Mein Profil",
+    "IMPRESSUM": "Impressum",
+    "MENU": "Menü"
+  },
+  "PROJECTCREATE": {
+    "PAGE_TITLE": "Erstelle ein neues Projekt",
+    "CREATING": "Projekt wird erstellt…",
+    "PROJECT_NAME": "Projektname",
+    "PROJECT_NAME_PLACEHOLDER": "Gib den Projektnamen ein",
+    "NO_PROJECT_NAME": "Kein Projektname",
+    "SHORT_DESCRIPTION": "Kurzbeschreibung",
+    "SHORT_DESCRIPTION_PLACEHOLDER": "Beschreibe dein Projekt in ein bis zwei Sätzen",
+    "NO_SHORT_DESCRIPTION": "Keine Kurzbeschreibung",
+    "DESCRIPTION": "Beschreibung",
+    "DESCRIPTION_PLACEHOLDER": "Beschreibe dein Projekt ausführlich",
+    "NO_DESCRIPTION": "Keine Projektbeschreibung",
+    "PROJECT_URL": "Projekt-URL",
+    "PROJECT_URL_LABEL": "Projekt-URL (Dein Projekt wird unter /project/dein-input verfügbar sein)",
+    "PROJECT_URL_PLACEHOLDER": "z.B. mein-projekt",
+    "NO_PROJECT_URL": "Keine Projekt URL",
+    "CHECKING_PROJECT_URL": "Projekt-URL wird geprüft...",
+    "PROJECT_URL_EXISTS": "Diese Projekt-URL ist bereits vergeben.",
+    "PROJECT_URL_AVAILABLE": "Diese Projekt-URL ist verfügbar.",
+    "PRIVATE_DESCRIPTION": "Nur eingeladene Nutzer werden das Projekt sehen können",
+    "MEMBERS": "Projektmitglieder",
+    "ADD_MEMBER": "Mitglied hinzufügen",
+    "ADD": "Hinzufügen",
+    "INVITED_MEMBERS": "Eingeladene Mitglieder",
+    "NO_MEMBERS_INVITED": "Keine Mitglieder eingeladen",
+    "MEMBER_DIALOG_TITLE": "Füge Personen zu deinem Projekt hinzu",
+    "MEMBER_DIALOG_SUBTITLE": "Suche nach Nutzername",
+    "USER_SEARCH_PLACEHOLDER": "Nutzer finden",
+    "USER_SEARCH_EMPTY_PREFIX": "Keine passenden User gefunden",
+    "FINISH_TITLE": "Fertigstellen",
+    "FINISH_DESCRIPTION": "Prüfe alle Eingaben, um dein Projekt fertigzustellen.",
+    "STATUS": "Status",
+    "STEPS": {
+      "GENERAL": "Allgemeines",
+      "SETTINGS": "Einstellungen",
+      "MEMBERS": "Mitglieder",
+      "FINISH": "Fertigstellen"
+    },
+    "PROJECT_URL_CHECK_ERROR": "Projekt-URL konnte nicht geprüft werden.",
+    "SUCCESS_CREATED": "Projekt erfolgreich erstellt!",
+    "SUCCESS_CREATED_WITH_INVITES": "Projekt erfolgreich erstellt und Einladungen gesendet!",
+    "ERROR_CREATE_PROJECT": "Projekt konnte nicht erstellt werden. Bitte versuche es erneut.",
+    "VALIDATION": {
+      "NAME_MIN": "Projektname muss mindestens 3 Zeichen lang sein.",
+      "NAME_MAX": "Projektname darf höchstens 20 Zeichen lang sein.",
+      "NAME_NO_QUOTES": "Projektname darf keine Anführungszeichen beinhalten.",
+      "SHORT_DESCRIPTION_MAX": "Kurzbeschreibung darf höchstens 200 Zeichen lang sein.",
+      "SHORT_DESCRIPTION_NO_QUOTES": "Kurzbeschreibung darf keine Anführungszeichen beinhalten.",
+      "DESCRIPTION_MAX": "Projektbeschreibung darf höchstens 500 Zeichen lang sein.",
+      "DESCRIPTION_NO_QUOTES": "Projektbeschreibung darf keine Anführungszeichen beinhalten.",
+      "PROJECT_URL_MIN": "Projekt URL muss mindestens 3 Zeichen lang sein.",
+      "PROJECT_URL_MAX": "Projekt URL darf höchstens 30 Zeichen lang sein.",
+      "PROJECT_URL_FORMAT": "Verwende ausschließlich Kleinbuchstaben, Zahlen und Bindestriche. Bindestriche sind am Anfang und am Ende nicht zulässig."
+    }
+  },
+  "SEARCH": {
+    "TITLE": "Suchen",
+    "SUBTITLE": "Projekte und Nutzer auf der gesamten Plattform finden",
+    "TAB_ALL": "Alle",
+    "TAB_PROJECTS": "Projekte",
+    "TAB_USERS": "Nutzer",
+    "RESULTS": "Ergebnisse",
+    "SEARCHING": "Suche...",
+    "NO_RESULTS_TITLE": "Keine Ergebnisse gefunden",
+    "NO_RESULTS_DESCRIPTION": "Es wurden keine passenden Ergebnisse gefunden. Bitte überprüfe die Schreibweise oder versuche es mit anderen Suchbegriffen.",
+    "PROJECTS_SECTION": "Projekte",
+    "USERS_SECTION": "Nutzer",
+    "ADD_SEARCH_INPUT": "Sucheingabe hinzufügen",
+    "INPUT_PLACEHOLDER": "Nach Nutzern oder Projekten suchen...",
+    "ERROR_FAILED": "Die Suche ist fehlgeschlagen. Bitte versuche es erneut."
+  },
+  "IMPRESSUM": {
+    "BADGE": "Rechtliches",
+    "TITLE": "Impressum",
+    "SUBTITLE": "Angaben gemäß § 5 TMG",
+    "PROVIDER": "Anbieter",
+    "ORGANIZATION": "Organisation",
+    "PROJECT": "Projekt",
+    "ADDRESS": "Anschrift",
+    "ORGANIZATION_VALUE": "Technische Hochschule Mittelhessen (THM)",
+    "PROJECT_VALUE": "IdeaCamp – Studentische Projektvermittlungsplattform",
+    "ADDRESS_VALUE": "Wiesenstraße 14\n35390 Gießen",
+    "CONTACT": "Kontakt",
+    "EMAIL": "E-Mail",
+    "RESPONSIBLE": "Verantwortlich für den Inhalt",
+    "ACCORDING_TO": "Gemäß § 18 Abs. 2 MStV",
+    "RESPONSIBLE_VALUE": "Das IdeaCamp-Entwicklungsteam\nTechnische Hochschule Mittelhessen\nWiesenstraße 14, 35390 Gießen",
+    "DISCLAIMER": "Haftungshinweis",
+    "DISCLAIMER_TEXT": "Trotz sorgfältiger inhaltlicher Kontrolle übernehmen wir keine Haftung für die Inhalte externer Links. Für den Inhalt der verlinkten Seiten sind ausschließlich deren Betreiber verantwortlich.",
+    "PRIVACY": "Datenschutz",
+    "PRIVACY_TEXT": "Da IdeaCamp ein studentisches Hochschulprojekt ohne kommerzielle Ausrichtung ist, werden keine personenbezogenen Daten dauerhaft gespeichert oder an Dritte weitergegeben. Bei Fragen wende dich direkt per E-Mail an uns.",
+    "UNIVERSITY_PROJECT": "Hochschulprojekt",
+    "UNIVERSITY_PROJECT_TEXT": "IdeaCamp ist ein studentisches Projekt im Rahmen eines Lehrveranstaltungsprojekts an der THM. Es handelt sich nicht um ein kommerzielles Angebot.",
+    "FOOTER": "IdeaCamp · THM Gießen"
+  },
+  "PROJECTSETTINGS": {
+    "TITLE": "Projekteinstellungen",
+    "BACK_TO_PROJECT": "Zurück zum Projekt",
+    "UNEXPECTED_ERROR": "Ein unerwarteter Fehler ist aufgetreten",
+    "TABS": {
+      "JOIN_REQUESTS": "Beitrittsanfragen",
+      "MEMBERS": "Mitglieder",
+      "PRIVACY": "Privatsphäre",
+      "DANGER_ZONE": "Gefahrenzone"
+    },
+    "ERRORS": {
+      "NO_PROJECT_URL": "Keine Projekt-URL gegeben.",
+      "LOAD_PROJECT": "Projekt konnte nicht geladen werden."
+    },
+    "PRIVACY": {
+      "SUBTITLE": "Steuern der Sichtbarkeit und Beitritt des Projekts",
+      "PUBLIC_VISIBILITY": "Öffentliche Sichtbarkeit",
+      "PUBLIC_VISIBLE_DESCRIPTION": "Dieses Projekt ist öffentlich sichtbar und kann von jedem gefunden werden.",
+      "PRIVATE_VISIBLE_DESCRIPTION": "Dieses Projekt ist privat und erscheint nicht in der Suche.",
+      "ALLOW_JOIN_REQUESTS": "Beitrittsanfragen zulassen",
+      "ALLOW_JOIN_REQUESTS_DESCRIPTION": "Nutzer können beantragen, dem Projekt beizutreten. Akzeptieren und Ablehnen durch Projektinhaber möglich"
+    },
+    "MEMBERS": {
+      "SUBTITLE": "Verwalte, welche Mitglieder Zugriff zum Projekt haben.",
+      "INVITE_MEMBER": "Mitglied einladen",
+      "LOADING": "Lade Mitglieder...",
+      "EMPTY": "Dieses Projekt hat noch keine Mitglieder.",
+      "TABLE_MEMBER": "Mitglied",
+      "TABLE_ROLE": "Rolle",
+      "ROLE_MEMBER": "Mitglied",
+      "DELETE_MEMBER": "Mitglied löschen",
+      "REMOVE_MEMBER": "Mitglied entfernen",
+      "REMOVE_ACCESS": "Zugriff zum Projekt wird entfernt",
+      "REMOVE_CONFIRM_START": "Bist du sicher, dass du",
+      "REMOVE_CONFIRM_MIDDLE": "vom Projekt entfernen möchtest?",
+      "REMOVE_CONFIRM_END": "Das Mitglied wird alle Berechtigungen zum Projekt verlieren!",
+      "INVITE_SUBTITLE": "Suche nach einem Nutzer",
+      "USER_SEARCH_PLACEHOLDER": "Nutzer suchen",
+      "USER_SEARCH_EMPTY": "Keine Nutzer gefunden für",
+      "MESSAGE_OPTIONAL": "Nachricht optional",
+      "MESSAGE_PLACEHOLDER": "Optionale Nachricht hinzufügen...",
+      "INVITING": "Wird eingeladen...",
+      "INVITE": "Einladen",
+      "ERROR_DELETE_MEMBER": "Mitglied konnte nicht gelöscht werden. Bitte versuche es gleich nochmal.",
+      "ERROR_LOAD_MEMBERS": "Mitglieder konnten nicht geladen werden. Bitte versuche es später nochmal.",
+      "ERROR_INVITE": "Einladung konnte nicht erstellt werden. Bitte versuche es erneut.",
+      "INVITE_SUCCESS": "Einladung wurde erfolgreich an {{ username }} gesendet."
+    },
+    "JOIN_REQUESTS": {
+      "SUBTITLE": "Beitrittsanfragen für dieses Projekt bearbeiten.",
+      "LOADING": "Beitrittsanfragen werden geladen…",
+      "EMPTY_TITLE": "Keine Beitrittsanfragen",
+      "EMPTY_DESCRIPTION": "Sobald jemand eine Anfrage stellt, erscheint sie hier."
+    },
+    "DANGER": {
+      "TITLE": "Projekt löschen",
+      "SUBTITLE": "Diese Aktion kann nicht rückgängig gemacht werden.",
+      "DESCRIPTION": "Dieses Projekt und alle zugehörigen Daten werden unwiderruflich gelöscht!",
+      "MODAL_SUBTITLE": "Das ist eine unwiderrufliche Aktion",
+      "DELETE_TEXT_START": "Wenn du",
+      "DELETE_TEXT_END": "endgültig löschst, werden alle Ideen, Mitglieder und Einstellungen gelöscht. Die Daten können nicht wiederhergestellt werden.",
+      "CONFIRM_TYPE_START": "Um diese Aktion zu bestätigen, tippe bitte",
+      "CONFIRM_TYPE_END": "ein.",
+      "DELETING": "Wird gelöscht…",
+      "ERROR_DELETE_PROJECT": "Projekt konnte nicht gelöscht werden."
+    }
+  },
+  "PROJECTSITE": {
+    "LOADING": "Projekt wird geladen…",
+    "INFORMATION": "Projektinformationen",
+    "PROJECT_UPDATED": "Projekt erfolgreich geändert.",
+    "ERRORS": {
+      "NO_PROJECT_URL": "Keine Projekt-URL angegeben.",
+      "LOAD_PROJECT": "Projektdaten konnten nicht abgerufen werden.",
+      "SAVE_PROJECT": "Projekt konnte nicht gespeichert werden."
+    },
+    "INFO": {
+      "VISIBILITY": "Sichtbarkeit",
+      "CONTRIBUTORS": "Mitwirkende",
+      "VIEWS": "Aufrufe",
+      "LIKES": "Likes",
+      "OPEN_POSITIONS": "Offene Stellen"
+    },
+    "HEADER": {
+      "SETTINGS": "Einstellungen"
+    },
+    "MEMBERS": {
+      "ALL_MEMBERS": "Alle Mitglieder",
+      "NO_MEMBERS": "Noch keine Mitglieder."
+    },
+
+    "TAGS": {
+      "ERROR_INVALID_CHARS": "Tag enthält ungültige Zeichen. Erlaubt: Buchstaben, Zahlen, Leerzeichen, Bindestrich und Punkt.",
+      "ERROR_DUPLICATE": "Tag ist bereits in diesem Projekt enthalten.",
+      "ERROR_TOO_LONG": "Tag zu lang.",
+      "ERROR_DELETE": "Tag konnte nicht gelöscht werden.",
+      "ERROR_LOAD": "Tags konnten nicht geladen werden.",
+      "LOADING": "Tags werden geladen…",
+      "NEW_TAG": "Neues Tag",
+      "ADD_TAG": "Tag hinzufügen",
+      "DELETE_TAG": "Tag löschen",
+      "EMPTY": "Keine Tags vorhanden."
+    },
+    "OPEN_POSITIONS": {
+      "TITLE": "Offene Stellen"
+    },
+    "FILES": {
+      "TITLE": "Dateien",
+      "UPLOAD": "Hochladen",
+      "UPLOADING": "Wird hochgeladen…",
+      "LOADING": "Dateien werden geladen...",
+      "EMPTY": "Keine Dateien vorhanden.",
+      "DROP_HINT": "Datei hierher ziehen",
+      "DOWNLOAD_FILE": "Datei herunterladen",
+      "DELETE_FILE": "Datei löschen",
+      "ERROR_TYPE_NOT_ALLOWED": "Dateityp nicht erlaubt. Erlaubt: PDF, PNG, JPG, DOCX, TXT, MD",
+      "ERROR_FILE_TOO_LARGE": "Datei ist zu groß. Maximale Dateigröße: 10 MB.",
+      "ERROR_LOAD": "Dateien konnten nicht geladen werden.",
+      "ERROR_UPLOAD": "Datei konnte nicht hochgeladen werden.",
+      "ERROR_DELETE": "Datei konnte nicht gelöscht werden.",
+      "ERROR_DOWNLOAD": "Datei konnte nicht heruntergeladen werden."
+    }
+  },
+  "JOIN_REQUEST": {
+    "PENDING_TITLE": "Anfrage ausstehend",
+    "REQUEST_TITLE": "Beitreten beantragen"
+  },
+  "USER": {
+    "VALIDATION": {
+      "USERNAME_REQUIRED": "Nutzername ist erforderlich.",
+      "ID_REQUIRED": "ID ist erforderlich."
+    }
+  },
+  "USER_SEARCH": {
+    "EMPTY": "Keine Nutzer gefunden"
+  }
+}

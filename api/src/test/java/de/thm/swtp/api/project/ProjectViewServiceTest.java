@@ -1,8 +1,9 @@
-package de.thm.swtp.api.projectView.service;
+package de.thm.swtp.api.project;
 
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.projectView.entity.ProjectViewEntity;
 import de.thm.swtp.api.projectView.repository.ProjectViewRepository;
+import de.thm.swtp.api.projectView.service.ProjectViewService;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

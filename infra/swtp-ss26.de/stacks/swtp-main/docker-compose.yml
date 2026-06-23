@@ -1,0 +1,66 @@
+services:
+  swtp-main-api:
+    image: ghcr.io/${GHCR_NAMESPACE:-mlanima}/swtp-api:latest
+    container_name: swtp-main-api
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://swtp-db:3306/swtp_main
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      SPRING_PROFILES_ACTIVE: mysql
+      APP_UPLOADS_DIR: /app/uploads
+      SPRING_MAIL_HOST: maildev
+      SPRING_MAIL_PORT: "1025"
+      SPRINGDOC_SWAGGERUI_ENABLED: "false"
+    volumes:
+      - ./uploads:/app/uploads
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-net
+      - traefik.http.routers.swtp-main-api.rule=Host(`api.swtp-ss26.de`)
+      - traefik.http.routers.swtp-main-api.entrypoints=websecure
+      - traefik.http.routers.swtp-main-api.tls.certresolver=letsencrypt-inwx
+      - traefik.http.routers.swtp-main-api.service=swtp-main-api
+      - traefik.http.services.swtp-main-api.loadbalancer.server.port=8080
+    networks:
+      - traefik-net
+      - app_internal
+    restart: unless-stopped
+
+  swtp-main-web:
+    image: ghcr.io/${GHCR_NAMESPACE:-mlanima}/swtp-web:latest
+    container_name: swtp-main-web
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-net
+      - traefik.http.routers.swtp-main-web.rule=Host(`www.swtp-ss26.de`)
+      - traefik.http.routers.swtp-main-web.entrypoints=websecure
+      - traefik.http.routers.swtp-main-web.tls.certresolver=letsencrypt-inwx
+      - traefik.http.routers.swtp-main-web.service=swtp-main-web
+      - traefik.http.services.swtp-main-web.loadbalancer.server.port=4000
+    networks:
+      - traefik-net
+    restart: unless-stopped
+
+  swtp-main-dozzle:
+    image: amir20/dozzle:latest
+    container_name: swtp-main-dozzle
+    command: ["--filter", "name=swtp-main", "--filter", "name=keycloak", "--filter", "name=maildev", "--filter", "name=hoppscotch", "--filter", "name=swtp-db", "--filter", "name=swtp-dashboard"]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-net
+      - traefik.http.routers.swtp-main-dozzle.rule=Host(`logs.swtp-ss26.de`)
+      - traefik.http.routers.swtp-main-dozzle.entrypoints=websecure
+      - traefik.http.routers.swtp-main-dozzle.tls.certresolver=letsencrypt-inwx
+      - traefik.http.routers.swtp-main-dozzle.service=swtp-main-dozzle
+      - traefik.http.services.swtp-main-dozzle.loadbalancer.server.port=8080
+    networks:
+      - traefik-net
+    restart: unless-stopped
+
+networks:
+  traefik-net:
+    external: true
+  app_internal:
+    external: true

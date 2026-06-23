@@ -10,6 +10,15 @@ permissions:
   packages: write
 
 jobs:
+  namespace:
+    name: Resolve GHCR namespace
+    runs-on: ubuntu-latest
+    outputs:
+      namespace: ${{ steps.lower.outputs.namespace }}
+    steps:
+      - id: lower
+        run: echo "namespace=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+
   detect-changes:
     name: Detect changes
     runs-on: ubuntu-latest
@@ -21,6 +30,7 @@ jobs:
       - uses: dorny/paths-filter@v4
         id: filter
         with:
+          base: ${{ github.ref_name }}
           filters: |
             backend:
               - 'api/**'
@@ -29,7 +39,7 @@ jobs:
 
   build-backend:
     name: Build & Push (Backend)
-    needs: detect-changes
+    needs: [namespace, detect-changes]
     if: needs.detect-changes.outputs.backend == 'true'
     runs-on: ubuntu-latest
     steps:
@@ -48,12 +58,12 @@ jobs:
           context: ./api
           push: true
           tags: |
-            ghcr.io/mlanima/swtp-api:latest
-            ghcr.io/mlanima/swtp-api:${{ github.run_number }}
+            ghcr.io/${{ needs.namespace.outputs.namespace }}/swtp-api:${{ github.ref_name == 'main' && 'latest' || 'dev' }}
+            ghcr.io/${{ needs.namespace.outputs.namespace }}/swtp-api:${{ github.run_number }}
 
   build-frontend:
     name: Build & Push (Frontend)
-    needs: detect-changes
+    needs: [namespace, detect-changes]
     if: needs.detect-changes.outputs.frontend == 'true'
     runs-on: ubuntu-latest
     steps:
@@ -71,21 +81,36 @@ jobs:
         with:
           context: ./web/ideacamp
           push: true
+          build-args: |
+            API_URL=${{ github.ref_name == 'main' && 'https://api.swtp-ss26.de/api' || 'https://api.dev.swtp-ss26.de/api' }}
           tags: |
-            ghcr.io/mlanima/swtp-web:latest
-            ghcr.io/mlanima/swtp-web:${{ github.run_number }}
+            ghcr.io/${{ needs.namespace.outputs.namespace }}/swtp-web:${{ github.ref_name == 'main' && 'latest' || 'dev' }}
+            ghcr.io/${{ needs.namespace.outputs.namespace }}/swtp-web:${{ github.run_number }}
 
   deploy:
     name: Deploy to Server
-    needs: [build-backend, build-frontend]
+    needs: [namespace, build-backend, build-frontend]
     if: |
       always() &&
       (needs.build-backend.result == 'success' || needs.build-frontend.result == 'success')
     runs-on: ubuntu-latest
     steps:
+      - name: Resolve deploy target
+        id: target
+        run: |
+          case "${{ github.ref_name }}" in
+            main)    echo "cmd=deploy-main" >> $GITHUB_OUTPUT ;;
+            developer) echo "cmd=deploy-dev" >> $GITHUB_OUTPUT ;;
+            *)
+              echo "cd-build-deploy only runs on main/developer branches" >&2
+              exit 1
+              ;;
+          esac
+
       - name: Trigger deploy via SSH
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key -p 2105 tosch@mail.schalz.de
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key -p 2105 tosch@mail.schalz.de \
+            "${{ steps.target.outputs.cmd }}"

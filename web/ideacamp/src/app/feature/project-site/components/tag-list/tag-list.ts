@@ -1,4 +1,5 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges, inject, signal } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { ProjectTagService, TagResponse } from '../../services/project-tag.service';
 import { EditableTagListComponent } from '../../../../shared/tags/tag-list/editable-tag-list.component';
 
@@ -11,6 +12,7 @@ import { EditableTagListComponent } from '../../../../shared/tags/tag-list/edita
 export class TagList implements OnInit, OnChanges {
   private readonly projectTagService = inject(ProjectTagService);
   private static readonly TAG_PATTERN = /^[a-zA-Z0-9äöüÄÖÜß \-.]+$/;
+  private readonly translateService = inject(TranslateService);
 
   @Input({ required: true }) projectId?: string;
   @Input() isOwner = false;
@@ -43,7 +45,7 @@ export class TagList implements OnInit, OnChanges {
     }
 
     if (!TagList.TAG_PATTERN.test(name)) {
-      this.errorMessage.set('Tag enthält ungültige Zeichen. Erlaubt: Buchstaben, Zahlen, Leerzeichen, Bindestrich und Punkt.');
+      this.errorMessage.set(this.translateService.instant('PROJECTSITE.TAGS.ERROR_INVALID_CHARS'));
       return;
     }
 
@@ -56,7 +58,7 @@ export class TagList implements OnInit, OnChanges {
         const existing = this.tags().some((item) => item.name.toLowerCase() === lower);
 
         if (existing) {
-          this.errorMessage.set('Tag ist bereits in diesem Projekt enthalten.');
+          this.errorMessage.set(this.translateService.instant('PROJECTSITE.TAGS.ERROR_DUPLICATE'));
         }
 
         if (!existing) {
@@ -65,7 +67,7 @@ export class TagList implements OnInit, OnChanges {
         this.isSaving.set(false);
       },
       error: () => {
-        this.errorMessage.set('Tag zu lang.');
+        this.errorMessage.set(this.translateService.instant('PROJECTSITE.TAGS.ERROR_TOO_LONG'));
         this.isSaving.set(false);
       },
     });
@@ -85,7 +87,7 @@ export class TagList implements OnInit, OnChanges {
         this.isDeleting.set(false);
       },
       error: () => {
-        this.errorMessage.set('Tag konnte nicht gelöscht werden.');
+        this.errorMessage.set(this.translateService.instant('PROJECTSITE.TAGS.ERROR_DELETE'));
         this.isDeleting.set(false);
       },
     });
@@ -102,7 +104,7 @@ export class TagList implements OnInit, OnChanges {
         this.isLoading.set(false);
       },
       error: () => {
-        this.errorMessage.set('Tags konnten nicht geladen werden.');
+        this.errorMessage.set(this.translateService.instant('PROJECTSITE.TAGS.ERROR_LOAD'));
         this.isLoading.set(false);
       },
     });

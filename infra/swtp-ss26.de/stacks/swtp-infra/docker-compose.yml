@@ -1,0 +1,173 @@
+services:
+  # === MySQL (zentral für Prod + Review-PRs) ===
+  swtp-db:
+    image: mysql:9
+    container_name: swtp-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: swtp
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+    ports:
+      - "127.0.0.1:3306:3306"
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app_internal
+      - review_net
+    restart: unless-stopped
+
+  # === Keycloak (Auth für alle Envs) ===
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.2
+    container_name: keycloak
+    command: start
+    environment:
+      KC_HOSTNAME: auth.swtp-ss26.de
+      KC_HTTP_ENABLED: "true"
+      KC_PROXY_HEADERS: xforwarded
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KC_ADMIN}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_ADMIN_PASSWORD}
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-db:5432/keycloak
+      KC_DB_USERNAME: ${KC_DB_USER}
+      KC_DB_PASSWORD: ${KC_DB_PASSWORD}
+    depends_on:
+      keycloak-db:
+        condition: service_healthy
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-net
+      - traefik.http.routers.keycloak.rule=Host(`auth.swtp-ss26.de`)
+      - traefik.http.routers.keycloak.entrypoints=websecure
+      - traefik.http.routers.keycloak.tls.certresolver=letsencrypt-inwx
+      - traefik.http.routers.keycloak.service=keycloak
+      - traefik.http.services.keycloak.loadbalancer.server.port=8080
+    networks:
+      - traefik-net
+      - keycloak_internal
+    restart: unless-stopped
+
+  keycloak-db:
+    image: postgres:17-alpine
+    container_name: keycloak-db
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: ${KC_DB_USER}
+      POSTGRES_PASSWORD: ${KC_DB_PASSWORD}
+    volumes:
+      - ./keycloak_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keycloak -d keycloak"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - keycloak_internal
+    restart: unless-stopped
+
+  # === Hoppscotch (API-Client) ===
+  hoppscotch-aio:
+    image: hoppscotch/hoppscotch:latest
+    container_name: hoppscotch-aio
+    env_file:
+      - .env
+    depends_on:
+      hoppscotch-db:
+        condition: service_healthy
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-net
+      # Main App
+      - traefik.http.routers.hopp-app.rule=Host(`restclient.swtp-ss26.de`)
+      - traefik.http.routers.hopp-app.entrypoints=websecure
+      - traefik.http.routers.hopp-app.tls.certresolver=letsencrypt-inwx
+      - traefik.http.routers.hopp-app.service=hopp-app
+      - traefik.http.services.hopp-app.loadbalancer.server.port=3000
+      # Admin Dashboard
+      - traefik.http.routers.hopp-admin.rule=Host(`restclient-admin.swtp-ss26.de`)
+      - traefik.http.routers.hopp-admin.entrypoints=websecure
+      - traefik.http.routers.hopp-admin.tls.certresolver=letsencrypt-inwx
+      - traefik.http.routers.hopp-admin.service=hopp-admin
+      - traefik.http.services.hopp-admin.loadbalancer.server.port=3100
+      # Backend API
+      - traefik.http.routers.hopp-api.rule=Host(`restclient-api.swtp-ss26.de`)
+      - traefik.http.routers.hopp-api.entrypoints=websecure
+      - traefik.http.routers.hopp-api.tls.certresolver=letsencrypt-inwx
+      - traefik.http.routers.hopp-api.service=hopp-api
+      - traefik.http.services.hopp-api.loadbalancer.server.port=3170
+    networks:
+      - traefik-net
+      - hopp_internal
+    restart: unless-stopped
+
+  hoppscotch-db:
+    image: postgres:15-alpine
+    container_name: hoppscotch-db
+    environment:
+      POSTGRES_USER: hoppscotch
+      POSTGRES_PASSWORD: ${HOPPSCOTCH_DB_PASSWORD}
+      POSTGRES_DB: hoppscotch
+    volumes:
+      - ./hoppscotch_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hoppscotch -d hoppscotch"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - hopp_internal
+    restart: unless-stopped
+
+  # === Maildev (zentraler SMTP-Dummy für alle Stacks) ===
+  maildev:
+    image: maildev/maildev:latest
+    container_name: maildev
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-net
+      - traefik.http.routers.maildev.rule=Host(`mail.swtp-ss26.de`)
+      - traefik.http.routers.maildev.entrypoints=websecure
+      - traefik.http.routers.maildev.tls.certresolver=letsencrypt-inwx
+      - traefik.http.routers.maildev.service=maildev
+      - traefik.http.services.maildev.loadbalancer.server.port=1080
+    networks:
+      - traefik-net
+      - app_internal
+      - review_net
+    restart: unless-stopped
+
+  # === Dashboard (statische Übersichtsseite aller Environments) ===
+  dashboard:
+    image: nginx:alpine
+    container_name: swtp-dashboard
+    volumes:
+      - ./dashboard:/usr/share/nginx/html:ro
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-net
+      - traefik.http.routers.dashboard.rule=Host(`status.swtp-ss26.de`)
+      - traefik.http.routers.dashboard.entrypoints=websecure
+      - traefik.http.routers.dashboard.tls.certresolver=letsencrypt-inwx
+      - traefik.http.routers.dashboard.service=dashboard
+      - traefik.http.services.dashboard.loadbalancer.server.port=80
+    networks:
+      - traefik-net
+    restart: unless-stopped
+
+networks:
+  traefik-net:
+    external: true
+  app_internal:
+    external: true
+  review_net:
+    external: true
+  keycloak_internal:
+    driver: bridge
+  hopp_internal:
+    driver: bridge

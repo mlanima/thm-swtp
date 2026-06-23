@@ -2,6 +2,11 @@ spring:
   application:
     name: api
 
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
   datasource:
     url: jdbc:sqlite:./db/dev.db?busy_timeout=5000&journal_mode=WAL&foreign_keys=on
     hikari:
@@ -14,9 +19,31 @@ spring:
       ddl-auto: update
     open-in-view: false
 
+  mail:
+    host: localhost
+    port: 1025
+    properties:
+      mail.smtp.auth: false
+      mail.smtp.starttls.enable: false
+
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
+
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: https://auth.swtp-ss26.de/realms/swtp
 
+
+server:
+  forward-headers-strategy: framework
+
+app:
+  uploads:
+    dir: ./uploads
+  mail:
+    from: noreply@swtp-ss26.de
+    language: de
+  frontend-url: http://localhost:4200

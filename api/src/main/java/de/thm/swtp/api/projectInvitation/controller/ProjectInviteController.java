@@ -6,6 +6,7 @@ import de.thm.swtp.api.projectInvitation.dto.UpdateProjectInviteStatusRequest;
 import de.thm.swtp.api.projectInvitation.service.ProjectInviteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
@@ -21,12 +22,11 @@ public class ProjectInviteController {
 
     /** Creates invitation to a project. Only the owner can create the invitation.*/
     @PostMapping("/projects/{projectId}/invitations")
+    @PreAuthorize("@security.canCreateProjectInvitation(#projectId, authentication)")
     public ProjectInviteResponse createProjectInvite(@PathVariable UUID projectId,
-                                                         @Valid @RequestBody CreateProjectInviteRequest request,
-                                                         @AuthenticationPrincipal Jwt jwt) {
-        UUID senderId = UUID.fromString(jwt.getSubject());
+                                                         @Valid @RequestBody CreateProjectInviteRequest request) {
         return ProjectInviteResponse.toResponse(
-                projectInviteService.createProjectInvite(projectId, request.invitedUserId(), request.message(), senderId)
+                projectInviteService.createProjectInvite(projectId, request.invitedUserId(), request.message())
         );
     }
 
@@ -41,9 +41,9 @@ public class ProjectInviteController {
     }
 
     @GetMapping("/projects/{projectId}/invitations")
-    public List<ProjectInviteResponse> getInvitesForProject(@PathVariable UUID projectId, @AuthenticationPrincipal Jwt jwt) {
-        UUID currentUserId = UUID.fromString(jwt.getSubject());
-        return projectInviteService.getInvitesForProject(projectId, currentUserId)
+    @PreAuthorize("@security.canViewProjectInvites(#projectId, authentication)")
+    public List<ProjectInviteResponse> getInvitesForProject(@PathVariable UUID projectId) {
+        return projectInviteService.getInvitesForProject(projectId)
                 .stream()
                 .map(ProjectInviteResponse::toResponse)
                 .toList();
@@ -51,10 +51,10 @@ public class ProjectInviteController {
 
     /** Current user can accept or reject an invitation. */
     @PatchMapping("/invitations/{invitationId}")
-    public ProjectInviteResponse updateInviteStatus(@PathVariable UUID invitationId, @Valid @RequestBody UpdateProjectInviteStatusRequest request, @AuthenticationPrincipal Jwt jwt) {
-        UUID currentUserId = UUID.fromString(jwt.getSubject());
+    @PreAuthorize("@security.canRespondToProjectInvite(#invitationId, authentication)")
+    public ProjectInviteResponse updateInviteStatus(@PathVariable UUID invitationId, @Valid @RequestBody UpdateProjectInviteStatusRequest request) {
         return ProjectInviteResponse.toResponse(
-                projectInviteService.updateInviteStatus(invitationId, request.status(), currentUserId)
+                projectInviteService.updateInviteStatus(invitationId, request.status())
         );
     }
 

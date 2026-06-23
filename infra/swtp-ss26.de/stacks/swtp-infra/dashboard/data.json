@@ -1,0 +1,26 @@
+{
+  "main": {
+    "fe": "https://www.swtp-ss26.de",
+    "keycloak": "https://auth.swtp-ss26.de",
+    "maildev": "https://mail.swtp-ss26.de",
+    "hoppscotch": "https://restclient.swtp-ss26.de",
+    "github": "https://github.com/mlanima/thm-swtp",
+    "logs": "https://logs.swtp-ss26.de",
+    "updated_at": "2026-06-15 12:00:00"
+  },
+  "dev": {
+    "fe": "https://dev.swtp-ss26.de",
+    "be": "https://api.dev.swtp-ss26.de",
+    "logs": "https://logs.dev.swtp-ss26.de",
+    "updated_at": "2026-06-15 12:00:00"
+  },
+  "prs": {
+    "6": {
+      "fe": "https://pr-6.review.swtp-ss26.de",
+      "be": "https://pr-6-api.review.swtp-ss26.de",
+      "logs": "https://pr-6-logs.review.swtp-ss26.de",
+      "pr_url": "https://github.com/T0SCH/thm-swtp/pull/6",
+      "updated_at": "2026-06-15 12:00:00"
+    }
+  }
+}
