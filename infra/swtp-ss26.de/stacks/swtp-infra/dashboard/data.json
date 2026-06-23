@@ -1,7 +1,10 @@
 {
   "main": {
     "fe": "https://www.swtp-ss26.de",
-    "be": "https://api.swtp-ss26.de",
+    "keycloak": "https://auth.swtp-ss26.de",
+    "maildev": "https://mail.swtp-ss26.de",
+    "hoppscotch": "https://restclient.swtp-ss26.de",
+    "github": "https://github.com/mlanima/thm-swtp",
     "logs": "https://logs.swtp-ss26.de",
     "updated_at": "2026-06-15 12:00:00"
   },
