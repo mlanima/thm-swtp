@@ -40,7 +40,7 @@ public class NotificationService {
     private String inviteTemplate;
 
     @PostConstruct
-    void loadTemplates() throws Exception {
+    public void loadTemplates() throws Exception {
         inviteTemplate = new ClassPathResource("templates/emails/invite.html")
                 .getContentAsString(StandardCharsets.UTF_8);
     }

@@ -5,6 +5,7 @@ import de.thm.swtp.api.notification.service.NotificationService;
 import de.thm.swtp.api.projectInvitation.domain.ProjectInvite;
 import de.thm.swtp.api.projectInvitation.domain.ProjectInviteStatus;
 import jakarta.mail.internet.MimeMessage;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -33,12 +34,16 @@ class NotificationServiceTest {
     @InjectMocks
     private NotificationService notificationService;
 
-    @Test
-    void sendInviteMail_shouldSendMailWithCorrectRecipient() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         ReflectionTestUtils.setField(notificationService, "mailFrom", "noreply@swtp-ss26.de");
         ReflectionTestUtils.setField(notificationService, "frontendUrl", "http://localhost:4200");
         ReflectionTestUtils.setField(notificationService, "mailLanguage", "de");
+        notificationService.loadTemplates();
+    }
 
+    @Test
+    void sendInviteMail_shouldSendMailWithCorrectRecipient() throws Exception {
         MimeMessage mimeMessage = mock(MimeMessage.class);
         when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
         when(messageSource.getMessage(anyString(), any(), any(Locale.class))).thenReturn("test");
