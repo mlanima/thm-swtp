@@ -54,7 +54,7 @@ public class NotificationService {
         String safeInviterName  = HtmlUtils.htmlEscape(invite.getInvitedByUsername());
 
         String subject = messageSource.getMessage("mail.invite.subject",
-                new Object[]{safeProjectName}, locale);
+                new Object[]{invite.getProjectName()}, locale);
         String greeting = messageSource.getMessage("mail.invite.greeting", null, locale);
         String body = messageSource.getMessage("mail.invite.body",
                 new Object[]{safeInviterName, safeProjectName}, locale);
