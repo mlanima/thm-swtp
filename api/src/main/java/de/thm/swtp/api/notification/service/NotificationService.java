@@ -89,12 +89,13 @@ public class NotificationService {
         } catch (jakarta.mail.MessagingException e) {
             throw new RuntimeException("Failed to build invite mail for " + event.invitedUserEmail(), e);
         }
-        log.info("Invite mail sent to {} for project '{}'", event.invitedUserEmail(), invite.getProjectName());
+        log.info("Invite mail sent: invite={}, to={}, project='{}', locale={}",
+                invite.getId(), event.invitedUserEmail(), invite.getProjectName(), locale);
     }
 
     @Recover
     public void recoverSendInviteMail(Exception ex, ProjectInviteCreatedEvent event) {
-        log.warn("Failed to send invite mail to {} after retries — giving up. Cause: {}",
-                event.invitedUserEmail(), ex.getMessage());
+        log.error("Invite mail failed after retries: invite={}, to={}, cause={}",
+                event.invite().getId(), event.invitedUserEmail(), ex.getMessage());
     }
 }
