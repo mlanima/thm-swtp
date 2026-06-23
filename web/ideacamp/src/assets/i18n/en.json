@@ -408,7 +408,15 @@
     "SUCCESS_DESCRIPTION": "Your request was successfully submitted. We will get back to you.",
     "SUCCESS_CLOSE": "Close",
     "ERROR_LOAD_USER": "User could not be loaded.",
-    "ERROR_SEND": "Your request could not be sent. Please try again later."
+    "ERROR_SEND": "Your request could not be sent. Please try again later.",
+    "VALIDATION": {
+      "NAME_REQUIRED": "Please enter your name.",
+      "NAME_MAX": "Name must not exceed 100 characters.",
+      "EMAIL_REQUIRED": "Please enter your email address.",
+      "EMAIL_INVALID": "Please enter a valid email address.",
+      "TEXT_REQUIRED": "Please enter a reason.",
+      "TEXT_MAX": "Text must not exceed 1000 characters."
+    }
   },
   "FOOTER": {
     "IMPRESSUM": "Legal notice",

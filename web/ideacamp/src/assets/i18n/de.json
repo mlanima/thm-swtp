@@ -401,7 +401,15 @@
     "SUCCESS_DESCRIPTION": "Ihre Anfrage wurde erfolgreich übermittelt. Wir melden uns bei Ihnen.",
     "SUCCESS_CLOSE": "Schließen",
     "ERROR_LOAD_USER": "Benutzer konnte nicht geladen werden.",
-    "ERROR_SEND": "Deine Anfrage konnte nicht gesendet werden. Bitte versuche es später erneut."
+    "ERROR_SEND": "Deine Anfrage konnte nicht gesendet werden. Bitte versuche es später erneut.",
+    "VALIDATION": {
+      "NAME_REQUIRED": "Bitte geben Sie Ihren Namen ein.",
+      "NAME_MAX": "Name darf höchstens 100 Zeichen lang sein.",
+      "EMAIL_REQUIRED": "Bitte geben Sie Ihre E-Mail-Adresse ein.",
+      "EMAIL_INVALID": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+      "TEXT_REQUIRED": "Bitte geben Sie eine Begründung ein.",
+      "TEXT_MAX": "Begründung darf höchstens 1000 Zeichen lang sein."
+    }
   },
   "FOOTER": {
     "IMPRESSUM": "Impressum",

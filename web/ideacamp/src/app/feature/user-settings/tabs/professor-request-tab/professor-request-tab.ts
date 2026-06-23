@@ -1,6 +1,5 @@
 import { Component, ElementRef, inject, OnInit, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { z } from 'zod';
 import {
@@ -14,18 +13,18 @@ const professorRequestSchema = z.object({
   name: z
     .string()
     .trim()
-    .min(1, 'Bitte geben Sie Ihren Namen ein.')
-    .max(100, 'Name darf höchstens 100 Zeichen lang sein.'),
+    .min(1, 'PROFESSOR_REQUEST.VALIDATION.NAME_REQUIRED')
+    .max(100, 'PROFESSOR_REQUEST.VALIDATION.NAME_MAX'),
   email: z
     .string()
     .trim()
-    .min(1, 'Bitte geben Sie Ihre E-Mail-Adresse ein.')
-    .email('Bitte geben Sie eine gültige E-Mail-Adresse ein.'),
+    .min(1, 'PROFESSOR_REQUEST.VALIDATION.EMAIL_REQUIRED')
+    .email('PROFESSOR_REQUEST.VALIDATION.EMAIL_INVALID'),
   text: z
     .string()
     .trim()
-    .min(1, 'Bitte geben Sie eine Begründung ein.')
-    .max(1000, 'Begründung darf höchstens 1000 Zeichen lang sein.'),
+    .min(1, 'PROFESSOR_REQUEST.VALIDATION.TEXT_REQUIRED')
+    .max(1000, 'PROFESSOR_REQUEST.VALIDATION.TEXT_MAX'),
 });
 
 type FormFields = keyof z.infer<typeof professorRequestSchema>;
@@ -33,7 +32,7 @@ type FormFields = keyof z.infer<typeof professorRequestSchema>;
 @Component({
   selector: 'app-professor-request-tab',
   standalone: true,
-  imports: [FormsModule, CommonModule, TranslatePipe],
+  imports: [FormsModule, TranslatePipe],
   templateUrl: './professor-request-tab.html',
 })
 export class ProfessorRequestTab implements OnInit {

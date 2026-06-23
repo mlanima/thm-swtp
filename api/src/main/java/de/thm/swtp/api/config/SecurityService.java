@@ -219,9 +219,13 @@ public class SecurityService {
         return hasModeratorRole(authentication);
     }
 
-    /** Allowed to create a professor request (regular users only). */
+    /** Allowed to create a professor request (regular users who are not already professors). */
     public boolean canCreateProfessorRequest(Authentication authentication) {
-        return isRegularUser(authentication);
+        if (!isRegularUser(authentication)) {
+            return false;
+        }
+        UUID currentUserId = getCurrentUserId(authentication);
+        return !userProfileRepository.existsByKeycloakIdAndProfessorTrue(currentUserId);
     }
 
     // User-profile permissions

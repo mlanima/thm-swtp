@@ -151,7 +151,7 @@
                   [class.focus:ring-primary/15]="!formErrors().name"
                 />
                 @if (formErrors().name) {
-                  <p class="mt-0.5 text-xs font-medium text-red-600">{{ formErrors().name }}</p>
+                  <p class="mt-0.5 text-xs font-medium text-red-600">{{ formErrors().name | translate }}</p>
                 }
               </div>
 
@@ -172,7 +172,7 @@
                   [class.focus:ring-primary/15]="!formErrors().email"
                 />
                 @if (formErrors().email) {
-                  <p class="mt-0.5 text-xs font-medium text-red-600">{{ formErrors().email }}</p>
+                  <p class="mt-0.5 text-xs font-medium text-red-600">{{ formErrors().email | translate }}</p>
                 }
               </div>
 
@@ -194,7 +194,7 @@
                   [class.focus:ring-primary/15]="!formErrors().text"
                 ></textarea>
                 @if (formErrors().text) {
-                  <p class="mt-1 text-xs font-medium text-red-600">{{ formErrors().text }}</p>
+                  <p class="mt-1 text-xs font-medium text-red-600">{{ formErrors().text | translate }}</p>
                 } @else {
                   <p class="mt-1 text-right text-xs text-slate-500">{{ userText().length }} / 1000</p>
                 }

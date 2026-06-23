@@ -1,10 +1,5 @@
 package de.thm.swtp.api.professorRequest;
 
-// TODO: Add controller tests (e.g. ProfessorRequestControllerTest) using @WebMvcTest or MockMvc
-// TODO: Add integration tests for the full professor-request lifecycle (create → accept → verify role change)
-// TODO: Add test for concurrent duplicate submissions
-// TODO: Add test verifying that accept/reject on already processed request throws correct exception
-
 import de.thm.swtp.api.professorRequest.domain.ProfessorRequest;
 import de.thm.swtp.api.professorRequest.domain.ProfessorRequestStatus;
 import de.thm.swtp.api.professorRequest.entity.ProfessorRequestEntity;
