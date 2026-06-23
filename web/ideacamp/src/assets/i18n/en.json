@@ -27,7 +27,7 @@
       "LABEL_PLACEHOLDER": "Example page",
       "URL_PLACEHOLDER": "e.g. example.com",
       "LOADING": "Links are loading...",
-      "EMPTY": "No public links available.",
+      "EMPTY": "No links available.",
       "EDIT_LINK": "Edit link",
       "DELETE_LINK": "Delete link",
       "VISIBILITY": "Visibility",

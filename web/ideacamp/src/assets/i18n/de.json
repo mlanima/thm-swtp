@@ -27,7 +27,7 @@
       "LABEL_PLACEHOLDER": "Beispielseite",
       "URL_PLACEHOLDER": "z.B. beispiel.com",
       "LOADING": "Links werden geladen...",
-      "EMPTY": "Keine öffentlichen Links verfügbar.",
+      "EMPTY": "Keine Links vorhanden.",
       "EDIT_LINK": "Link bearbeiten",
       "DELETE_LINK": "Link löschen",
       "VISIBILITY": "Sichtbarkeit",
