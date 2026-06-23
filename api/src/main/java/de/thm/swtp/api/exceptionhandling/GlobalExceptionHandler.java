@@ -344,7 +344,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleAccessDeniedSpring(AccessDeniedException ex) {
         log.warn("Forbidden (403): {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(ErrorResponse.of(403, "Forbidden", ex.getMessage()));
+                .body(ErrorResponse.of(403, "Forbidden", "You do not have permission to perform this action."));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -387,7 +387,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<ErrorResponse> handleUploadTooLarge(MaxUploadSizeExceededException ex) {
-        log.debug("Payload Too Large (413): {}", ex.getMessage());
+        log.warn("Payload Too Large (413): {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
                 .body(ErrorResponse.of(413, "Payload Too Large", ex.getMessage()));
     }

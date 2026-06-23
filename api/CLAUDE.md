@@ -17,10 +17,17 @@ Spring Boot application, Java 25, built with Maven.
   - `warn` — expected but notable: denied ownership/access, business-rule violations, orphaned state.
   - `info` — lifecycle events: create/update/delete/status transitions, with resource id (+ actor where available).
   - `debug` — query parameters & hit counts (search); off in production, no prod noise.
-- `GlobalExceptionHandler` level matrix: `AccessDenied`/`Forbidden` and server-enforced business-policy 4xx (file-type 415, upload-limit 422) → `warn`; expected client 4xx (404/409/400/410) → `debug`; 5xx and catch-all → `error`.
-- Division of labour: services log business/Fachfehler; `GlobalExceptionHandler` logs technical/unexpected exceptions once. Domain exceptions are not re-logged in the handler.
+- `GlobalExceptionHandler` maps by status: `AccessDenied`/`Forbidden` and server-enforced
+  business-policy 4xx (upload-size 413, file-type 415, upload-limit 422) → `warn`; expected
+  client 4xx (404/409/400/410) → `debug`; 5xx and catch-all → `error`.
+- The `AccessDeniedException` handler returns the same generic body as `RestAccessDeniedHandler`
+  so 403 is uniform across method- and URL-based denials.
+- Division of labour: services log business/Fachfehler; `GlobalExceptionHandler` logs
+  technical/unexpected exceptions once. Domain exceptions are not re-logged in the handler.
 - Read paths stay silent unless the log answers an incident question.
-- Dev visibility: set `LOGGING_LEVEL_DE_THM_SWTP_API=DEBUG` (or `logging.level.de.thm.swtp.api=debug`) to see every request via `RequestLoggingFilter` plus search/query debug logs. Production stays at INFO, so reads are silent in prod.
+- Dev visibility: set `LOGGING_LEVEL_DE_THM_SWTP_API=DEBUG` (or
+  `logging.level.de.thm.swtp.api=debug`) to see every request via `RequestLoggingFilter` plus
+  search/query debug logs. Production stays at INFO, so reads are silent in prod.
 
 ## Review focus
 

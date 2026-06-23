@@ -30,6 +30,9 @@ public class UserProfileService {
                     existing.setUsername(username);
                     existing.setEmail(email);
                     UserProfile synced = userProfileRepository.save(existing);
+                    // note: debug, not info/txlogger — this runs on every authenticated
+                    // request (jwt sync), so info would be noise; and it's a sync, not a
+                    // durability lifecycle claim, so txlogger (commit-gated info) doesn't fit.
                     log.debug("Profile synced from JWT: user={}", username);
                     return synced;
                 })

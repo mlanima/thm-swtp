@@ -97,9 +97,13 @@ class GlobalExceptionHandlerTest {
     // ── framework exceptions: explicit handlers must beat the catch-all ──
 
     @Test
-    void springAccessDeniedReturns403Not500() {
-        // Regression guard: before the explicit handler, the catch-all mapped this to 500.
-        assertStatus(handler.handleAccessDeniedSpring(new AccessDeniedException("denied")), HttpStatus.FORBIDDEN);
+    void springAccessDeniedReturns403WithGenericPermissionBody() {
+        // 403 must be uniform with RestAccessDeniedHandler (URL-based denials): same generic
+        // body, never ex.getMessage(). The handler still logs the real message at warn for audit.
+        ResponseEntity<ErrorResponse> r = handler.handleAccessDeniedSpring(new AccessDeniedException("denied"));
+        assertStatus(r, HttpStatus.FORBIDDEN);
+        assertThat(r.getBody().getMessage()).isEqualTo("You do not have permission to perform this action.");
+        assertThat(r.getBody().getMessage()).doesNotContain("denied");
     }
 
     @Test
