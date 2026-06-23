@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
@@ -25,10 +26,9 @@ import java.util.UUID;
 public class ProfessorRequestController {
     private final ProfessorRequestService professorRequestService;
 
-    /** Returns all professor-rights requests (paginated).
-     *  TODO: Restrict to admin users only.
-     */
+    /** Returns all professor-rights requests (paginated). */
     @GetMapping
+    @PreAuthorize("@security.canViewAllProfessorRequests(authentication)")
     public Page<ProfessorRequestResponse> getAllProfessorRequests(
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return professorRequestService.getAllProfessorRequests(pageable)
@@ -37,6 +37,7 @@ public class ProfessorRequestController {
 
     /** Returns all requests for a specific user. */
     @GetMapping("/{userId}")
+    @PreAuthorize("@security.canViewProfessorRequestForUser(#userId, authentication)")
     public List<ProfessorRequestResponse> getRequestsByUser(@PathVariable UUID userId) {
         return professorRequestService.getRequestsByUser(userId)
                 .stream()
@@ -46,6 +47,7 @@ public class ProfessorRequestController {
 
     /** Creates a new professor-rights request for the authenticated user with status PENDING. */
     @PostMapping
+    @PreAuthorize("@security.canCreateProfessorRequest(authentication)")
     public ProfessorRequestResponse createProfessorRequest(
             @Valid @RequestBody CreateProfessorRequestRequest request,
             @AuthenticationPrincipal Jwt jwt) {
@@ -56,19 +58,17 @@ public class ProfessorRequestController {
         return ProfessorRequestResponse.toResponse(professorRequest);
     }
 
-    /** Accepts a professor-rights request by setting its status to ACCEPTED.
-     *  TODO: Restrict to admin users only.
-     */
+    /** Accepts a professor-rights request by setting its status to ACCEPTED. */
     @PatchMapping("/{requestId}/accept")
+    @PreAuthorize("@security.canManageProfessorRequests(authentication)")
     public ProfessorRequestResponse acceptProfessorRequest(@PathVariable UUID requestId) {
         ProfessorRequest professorRequest = professorRequestService.acceptProfessorRequest(requestId);
         return ProfessorRequestResponse.toResponse(professorRequest);
     }
 
-    /** Rejects a professor-rights request by setting its status to REJECTED.
-     *  TODO: Restrict to admin users only.
-     */
+    /** Rejects a professor-rights request by setting its status to REJECTED. */
     @PatchMapping("/{requestId}/reject")
+    @PreAuthorize("@security.canManageProfessorRequests(authentication)")
     public ProfessorRequestResponse rejectProfessorRequest(@PathVariable UUID requestId) {
         ProfessorRequest professorRequest = professorRequestService.rejectProfessorRequest(requestId);
         return ProfessorRequestResponse.toResponse(professorRequest);

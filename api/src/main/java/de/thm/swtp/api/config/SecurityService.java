@@ -198,6 +198,32 @@ public class SecurityService {
         return isRegularUser(authentication) && canViewProject(projectId, authentication);
     }
 
+    // Professor-request permissions
+
+    /** Allowed to view all professor requests (moderator only). */
+    public boolean canViewAllProfessorRequests(Authentication authentication) {
+        return hasModeratorRole(authentication);
+    }
+
+    /** Allowed to view professor requests for a specific user (own or as moderator). */
+    public boolean canViewProfessorRequestForUser(UUID userId, Authentication authentication) {
+        if (!hasAuthenticationContext(userId, authentication)) {
+            return false;
+        }
+        UUID currentUserId = getCurrentUserId(authentication);
+        return hasModeratorRole(authentication) || userId.equals(currentUserId);
+    }
+
+    /** Allowed to manage (accept/reject) professor requests (moderator only). */
+    public boolean canManageProfessorRequests(Authentication authentication) {
+        return hasModeratorRole(authentication);
+    }
+
+    /** Allowed to create a professor request (regular users only). */
+    public boolean canCreateProfessorRequest(Authentication authentication) {
+        return isRegularUser(authentication);
+    }
+
     // User-profile permissions
 
     /** Allowed to view projects of a user.*/
