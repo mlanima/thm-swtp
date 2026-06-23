@@ -16,6 +16,7 @@ import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,7 @@ import java.util.UUID;
 /** Service for managing {@link ProjectInvite} domain objects.*/
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProjectInviteService {
     private final ProjectInviteRepository projectInviteRepository;
     private final ProjectRepository projectRepository;
@@ -52,6 +54,9 @@ public class ProjectInviteService {
 
         if (invitedUserEntity.getEmail() != null) {
             eventPublisher.publishEvent(new ProjectInviteCreatedEvent(invite, invitedUserEntity.getEmail()));
+        } else {
+            log.warn("No email address for invited user '{}' — skipping invite notification for project '{}'",
+                    invitedUserEntity.getUsername(), invite.getProjectName());
         }
 
         return invite;
