@@ -1,7 +1,8 @@
 package de.thm.swtp.api.links.controller;
 
-import de.thm.swtp.api.links.dto.CreateLinkRequest;
-import de.thm.swtp.api.links.dto.UpdateLinkRequest;
+
+import de.thm.swtp.api.links.dto.CreateUserProfileLinkRequest;
+import de.thm.swtp.api.links.dto.UpdateUserProfileLinkRequest;
 import de.thm.swtp.api.links.dto.UserProfileLinkResponse;
 import de.thm.swtp.api.links.service.UserProfileLinkService;
 import jakarta.validation.Valid;
@@ -31,18 +32,17 @@ public class UserProfileLinkController {
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("@security.canCreateUserProfileLinks(#userId, authentication)")
     public UserProfileLinkResponse createUserProfileLink(@PathVariable UUID userId,
-                                                 @Valid @RequestBody CreateLinkRequest createLinkRequest) {
+                                                 @Valid @RequestBody CreateUserProfileLinkRequest userProfileLinkRequest) {
         return UserProfileLinkResponse.toResponse(userProfileLinkService.createUserProfileLink(userId,
-                createLinkRequest.label(), createLinkRequest.url()));
+                userProfileLinkRequest.label(), userProfileLinkRequest.url()));
     }
 
     @PatchMapping("/{linkId}")
     @PreAuthorize("@security.canEditUserProfileLinks(#userId, authentication)")
     public UserProfileLinkResponse updateUserProfileLink(@PathVariable UUID userId, @PathVariable UUID linkId,
-                                                 @Valid @RequestBody UpdateLinkRequest updateLinkRequest) {
-
+                                                 @Valid @RequestBody UpdateUserProfileLinkRequest updateUserProfileLinkRequest) {
         return UserProfileLinkResponse.toResponse(userProfileLinkService.updateUserProfileLink(userId,
-                linkId, updateLinkRequest.label(), updateLinkRequest.url()));
+                linkId, updateUserProfileLinkRequest.label(), updateUserProfileLinkRequest.url()));
     }
 
     @DeleteMapping("/{linkId}")

@@ -1,9 +1,9 @@
 import { z } from 'zod';
-import { LinkVisibilitySchema} from '../../../models/link-visibility.model';
+import { LinkVisibilitySchema } from '../../models/link-visibility.model';
 
-const containsNoQuotes = (value : string) => !value.includes('"') && !value.includes("'");
+const containsNoQuotes = (value: string) => !value.includes('"') && !value.includes("'");
 
-export const createProjectLinkSchema = z.object({
+export const createLinkSchema = z.object({
   label: z
     .string()
     .trim()
@@ -16,12 +16,12 @@ export const createProjectLinkSchema = z.object({
     .trim()
     .min(1, 'COMMON.QUICKLINKS.VALIDATION_URL_REQUIRED')
     .max(300, 'COMMON.QUICKLINKS.VALIDATION_URL_TOO_LONG')
-    .url('COMMON.QUICKLINKS.VALIDATION_URL_INVALID'),
+    .pipe(z.url('COMMON.QUICKLINKS.VALIDATION_URL_INVALID')),
 
-  visibility: LinkVisibilitySchema.default('PUBLIC'),
+  visibility: LinkVisibilitySchema.optional(),
 });
 
-export const updateProjectLinkSchema = z.object({
+export const updateLinkSchema = z.object({
   label: z
     .string()
     .trim()
@@ -33,12 +33,11 @@ export const updateProjectLinkSchema = z.object({
     .string()
     .trim()
     .max(300, 'COMMON.QUICKLINKS.VALIDATION_URL_TOO_LONG')
-    .url('COMMON.QUICKLINKS.VALIDATION_URL_INVALID')
+    .pipe(z.url('COMMON.QUICKLINKS.VALIDATION_URL_INVALID'))
     .optional(),
 
   visibility: LinkVisibilitySchema.optional(),
 });
 
-export type CreateProjectLinkRequest = z.infer<typeof createProjectLinkSchema>;
-export type UpdateProjectLinkRequest = z.infer<typeof updateProjectLinkSchema>;
-
+export type CreateLinkRequest = z.infer<typeof createLinkSchema>;
+export type UpdateLinkRequest = z.infer<typeof updateLinkSchema>;

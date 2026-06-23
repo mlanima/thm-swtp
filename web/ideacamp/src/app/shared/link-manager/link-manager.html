@@ -53,22 +53,25 @@
           />
         </div>
 
-        <div>
-          <p class="mb-1 text-xs font-medium text-slate-500">
-            {{ 'COMMON.QUICKLINKS.VISIBILITY' | translate }}
-          </p>
-          <button
-          type="button"
-          (click)="toggleNewVisibility()"
-          class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
-          >
-            <i
-              class="pi"
-              [ngClass]="newVisibility === 'PUBLIC' ? 'pi-globe' : 'pi-lock'"
-            ></i>
-            {{ (newVisibility === 'PUBLIC' ? 'COMMON.QUICKLINKS.PUBLIC' : 'COMMON.QUICKLINKS.PRIVATE') | translate }}
-          </button>
-        </div>
+        @if (allowVisibility) {
+          <div>
+            <p class="mb-1 text-xs font-medium text-slate-500">
+              {{ 'COMMON.QUICKLINKS.VISIBILITY' | translate }}
+            </p>
+
+            <button
+              type="button"
+              (click)="toggleNewVisibility()"
+              class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">
+              <i
+                class="pi"
+                [ngClass]="newVisibility === 'PUBLIC' ? 'pi-globe' : 'pi-lock'">
+              </i>
+
+              {{ (newVisibility === 'PUBLIC' ? 'COMMON.QUICKLINKS.PUBLIC' : 'COMMON.QUICKLINKS.PRIVATE') | translate }}
+            </button>
+          </div>
+        }
 
         <div class="flex gap-2">
           <button
@@ -132,24 +135,25 @@
                   />
                 </div>
 
-                <div>
-                  <p class="mb-1 text-xs font-medium text-slate-500">
-                    {{ 'COMMON.QUICKLINKS.VISIBILITY' | translate }}
-                  </p>
+                @if (allowVisibility) {
+                  <div>
+                    <p class="mb-1 text-xs font-medium text-slate-500">
+                      {{ 'COMMON.QUICKLINKS.VISIBILITY' | translate }}
+                    </p>
 
-                  <button
-                    type="button"
-                    (click)="toggleUpdateVisibility()"
-                    class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
-                  >
-                    <i
-                      class="pi"
-                      [ngClass]="updateVisibility === 'PUBLIC' ? 'pi-globe' : 'pi-lock'"
-                    ></i>
+                    <button
+                      type="button"
+                      (click)="toggleUpdateVisibility()"
+                      class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">
+                      <i
+                        class="pi"
+                        [ngClass]="updateVisibility === 'PUBLIC' ? 'pi-globe' : 'pi-lock'">
+                      </i>
 
-                    {{ (updateVisibility === 'PUBLIC' ? 'COMMON.QUICKLINKS.PUBLIC' : 'COMMON.QUICKLINKS.PRIVATE') | translate }}
-                  </button>
-                </div>
+                      {{ (updateVisibility === 'PUBLIC' ? 'COMMON.QUICKLINKS.PUBLIC' : 'COMMON.QUICKLINKS.PRIVATE') | translate }}
+                    </button>
+                  </div>
+                }
 
                 <div class="flex gap-2">
                   <button
@@ -174,23 +178,26 @@
                 type="button"
                 (click)="openLink(link.url)"
                 class="min-w-0 flex-1 cursor-pointer text-left hover:text-lime-500">
-
                 <div class="flex min-w-0 items-center gap-2">
                   <p class="truncate font-medium">
                     {{ link.label }}
                   </p>
 
-                  <span
-                    class="inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium"
-                    [ngClass]="link.visibility === 'PRIVATE'
-                    ? 'bg-slate-100 text-slate-600'
-                    : 'bg-lime-50 text-lime-700'">
+                  @if (allowVisibility && link.visibility) {
+                    <span
+                      class="inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium"
+                      [ngClass]="link.visibility === 'PRIVATE'
+                        ? 'bg-slate-100 text-slate-600'
+                        : 'bg-lime-50 text-lime-700'">
 
-                    <i class="pi text-[9px]"
-                    [ngClass]="link.visibility === 'PRIVATE' ? 'pi-lock' : 'pi-globe'"
-                    ></i>
-                    {{ (link.visibility === 'PRIVATE' ? 'COMMON.QUICKLINKS.PRIVATE' : 'COMMON.QUICKLINKS.PUBLIC') | translate }}
-                  </span>
+                      <i
+                        class="pi text-[9px]"
+                        [ngClass]="link.visibility === 'PRIVATE' ? 'pi-lock' : 'pi-globe'">
+                      </i>
+
+                      {{ (link.visibility === 'PRIVATE' ? 'COMMON.QUICKLINKS.PRIVATE' : 'COMMON.QUICKLINKS.PUBLIC') | translate }}
+                    </span>
+                  }
                 </div>
 
                 <p class="truncate text-xs text-slate-400">

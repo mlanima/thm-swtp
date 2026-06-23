@@ -1,27 +1,26 @@
-import { Component, Input, OnChanges, SimpleChanges, inject, ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnChanges, SimpleChanges, inject, } from '@angular/core';
+import { NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { ProjectLinkModel} from '../../../../models/project-link.model';
-import { ProjectLinkService } from '../../services/project-link.service';
-import { createProjectLinkSchema, updateProjectLinkSchema, CreateProjectLinkRequest, UpdateProjectLinkRequest} from '../../schemas/project-link.schema';
-import { LinkVisibility } from '../../../../models/link-visibility.model';
-import { NgClass } from '@angular/common';
+import { LinkVisibility } from '../../models/link-visibility.model';
+import { createLinkSchema, updateLinkSchema, CreateLinkRequest, UpdateLinkRequest } from './link-manager.schema';
+import { LinkManagerDataSource, LinkManager } from './link-manager.types';
 
 @Component({
-  selector: 'app-quicklinks',
+  selector: 'app-link-manager',
   standalone: true,
-  imports: [FormsModule, NgClass, TranslatePipe],
-  templateUrl: './quicklinks.html',
+  imports: [FormsModule, TranslatePipe, NgClass],
+  templateUrl: './link-manager.html',
 })
-export class Quicklinks implements OnChanges {
-  private readonly projectLinkService = inject(ProjectLinkService);
+export class LinkManagerComponent implements OnChanges {
   private readonly changeDetectorRef = inject(ChangeDetectorRef);
   private readonly translateService = inject(TranslateService);
 
-  @Input({ required: true }) projectId!: string;
+  @Input({ required: true }) dataSource!: LinkManagerDataSource;
   @Input() isOwner = false;
+  @Input() allowVisibility = false;
 
-  links: ProjectLinkModel[] = [];
+  links: LinkManager[] = [];
 
   isLoading = false;
   errorMessage: string | null = null;
@@ -30,15 +29,14 @@ export class Quicklinks implements OnChanges {
 
   newLabel = '';
   newUrl = '';
+  newVisibility: LinkVisibility = 'PUBLIC';
 
   updateLabel = '';
   updateUrl = '';
-
-  newVisibility: LinkVisibility = 'PUBLIC';
   updateVisibility: LinkVisibility = 'PUBLIC';
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['projectId'] && this.projectId) {
+    if (changes['dataSource'] && this.dataSource) {
       this.loadLinks();
     }
   }
@@ -60,13 +58,13 @@ export class Quicklinks implements OnChanges {
     this.newVisibility = 'PUBLIC';
   }
 
-  startEdit(link: ProjectLinkModel): void {
+  startEdit(link: LinkManager): void {
     this.editingLinkId = link.id;
     this.isLoading = false;
     this.errorMessage = null;
     this.updateLabel = link.label;
     this.updateUrl = link.url;
-    this.updateVisibility = link.visibility;
+    this.updateVisibility = link.visibility ?? 'PUBLIC';
   }
 
   cancelEdit(): void {
@@ -82,7 +80,7 @@ export class Quicklinks implements OnChanges {
     this.errorMessage = null;
     this.changeDetectorRef.markForCheck();
 
-    this.projectLinkService.getProjectLinks(this.projectId).subscribe({
+    this.dataSource.load().subscribe({
       next: (links) => {
         this.links = links;
         this.isLoading = false;
@@ -106,18 +104,20 @@ export class Quicklinks implements OnChanges {
 
   addLink(): void {
     const request = this.validateCreateLinkRequest();
+
     if (!request) {
       return;
     }
 
-    this.projectLinkService.addProjectLink(this.projectId, request).subscribe({
+    this.dataSource.createLink(request).subscribe({
       next: (link) => {
-        this.addCreatedProjectLink(link);
+        this.links = [...this.links, link];
         this.cancelAdd();
         this.changeDetectorRef.markForCheck();
       },
       error: () => {
         this.errorMessage = this.translateService.instant('COMMON.QUICKLINKS.ERROR_ADD');
+        this.changeDetectorRef.markForCheck();
       },
     });
   }
@@ -128,26 +128,30 @@ export class Quicklinks implements OnChanges {
     if (!request) {
       return;
     }
-    this.projectLinkService.updateProjectLink(this.projectId, linkId, request).subscribe({
+
+    this.dataSource.updateLink(linkId, request).subscribe({
       next: (updatedLink) => {
-        this.replaceUpdatedLink(updatedLink);
+        this.links = this.links.map((link) => (link.id === updatedLink.id ? updatedLink : link));
+
         this.cancelEdit();
         this.changeDetectorRef.markForCheck();
       },
       error: () => {
         this.errorMessage = this.translateService.instant('COMMON.QUICKLINKS.ERROR_UPDATE');
+        this.changeDetectorRef.markForCheck();
       },
     });
   }
 
   deleteLink(linkId: string): void {
-    this.projectLinkService.deleteProjectLink(this.projectId, linkId).subscribe({
+    this.dataSource.deleteLink(linkId).subscribe({
       next: () => {
-        this.removeDeletedLink(linkId);
+        this.links = this.links.filter((link) => link.id !== linkId);
         this.changeDetectorRef.markForCheck();
       },
       error: () => {
         this.errorMessage = this.translateService.instant('COMMON.QUICKLINKS.ERROR_DELETE');
+        this.changeDetectorRef.markForCheck();
       },
     });
   }
@@ -160,12 +164,14 @@ export class Quicklinks implements OnChanges {
     return url.replace(/^https?:\/\//, '').replace(/\/$/, '');
   }
 
-  private validateCreateLinkRequest(): CreateProjectLinkRequest | null {
-    const res = createProjectLinkSchema.safeParse({
+  private validateCreateLinkRequest(): CreateLinkRequest | null {
+    const request = {
       label: this.newLabel,
-      url: this.addsHttpsToUrl(this.newUrl),
-      visibility: this.newVisibility,
-    });
+      url: this.addHttpsToUrl(this.newUrl),
+      ...(this.allowVisibility ? { visibility: this.newVisibility } : {}),
+    };
+
+    const res = createLinkSchema.safeParse(request);
 
     if (!res.success) {
       this.setValidationError(res.error.issues[0]?.message);
@@ -175,12 +181,14 @@ export class Quicklinks implements OnChanges {
     return res.data;
   }
 
-  private validateUpdateLinkRequest(): UpdateProjectLinkRequest | null {
-    const res = updateProjectLinkSchema.safeParse({
+  private validateUpdateLinkRequest(): UpdateLinkRequest | null {
+    const request = {
       label: this.updateLabel,
-      url: this.addsHttpsToUrl(this.updateUrl),
-      visibility: this.updateVisibility,
-    });
+      url: this.addHttpsToUrl(this.updateUrl),
+      ...(this.allowVisibility ? { visibility: this.updateVisibility } : {}),
+    };
+
+    const res = updateLinkSchema.safeParse(request);
 
     if (!res.success) {
       this.setValidationError(res.error.issues[0]?.message);
@@ -192,26 +200,16 @@ export class Quicklinks implements OnChanges {
 
   private setValidationError(message?: string): void {
     this.errorMessage = this.translateService.instant(message ?? 'COMMON.QUICKLINKS.ERROR_INVALID');
+    this.changeDetectorRef.markForCheck();
   }
 
-  private addCreatedProjectLink(link: ProjectLinkModel) {
-    this.links = [...this.links, link];
-  }
-
-  private replaceUpdatedLink(updatedLink: ProjectLinkModel): void {
-    this.links = this.links.map((link) => (link.id === updatedLink.id ? updatedLink : link));
-  }
-
-  private removeDeletedLink(linkId: string): void {
-    this.links = this.links.filter((link) => link.id !== linkId);
-  }
-
-  private addsHttpsToUrl(url: string): string {
+  private addHttpsToUrl(url: string): string {
     const trimmedUrl = url.trim();
 
     if (/^https?:\/\//i.test(trimmedUrl)) {
       return trimmedUrl;
     }
+
     return `https://${trimmedUrl}`;
   }
 }

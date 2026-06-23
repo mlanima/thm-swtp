@@ -1,8 +1,8 @@
 <div class="flex flex-col gap-6">
-  <app-tag-list [projectId]="projectId" [isOwner]="isOwner" />
-  <app-quicklinks [projectId]="projectId!" [isOwner]="isOwner"/>
-  <app-project-files [projectId]="projectId!" [isOwner]="isOwner"/>
+  <app-tag-list [projectId]="projectId()" [isOwner]="isOwner()"> </app-tag-list>
+  <app-link-manager [dataSource]="projectLinkDataSource()" [isOwner]="isOwner()" [allowVisibility]="true"> </app-link-manager>
+  <app-project-files [projectId]="projectId()" [isOwner]="isOwner()"/>
 <!--  TODO: not imlemented yet-->
 <!--  <app-tech-stack />-->
-  <app-member-list [projectId]="projectId" [ownerId]="ownerId" [ownerUsername]="ownerUsername" />
+  <app-member-list [projectId]="projectId()" [ownerId]="ownerId()" [ownerUsername]="ownerUsername()"> </app-member-list>
 </div>

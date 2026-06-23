@@ -1,5 +1,6 @@
 package de.thm.swtp.api.links.entity;
 
+import de.thm.swtp.api.links.domain.LinkVisibility;
 import de.thm.swtp.api.project.ProjectEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -37,6 +38,11 @@ public class ProjectLinkEntity {
 
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 7)
+    @Builder.Default
+    private LinkVisibility visibility = LinkVisibility.PUBLIC;
 
     @PrePersist
     protected void onCreate(){
