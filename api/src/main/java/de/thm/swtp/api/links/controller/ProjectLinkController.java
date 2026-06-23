@@ -7,8 +7,7 @@ import de.thm.swtp.api.links.service.ProjectLinkService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +20,7 @@ public class ProjectLinkController {
     private final ProjectLinkService projectLinkService;
 
     @GetMapping
+    @PreAuthorize("@security.canViewProject(#projectId, authentication)")
     public List<ProjectLinkResponse> getProjectLinks(@PathVariable UUID projectId) {
         return projectLinkService.getProjectLinks(projectId)
                 .stream()
@@ -30,34 +30,28 @@ public class ProjectLinkController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ProjectLinkResponse createProjectLink(@PathVariable UUID projectId, @AuthenticationPrincipal Jwt jwt,
+    @PreAuthorize("@security.canEditProject(#projectId, authentication)")
+    public ProjectLinkResponse createProjectLink(@PathVariable UUID projectId,
                                                  @Valid @RequestBody CreateLinkRequest createLinkRequest) {
-        UUID currentUserId = getCurrentUserId(jwt);
 
-        return ProjectLinkResponse.toResponse(projectLinkService.createProjectLink(projectId, currentUserId,
+        return ProjectLinkResponse.toResponse(projectLinkService.createProjectLink(projectId,
                 createLinkRequest.label(), createLinkRequest.url()));
     }
 
     @PatchMapping("/{linkId}")
-    public ProjectLinkResponse updateProjectLink(@PathVariable UUID projectId, @AuthenticationPrincipal Jwt jwt, @PathVariable UUID linkId,
+    @PreAuthorize("@security.canEditProject(#projectId, authentication)")
+    public ProjectLinkResponse updateProjectLink(@PathVariable UUID projectId, @PathVariable UUID linkId,
                                                  @Valid @RequestBody UpdateLinkRequest updateLinkRequest) {
-        UUID currentUserId = getCurrentUserId(jwt);
 
-        return ProjectLinkResponse.toResponse(projectLinkService.updateProjectLink(projectId, currentUserId,
+        return ProjectLinkResponse.toResponse(projectLinkService.updateProjectLink(projectId,
                 linkId, updateLinkRequest.label(), updateLinkRequest.url()));
     }
 
     @DeleteMapping("/{linkId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteProjectLink(@PathVariable UUID projectId, @PathVariable UUID linkId, @AuthenticationPrincipal Jwt jwt) {
-        UUID currentUserId = getCurrentUserId(jwt);
-        projectLinkService.deleteProjectLink(projectId, currentUserId, linkId);
+    @PreAuthorize("@security.canEditProject(#projectId, authentication)")
+    public void deleteProjectLink(@PathVariable UUID projectId, @PathVariable UUID linkId) {
+        projectLinkService.deleteProjectLink(projectId, linkId);
     }
 
-
-
-
-    private UUID getCurrentUserId(Jwt jwt){
-        return UUID.fromString(jwt.getSubject());
-    }
 }

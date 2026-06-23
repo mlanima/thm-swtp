@@ -4,6 +4,7 @@ package de.thm.swtp.api.project;
 import de.thm.swtp.api.project.dto.request.*;
 import de.thm.swtp.api.project.dto.response.*;
 import lombok.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
@@ -18,24 +19,24 @@ public class ProjectController {
     private final ProjectService projectService;
 
     @PostMapping
+    @PreAuthorize("@security.canCreateProject(authentication)")
     public ResponseEntity<ProjectResponse> createProject(
             @RequestBody CreateProjectRequest request,
             @AuthenticationPrincipal Jwt jwt) {
-        String username = jwt.getClaimAsString("preferred_username");
-        ProjectResponse response = projectService.createProject(request, username);
+        UUID currentUserId = UUID.fromString(jwt.getSubject());
+        ProjectResponse response = projectService.createProject(request, currentUserId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @DeleteMapping("/{projectId}")
-    public ResponseEntity<DeleteProjectResponse> deleteProject(
-            @PathVariable UUID projectId,
-            @AuthenticationPrincipal Jwt jwt) {
-        String username = jwt.getClaimAsString("preferred_username");
-        DeleteProjectResponse response = projectService.deleteProject(projectId, username);
+    @PreAuthorize("@security.canDeleteProject(#projectId, authentication)")
+    public ResponseEntity<DeleteProjectResponse> deleteProject(@PathVariable UUID projectId) {
+        DeleteProjectResponse response = projectService.deleteProject(projectId);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{projectId}")
+    @PreAuthorize("@security.canViewProject(#projectId, authentication)")
     public ResponseEntity<ProjectResponse> getProject(
             @PathVariable UUID projectId) {
         ProjectResponse response = projectService.getProject(projectId);
@@ -43,6 +44,7 @@ public class ProjectController {
     }
 
     @GetMapping("/by-url/{projectUrl}")
+    @PreAuthorize("@security.canViewProjectByUrl(#projectUrl, authentication)")
     public ResponseEntity<ProjectResponse> getProjectByUrl(
             @PathVariable String projectUrl) {
         ProjectResponse response = projectService.getProjectByUrl(projectUrl);
@@ -50,26 +52,25 @@ public class ProjectController {
     }
 
     @PutMapping("/{projectId}")
+    @PreAuthorize("@security.canEditProject(#projectId, authentication)")
     public ResponseEntity<ProjectResponse> editProject(
             @PathVariable UUID projectId,
-            @RequestBody UpdateProjectRequest request,
-            @AuthenticationPrincipal Jwt jwt) {
-        String username = jwt.getClaimAsString("preferred_username");
-        ProjectResponse response = projectService.editProject(projectId, request, username);
+            @RequestBody UpdateProjectRequest request) {
+        ProjectResponse response = projectService.editProject(projectId, request);
         return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/{projectId}/allow-join-requests")
+    @PreAuthorize("@security.canEditProject(#projectId, authentication)")
     public ResponseEntity<ProjectResponse> updateAllowJoinRequests(
             @PathVariable UUID projectId,
-            @RequestParam boolean allow,
-            @AuthenticationPrincipal Jwt jwt) {
-        UUID currentUserId = UUID.fromString(jwt.getSubject());
-        ProjectResponse response = projectService.updateAllowJoinRequests(projectId, allow, currentUserId);
+            @RequestParam boolean allow) {
+        ProjectResponse response = projectService.updateAllowJoinRequests(projectId, allow);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{projectId}/members")
+    @PreAuthorize("@security.canViewProjectMembers(#projectId, authentication)")
     public List<ProjectMemberResponse> getProjectMembers(@PathVariable UUID projectId) {
         return projectService.getProjectMembers(projectId)
                 .stream()
@@ -78,9 +79,9 @@ public class ProjectController {
     }
 
     @DeleteMapping("/{projectId}/members/{memberId}")
-    public void deleteProjectMember(@PathVariable UUID projectId, @PathVariable UUID memberId, @AuthenticationPrincipal Jwt jwt) {
-        UUID currentUserId = UUID.fromString(jwt.getSubject());
-        projectService.deleteProjectMember(projectId, currentUserId, memberId);
+    @PreAuthorize("@security.canRemoveProjectMember(#projectId, #memberId, authentication)")
+    public void deleteProjectMember(@PathVariable UUID projectId, @PathVariable UUID memberId) {
+        projectService.deleteProjectMember(projectId, memberId);
     }
 
     @GetMapping("/url-exists/{projectUrl}")

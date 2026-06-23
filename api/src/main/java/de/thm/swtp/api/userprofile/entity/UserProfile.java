@@ -41,6 +41,10 @@ public class UserProfile {
     @Column(columnDefinition = "TEXT")
     private String experience;
 
+    @Builder.Default
+    @Column(name = "is_professor", nullable = false)
+    private boolean isProfessor = false;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
