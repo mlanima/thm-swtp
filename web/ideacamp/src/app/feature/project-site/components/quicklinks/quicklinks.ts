@@ -10,11 +10,7 @@ import { NgClass } from '@angular/common';
 @Component({
   selector: 'app-quicklinks',
   standalone: true,
-<<<<<<< HEAD
-  imports: [FormsModule, NgClass],
-=======
-  imports: [FormsModule, TranslatePipe],
->>>>>>> origin/developer
+  imports: [FormsModule, NgClass, TranslatePipe],
   templateUrl: './quicklinks.html',
 })
 export class Quicklinks implements OnChanges {
@@ -93,7 +89,7 @@ export class Quicklinks implements OnChanges {
         this.changeDetectorRef.markForCheck();
       },
       error: () => {
-        this.errorMessage = this.translateService.instant('PROJECTSITE.QUICKLINKS.ERROR_LOAD');
+        this.errorMessage = this.translateService.instant('COMMON.QUICKLINKS.ERROR_LOAD');
         this.isLoading = false;
         this.changeDetectorRef.markForCheck();
       },
@@ -121,7 +117,7 @@ export class Quicklinks implements OnChanges {
         this.changeDetectorRef.markForCheck();
       },
       error: () => {
-        this.errorMessage = this.translateService.instant('PROJECTSITE.QUICKLINKS.ERROR_ADD');
+        this.errorMessage = this.translateService.instant('COMMON.QUICKLINKS.ERROR_ADD');
       },
     });
   }
@@ -139,7 +135,7 @@ export class Quicklinks implements OnChanges {
         this.changeDetectorRef.markForCheck();
       },
       error: () => {
-        this.errorMessage = this.translateService.instant('PROJECTSITE.QUICKLINKS.ERROR_UPDATE');
+        this.errorMessage = this.translateService.instant('COMMON.QUICKLINKS.ERROR_UPDATE');
       },
     });
   }
@@ -151,7 +147,7 @@ export class Quicklinks implements OnChanges {
         this.changeDetectorRef.markForCheck();
       },
       error: () => {
-        this.errorMessage = this.translateService.instant('PROJECTSITE.QUICKLINKS.ERROR_DELETE');
+        this.errorMessage = this.translateService.instant('COMMON.QUICKLINKS.ERROR_DELETE');
       },
     });
   }
@@ -195,7 +191,7 @@ export class Quicklinks implements OnChanges {
   }
 
   private setValidationError(message?: string): void {
-    this.errorMessage = this.translateService.instant(message ?? 'PROJECTSITE.QUICKLINKS.ERROR_INVALID');
+    this.errorMessage = this.translateService.instant(message ?? 'COMMON.QUICKLINKS.ERROR_INVALID');
   }
 
   private addCreatedProjectLink(link: ProjectLinkModel) {
