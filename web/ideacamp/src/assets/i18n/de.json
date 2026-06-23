@@ -20,7 +20,32 @@
     "BACK": "Zurück",
     "FINISH": "Fertig",
     "PRIVATE": "Privat",
-    "PUBLIC": "Öffentlich"
+    "PUBLIC": "Öffentlich",
+    "QUICKLINKS": {
+      "TITLE": "Links",
+      "ADD": "Hinzufügen",
+      "LABEL": "Bezeichnung",
+      "LABEL_PLACEHOLDER": "Beispielseite",
+      "URL_PLACEHOLDER": "z.B. beispiel.com",
+      "LOADING": "Links werden geladen...",
+      "EMPTY": "Keine öffentlichen Links verfügbar.",
+      "EDIT_LINK": "Link bearbeiten",
+      "DELETE_LINK": "Link löschen",
+      "VISIBILITY": "Sichtbarkeit",
+      "PUBLIC": "Öffentlich",
+      "PRIVATE": "Privat",
+      "ERROR_LOAD": "Links konnten nicht geladen werden.",
+      "ERROR_ADD": "Link konnte nicht hinzugefügt werden.",
+      "ERROR_UPDATE": "Link konnte nicht aktualisiert werden.",
+      "ERROR_DELETE": "Link konnte nicht gelöscht werden.",
+      "ERROR_INVALID": "Ungültige Linkdaten.",
+      "VALIDATION_LABEL_REQUIRED": "Bezeichnung erforderlich.",
+      "VALIDATION_LABEL_TOO_LONG": "Die Bezeichnung darf nicht länger als 100 Zeichen sein.",
+      "VALIDATION_LABEL_NO_QUOTES": "Die Bezeichnung darf keine Anführungszeichen enthalten.",
+      "VALIDATION_URL_REQUIRED": "URL erforderlich.",
+      "VALIDATION_URL_TOO_LONG": "Die URL darf nicht länger als 300 Zeichen sein.",
+      "VALIDATION_URL_INVALID": "Die URL muss gültig sein."
+    }
   },
   "LANGUAGE": {
     "GERMAN": "Deutsch",
@@ -337,6 +362,22 @@
     },
     "OPEN_POSITIONS": {
       "TITLE": "Offene Stellen"
+    },
+    "FILES": {
+      "TITLE": "Dateien",
+      "UPLOAD": "Hochladen",
+      "UPLOADING": "Wird hochgeladen…",
+      "LOADING": "Dateien werden geladen...",
+      "EMPTY": "Keine Dateien vorhanden.",
+      "DROP_HINT": "Datei hierher ziehen",
+      "DOWNLOAD_FILE": "Datei herunterladen",
+      "DELETE_FILE": "Datei löschen",
+      "ERROR_TYPE_NOT_ALLOWED": "Dateityp nicht erlaubt. Erlaubt: PDF, PNG, JPG, DOCX, TXT, MD",
+      "ERROR_FILE_TOO_LARGE": "Datei ist zu groß. Maximale Dateigröße: 10 MB.",
+      "ERROR_LOAD": "Dateien konnten nicht geladen werden.",
+      "ERROR_UPLOAD": "Datei konnte nicht hochgeladen werden.",
+      "ERROR_DELETE": "Datei konnte nicht gelöscht werden.",
+      "ERROR_DOWNLOAD": "Datei konnte nicht heruntergeladen werden."
     }
   },
   "JOIN_REQUEST": {

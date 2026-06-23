@@ -1,5 +1,6 @@
 package de.thm.swtp.api.projectInvitation.service;
 
+import de.thm.swtp.api.notification.event.ProjectInviteCreatedEvent;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
 import de.thm.swtp.api.project.exception.ProjectNotFoundException;
@@ -13,9 +14,11 @@ import de.thm.swtp.api.projectInvitation.repository.ProjectInviteRepository;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -23,10 +26,12 @@ import java.util.UUID;
 /** Service for managing {@link ProjectInvite} domain objects.*/
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProjectInviteService {
     private final ProjectInviteRepository projectInviteRepository;
     private final ProjectRepository projectRepository;
     private final UserProfileRepository userProfileRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     /** Creates a new project invitation. Only the project owner is allowed to send an invitation.*/
     @Transactional
@@ -44,7 +49,16 @@ public class ProjectInviteService {
         ProjectInviteEntity projectInviteEntity = createPendingInvite(projectEntity, invitedUserEntity, message);
 
         ProjectInviteEntity saved = projectInviteRepository.save(projectInviteEntity);
-        return ProjectInviteMapper.toDomain(saved);
+        ProjectInvite invite = ProjectInviteMapper.toDomain(saved);
+
+        if (invitedUserEntity.getEmail() != null) {
+            eventPublisher.publishEvent(new ProjectInviteCreatedEvent(invite, invitedUserEntity.getEmail()));
+        } else {
+            log.warn("No email address for invited user '{}' — skipping invite notification for project '{}'",
+                    invitedUserEntity.getUsername(), invite.getProjectName());
+        }
+
+        return invite;
     }
 
     /** Returns all invitations that were sent to the given user.*/

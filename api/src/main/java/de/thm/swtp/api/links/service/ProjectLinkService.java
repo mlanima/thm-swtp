@@ -3,6 +3,7 @@ package de.thm.swtp.api.links.service;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectLinkAlreadyExistsException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectLinkDoesNotBelongToProjectException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectLinkNotFoundException;
+import de.thm.swtp.api.links.domain.LinkVisibility;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
 import de.thm.swtp.api.project.exception.ProjectNotFoundException;
@@ -26,21 +27,31 @@ public class ProjectLinkService {
 
 
     @Transactional(readOnly = true)
-    public List<ProjectLink> getProjectLinks(UUID projectId){
-        getProjectOrThrowError(projectId);
+    public List<ProjectLink> getProjectLinks(UUID projectId, UUID currentUserId){
+        ProjectEntity projectEntity = getProjectOrThrowError(projectId);
 
-        return projectLinkRepository.findByProjectIdOrderByCreatedAtAsc(projectId)
+        boolean allowedToSeePrivateLinks = isProjectOwner(projectEntity, currentUserId) || isProjectMember(projectEntity, currentUserId);
+
+        if (allowedToSeePrivateLinks) {
+            return projectLinkRepository.findByProjectIdOrderByCreatedAtAsc(projectId)
+                    .stream()
+                    .map(ProjectLinkMapper::toDomain)
+                    .toList();
+        }
+
+        return projectLinkRepository.findByProjectIdAndVisibilityOrderByCreatedAtAsc(projectId, LinkVisibility.PUBLIC)
                 .stream()
                 .map(ProjectLinkMapper::toDomain)
                 .toList();
     }
 
     @Transactional
-    public ProjectLink createProjectLink(UUID projectId, String label, String url){
+    public ProjectLink createProjectLink(UUID projectId, String label, String url, LinkVisibility visibility){
         ProjectEntity projectEntity = getProjectOrThrowError(projectId);
 
         String cleanedLabel = label.trim();
         String cleanedUrl = url.trim();
+        LinkVisibility cleanedVisibility = visibility != null ? visibility : LinkVisibility.PUBLIC;
 
         if (projectLinkRepository.existsByProjectIdAndUrlIgnoreCase(projectEntity.getId(), cleanedUrl)) {
             throw new ProjectLinkAlreadyExistsException();
@@ -52,6 +63,7 @@ public class ProjectLinkService {
                 .project(projectEntity)
                 .label(cleanedLabel)
                 .url(cleanedUrl)
+                .visibility(cleanedVisibility)
                 .build();
 
         ProjectLinkEntity saved = projectLinkRepository.save(projectLinkEntity);
@@ -60,7 +72,7 @@ public class ProjectLinkService {
 
 
     @Transactional
-    public ProjectLink updateProjectLink(UUID projectId, UUID linkId, String label, String url){
+    public ProjectLink updateProjectLink(UUID projectId, UUID linkId, String label, String url, LinkVisibility visibility){
         ProjectEntity projectEntity = getProjectOrThrowError(projectId);
 
         ProjectLinkEntity projectLinkEntity = getProjectLinkOrThrowError(linkId);
@@ -73,7 +85,7 @@ public class ProjectLinkService {
         if (url != null) {
             String cleanedUrl = url.trim();
 
-            boolean changedUrl = !projectLinkEntity.getUrl().equals(cleanedUrl);
+            boolean changedUrl = !projectLinkEntity.getUrl().equalsIgnoreCase(cleanedUrl);
 
             if (changedUrl && projectLinkRepository.existsByProjectIdAndUrlIgnoreCase(projectEntity.getId(), cleanedUrl)) {
                 throw new ProjectLinkAlreadyExistsException();
@@ -82,12 +94,17 @@ public class ProjectLinkService {
             projectLinkEntity.setUrl(cleanedUrl);
         }
 
+        if (visibility != null) {
+            projectLinkEntity.setVisibility(visibility);
+        }
+
         ProjectLinkEntity saved = projectLinkRepository.save(projectLinkEntity);
         return ProjectLinkMapper.toDomain(saved);
     }
 
     @Transactional
     public void deleteProjectLink(UUID projectId, UUID linkId){
+        getProjectOrThrowError(projectId);
 
         ProjectLinkEntity projectLinkEntity = getProjectLinkOrThrowError(linkId);
         checkLinkBelongsToProject(projectLinkEntity, projectId);
@@ -109,5 +126,15 @@ public class ProjectLinkService {
         if (!projectLinkEntity.getProject().getId().equals(projectId)){
             throw new ProjectLinkDoesNotBelongToProjectException();
         }
+    }
+
+    private boolean isProjectOwner(ProjectEntity projectEntity, UUID currentUserId){
+        return projectEntity.getOwner().getKeycloakId().equals(currentUserId);
+    }
+
+    private boolean isProjectMember(ProjectEntity projectEntity, UUID currentUserId){
+        return projectEntity.getMembers()
+                .stream()
+                .anyMatch(member -> member.getKeycloakId().equals(currentUserId));
     }
 }

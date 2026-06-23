@@ -20,7 +20,32 @@
     "BACK": "Back",
     "FINISH": "Finish",
     "PRIVATE": "Private",
-    "PUBLIC": "Public"
+    "PUBLIC": "Public",
+    "QUICKLINKS": {
+      "TITLE": "Links",
+      "ADD": "Add",
+      "LABEL": "Label",
+      "LABEL_PLACEHOLDER": "Example page",
+      "URL_PLACEHOLDER": "e.g. example.com",
+      "LOADING": "Links are loading...",
+      "EMPTY": "No public links available.",
+      "EDIT_LINK": "Edit link",
+      "DELETE_LINK": "Delete link",
+      "VISIBILITY": "Visibility",
+      "PUBLIC": "Public",
+      "PRIVATE": "Private",
+      "ERROR_LOAD": "Links could not be loaded.",
+      "ERROR_ADD": "Link could not be added.",
+      "ERROR_UPDATE": "Link could not be updated.",
+      "ERROR_DELETE": "Link could not be deleted.",
+      "ERROR_INVALID": "Invalid link data.",
+      "VALIDATION_LABEL_REQUIRED": "Label is required.",
+      "VALIDATION_LABEL_TOO_LONG": "The label must not be longer than 100 characters.",
+      "VALIDATION_LABEL_NO_QUOTES": "The label must not contain quotation marks.",
+      "VALIDATION_URL_REQUIRED": "URL is required.",
+      "VALIDATION_URL_TOO_LONG": "The URL must not be longer than 300 characters.",
+      "VALIDATION_URL_INVALID": "The URL must be valid."
+    }
   },
   "LANGUAGE": {
     "GERMAN": "German",
@@ -344,6 +369,22 @@
     },
     "OPEN_POSITIONS": {
       "TITLE": "Open positions"
+    },
+    "FILES": {
+      "TITLE": "Files",
+      "UPLOAD": "Upload",
+      "UPLOADING": "Uploading…",
+      "LOADING": "Files are loading...",
+      "EMPTY": "No files available.",
+      "DROP_HINT": "Drop file here",
+      "DOWNLOAD_FILE": "Download file",
+      "DELETE_FILE": "Delete file",
+      "ERROR_TYPE_NOT_ALLOWED": "File type not allowed. Allowed: PDF, PNG, JPG, DOCX, TXT, MD",
+      "ERROR_FILE_TOO_LARGE": "File is too large. Maximum file size: 10 MB.",
+      "ERROR_LOAD": "Files could not be loaded.",
+      "ERROR_UPLOAD": "File could not be uploaded.",
+      "ERROR_DELETE": "File could not be deleted.",
+      "ERROR_DOWNLOAD": "File could not be downloaded."
     }
   },
   "JOIN_REQUEST": {

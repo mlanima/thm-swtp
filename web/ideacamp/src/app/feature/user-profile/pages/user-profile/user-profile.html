@@ -119,11 +119,18 @@
               </app-profile-information>
             }
           </div>
-          <aside class="lg:self-start">
+          <aside class="flex flex-col gap-6 lg:self-start">
             <app-profile-tag-list
               [username]="state.profile.keycloakId"
               [isOwner]="isOwner">
             </app-profile-tag-list>
+
+            @if (profileLinkDataSource) {
+              <app-link-manager
+                [dataSource]="profileLinkDataSource"
+                [isOwner]="isOwner">
+              </app-link-manager>
+            }
           </aside>
         </div>
       }

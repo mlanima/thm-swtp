@@ -8,6 +8,9 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
       SPRING_PROFILES_ACTIVE: mysql
       APP_UPLOADS_DIR: /app/uploads
+      SPRING_MAIL_HOST: maildev
+      SPRING_MAIL_PORT: "1025"
+      SPRINGDOC_SWAGGERUI_ENABLED: "false"
     volumes:
       - ./uploads:/app/uploads
     labels:
@@ -41,8 +44,7 @@ services:
   swtp-main-dozzle:
     image: amir20/dozzle:latest
     container_name: swtp-main-dozzle
-    environment:
-      DOZZLE_FILTER: name=swtp-main
+    command: ["--filter", "name=swtp-main", "--filter", "name=keycloak", "--filter", "name=maildev", "--filter", "name=hoppscotch", "--filter", "name=swtp-db", "--filter", "name=swtp-dashboard"]
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
