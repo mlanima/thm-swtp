@@ -41,15 +41,8 @@ export class ProjectSite  implements OnInit {
     return user.id === proj.ownerId;
   }
 
-  get isMember(): boolean {
-    const user = this.authService.user();
-    const proj = this.project();
-    if (!user || !proj) return false;
-    return proj.memberIds.includes(user.id);
-  }
-
   get canCreatePosts(): boolean {
-    return this.isOwner || this.isMember;
+    return this.isOwner;
   }
 
   ngOnInit(): void {
