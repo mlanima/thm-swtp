@@ -12,8 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import java.nio.charset.StandardCharsets;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,9 +27,9 @@ public class ProjectFileController {
     private final ProjectFileService projectFileService;
 
     @GetMapping
-    public List<ProjectFileResponse> getProjectFiles(@PathVariable UUID projectId,
-                                                     @AuthenticationPrincipal Jwt jwt) {
-        return projectFileService.getProjectFiles(projectId, getCurrentUserId(jwt))
+    @PreAuthorize("@security.canViewProject(#projectId, authentication)")
+    public List<ProjectFileResponse> getProjectFiles(@PathVariable UUID projectId) {
+        return projectFileService.getProjectFiles(projectId)
                 .stream()
                 .map(ProjectFileResponse::toResponse)
                 .toList();
@@ -38,18 +37,17 @@ public class ProjectFileController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("@security.canEditProject(#projectId, authentication)")
     public ProjectFileResponse uploadFile(@PathVariable UUID projectId,
-                                          @AuthenticationPrincipal Jwt jwt,
                                           @RequestParam("file") MultipartFile file) {
-        UUID currentUserId = getCurrentUserId(jwt);
-        return ProjectFileResponse.toResponse(projectFileService.uploadFile(projectId, currentUserId, file));
+        return ProjectFileResponse.toResponse(projectFileService.uploadFile(projectId, file));
     }
 
     @GetMapping("/{fileId}/download")
+    @PreAuthorize("@security.canViewProject(#projectId, authentication)")
     public ResponseEntity<Resource> downloadFile(@PathVariable UUID projectId,
-                                                 @PathVariable UUID fileId,
-                                                 @AuthenticationPrincipal Jwt jwt) {
-        ProjectFileDownload download = projectFileService.prepareDownload(projectId, fileId, getCurrentUserId(jwt));
+                                                 @PathVariable UUID fileId) {
+        ProjectFileDownload download = projectFileService.prepareDownload(projectId, fileId);
 
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(download.file().getMimeType()))
@@ -63,14 +61,10 @@ public class ProjectFileController {
 
     @DeleteMapping("/{fileId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("@security.canEditProject(#projectId, authentication)")
     public void deleteFile(@PathVariable UUID projectId,
-                           @PathVariable UUID fileId,
-                           @AuthenticationPrincipal Jwt jwt) {
-        UUID currentUserId = getCurrentUserId(jwt);
-        projectFileService.deleteFile(projectId, currentUserId, fileId);
+                           @PathVariable UUID fileId) {
+        projectFileService.deleteFile(projectId, fileId);
     }
 
-    private UUID getCurrentUserId(Jwt jwt) {
-        return UUID.fromString(jwt.getSubject());
-    }
 }

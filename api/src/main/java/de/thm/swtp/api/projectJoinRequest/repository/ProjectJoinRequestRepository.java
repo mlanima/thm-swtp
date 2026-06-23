@@ -19,4 +19,7 @@ public interface ProjectJoinRequestRepository extends JpaRepository<ProjectJoinR
 
     /** Returns a list of all join-requests from a given user. */
     List<ProjectJoinRequestEntity> findByRequestingUserKeycloakId(UUID requestingUserKeycloakId);
+
+    /** Checks if a join-requests exists and belongs to a project owned by the specified user.*/
+    boolean existsByIdAndProjectOwnerKeycloakId(UUID requestId, UUID ownerId);
 }
