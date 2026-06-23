@@ -11,6 +11,7 @@ import { MyProjectsPage } from './feature/my-projects/pages/my-projects-page/my-
 import { ProjectSettings } from './feature/project-settings/project-settings';
 import { FavoritesPage } from './feature/favorites/pages/favorites-page/favorites-page';
 import { LandingPage } from './feature/landing-page/pages/landing-page/landing-page';
+import { UserSettings } from './feature/user-settings/user-settings';
 
 export const routes: Routes = [
   {path: '', redirectTo: 'landing', pathMatch: 'full' },
@@ -25,4 +26,6 @@ export const routes: Routes = [
   {path: 'createProject', component: ProjectCreate, canActivate: [authGuard]},
   {path: 'my-projects', component: MyProjectsPage, canActivate: [authGuard]},
   {path: 'favorites', component: FavoritesPage, canActivate: [authGuard]},
+  {path: 'settings', component: UserSettings, canActivate: [authGuard]},
+  {path: 'professor-request', redirectTo: 'settings', pathMatch: 'full'},
 ];

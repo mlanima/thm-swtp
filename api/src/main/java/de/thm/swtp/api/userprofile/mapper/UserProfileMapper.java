@@ -17,6 +17,7 @@ public class UserProfileMapper {
                 .followers(profile.getFollowers())
                 .about(profile.getAbout())
                 .experience(profile.getExperience())
+                .isProfessor(profile.isProfessor())
                 .build();
     }
 }

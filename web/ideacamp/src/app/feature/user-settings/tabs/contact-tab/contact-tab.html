@@ -1,0 +1,21 @@
+<div>
+  <h2 class="text-2xl font-bold text-slate-700">{{ 'USER_SETTINGS.CONTACT.TITLE' | translate }}</h2>
+  <p class="mt-1 text-sm text-slate-500">{{ 'USER_SETTINGS.CONTACT.DESCRIPTION' | translate }}</p>
+
+  <div class="mt-6 flex items-center gap-3">
+    <a
+      href="mailto:ideacamp.thm@protonmail.com"
+      class="inline-flex items-center gap-2 rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700"
+    >
+      <i class="pi pi-envelope text-sm"></i>
+      {{ 'USER_SETTINGS.CONTACT.SEND_EMAIL' | translate }}
+    </a>
+    <button
+      type="button"
+      (click)="copyMail()"
+      class="text-sm text-slate-500 transition hover:text-lime-600"
+    >
+      {{ copied() ? ('USER_SETTINGS.CONTACT.COPIED' | translate) : ('USER_SETTINGS.CONTACT.COPY' | translate) }}
+    </button>
+  </div>
+</div>

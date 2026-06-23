@@ -25,6 +25,7 @@
           {{ 'NAV.SEARCH' | translate }}
         </app-feature>
       </a>
+
     </nav>
 
     <div class="flex justify-end flex-1">
@@ -35,7 +36,7 @@
       } @else {
         <div class="flex gap-1 items-center">
           <button (click)="auth.login()" class="group flex gap-2 items-center border border-slate-900 px-4 py-2 rounded-xl text-slate-900 transition-colors duration-300 ease-out hover:bg-slate-900 hover:shadow-lg hover:text-white">
-            Login
+            {{ 'NAV.LOGIN' | translate }}
             <i class="pi pi-sign-in transition-transform duration-300 ease-out group-hover:translate-x-1"></i>
           </button>
         </div>

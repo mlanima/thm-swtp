@@ -34,7 +34,7 @@
         [class.text-green-600]="activeTab() === 'projects'"
         [class.text-slate-500]="activeTab() !== 'projects'"
       >
-        {{ 'SEARCH.TAB_PROJECTS' | translate }} @if (projects().length > 0) { ({{ projects().length }}) }
+        {{ 'SEARCH.TAB_PROJECTS' | translate }} @if (projectsTotalCount() > 0) { ({{ projectsTotalCount() }}) }
       </button>
 
       <button
@@ -45,7 +45,7 @@
         [class.text-green-600]="activeTab() === 'users'"
         [class.text-slate-500]="activeTab() !== 'users'"
       >
-        {{ 'SEARCH.TAB_USERS' | translate }} @if (users().length > 0) { ({{ users().length }}) }
+        {{ 'SEARCH.TAB_USERS' | translate }} @if (usersTotalCount() > 0) { ({{ usersTotalCount() }}) }
       </button>
     </div>
 
@@ -53,7 +53,7 @@
     @if (currentQueriesCount() > 0 && !isLoading() && !errorMessage()) {
       <div class="mt-6">
         <h2 class="text-lg font-semibold text-slate-700">
-          {{ 'SEARCH.RESULTS' | translate }} ({{ activeTab() === 'all' ? totalResults() : (activeTab() === 'projects' ? projects().length : users().length) }})
+          {{ 'SEARCH.RESULTS' | translate }} ({{ activeTab() === 'all' ? totalResults() : (activeTab() === 'projects' ? projectsTotalCount() : usersTotalCount()) }})
         </h2>
       </div>
     }
@@ -93,13 +93,13 @@
       @if ((activeTab() === 'projects' || activeTab() === 'all') && displayedProjects().length > 0) {
         <div class="flex flex-col gap mt-6 space-y-4">
           @if (activeTab() === 'all') { <h3 class="text-sm font-semibold tracking-wider text-slate-500 uppercase">{{ 'SEARCH.PROJECTS_SECTION' | translate }}</h3> }
-          @for (project of projects(); track project.projectUrl) {
+          @for (project of displayedProjects(); track project.projectUrl) {
             <app-project-result-card [project]="project" [animationDelay]="$index * 50" />
           }
         </div>
         @if (activeTab() === 'all' && projectsTotalCount() > displayedProjects().length) {
           <button (click)="setTab('projects')" class="mt-3 text-sm font-medium text-green-600 hover:underline">
-            Alle {{ projectsTotalCount() }} Projekte anzeigen
+            {{ 'SEARCH.SHOW_ALL_PROJECTS' | translate: { count: projectsTotalCount() } }}
           </button>
         }
       }
@@ -107,13 +107,13 @@
       @if ((activeTab() === 'users' || activeTab() === 'all') && displayedUsers().length > 0) {
         <div class="flex flex-col gap mt-6 space-y-4">
           @if (activeTab() === 'all') { <h3 class="text-sm font-semibold tracking-wider text-slate-500 uppercase">{{ 'SEARCH.USERS_SECTION' | translate }}</h3> }
-          @for (user of users(); track user.keycloakId) {
+          @for (user of displayedUsers(); track user.keycloakId) {
             <app-user-result-card [user]="user" />
           }
         </div>
         @if (activeTab() === 'all' && usersTotalCount() > displayedUsers().length) {
           <button (click)="setTab('users')" class="mt-3 text-sm font-medium text-green-600 hover:underline">
-            Alle {{ usersTotalCount() }} Nutzer anzeigen
+            {{ 'SEARCH.SHOW_ALL_USERS' | translate: { count: usersTotalCount() } }}
           </button>
         }
       }
@@ -126,7 +126,7 @@
             [disabled]="currentPage() === 0"
             class="rounded-lg px-3 py-2 text-sm font-medium text-slate-500 transition hover:text-green-600 disabled:opacity-40 disabled:hover:text-slate-500"
           >
-            Zurück
+            {{ 'SEARCH.PREVIOUS' | translate }}
           </button>
 
           @for (p of pageNumbers(); track p) {
@@ -147,7 +147,7 @@
             [disabled]="currentPage() + 1 >= currentTotalPages()"
             class="rounded-lg px-3 py-2 text-sm font-medium text-slate-500 transition hover:text-green-600 disabled:opacity-40 disabled:hover:text-slate-500"
           >
-            Weiter
+            {{ 'SEARCH.NEXT' | translate }}
           </button>
         </div>
       }

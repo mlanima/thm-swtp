@@ -48,10 +48,6 @@
             <span>{{ 'SIDEBAR.PROFILE' | translate }}</span>
           </app-menu-link>
           </a>
-          <!--<app-menu-link>
-            <i class="pi pi-users text-sm text-zinc-400"></i>
-            <span>Kontakten</span>
-          </app-menu-link>-->
 
           <!--<app-menu-link>
             <i class="pi pi-folder text-sm text-zinc-400"></i>
@@ -65,10 +61,10 @@
       </menu>
 
       <footer class="space-y-2 border-t border-zinc-700 px-6 py-5">
-        <a routerLink="/impressum" (click)="requestClose()">
+        <a routerLink="/settings" (click)="requestClose()">
         <app-menu-link>
-          <i class="pi pi-file text-sm text-zinc-400"></i>
-          <span>{{ 'SIDEBAR.IMPRESSUM' | translate }}</span>
+          <i class="pi pi-cog text-sm text-zinc-400"></i>
+          <span>{{ 'USER_SETTINGS.TITLE' | translate }}</span>
         </app-menu-link>
         </a>
 

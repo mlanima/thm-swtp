@@ -1,0 +1,57 @@
+<div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+  <h2 class="text-2xl font-bold text-slate-700">{{ 'IMPRESSUM.TITLE' | translate }}</h2>
+  <p class="mt-1 text-sm text-slate-500">{{ 'IMPRESSUM.SUBTITLE' | translate }}</p>
+
+  <div class="mt-6 space-y-6">
+
+    <div>
+      <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-500">{{ 'IMPRESSUM.PROVIDER' | translate }}</h3>
+      <div class="mt-2 space-y-1 text-sm text-slate-600">
+        <p>{{ 'IMPRESSUM.ORGANIZATION_VALUE' | translate }}<br />{{ 'IMPRESSUM.PROJECT_VALUE' | translate }}</p>
+        <p>{{ 'IMPRESSUM.ADDRESS_VALUE' | translate }}</p>
+      </div>
+    </div>
+
+    <div>
+      <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-500">{{ 'IMPRESSUM.CONTACT' | translate }}</h3>
+      <p class="mt-2 text-sm text-slate-600">
+        E-Mail:
+        <a href="mailto:ideacamp.thm@protonmail.com" class="text-lime-600 hover:text-lime-700 hover:underline">
+          ideacamp.thm&#64;protonmail.com
+        </a>
+      </p>
+    </div>
+
+    <div>
+      <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-500">{{ 'IMPRESSUM.RESPONSIBLE' | translate }}</h3>
+      <p class="mt-1 text-xs text-slate-400">{{ 'IMPRESSUM.ACCORDING_TO' | translate }}</p>
+      <p class="mt-1 text-sm text-slate-600">
+        {{ 'IMPRESSUM.RESPONSIBLE_VALUE' | translate }}
+      </p>
+    </div>
+
+    <div>
+      <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-500">{{ 'IMPRESSUM.DISCLAIMER' | translate }}</h3>
+      <p class="mt-2 text-sm leading-relaxed text-slate-600 max-w-[65ch]">
+        {{ 'IMPRESSUM.DISCLAIMER_TEXT' | translate }}
+      </p>
+    </div>
+
+    <div>
+      <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-500">{{ 'IMPRESSUM.PRIVACY' | translate }}</h3>
+      <p class="mt-2 text-sm leading-relaxed text-slate-600 max-w-[65ch]">
+        {{ 'IMPRESSUM.PRIVACY_TEXT' | translate }}
+      </p>
+    </div>
+
+    <div>
+      <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-500">{{ 'IMPRESSUM.UNIVERSITY_PROJECT' | translate }}</h3>
+      <p class="mt-2 text-sm leading-relaxed text-slate-600 max-w-[65ch]">
+        {{ 'IMPRESSUM.UNIVERSITY_PROJECT_TEXT' | translate }}
+      </p>
+    </div>
+
+  </div>
+
+  <p class="mt-6 text-xs text-slate-400">&copy; {{ currentYear }} {{ 'IMPRESSUM.FOOTER' | translate }}</p>
+</div>

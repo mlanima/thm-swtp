@@ -13,6 +13,11 @@ import { UserProfileModel } from '../../../../models/user-profile.model';
 import { ProfileTagListComponent } from '../../components/profile-tag-list/profile-tag-list.component'
 import { SuccessModal } from '../../../../shared/success-modal/success-modal';
 
+import { LinkManagerComponent } from '../../../../shared/link-manager/link-manager';
+import { LinkManagerDataSource } from '../../../../shared/link-manager/link-manager.types';
+import { UserProfileLinkModel } from '../../../../models/user-profile-link.model';
+import { UserProfileLinkService } from '../../services/user-profile-link.service';
+
 interface ProfileViewState {
   /** Indicates whether the profile request is currently running. */
   isLoading: boolean;
@@ -28,7 +33,15 @@ interface ProfileViewState {
 @Component({
   selector: 'app-user-profile',
   standalone: true,
-  imports: [ProfileInformation, ProfileBanner, FormsModule, ProfileTagListComponent, SuccessModal, TranslatePipe],
+  imports: [
+    ProfileInformation,
+    ProfileBanner,
+    FormsModule,
+    ProfileTagListComponent,
+    SuccessModal,
+    TranslatePipe,
+    LinkManagerComponent,
+  ],
   templateUrl: './user-profile.html',
 })
 export class UserProfile implements OnInit, OnDestroy {
@@ -40,6 +53,12 @@ export class UserProfile implements OnInit, OnDestroy {
 
   /** Service used to load and update user profile data from the backend. */
   private readonly userProfileService = inject(UserProfileService);
+
+  /** Service used to load / update / delete link data from the backend. */
+  private readonly userProfileLinkService = inject(UserProfileLinkService);
+
+  /** Data source for profile links. Initialized after the profile has been loaded. */
+  profileLinkDataSource: LinkManagerDataSource<UserProfileLinkModel> | null = null;
 
   /** Auth service used to determine whether the viewer is the profile owner. */
   private readonly authService = inject(AuthService);
@@ -99,11 +118,15 @@ export class UserProfile implements OnInit, OnDestroy {
 
     await this.authService.waitUntilAuthReady();
 
-    this.paramSub = this.route.paramMap.subscribe(params => {
+    this.paramSub = this.route.paramMap.subscribe((params) => {
       this.routeUsername = params.get('username') ?? '';
 
       if (!this.routeUsername) {
-        this.profileState.set({ isLoading: false, profile: null, errorMessage: this.translateService.instant('USERPROFILE.ERROR_NOT_FOUND') });
+        this.profileState.set({
+          isLoading: false,
+          profile: null,
+          errorMessage: this.translateService.instant('USERPROFILE.ERROR_NOT_FOUND'),
+        });
         return;
       }
 
@@ -129,6 +152,7 @@ export class UserProfile implements OnInit, OnDestroy {
 
     this.userProfileService.getProfile(this.routeUsername).subscribe({
       next: (profile) => {
+        this.profileLinkDataSource = this.createProfileLinkDataSource(profile.keycloakId);
         this.profileState.set({
           isLoading: false,
           profile,
@@ -222,5 +246,15 @@ export class UserProfile implements OnInit, OnDestroy {
   /** Closes the success modal after a successful profile update */
   closeSuccessModal(): void {
     this.showSuccessModal = false;
+  }
+
+  private createProfileLinkDataSource(userId: string): LinkManagerDataSource<UserProfileLinkModel> {
+    return {
+      load: () => this.userProfileLinkService.getUserProfileLinks(userId),
+      createLink: (request) => this.userProfileLinkService.addUserProfileLink(userId, request),
+      updateLink: (linkId, request) =>
+        this.userProfileLinkService.updateUserProfileLink(userId, linkId, request),
+      deleteLink: (linkId) => this.userProfileLinkService.deleteUserProfileLink(userId, linkId),
+    };
   }
 }

@@ -4,6 +4,7 @@
     "PROJECTS": "Projekte",
     "PROFILE": "Profil",
     "LOGOUT": "Abmelden",
+    "LOGIN": "Login",
     "SEARCH": "Erkunden",
     "AUTH": "Eingeloggt"
   },
@@ -19,7 +20,32 @@
     "BACK": "Zurück",
     "FINISH": "Fertig",
     "PRIVATE": "Privat",
-    "PUBLIC": "Öffentlich"
+    "PUBLIC": "Öffentlich",
+    "QUICKLINKS": {
+      "TITLE": "Links",
+      "ADD": "Hinzufügen",
+      "LABEL": "Bezeichnung",
+      "LABEL_PLACEHOLDER": "Beispielseite",
+      "URL_PLACEHOLDER": "z.B. beispiel.com",
+      "LOADING": "Links werden geladen...",
+      "EMPTY": "Keine öffentlichen Links verfügbar.",
+      "EDIT_LINK": "Link bearbeiten",
+      "DELETE_LINK": "Link löschen",
+      "VISIBILITY": "Sichtbarkeit",
+      "PUBLIC": "Öffentlich",
+      "PRIVATE": "Privat",
+      "ERROR_LOAD": "Links konnten nicht geladen werden.",
+      "ERROR_ADD": "Link konnte nicht hinzugefügt werden.",
+      "ERROR_UPDATE": "Link konnte nicht aktualisiert werden.",
+      "ERROR_DELETE": "Link konnte nicht gelöscht werden.",
+      "ERROR_INVALID": "Ungültige Linkdaten.",
+      "VALIDATION_LABEL_REQUIRED": "Bezeichnung erforderlich.",
+      "VALIDATION_LABEL_TOO_LONG": "Die Bezeichnung darf nicht länger als 100 Zeichen sein.",
+      "VALIDATION_LABEL_NO_QUOTES": "Die Bezeichnung darf keine Anführungszeichen enthalten.",
+      "VALIDATION_URL_REQUIRED": "URL erforderlich.",
+      "VALIDATION_URL_TOO_LONG": "Die URL darf nicht länger als 300 Zeichen sein.",
+      "VALIDATION_URL_INVALID": "Die URL muss gültig sein."
+    }
   },
   "LANGUAGE": {
     "GERMAN": "Deutsch",
@@ -39,12 +65,15 @@
     "TITLE": "Meine Projekte",
     "CREATE_PROJECT": "Projekt erstellen",
     "PROJECTS": "Projekte",
+    "PROJECTS_COUNT_LABEL": "Projekte",
     "OWNED_PROJECTS_COUNT_LABEL": "Projekte im Besitz",
     "INVITATIONS": "Projekteinladungen",
     "INVITED_BY": "Eingeladen von:",
     "ACCEPT": "Annehmen",
     "DECLINE": "Ablehnen",
     "NO_SHORT_DESCRIPTION": "Keine Kurzbeschreibung.",
+    "PRIVATE": "Privat",
+    "PUBLIC": "Öffentlich",
     "OWNER": "Gründer",
     "FILTER_ALL": "Alle Projekte",
     "FILTER_OWNED": "Im Besitz",
@@ -79,7 +108,12 @@
     "ERROR_AUTH_REQUIRED": "Bitte melde dich an, um dieses Profil anzuzeigen.",
     "ERROR_LOAD_PROFILE": "Profilinformationen konnten nicht geladen werden. Bitte versuche es später erneut.",
     "ERROR_EDIT_FORBIDDEN": "Du bist nicht berechtigt, dieses Profil zu bearbeiten.",
-    "ERROR_UPDATE_PROFILE": "Das Profil konnte nicht aktualisiert werden. Bitte versuche es später erneut."
+    "FOLLOWERS": "Follower",
+    "ERROR_UPDATE_PROFILE": "Das Profil konnte nicht aktualisiert werden. Bitte versuche es später erneut.",
+    "FOLLOW": "Folgen",
+    "FOLLOWING": "Folge ich",
+    "UNFOLLOW": "Entfolgen",
+    "INVITE": "Einladen"
   },
   "CONTACT-REQUESTS": {
     "CONTACT": "Kontaktanfragen",
@@ -92,8 +126,12 @@
     "LOADING": "Deine Favoriten werden geladen…",
     "EMPTY": "Noch keine Favoriten",
     "EMPTY_DESCRIPTION": "Sobald du ein Projekt favorisierst, erscheint es hier.",
+    "PRIVATE": "Privat",
+    "PUBLIC": "Öffentlich",
     "NO_DESCRIPTION": "Keine Beschreibung vorhanden.",
     "OPEN_PROJECT": "Projekt öffnen",
+    "REMOVE_TITLE": "Aus Favoriten entfernen",
+    "ADD_TITLE": "Zu Favoriten hinzufügen",
     "ERROR_LOAD": "Deine Favoriten konnten nicht geladen werden."
   },
   "SIDEBAR": {
@@ -122,6 +160,8 @@
     "CHECKING_PROJECT_URL": "Projekt-URL wird geprüft...",
     "PROJECT_URL_EXISTS": "Diese Projekt-URL ist bereits vergeben.",
     "PROJECT_URL_AVAILABLE": "Diese Projekt-URL ist verfügbar.",
+    "PRIVATE": "Privat",
+    "PUBLIC": "Öffentlich",
     "PRIVATE_DESCRIPTION": "Nur eingeladene Nutzer werden das Projekt sehen können",
     "MEMBERS": "Projektmitglieder",
     "ADD_MEMBER": "Mitglied hinzufügen",
@@ -172,6 +212,10 @@
     "USERS_SECTION": "Nutzer",
     "ADD_SEARCH_INPUT": "Sucheingabe hinzufügen",
     "INPUT_PLACEHOLDER": "Nach Nutzern oder Projekten suchen...",
+    "SHOW_ALL_PROJECTS": "Alle {{ count }} Projekte anzeigen",
+    "SHOW_ALL_USERS": "Alle {{ count }} Nutzer anzeigen",
+    "PREVIOUS": "Zurück",
+    "NEXT": "Weiter",
     "ERROR_FAILED": "Die Suche ist fehlgeschlagen. Bitte versuche es erneut."
   },
   "IMPRESSUM": {
@@ -308,6 +352,7 @@
       "VALIDATION_LABEL_NO_QUOTES": "Die Bezeichnung darf keine Anführungszeichen enthalten.",
       "VALIDATION_URL_REQUIRED": "URL erforderlich.",
       "VALIDATION_URL_TOO_LONG": "Die URL darf nicht länger als 300 Zeichen sein.",
+      "URL_LABEL": "URL",
       "VALIDATION_URL_INVALID": "Die URL muss gültig sein."
     },
     "TAGS": {
@@ -324,6 +369,22 @@
     },
     "OPEN_POSITIONS": {
       "TITLE": "Offene Stellen"
+    },
+    "FILES": {
+      "TITLE": "Dateien",
+      "UPLOAD": "Hochladen",
+      "UPLOADING": "Wird hochgeladen…",
+      "LOADING": "Dateien werden geladen...",
+      "EMPTY": "Keine Dateien vorhanden.",
+      "DROP_HINT": "Datei hierher ziehen",
+      "DOWNLOAD_FILE": "Datei herunterladen",
+      "DELETE_FILE": "Datei löschen",
+      "ERROR_TYPE_NOT_ALLOWED": "Dateityp nicht erlaubt. Erlaubt: PDF, PNG, JPG, DOCX, TXT, MD",
+      "ERROR_FILE_TOO_LARGE": "Datei ist zu groß. Maximale Dateigröße: 10 MB.",
+      "ERROR_LOAD": "Dateien konnten nicht geladen werden.",
+      "ERROR_UPLOAD": "Datei konnte nicht hochgeladen werden.",
+      "ERROR_DELETE": "Datei konnte nicht gelöscht werden.",
+      "ERROR_DOWNLOAD": "Datei konnte nicht heruntergeladen werden."
     }
   },
   "JOIN_REQUEST": {
@@ -372,5 +433,70 @@
     "DELETE_POST": "Post löschen",
     "DELETING": "Wird gelöscht…",
     "DELETE_SUCCESS": "Post erfolgreich gelöscht."
+  "USER_SETTINGS": {
+    "TITLE": "Einstellungen",
+    "TABS": {
+      "PROFESSOR_REQUEST": "Professor:in werden",
+      "CONTACT": "Kontakt",
+      "IMPRESSUM": "Impressum"
+    },
+    "CONTACT": {
+      "TITLE": "Kontakt",
+      "DESCRIPTION": "Bei Fragen oder Anliegen kannst du dich an uns wenden.",
+      "SEND_EMAIL": "E-Mail senden",
+      "COPIED": "Email kopiert",
+      "COPY": "Email kopieren"
+    }
+  },
+  "PROFESSOR_REQUEST": {
+    "LOADING": "Daten werden geladen",
+    "PENDING_TITLE": "Anfrage in Prüfung",
+    "PENDING_DESCRIPTION": "Ihre Anfrage wird bearbeitet. Sie bekommen eine Rückmeldung, sobald eine Entscheidung getroffen wurde.",
+    "PENDING_BADGE": "Ausstehend",
+    "YOUR_MESSAGE": "Ihre Nachricht",
+    "ACCEPTED_TITLE": "Anfrage bestätigt",
+    "ACCEPTED_DESCRIPTION": "Ihr Antrag wurde angenommen. Sie haben jetzt Zugriff auf alle erweiterten Funktionen.",
+    "ACCEPTED_BADGE": "Angenommen",
+    "REJECTED_TITLE": "Anfrage abgelehnt",
+    "REJECTED_DESCRIPTION": "Ihre Anfrage wurde leider abgelehnt. Sie können jederzeit eine neue Anfrage stellen.",
+    "NEW_REQUEST": "Neue Anfrage stellen",
+    "CARD_TITLE": "Professor:in werden",
+    "CARD_DESCRIPTION": "Erweiterte Funktionen für Abschlussarbeiten, Forschung und Studierendenkontakt.",
+    "FEATURE_THESIS": "Abschlussarbeiten betreuen",
+    "FEATURE_THESIS_DESC": "Erstelle Themen für Bachelor- und Masterarbeiten.",
+    "FEATURE_RESEARCH": "Forschung sichtbar machen",
+    "FEATURE_RESEARCH_DESC": "Teile Forschungsschwerpunkte für passende Angebote.",
+    "FEATURE_STUDENTS": "Studierende erreichen",
+    "FEATURE_STUDENTS_DESC": "Knüpfe Kontakt und begleite Abschlussprojekte.",
+    "FORM_TITLE": "Jetzt bewerben",
+    "FORM_DESCRIPTION": "Beschreiben Sie kurz, warum Sie Professor:innen-Rechte benötigen.",
+    "FORM_NAME": "Name *",
+    "FORM_NAME_PLACEHOLDER": "Ihr vollständiger Name",
+    "FORM_EMAIL": "E-Mail *",
+    "FORM_EMAIL_PLACEHOLDER": "ihre@hochschule.de",
+    "FORM_REASON": "Begründung *",
+    "FORM_REASON_PLACEHOLDER": "Schreiben Sie Ihr Anschreiben für die Anfrage...",
+    "SUBMITTING": "Wird gesendet",
+    "SUBMIT": "Anfrage senden",
+    "SUCCESS_TITLE": "Anfrage gesendet",
+    "SUCCESS_DESCRIPTION": "Ihre Anfrage wurde erfolgreich übermittelt. Wir melden uns bei Ihnen.",
+    "SUCCESS_CLOSE": "Schließen",
+    "ERROR_LOAD_USER": "Benutzer konnte nicht geladen werden.",
+    "ERROR_SEND": "Deine Anfrage konnte nicht gesendet werden. Bitte versuche es später erneut.",
+    "VALIDATION": {
+      "NAME_REQUIRED": "Bitte geben Sie Ihren Namen ein.",
+      "NAME_MAX": "Name darf höchstens 100 Zeichen lang sein.",
+      "EMAIL_REQUIRED": "Bitte geben Sie Ihre E-Mail-Adresse ein.",
+      "EMAIL_INVALID": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+      "TEXT_REQUIRED": "Bitte geben Sie eine Begründung ein.",
+      "TEXT_MAX": "Begründung darf höchstens 1000 Zeichen lang sein."
+    }
+  },
+  "FOOTER": {
+    "IMPRESSUM": "Impressum",
+    "CONTACT": "Kontakt"
+  },
+  "TAGS": {
+    "TITLE": "Tags"
   }
 }

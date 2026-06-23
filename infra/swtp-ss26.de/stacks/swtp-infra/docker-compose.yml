@@ -124,6 +124,24 @@ services:
       - hopp_internal
     restart: unless-stopped
 
+  # === Maildev (zentraler SMTP-Dummy für alle Stacks) ===
+  maildev:
+    image: maildev/maildev:latest
+    container_name: maildev
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-net
+      - traefik.http.routers.maildev.rule=Host(`mail.swtp-ss26.de`)
+      - traefik.http.routers.maildev.entrypoints=websecure
+      - traefik.http.routers.maildev.tls.certresolver=letsencrypt-inwx
+      - traefik.http.routers.maildev.service=maildev
+      - traefik.http.services.maildev.loadbalancer.server.port=1080
+    networks:
+      - traefik-net
+      - app_internal
+      - review_net
+    restart: unless-stopped
+
   # === Dashboard (statische Übersichtsseite aller Environments) ===
   dashboard:
     image: nginx:alpine

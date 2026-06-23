@@ -1,4 +1,4 @@
-package de.thm.swtp.api.projectPost.ProjectPostController;
+package de.thm.swtp.api.projectPost.controller;
 
 import de.thm.swtp.api.projectPost.service.ProjectPostService;
 import de.thm.swtp.api.projectPost.dto.CreateProjectPostRequest;
@@ -6,6 +6,7 @@ import de.thm.swtp.api.projectPost.dto.ProjectPostResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
@@ -20,9 +21,9 @@ public class ProjectPostController {
     private final ProjectPostService projectPostService;
 
     @GetMapping
-    public List<ProjectPostResponse> getPublishedPosts(@PathVariable UUID projectId, @AuthenticationPrincipal Jwt jwt) {
-        UUID currentUserId = getCurrentUserId(jwt);
-        return projectPostService.getPublishedPostsForProject(projectId, currentUserId)
+    @PreAuthorize("@security.canViewProject(#projectId, authentication)")
+    public List<ProjectPostResponse> getPublishedPosts(@PathVariable UUID projectId) {
+        return projectPostService.getPublishedPostsForProject(projectId)
                 .stream()
                 .map(ProjectPostResponse::toResponse)
                 .toList();
@@ -30,34 +31,33 @@ public class ProjectPostController {
 
 
     @PostMapping
+    @PreAuthorize("@security.canCreateProjectPost(#projectId, authentication)")
     public ProjectPostResponse createPost(@PathVariable UUID projectId, @AuthenticationPrincipal Jwt jwt,
                                           @Valid @RequestBody CreateProjectPostRequest createProjectPostRequest) {
 
-        UUID currentUserId = getCurrentUserId(jwt);
-        return ProjectPostResponse.toResponse(projectPostService.createProjectPost(projectId, currentUserId,
+        UUID authorId = getCurrentUserId(jwt);
+        return ProjectPostResponse.toResponse(projectPostService.createProjectPost(projectId, authorId,
                 createProjectPostRequest.title(), createProjectPostRequest.content(),
                 createProjectPostRequest.contentFormat(), createProjectPostRequest.status()));
     }
 
     @DeleteMapping("/{postId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deletePost(@PathVariable UUID projectId, @PathVariable UUID postId, @AuthenticationPrincipal Jwt jwt) {
-        UUID currentUserId = getCurrentUserId(jwt);
-        projectPostService.deleteProjectPost(projectId, postId, currentUserId);
+    @PreAuthorize("@security.canDeleteProjectPost(#projectId, #postId, authentication)")
+    public void deletePost(@PathVariable UUID projectId, @PathVariable UUID postId) {
+        projectPostService.deleteProjectPost(projectId, postId);
     }
 
     @PatchMapping("/{postId}/publish")
-    public ProjectPostResponse publishPost(@PathVariable UUID projectId, @PathVariable UUID postId, @AuthenticationPrincipal Jwt jwt) {
-        UUID currentUserId = getCurrentUserId(jwt);
-
-        return ProjectPostResponse.toResponse(projectPostService.publishProjectPost(projectId, postId, currentUserId));
+    @PreAuthorize("@security.canPublishProjectPost(#projectId, #postId, authentication)")
+    public ProjectPostResponse publishPost(@PathVariable UUID projectId, @PathVariable UUID postId) {
+        return ProjectPostResponse.toResponse(projectPostService.publishProjectPost(projectId, postId));
     }
 
     @PatchMapping("/{postId}/archive")
-    public ProjectPostResponse archivePost(@PathVariable UUID projectId, @PathVariable UUID postId, @AuthenticationPrincipal Jwt jwt) {
-        UUID currentUserId = getCurrentUserId(jwt);
-
-        return ProjectPostResponse.toResponse(projectPostService.archiveProjectPost(projectId, postId, currentUserId));
+    @PreAuthorize("@security.canArchiveProjectPost(#projectId, #postId, authentication)")
+    public ProjectPostResponse archivePost(@PathVariable UUID projectId, @PathVariable UUID postId) {
+        return ProjectPostResponse.toResponse(projectPostService.archiveProjectPost(projectId, postId));
 
     }
 

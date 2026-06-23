@@ -1,11 +1,10 @@
-package de.thm.swtp.api.projectFavorite.service;
+package de.thm.swtp.api.project;
 
-import de.thm.swtp.api.project.ProjectEntity;
-import de.thm.swtp.api.project.ProjectRepository;
 import de.thm.swtp.api.projectFavorite.entity.ProjectFavoriteEntity;
 import de.thm.swtp.api.projectFavorite.exception.ProjectAlreadyFavoritedException;
 import de.thm.swtp.api.projectFavorite.exception.ProjectFavoriteNotFoundException;
 import de.thm.swtp.api.projectFavorite.repository.ProjectFavoriteRepository;
+import de.thm.swtp.api.projectFavorite.service.ProjectFavoriteService;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import org.junit.jupiter.api.Test;

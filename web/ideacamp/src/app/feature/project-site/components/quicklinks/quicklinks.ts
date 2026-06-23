@@ -4,11 +4,13 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ProjectLinkModel} from '../../../../models/project-link.model';
 import { ProjectLinkService } from '../../services/project-link.service';
 import { createProjectLinkSchema, updateProjectLinkSchema, CreateProjectLinkRequest, UpdateProjectLinkRequest} from '../../schemas/project-link.schema';
+import { LinkVisibility } from '../../../../models/link-visibility.model';
+import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-quicklinks',
   standalone: true,
-  imports: [FormsModule, TranslatePipe],
+  imports: [FormsModule, NgClass, TranslatePipe],
   templateUrl: './quicklinks.html',
 })
 export class Quicklinks implements OnChanges {
@@ -32,6 +34,9 @@ export class Quicklinks implements OnChanges {
   updateLabel = '';
   updateUrl = '';
 
+  newVisibility: LinkVisibility = 'PUBLIC';
+  updateVisibility: LinkVisibility = 'PUBLIC';
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['projectId'] && this.projectId) {
       this.loadLinks();
@@ -44,6 +49,7 @@ export class Quicklinks implements OnChanges {
     this.errorMessage = null;
     this.newLabel = '';
     this.newUrl = '';
+    this.newVisibility = 'PUBLIC';
   }
 
   cancelAdd(): void {
@@ -51,6 +57,7 @@ export class Quicklinks implements OnChanges {
     this.errorMessage = null;
     this.newLabel = '';
     this.newUrl = '';
+    this.newVisibility = 'PUBLIC';
   }
 
   startEdit(link: ProjectLinkModel): void {
@@ -59,6 +66,7 @@ export class Quicklinks implements OnChanges {
     this.errorMessage = null;
     this.updateLabel = link.label;
     this.updateUrl = link.url;
+    this.updateVisibility = link.visibility;
   }
 
   cancelEdit(): void {
@@ -66,6 +74,7 @@ export class Quicklinks implements OnChanges {
     this.errorMessage = null;
     this.updateLabel = '';
     this.updateUrl = '';
+    this.updateVisibility = 'PUBLIC';
   }
 
   loadLinks(): void {
@@ -80,11 +89,19 @@ export class Quicklinks implements OnChanges {
         this.changeDetectorRef.markForCheck();
       },
       error: () => {
-        this.errorMessage = this.translateService.instant('PROJECTSITE.QUICKLINKS.ERROR_LOAD');
+        this.errorMessage = this.translateService.instant('COMMON.QUICKLINKS.ERROR_LOAD');
         this.isLoading = false;
         this.changeDetectorRef.markForCheck();
       },
     });
+  }
+
+  toggleNewVisibility(): void {
+    this.newVisibility = this.newVisibility === 'PUBLIC' ? 'PRIVATE' : 'PUBLIC';
+  }
+
+  toggleUpdateVisibility(): void {
+    this.updateVisibility = this.updateVisibility === 'PUBLIC' ? 'PRIVATE' : 'PUBLIC';
   }
 
   addLink(): void {
@@ -100,7 +117,7 @@ export class Quicklinks implements OnChanges {
         this.changeDetectorRef.markForCheck();
       },
       error: () => {
-        this.errorMessage = this.translateService.instant('PROJECTSITE.QUICKLINKS.ERROR_ADD');
+        this.errorMessage = this.translateService.instant('COMMON.QUICKLINKS.ERROR_ADD');
       },
     });
   }
@@ -118,7 +135,7 @@ export class Quicklinks implements OnChanges {
         this.changeDetectorRef.markForCheck();
       },
       error: () => {
-        this.errorMessage = this.translateService.instant('PROJECTSITE.QUICKLINKS.ERROR_UPDATE');
+        this.errorMessage = this.translateService.instant('COMMON.QUICKLINKS.ERROR_UPDATE');
       },
     });
   }
@@ -130,25 +147,24 @@ export class Quicklinks implements OnChanges {
         this.changeDetectorRef.markForCheck();
       },
       error: () => {
-        this.errorMessage = this.translateService.instant('PROJECTSITE.QUICKLINKS.ERROR_DELETE');
+        this.errorMessage = this.translateService.instant('COMMON.QUICKLINKS.ERROR_DELETE');
       },
     });
   }
 
-  openLink(url : string): void {
+  openLink(url: string): void {
     window.open(url, '_blank', 'noopener,noreferrer');
   }
 
   removeHttpFromLink(url: string): string {
-    return url
-      .replace(/^https?:\/\//, '')
-      .replace(/\/$/, '');
+    return url.replace(/^https?:\/\//, '').replace(/\/$/, '');
   }
 
   private validateCreateLinkRequest(): CreateProjectLinkRequest | null {
     const res = createProjectLinkSchema.safeParse({
       label: this.newLabel,
       url: this.addsHttpsToUrl(this.newUrl),
+      visibility: this.newVisibility,
     });
 
     if (!res.success) {
@@ -163,6 +179,7 @@ export class Quicklinks implements OnChanges {
     const res = updateProjectLinkSchema.safeParse({
       label: this.updateLabel,
       url: this.addsHttpsToUrl(this.updateUrl),
+      visibility: this.updateVisibility,
     });
 
     if (!res.success) {
@@ -174,7 +191,7 @@ export class Quicklinks implements OnChanges {
   }
 
   private setValidationError(message?: string): void {
-    this.errorMessage = this.translateService.instant(message ?? 'PROJECTSITE.QUICKLINKS.ERROR_INVALID');
+    this.errorMessage = this.translateService.instant(message ?? 'COMMON.QUICKLINKS.ERROR_INVALID');
   }
 
   private addCreatedProjectLink(link: ProjectLinkModel) {
@@ -189,10 +206,10 @@ export class Quicklinks implements OnChanges {
     this.links = this.links.filter((link) => link.id !== linkId);
   }
 
-  private addsHttpsToUrl(url : string): string {
+  private addsHttpsToUrl(url: string): string {
     const trimmedUrl = url.trim();
 
-    if (/^https?:\/\//i.test(trimmedUrl)){
+    if (/^https?:\/\//i.test(trimmedUrl)) {
       return trimmedUrl;
     }
     return `https://${trimmedUrl}`;

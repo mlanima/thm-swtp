@@ -13,6 +13,7 @@ public class ProjectLinkMapper{
                 .url(projectLinkEntity.getUrl())
                 .createdAt(projectLinkEntity.getCreatedAt())
                 .updatedAt(projectLinkEntity.getUpdatedAt())
+                .visibility(projectLinkEntity.getVisibility())
                 .build();
     }
 }

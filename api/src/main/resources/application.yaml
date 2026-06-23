@@ -19,6 +19,17 @@ spring:
       ddl-auto: update
     open-in-view: false
 
+  mail:
+    host: localhost
+    port: 1025
+    properties:
+      mail.smtp.auth: false
+      mail.smtp.starttls.enable: false
+
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
+
   security:
     oauth2:
       resourceserver:
@@ -32,3 +43,7 @@ server:
 app:
   uploads:
     dir: ./uploads
+  mail:
+    from: noreply@swtp-ss26.de
+    language: de
+  frontend-url: http://localhost:4200

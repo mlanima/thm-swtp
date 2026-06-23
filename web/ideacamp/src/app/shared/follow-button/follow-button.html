@@ -1,0 +1,25 @@
+@if (!loading()) {
+  @if (following()) {
+    <button
+      type="button"
+      (click)="toggle($event)"
+      class="group flex items-center gap-1.5 rounded-lg bg-slate-700 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-slate-500">
+      <span class="flex items-center gap-1.5 group-hover:hidden">
+        <i class="pi pi-check text-sm"></i>
+        {{ 'USERPROFILE.FOLLOWING' | translate }}
+      </span>
+      <span class="hidden items-center gap-1.5 group-hover:flex">
+        <i class="pi pi-user-minus text-sm"></i>
+        {{ 'USERPROFILE.UNFOLLOW' | translate }}
+      </span>
+    </button>
+  } @else {
+    <button
+      type="button"
+      (click)="toggle($event)"
+      class="flex items-center gap-1.5 rounded-lg bg-slate-700 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-slate-800">
+      <i class="pi pi-user-plus text-sm"></i>
+      {{ 'USERPROFILE.FOLLOW' | translate }}
+    </button>
+  }
+}
