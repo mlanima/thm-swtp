@@ -126,6 +126,7 @@
   .dot.be { background: var(--accent2); }
   .dot.keycloak { background: #e8872a; }
   .dot.maildev { background: #3ddc97; }
+  .dot.hoppscotch { background: #ff7272; }
   .dot.logs { background: var(--fg-dim); }
   .dot.pr_url { background: var(--fg-dim); }
   .meta {
@@ -167,22 +168,24 @@
 
 <script>
 const ICONS = {
-  fe:       "🖥",
-  be:       "⚙",
-  keycloak: "🔐",
-  maildev:  "📬",
-  logs:     "📜",
-  pr_url:   "🔗"
+  fe:         "🖥",
+  be:         "⚙",
+  keycloak:   "🔐",
+  maildev:    "📬",
+  hoppscotch: "🚀",
+  logs:       "📜",
+  pr_url:     "🔗"
 };
 const LABELS = {
-  fe:       "Frontend",
-  be:       "Backend",
-  keycloak: "Keycloak",
-  maildev:  "Maildev",
-  logs:     "Logs",
-  pr_url:   "Pull Request"
+  fe:         "Frontend",
+  be:         "Backend",
+  keycloak:   "Keycloak",
+  maildev:    "Maildev",
+  hoppscotch: "Hoppscotch",
+  logs:       "Dozzle",
+  pr_url:     "Pull Request"
 };
-const KEY_ORDER = ["fe", "be", "keycloak", "maildev", "logs", "pr_url"];
+const KEY_ORDER = ["fe", "be", "keycloak", "maildev", "hoppscotch", "logs", "pr_url"];
 
 function linkRow(kind, url) {
   if (!url) return "";
