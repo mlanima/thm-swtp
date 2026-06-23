@@ -225,16 +225,16 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
     }
 
-    @ExceptionHandler(ProjectFileNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleProjectFileNotFound(ProjectFileNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
-    }
-
     @ExceptionHandler(ProfessorRequestInvalidStatusException.class)
     public ResponseEntity<ErrorResponse> handleProfessorRequestInvalidStatus(ProfessorRequestInvalidStatusException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ProjectFileNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleProjectFileNotFound(ProjectFileNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
     }
 
     @ExceptionHandler(ProjectFileDoesNotBelongToProjectException.class)
