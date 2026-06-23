@@ -63,6 +63,32 @@ body {
 .auth-card-header {
   border-bottom: 1px solid var(--gray-300);
   padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.locale-switcher {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.locale-item {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--slate-500);
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.locale-item:hover {
+  color: var(--slate-900);
+}
+
+.locale-item-active {
+  color: var(--slate-900);
 }
 
 .logo {

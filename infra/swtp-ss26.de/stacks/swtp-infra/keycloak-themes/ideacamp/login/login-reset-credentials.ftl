@@ -31,7 +31,7 @@
 
   <#elseif section = "info">
     <p class="auth-info-text">
-      <a class="form-link" href="${url.loginUrl}">← Back to Login</a>
+      <a class="form-link" href="${url.loginUrl}">${msg("backToLogin")?no_esc}</a>
     </p>
   </#if>
 

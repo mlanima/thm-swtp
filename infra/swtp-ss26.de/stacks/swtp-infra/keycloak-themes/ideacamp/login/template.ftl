@@ -18,6 +18,17 @@
           <div class="logo-divider"></div>
           <span class="logo-name">IdeaCamp</span>
         </div>
+        <#if realm.internationalizationEnabled && locale.supported?size gt 1>
+          <div class="locale-switcher">
+            <#list locale.supported as l>
+              <#if l.languageTag = locale.currentLanguageTag>
+                <span class="locale-item locale-item-active">${l.label}</span>
+              <#else>
+                <a class="locale-item" href="${l.url}">${l.label}</a>
+              </#if>
+            </#list>
+          </div>
+        </#if>
       </div>
 
       <div class="auth-card-body">
