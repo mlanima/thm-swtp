@@ -25,8 +25,7 @@ export interface UpdateProjectRequest {
 @Injectable({ providedIn: 'root' })
 export class ProjectService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = `${environment.apiUrl}/projects`;
-  private readonly baseUrl1 = `${environment.apiUrl}/v1/projects`;
+  private readonly baseUrl = `${environment.apiUrl}/v1/projects`;
 
   createProject(data: CreateProjectRequest): Observable<ProjectResponse> {
     return this.http.post<ProjectResponse>(this.baseUrl, data);
@@ -54,14 +53,14 @@ export class ProjectService {
   }
 
   getProjectPosts(projectId: string): Observable<ProjectPostResponse[]> {
-    return this.http.get<ProjectPostResponse[]>(`${this.baseUrl1}/${projectId}/posts`);
+    return this.http.get<ProjectPostResponse[]>(`${this.baseUrl}/${projectId}/posts`);
   }
 
   createProjectPost(projectId: string, request: CreateProjectPostRequest): Observable<ProjectPostResponse> {
-    return this.http.post<ProjectPostResponse>(`${this.baseUrl1}/${projectId}/posts`, request);
+    return this.http.post<ProjectPostResponse>(`${this.baseUrl}/${projectId}/posts`, request);
   }
 
   deleteProjectPost(projectId: string, postId: string) {
-    return this.http.delete<void>(`${this.baseUrl1}/${projectId}/posts/${postId}`);
+    return this.http.delete<void>(`${this.baseUrl}/${projectId}/posts/${postId}`);
   }
 }
