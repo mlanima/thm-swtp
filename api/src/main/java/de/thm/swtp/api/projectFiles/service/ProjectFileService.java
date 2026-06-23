@@ -10,8 +10,9 @@ import de.thm.swtp.api.projectFiles.entity.ProjectFileEntity;
 import de.thm.swtp.api.projectFiles.mapper.ProjectFileMapper;
 import de.thm.swtp.api.projectFiles.repository.ProjectFileRepository;
 import jakarta.annotation.PostConstruct;
-import org.apache.tika.Tika;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -30,6 +31,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ProjectFileService {
 
@@ -98,6 +100,7 @@ public class ProjectFileService {
         try {
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
+            log.error("Upload failed (write): project={}, file={}", projectId, originalName, e);
             throw new RuntimeException("Failed to write file to storage", e);
         }
 
@@ -131,7 +134,10 @@ public class ProjectFileService {
                 .build();
 
         try {
-            return ProjectFileMapper.toDomain(projectFileRepository.save(entity));
+            ProjectFile saved = ProjectFileMapper.toDomain(projectFileRepository.save(entity));
+            log.info("Upload: project={}, file={}, bytes={}, mime={}",
+                    projectId, originalName, file.getSize(), mimeType);
+            return saved;
         } catch (Exception e) {
             try {
                 Files.deleteIfExists(filePath);
@@ -167,8 +173,16 @@ public class ProjectFileService {
         // but never a DB record pointing to a missing file (unrecoverable crash on next download).
         projectFileRepository.delete(fileEntity);
         try {
-            Files.deleteIfExists(uploadDir.resolve(fileEntity.getStorageName()));
+            boolean removed = Files.deleteIfExists(uploadDir.resolve(fileEntity.getStorageName()));
+            if (!removed) {
+                log.warn("Delete: file missing on disk, DB record removed: project={}, file={}",
+                        projectId, fileId);
+            } else {
+                log.info("Delete: project={}, file={}, storage={}",
+                        projectId, fileId, fileEntity.getStorageName());
+            }
         } catch (IOException e) {
+            log.error("Delete failed (disk): project={}, file={}", projectId, fileId, e);
             throw new RuntimeException("Failed to delete file from storage", e);
         }
     }
