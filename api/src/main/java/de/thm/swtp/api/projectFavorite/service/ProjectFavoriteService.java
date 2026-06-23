@@ -12,6 +12,7 @@ import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProjectFavoriteService {
 
     private final ProjectFavoriteRepository projectFavoriteRepository;
@@ -48,6 +50,7 @@ public class ProjectFavoriteService {
                         .project(project)
                         .build()
         );
+        log.info("Favorite added: project={}, user={}", projectId, userId);
     }
 
     @Transactional
@@ -58,6 +61,7 @@ public class ProjectFavoriteService {
 
         ProjectEntity project = favorite.getProject();
         projectFavoriteRepository.delete(favorite);
+        log.info("Favorite removed: project={}, user={}", projectId, userId);
     }
 
     @Transactional(readOnly = true)

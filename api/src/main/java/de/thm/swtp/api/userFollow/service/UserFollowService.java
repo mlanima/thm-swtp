@@ -9,6 +9,7 @@ import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserFollowService {
 
     private final UserFollowRepository userFollowRepository;
@@ -50,6 +52,7 @@ public class UserFollowService {
         }
 
         userProfileRepository.incrementFollowers(followingId);
+        log.info("Follow: follower={}, following={}", followerId, followingId);
     }
 
     @Transactional
@@ -60,6 +63,7 @@ public class UserFollowService {
 
         userFollowRepository.delete(follow);
         userProfileRepository.decrementFollowers(followingId);
+        log.info("Unfollow: follower={}, following={}", followerId, followingId);
     }
 
     @Transactional(readOnly = true)

@@ -49,6 +49,8 @@ public class ProjectInviteService {
         ProjectInviteEntity projectInviteEntity = createPendingInvite(projectEntity, invitedUserEntity, message);
 
         ProjectInviteEntity saved = projectInviteRepository.save(projectInviteEntity);
+        log.info("Invite created: invite={}, project={}, from={}, to={}",
+                saved.getId(), projectId, projectEntity.getOwner().getKeycloakId(), invitedUserId);
         ProjectInvite invite = ProjectInviteMapper.toDomain(saved);
 
         if (invitedUserEntity.getEmail() != null) {
@@ -91,6 +93,7 @@ public class ProjectInviteService {
         ProjectInvite invite = ProjectInviteMapper.toDomain(inviteEntity);
 
         checkInviteStatus(invite, newStatus);
+        log.info("Invite status: invite={}, {}->{}", inviteId, invite.getStatus(), newStatus);
         inviteEntity.setStatus(newStatus);
 
 

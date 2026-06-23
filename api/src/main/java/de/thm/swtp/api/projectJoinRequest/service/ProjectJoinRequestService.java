@@ -16,6 +16,7 @@ import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +27,7 @@ import java.util.UUID;
 /** Service for managing project join-requests. */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProjectJoinRequestService {
     private final ProjectJoinRequestRepository projectJoinRequestRepository;
     private final ProjectRepository projectRepository;
@@ -61,6 +63,8 @@ public class ProjectJoinRequestService {
                 .build();
 
         ProjectJoinRequestEntity saved =  projectJoinRequestRepository.save(joinRequestEntity);
+        log.info("Join request created: request={}, project={}, by={}",
+                saved.getId(), projectId, currentUserId);
         return ProjectJoinRequestMapper.toDomain(saved);
     }
 
@@ -82,6 +86,8 @@ public class ProjectJoinRequestService {
 
         projectEntity.getMembers().add(joinRequestEntity.getRequestingUser());
         ProjectJoinRequestEntity saved = projectJoinRequestRepository.save(joinRequestEntity);
+        log.info("Join request accepted: request={}, project={}, user={}",
+                saved.getId(), projectEntity.getId(), joinRequestEntity.getRequestingUser().getKeycloakId());
 
         return ProjectJoinRequestMapper.toDomain(saved);
 
@@ -101,6 +107,8 @@ public class ProjectJoinRequestService {
 
         joinRequestEntity.setStatus(ProjectJoinRequestStatus.REJECTED);
         ProjectJoinRequestEntity saved = projectJoinRequestRepository.save(joinRequestEntity);
+        log.info("Join request rejected: request={}, project={}",
+                saved.getId(), joinRequestEntity.getProject().getId());
 
         return ProjectJoinRequestMapper.toDomain(saved);
     }
