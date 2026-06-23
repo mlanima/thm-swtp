@@ -433,6 +433,7 @@
     "DELETE_POST": "Delete post",
     "DELETING": "Deleting…",
     "DELETE_SUCCESS": "Post deleted successfully."
+  },
   "USER_SETTINGS": {
     "TITLE": "Settings",
     "TABS": {
