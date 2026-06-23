@@ -19,6 +19,10 @@ spring:
       ddl-auto: update
     open-in-view: false
 
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
+
   security:
     oauth2:
       resourceserver:
@@ -32,3 +36,5 @@ server:
 app:
   uploads:
     dir: ./uploads
+  mail:
+    language: de
