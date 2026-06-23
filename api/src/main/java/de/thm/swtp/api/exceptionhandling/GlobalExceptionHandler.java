@@ -231,11 +231,6 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(422, "Unprocessable Entity", ex.getMessage()));
     }
 
-    @ExceptionHandler(UserProfileNotAllowedException.class)
-    public ResponseEntity<ErrorResponse> handleUserProfileNotAllowed(UserProfileNotAllowedException ex) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(ErrorResponse.of(403, "Forbidden", ex.getMessage()));
-    }
     @ExceptionHandler(CannotFollowYourselfException.class)
     public ResponseEntity<ErrorResponse> handleCannotFollowYourself(CannotFollowYourselfException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
