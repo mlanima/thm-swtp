@@ -70,6 +70,7 @@ public class NotificationService {
                 : "";
 
         String html = inviteTemplate
+                .replace("{lang}", mailLanguage)
                 .replace("{greeting}", greeting)
                 .replace("{body}", body)
                 .replace("{message-block}", messageBlock)
