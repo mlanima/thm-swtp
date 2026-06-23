@@ -331,6 +331,108 @@ body {
   margin-left: 4px;
 }
 
+/* ── Inline back link (used below form, no border) ──────── */
+
+.auth-card-footer-inline {
+  margin-top: 4px;
+  text-align: center;
+}
+
+/* ── Keycloak built-in template overrides (forgot password) ─ */
+/* Applied when Keycloak's JAR template is used instead of ours */
+
+[class*="col-xs-"], [class*="col-sm-"],
+[class*="col-md-"], [class*="col-lg-"] {
+  width: 100%;
+  display: block;
+  float: none;
+}
+
+.pf-c-form__label,
+.pf-c-form__label-text {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--slate-700);
+  display: block;
+}
+
+.pf-c-form-control {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--gray-300);
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  font-family: inherit;
+  color: var(--slate-900);
+  background-color: #ffffff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  box-sizing: border-box;
+  display: block;
+}
+
+.pf-c-form-control:focus {
+  border-color: var(--slate-900);
+  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.08);
+}
+
+input.pf-c-button.pf-m-primary,
+.pf-c-button.pf-m-primary {
+  width: 100%;
+  padding: 10px 16px;
+  background-color: var(--slate-900);
+  color: #ffffff;
+  border: 1px solid var(--slate-900);
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: center;
+  display: block;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  outline: none;
+  box-sizing: border-box;
+}
+
+input.pf-c-button.pf-m-primary:hover,
+.pf-c-button.pf-m-primary:hover {
+  background-color: var(--slate-700);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
+}
+
+.login-pf-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#kc-form-options {
+  text-align: center;
+}
+
+#kc-form-options a {
+  font-size: 0.8125rem;
+  color: var(--slate-500);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-color: var(--slate-300);
+}
+
+#kc-form-options a:hover {
+  color: var(--slate-900);
+  text-decoration-color: var(--slate-500);
+}
+
+.auth-card-footer {
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--slate-500);
+  line-height: 1.5;
+}
+
 /* ── Info page actions list ──────────────────────────────── */
 
 .info-actions-list {

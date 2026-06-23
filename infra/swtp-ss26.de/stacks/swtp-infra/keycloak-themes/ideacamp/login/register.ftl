@@ -1,7 +1,5 @@
 <#import "template.ftl" as layout>
-<@layout.registrationLayout
-  displayMessage=!messagesPerField.existsError('firstName','lastName','email','username','password','password-confirm')
-  displayInfo=true; section>
+<@layout.registrationLayout displayMessage=true displayInfo=true; section>
 
   <#if section = "header">
     <h2 class="auth-title">${msg("registerTitle")}</h2>
