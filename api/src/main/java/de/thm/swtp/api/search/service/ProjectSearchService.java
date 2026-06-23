@@ -24,8 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
  * generic engine to the project entity type.
  */
 @Service
-@Slf4j
 @RequiredArgsConstructor
+@Slf4j
 public class ProjectSearchService {
 
     private final ProjectSearchRepository projectSearchRepository;

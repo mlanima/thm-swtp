@@ -31,8 +31,8 @@ import java.util.Set;
 import java.util.UUID;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
+@Slf4j
 public class ProjectFileService {
 
     private static final Set<String> ALLOWED_MIME_TYPES = Set.of(

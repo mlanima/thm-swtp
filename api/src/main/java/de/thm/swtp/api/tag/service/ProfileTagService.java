@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
+@Slf4j
 public class ProfileTagService {
 
     private final TagRepository tagRepository;

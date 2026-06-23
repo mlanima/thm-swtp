@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
+@Slf4j
 public class ProjectPostService {
     private final ProjectPostRepository projectPostRepository;
     private final ProjectRepository projectRepository;

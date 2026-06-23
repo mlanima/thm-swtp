@@ -22,8 +22,8 @@ import java.time.*;
 import org.springframework.stereotype.Service;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
+@Slf4j
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
