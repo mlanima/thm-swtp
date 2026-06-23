@@ -4,7 +4,6 @@ package de.thm.swtp.api.config;
 import de.thm.swtp.api.exceptionhandling.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.http.MediaType;
@@ -24,7 +23,7 @@ public class RestAuthenticationEntryPoint
     private final ObjectMapper objectMapper;
 
     @Override
-    public void commence(@NonNull HttpServletRequest request, @NotNull HttpServletResponse response, @NonNull AuthenticationException exception)
+    public void commence(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull AuthenticationException exception)
             throws IOException {
 
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
