@@ -78,14 +78,17 @@ public class NotificationService {
                 .replace("{hint}", hint)
                 .replace("{footer}", footer);
 
-        MimeMessage mail = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(mail, false, "UTF-8");
-        helper.setFrom(mailFrom);
-        helper.setTo(event.invitedUserEmail());
-        helper.setSubject(subject);
-        helper.setText(html, true);
-
-        mailSender.send(mail);
+        try {
+            MimeMessage mail = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mail, false, "UTF-8");
+            helper.setFrom(mailFrom);
+            helper.setTo(event.invitedUserEmail());
+            helper.setSubject(subject);
+            helper.setText(html, true);
+            mailSender.send(mail);
+        } catch (jakarta.mail.MessagingException e) {
+            throw new RuntimeException("Failed to build invite mail for " + event.invitedUserEmail(), e);
+        }
         log.info("Invite mail sent to {} for project '{}'", event.invitedUserEmail(), invite.getProjectName());
     }
 
