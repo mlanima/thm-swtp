@@ -16,6 +16,8 @@ import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.util.UUID;
@@ -102,9 +104,11 @@ class GlobalExceptionHandlerTest {
 
     @Test
     void validationReturns400() {
-        // MethodArgumentNotValidException's constructor/getMessage need a real MethodParameter+BindingResult;
-        // the handler only reads getMessage(), so a mock is enough and avoids fragile Spring MVC wiring.
-        MethodArgumentNotValidException ex = org.mockito.Mockito.mock(MethodArgumentNotValidException.class);
+        // Handler joins field-error messages from the BindingResult, so build a real one
+        // rather than mocking the exception (a mock's getBindingResult() returns null).
+        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(new Object(), "obj");
+        bindingResult.addError(new FieldError("obj", "name", "must not be blank"));
+        MethodArgumentNotValidException ex = new MethodArgumentNotValidException(null, bindingResult);
         assertStatus(handler.handleValidation(ex), HttpStatus.BAD_REQUEST);
     }
 
