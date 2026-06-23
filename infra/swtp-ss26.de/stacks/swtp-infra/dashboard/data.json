@@ -3,6 +3,7 @@
     "fe": "https://www.swtp-ss26.de",
     "be": "https://api.swtp-ss26.de",
     "logs": "https://logs.swtp-ss26.de",
+    "hide_be": true,
     "updated_at": "2026-06-15 12:00:00"
   },
   "dev": {

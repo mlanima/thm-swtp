@@ -185,7 +185,8 @@ function linkRow(kind, url) {
 
 function card(title, env) {
   if (!env) return "";
-  const links = ["fe", "be", "logs", "pr_url"].map(k => linkRow(k, env[k])).join("");
+  const keys = env.hide_be ? ["fe", "logs", "pr_url"] : ["fe", "be", "logs", "pr_url"];
+  const links = keys.map(k => linkRow(k, env[k])).join("");
   const updated = env.updated_at ? `Stand: ${env.updated_at}` : "";
   return `<div class="card">
     <h3>${title} <span class="badge">live</span></h3>

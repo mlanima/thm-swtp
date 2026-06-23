@@ -8,6 +8,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
       SPRING_PROFILES_ACTIVE: mysql
       APP_UPLOADS_DIR: /app/uploads
+      SPRINGDOC_SWAGGERUI_ENABLED: "false"
     volumes:
       - ./uploads:/app/uploads
     labels:

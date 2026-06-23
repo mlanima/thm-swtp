@@ -9,9 +9,10 @@
 ;; ── Per-stack config ─────────────────────────────────────────────────────────
 (def stacks
   {"main" {:tag       "latest"
-           :dashboard {"fe"   "https://www.swtp-ss26.de"
-                       "be"   "https://api.swtp-ss26.de/swagger-ui/index.html"
-                       "logs" "https://logs.swtp-ss26.de"}}
+           :dashboard {"fe"      "https://www.swtp-ss26.de"
+                       "be"      "https://api.swtp-ss26.de"
+                       "logs"    "https://logs.swtp-ss26.de"
+                       "hide_be" true}}
    "dev"  {:tag       "dev"
            :dashboard {"fe"   "https://dev.swtp-ss26.de"
                        "be"   "https://api.dev.swtp-ss26.de/swagger-ui/index.html"
