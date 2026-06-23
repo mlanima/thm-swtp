@@ -44,7 +44,7 @@ services:
   swtp-main-dozzle:
     image: amir20/dozzle:latest
     container_name: swtp-main-dozzle
-    command: ["--filter", "name=swtp-main", "--filter", "name=keycloak", "--filter", "name=maildev", "--filter", "name=hoppscotch", "--filter", "name=swtp-db"]
+    command: ["--filter", "name=swtp-main", "--filter", "name=keycloak", "--filter", "name=maildev", "--filter", "name=hoppscotch", "--filter", "name=swtp-db", "--filter", "name=swtp-dashboard"]
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
