@@ -15,6 +15,7 @@ import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
+import jakarta.annotation.PostConstruct;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import org.springframework.web.util.HtmlUtils;
@@ -36,6 +37,14 @@ public class NotificationService {
     @Value("${app.mail.language:de}")
     private String mailLanguage;
 
+    private String inviteTemplate;
+
+    @PostConstruct
+    void loadTemplates() throws Exception {
+        inviteTemplate = new ClassPathResource("templates/emails/invite.html")
+                .getContentAsString(StandardCharsets.UTF_8);
+    }
+
     // 3 Retries bei jedem Fehler: nach ~10s, ~60s, ~5min — danach @Recover (warn + swallow)
     @Retryable(retryFor = Exception.class, maxAttempts = 4, backoff = @Backoff(delay = 10_000, multiplier = 6, maxDelay = 300_000))
     public void sendInviteMail(ProjectInviteCreatedEvent event) throws Exception {
@@ -56,14 +65,11 @@ public class NotificationService {
 
         String ctaUrl = frontendUrl + "/my-projects";
 
-        String template = new ClassPathResource("templates/emails/invite.html")
-                .getContentAsString(StandardCharsets.UTF_8);
-
         String messageBlock = (invite.getMessage() != null && !invite.getMessage().isBlank())
                 ? "<div class=\"message-box\">" + HtmlUtils.htmlEscape(invite.getMessage()) + "</div>"
                 : "";
 
-        String html = template
+        String html = inviteTemplate
                 .replace("{greeting}", greeting)
                 .replace("{body}", body)
                 .replace("{message-block}", messageBlock)
