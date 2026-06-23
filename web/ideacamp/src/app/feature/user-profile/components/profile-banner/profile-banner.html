@@ -34,9 +34,7 @@
 
               <div class="flex items-center gap-1.5">
                 <app-followers-icon></app-followers-icon>
-                <span>
-                  {{ profile.followers }} Followers
-                </span>
+                <span>{{ followerCount() }} {{ 'USERPROFILE.FOLLOWERS' | translate }}</span>
               </div>
             </div>
           } @else {
@@ -60,9 +58,7 @@
 
               <div class="flex items-center gap-1.5">
                 <app-followers-icon></app-followers-icon>
-                <span>
-                  {{ profile.followers }} Followers
-                </span>
+                <span>{{ followerCount() }} {{ 'USERPROFILE.FOLLOWERS' | translate }}</span>
               </div>
             </div>
           }
@@ -70,6 +66,17 @@
       </div>
     </div>
   </div>
+
+  @if (!isOwnProfile) {
+    <div class="absolute right-4 top-4 flex gap-2">
+      <app-follow-button [username]="profile.username" [count]="profile.followers" (followerCountChanged)="followerCount.set($event)"></app-follow-button>
+      <!--<button
+        type="button"
+        class="rounded-lg bg-slate-700 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-slate-800">
+        {{ 'USERPROFILE.INVITE' | translate }}
+      </button>-->
+    </div>
+  }
 
   @if (isOwnProfile) {
     <div class="absolute bottom-4 right-4">
