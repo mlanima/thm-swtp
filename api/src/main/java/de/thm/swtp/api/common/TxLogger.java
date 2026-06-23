@@ -21,12 +21,11 @@ public final class TxLogger {
 
     public static void afterCommit(Logger logger, String message, Object... args) {
         if (!TransactionSynchronizationManager.isSynchronizationActive()) {
-            // ponytail: no active tx — log immediately so the line isn't lost
             logger.info(message, args);
             return;
         }
         // Eagerly format for the rollback warn — SLF4J placeholders can't span two strings.
-        String rolledBackMsg = "Rolled back — " + MessageFormatter.format(message, args).getMessage();
+        String rolledBackMsg = "Rolled back — " + MessageFormatter.arrayFormat(message, args).getMessage();
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
