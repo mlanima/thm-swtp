@@ -79,6 +79,7 @@ public class ProjectEntity {
             joinColumns = @JoinColumn(name = "project_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_name")
     )
+    @Builder.Default
     private Set<TagEntity> tags = new HashSet<>();
 
     @OneToMany(mappedBy = "project", orphanRemoval = true)

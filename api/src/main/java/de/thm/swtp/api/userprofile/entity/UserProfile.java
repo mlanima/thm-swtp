@@ -55,5 +55,6 @@ public class UserProfile {
 
     @ManyToMany
     @JoinTable(name = "user_profile_tags", joinColumns = @JoinColumn(name = "user_profile_keycloak_id"), inverseJoinColumns = @JoinColumn(name = "tag_name"))
+    @Builder.Default
     private Set<TagEntity> tags = new HashSet<>();
 }

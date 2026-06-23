@@ -1,7 +1,7 @@
 @if (!loading()) {
   <button
     (click)="toggle($event)"
-    [title]="favorited() ? 'Aus Favoriten entfernen' : 'Zu Favoriten hinzufügen'"
+    [title]="(favorited() ? 'FAVORITE.REMOVE_TITLE' : 'FAVORITE.ADD_TITLE') | translate"
     class="flex items-center gap-1.5 rounded-full p-3 transition"
     [class]="onDark ? 'hover:bg-white/20' : 'hover:bg-slate-100'"
   >

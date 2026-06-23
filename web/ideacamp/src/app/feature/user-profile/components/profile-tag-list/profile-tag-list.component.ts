@@ -1,12 +1,12 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges, inject, signal } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { EditableTagListComponent } from '../../../../shared/tags/tag-list/editable-tag-list.component';
 import { UserProfileTagService, TagResponse } from '../../services/user-profile-tag.service'
 
 @Component({
   selector: 'app-profile-tag-list',
   standalone: true,
-  imports: [EditableTagListComponent],
+  imports: [EditableTagListComponent, TranslatePipe],
   templateUrl: './profile-tag-list.component.html',
 })
 export class ProfileTagListComponent implements OnInit, OnChanges {
