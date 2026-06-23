@@ -10,6 +10,7 @@ services:
       APP_UPLOADS_DIR: /app/uploads
       SPRING_MAIL_HOST: maildev
       SPRING_MAIL_PORT: "1025"
+      APP_FRONTEND_URL: https://dev.swtp-ss26.de
     volumes:
       - ./uploads:/app/uploads
     labels:
