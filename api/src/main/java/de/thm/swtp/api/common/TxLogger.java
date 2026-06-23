@@ -24,8 +24,6 @@ public final class TxLogger {
             logger.info(message, args);
             return;
         }
-        // Eagerly format for the rollback warn — SLF4J placeholders can't span two strings.
-        String rolledBackMsg = "Rolled back — " + MessageFormatter.arrayFormat(message, args).getMessage();
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
@@ -35,7 +33,8 @@ public final class TxLogger {
             @Override
             public void afterCompletion(int status) {
                 if (status == TransactionSynchronization.STATUS_ROLLED_BACK) {
-                    logger.warn(rolledBackMsg);
+                    // Format lazily — only on the rollback branch, not on every commit.
+                    logger.warn("Rolled back — " + MessageFormatter.arrayFormat(message, args).getMessage());
                 }
             }
         });

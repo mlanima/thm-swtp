@@ -94,6 +94,7 @@ public class ProjectFileService {
                 ? file.getOriginalFilename()
                 : "file";
         String originalName = rawName.length() > 255 ? rawName.substring(0, 255) : rawName;
+        String logName = originalName.replaceAll("\\p{Cntrl}", "_"); // strip control chars (CR/LF/...) for log output — originalName is client-controlled
         String extension = getExtension(originalName);
         String storageName = UUID.randomUUID() + (extension.isEmpty() ? "" : "." + extension);
         Path filePath = uploadDir.resolve(storageName);
@@ -101,7 +102,7 @@ public class ProjectFileService {
         try {
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            log.error("Upload failed (write): project={}, file={}", projectId, originalName, e);
+            log.error("Upload failed (write): project={}, file={}", projectId, logName, e);
             throw new RuntimeException("Failed to write file to storage", e);
         }
 
@@ -137,7 +138,7 @@ public class ProjectFileService {
         try {
             ProjectFile saved = ProjectFileMapper.toDomain(projectFileRepository.save(entity));
             TxLogger.afterCommit(log, "Upload: project={}, file={}, bytes={}, mime={}",
-                    projectId, originalName, file.getSize(), mimeType);
+                    projectId, logName, file.getSize(), mimeType);
             return saved;
         } catch (Exception e) {
             try {

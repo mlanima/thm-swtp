@@ -284,14 +284,14 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ProjectFileTypeNotAllowedException.class)
     public ResponseEntity<ErrorResponse> handleProjectFileTypeNotAllowed(ProjectFileTypeNotAllowedException ex) {
-        log.debug("Unsupported Media Type (415): {}", ex.getMessage());
+        log.warn("Unsupported Media Type (415): {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
                 .body(ErrorResponse.of(415, "Unsupported Media Type", ex.getMessage()));
     }
 
     @ExceptionHandler(ProjectFileUploadLimitExceededException.class)
     public ResponseEntity<ErrorResponse> handleProjectFileUploadLimitExceeded(ProjectFileUploadLimitExceededException ex) {
-        log.debug("Unprocessable Entity (422): {}", ex.getMessage());
+        log.warn("Unprocessable Entity (422): {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
                 .body(ErrorResponse.of(422, "Unprocessable Entity", ex.getMessage()));
     }
