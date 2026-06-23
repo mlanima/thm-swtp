@@ -1,13 +1,13 @@
 <div class="rounded-2xl bg-white p-5 shadow-sm">
   <div class="mb-4 flex items-center justify-between">
     <h3 class="text-sm font-semibold text-slate-700">
-      Dateien
+      {{ 'PROJECTSITE.FILES.TITLE' | translate }}
     </h3>
 
     @if (isOwner) {
       <label
         class="cursor-pointer rounded-md px-3 text-sm text-slate-500 transition hover:bg-slate-100 hover:text-lime-500">
-        + Hochladen
+        + {{ 'PROJECTSITE.FILES.UPLOAD' | translate }}
         <input
           type="file"
           class="hidden"
@@ -30,20 +30,20 @@
       (dragover)="onDragOver($event)"
       (drop)="onDrop($event)">
       @if (isUploading()) {
-        Wird hochgeladen…
+        {{ 'PROJECTSITE.FILES.UPLOADING' | translate }}
       } @else {
-        Datei hierher ziehen
+        {{ 'PROJECTSITE.FILES.DROP_HINT' | translate }}
       }
     </div>
   }
 
   @if (isLoading()) {
     <p class="text-sm text-slate-500">
-      Dateien werden geladen...
+      {{ 'PROJECTSITE.FILES.LOADING' | translate }}
     </p>
   } @else if (files().length === 0) {
     <p class="text-sm text-slate-400">
-      Keine Dateien vorhanden.
+      {{ 'PROJECTSITE.FILES.EMPTY' | translate }}
     </p>
   } @else {
     <div class="space-y-3 text-sm text-slate-600">
@@ -57,20 +57,20 @@
           </div>
 
           <div class="flex shrink-0 gap-1 opacity-0 transition group-hover:opacity-100">
-            <a
-              [href]="downloadUrl(file.id)"
-              download
+            <button
+              type="button"
+              (click)="downloadFile(file.id, file.originalName)"
               class="rounded-md px-2 py-1 text-sm text-slate-400 hover:bg-slate-100 hover:text-lime-500"
-              aria-label="Datei herunterladen">
+              [attr.aria-label]="'PROJECTSITE.FILES.DOWNLOAD_FILE' | translate">
               ↓
-            </a>
+            </button>
 
             @if (isOwner) {
               <button
                 type="button"
                 (click)="deleteFile(file.id)"
                 class="rounded-md px-2 py-1 text-sm text-slate-400 hover:bg-red-50 hover:text-red-500"
-                aria-label="Datei löschen">
+                [attr.aria-label]="'PROJECTSITE.FILES.DELETE_FILE' | translate">
                 ×
               </button>
             }

@@ -1,15 +1,17 @@
 import { Component, Input, OnChanges, SimpleChanges, inject, signal } from '@angular/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ProjectFileModel } from '../../../../models/project-file.model';
 import { ProjectFileService } from '../../services/project-file.service';
 
 @Component({
   selector: 'app-project-files',
   standalone: true,
-  imports: [],
+  imports: [TranslatePipe],
   templateUrl: './project-files.html',
 })
 export class ProjectFiles implements OnChanges {
   private readonly projectFileService = inject(ProjectFileService);
+  private readonly translateService = inject(TranslateService);
 
   private readonly ALLOWED_TYPES = [
     'application/pdf',
@@ -19,6 +21,8 @@ export class ProjectFiles implements OnChanges {
     'text/plain',
     'text/markdown',
   ];
+
+  private readonly ALLOWED_EXTENSIONS = ['pdf', 'png', 'jpg', 'jpeg', 'docx', 'txt', 'md'];
 
   @Input({ required: true }) projectId!: string;
   @Input() isOwner = false;
@@ -44,7 +48,7 @@ export class ProjectFiles implements OnChanges {
         this.isLoading.set(false);
       },
       error: () => {
-        this.errorMessage.set('Dateien konnten nicht geladen werden.');
+        this.errorMessage.set(this.translateService.instant('PROJECTSITE.FILES.ERROR_LOAD'));
         this.isLoading.set(false);
       },
     });
@@ -75,13 +79,25 @@ export class ProjectFiles implements OnChanges {
         this.files.set(this.files().filter((f) => f.id !== fileId));
       },
       error: () => {
-        this.errorMessage.set('Datei konnte nicht gelöscht werden.');
+        this.errorMessage.set(this.translateService.instant('PROJECTSITE.FILES.ERROR_DELETE'));
       },
     });
   }
 
-  downloadUrl(fileId: string): string {
-    return this.projectFileService.downloadUrl(this.projectId, fileId);
+  downloadFile(fileId: string, fileName: string): void {
+    this.projectFileService.downloadFile(this.projectId, fileId).subscribe({
+      next: (blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        a.click();
+        URL.revokeObjectURL(url);
+      },
+      error: () => {
+        this.errorMessage.set(this.translateService.instant('PROJECTSITE.FILES.ERROR_DOWNLOAD'));
+      },
+    });
   }
 
   formatFileSize(bytes: number): string {
@@ -98,9 +114,15 @@ export class ProjectFiles implements OnChanges {
     });
   }
 
+  private isAllowedFile(file: File): boolean {
+    if (file.type) return this.ALLOWED_TYPES.includes(file.type);
+    const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
+    return this.ALLOWED_EXTENSIONS.includes(ext);
+  }
+
   private upload(file: File): void {
-    if (!this.ALLOWED_TYPES.includes(file.type)) {
-      this.errorMessage.set('Dateityp nicht erlaubt. Erlaubt: PDF, PNG, JPG, DOCX, TXT, MD');
+    if (!this.isAllowedFile(file)) {
+      this.errorMessage.set(this.translateService.instant('PROJECTSITE.FILES.ERROR_TYPE_NOT_ALLOWED'));
       return;
     }
 
@@ -113,7 +135,7 @@ export class ProjectFiles implements OnChanges {
         this.isUploading.set(false);
       },
       error: () => {
-        this.errorMessage.set('Datei konnte nicht hochgeladen werden.');
+        this.errorMessage.set(this.translateService.instant('PROJECTSITE.FILES.ERROR_UPLOAD'));
         this.isUploading.set(false);
       },
     });

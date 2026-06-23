@@ -28,7 +28,9 @@ export class ProjectFileService {
     return this.http.delete<void>(`${this.baseUrl}/${projectId}/files/${fileId}`);
   }
 
-  downloadUrl(projectId: string, fileId: string): string {
-    return `${this.baseUrl}/${projectId}/files/${fileId}/download`;
+  downloadFile(projectId: string, fileId: string): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/${projectId}/files/${fileId}/download`, {
+      responseType: 'blob',
+    });
   }
 }

@@ -324,6 +324,21 @@
     },
     "OPEN_POSITIONS": {
       "TITLE": "Offene Stellen"
+    },
+    "FILES": {
+      "TITLE": "Dateien",
+      "UPLOAD": "Hochladen",
+      "UPLOADING": "Wird hochgeladen…",
+      "LOADING": "Dateien werden geladen...",
+      "EMPTY": "Keine Dateien vorhanden.",
+      "DROP_HINT": "Datei hierher ziehen",
+      "DOWNLOAD_FILE": "Datei herunterladen",
+      "DELETE_FILE": "Datei löschen",
+      "ERROR_TYPE_NOT_ALLOWED": "Dateityp nicht erlaubt. Erlaubt: PDF, PNG, JPG, DOCX, TXT, MD",
+      "ERROR_LOAD": "Dateien konnten nicht geladen werden.",
+      "ERROR_UPLOAD": "Datei konnte nicht hochgeladen werden.",
+      "ERROR_DELETE": "Datei konnte nicht gelöscht werden.",
+      "ERROR_DOWNLOAD": "Datei konnte nicht heruntergeladen werden."
     }
   },
   "JOIN_REQUEST": {
