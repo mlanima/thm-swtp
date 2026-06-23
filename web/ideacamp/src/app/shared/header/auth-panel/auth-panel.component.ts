@@ -3,10 +3,11 @@ import { User } from '../../types/user.type';
 import { NgOptimizedImage } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../feature/auth/auth.service';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-auth-panel',
-  imports: [NgOptimizedImage, RouterLink],
+  imports: [NgOptimizedImage, RouterLink, TranslatePipe],
   templateUrl: './auth-panel.component.html',
   styleUrl: './auth-panel.component.css',
 })

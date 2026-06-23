@@ -1,6 +1,7 @@
 import { Component, OnInit, signal, inject, computed } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ProjectMember, ProjectMemberResponse } from '../../models/project-settings.model';
 import { ProjectSettingsService } from '../../services/project-settings.service';
 import { ProjectSettingsStore } from '../../project-settings.store';
@@ -10,12 +11,13 @@ import { UserSearchResult } from '../../../search/models/user-search-result.mode
 @Component({
   selector: 'app-members-tab',
   standalone: true,
-  imports: [NgClass, FormsModule, UserSearchPick],
+  imports: [NgClass, FormsModule, UserSearchPick, TranslatePipe],
   templateUrl: './members-tab.html',
 })
 export class MembersTab implements OnInit {
   private readonly store = inject(ProjectSettingsStore);
   private readonly projectSettingsService = inject(ProjectSettingsService);
+  private readonly translateService = inject(TranslateService);
 
   members = signal<ProjectMember[]>([]);
   isLoading = signal(false);
@@ -71,7 +73,7 @@ export class MembersTab implements OnInit {
         this.isDeleting.set(false);
       },
       error: () => {
-        this.errorMessage.set('Mitglied konnte nicht gelöscht werden. Bitte versuchen Sie es gleich nochmal.');
+        this.errorMessage.set(this.translateService.instant('PROJECTSETTINGS.MEMBERS.ERROR_DELETE_MEMBER'));
         this.isDeleting.set(false);
       },
     });
@@ -116,7 +118,7 @@ export class MembersTab implements OnInit {
     })
       .subscribe({
         next: () => {
-          this.inviteSuccessMessage.set(`Einladung wurde erfolgreich an ${user.username} gesendet.`);
+          this.inviteSuccessMessage.set(this.translateService.instant('PROJECTSETTINGS.MEMBERS.INVITE_SUCCESS', {username: user.username}));
           this.pendingInvitedUserIds.update((ids) => [...ids, user.keycloakId]);
           this.isInviting.set(false);
           this.closeInviteModal();
@@ -126,7 +128,7 @@ export class MembersTab implements OnInit {
           }, 5000);
         },
         error: () => {
-          this.inviteErrorMessage.set('Einladung konnte nicht erstellt werden, bitte versuchen Sie es erneut.');
+          this.inviteErrorMessage.set(this.translateService.instant('PROJECTSETTINGS.MEMBERS.ERROR_INVITE'));
           this.isInviting.set(false);
         },
       });
@@ -145,7 +147,7 @@ export class MembersTab implements OnInit {
         this.isLoading.set(false);
       },
       error: () => {
-        this.errorMessage.set('Mitglieder konnten nicht geladen werden. Bitte versuchen sie es später nochmal.');
+        this.errorMessage.set(this.translateService.instant('PROJECTSETTINGS.MEMBERS.ERROR_LOAD_MEMBERS'));
         this.isLoading.set(false);
       },
     });

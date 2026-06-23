@@ -1,6 +1,5 @@
 package de.thm.swtp.api.projectJoinRequest;
 
-import de.thm.swtp.api.exceptionhandling.exceptions.ProjectJoinRequestAccessDeniedException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectJoinRequestAlreadyExistsException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectJoinRequestInvalidStatusForEditException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectJoinRequestNotFoundException;
@@ -140,33 +139,14 @@ public class ProjectJoinRequestServiceTest {
         when(projectJoinRequestRepository.findById(requestId)).thenReturn(Optional.of(joinRequest));
         when(projectJoinRequestRepository.save(joinRequest)).thenReturn(joinRequest);
 
-        ProjectJoinRequest res = projectJoinRequestService.acceptProjectJoinRequest(requestId,ownerId);
+        ProjectJoinRequest res = projectJoinRequestService.acceptProjectJoinRequest(requestId);
 
-        Set<UserProfile> members = project.getMembers();
 
         assertThat(res.getStatus()).isEqualTo(ProjectJoinRequestStatus.ACCEPTED);
         assertThat(project.getMembers()).contains(requestingUser);
         verify(projectJoinRequestRepository).save(joinRequest);
     }
 
-    @Test
-    void acceptProjectJoinRequest_shouldThrowAccessDenied_whenCurrentUserIsNotOwner() {
-        UUID otherUserId = UUID.randomUUID();
-
-        ProjectJoinRequestEntity joinRequest = ProjectJoinRequestEntity.builder()
-                .id(requestId)
-                .project(project)
-                .requestingUser(requestingUser)
-                .status(ProjectJoinRequestStatus.PENDING)
-                .build();
-
-        when(projectJoinRequestRepository.findById(requestId)).thenReturn(Optional.of(joinRequest));
-
-        assertThatThrownBy(() -> projectJoinRequestService.acceptProjectJoinRequest(requestId, otherUserId))
-                .isInstanceOf(ProjectJoinRequestAccessDeniedException.class);
-
-        verify(projectJoinRequestRepository, never()).save(any());
-    }
 
     @Test
     void acceptProjectJoinRequest_shouldThrowException_whenRequestIsNotPending() {
@@ -179,7 +159,7 @@ public class ProjectJoinRequestServiceTest {
 
         when(projectJoinRequestRepository.findById(requestId)).thenReturn(Optional.of(joinRequest));
 
-        assertThatThrownBy(() -> projectJoinRequestService.acceptProjectJoinRequest(requestId, ownerId))
+        assertThatThrownBy(() -> projectJoinRequestService.acceptProjectJoinRequest(requestId))
                 .isInstanceOf(ProjectJoinRequestInvalidStatusForEditException.class);
 
         verify(projectJoinRequestRepository, never()).save(any());
@@ -200,7 +180,7 @@ public class ProjectJoinRequestServiceTest {
         when(projectJoinRequestRepository.findById(requestId)).thenReturn(Optional.of(joinRequest));
         when(projectJoinRequestRepository.save(joinRequest)).thenReturn(joinRequest);
 
-        ProjectJoinRequest result = projectJoinRequestService.rejectProjectJoinRequest(requestId, ownerId);
+        ProjectJoinRequest result = projectJoinRequestService.rejectProjectJoinRequest(requestId);
 
         assertThat(result.getStatus()).isEqualTo(ProjectJoinRequestStatus.REJECTED);
 
@@ -208,8 +188,9 @@ public class ProjectJoinRequestServiceTest {
     }
 
     @Test
-    void getProjectJoinRequestsForProject_shouldReturnRequests_whenCurrentUserIsOwner() {
-        ProjectJoinRequestEntity joinRequest = ProjectJoinRequestEntity.builder()
+    void getProjectJoinRequestsForProject_shouldReturnRequests_whenProjectExists() {
+        ProjectJoinRequestEntity joinRequest =
+                ProjectJoinRequestEntity.builder()
                         .id(requestId)
                         .project(project)
                         .requestingUser(requestingUser)
@@ -219,15 +200,20 @@ public class ProjectJoinRequestServiceTest {
                         .updatedAt(LocalDateTime.now())
                         .build();
 
+        when(projectRepository.existsById(projectId))
+                .thenReturn(true);
 
-        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
-        when(projectJoinRequestRepository.findByProjectId(projectId)).thenReturn(List.of(joinRequest));
+        when(projectJoinRequestRepository.findByProjectId(projectId))
+                .thenReturn(List.of(joinRequest));
 
-        List<ProjectJoinRequest> result = projectJoinRequestService.getProjectJoinRequestsForProject(projectId, ownerId);
+        List<ProjectJoinRequest> result =
+                projectJoinRequestService
+                        .getProjectJoinRequestsForProject(projectId);
 
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().getId()).isEqualTo(requestId);
     }
+
     @Test
     void getProjectJoinRequestsFromUser_shouldReturnOwnRequests() {
         ProjectJoinRequestEntity joinRequest = ProjectJoinRequestEntity.builder()
@@ -253,7 +239,7 @@ public class ProjectJoinRequestServiceTest {
     void acceptProjectJoinRequest_shouldThrowNotFound_whenRequestDoesNotExist() {
         when(projectJoinRequestRepository.findById(requestId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> projectJoinRequestService.acceptProjectJoinRequest(requestId, ownerId))
+        assertThatThrownBy(() -> projectJoinRequestService.acceptProjectJoinRequest(requestId))
                 .isInstanceOf(ProjectJoinRequestNotFoundException.class);
     }
 }

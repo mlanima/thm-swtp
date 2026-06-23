@@ -12,6 +12,9 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, UUID> {
     boolean existsByName(String name);
     boolean existsByNameAndIdNot(String name, UUID id);
 
+    boolean existsByIdAndOwnerKeycloakId(UUID id, UUID ownerKeycloakId);
+    boolean existsByIdAndMembersKeycloakId(UUID id, UUID memberKeycloakId);
+
     Optional<ProjectEntity> findByProjectUrl(String projectUrl);
 
     /**
@@ -30,4 +33,5 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, UUID> {
 
     boolean existsByProjectUrl(String projectUrl);
 
+    boolean existsByIdAndIsPrivateProjectFalse(UUID id);
 }

@@ -9,7 +9,9 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "project_links")
+@Table(name = "project_links", uniqueConstraints = {
+        @UniqueConstraint(name = "UK_project_links_project_url", columnNames = {"project_id", "url"})
+})
 @Getter
 @Setter
 @Builder

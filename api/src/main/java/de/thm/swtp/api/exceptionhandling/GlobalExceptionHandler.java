@@ -2,6 +2,9 @@ package de.thm.swtp.api.exceptionhandling;
 
 import de.thm.swtp.api.exceptionhandling.exceptions.*;
 import de.thm.swtp.api.projectFavorite.exception.ProjectAlreadyFavoritedException;
+import de.thm.swtp.api.userFollow.exception.CannotFollowYourselfException;
+import de.thm.swtp.api.userFollow.exception.UserAlreadyFollowingException;
+import de.thm.swtp.api.userFollow.exception.UserFollowNotFoundException;
 import de.thm.swtp.api.projectFavorite.exception.ProjectFavoriteNotFoundException;
 import de.thm.swtp.api.projectInvitation.exception.InvalidProjectInviteException;
 import de.thm.swtp.api.projectInvitation.exception.ProjectInviteAccessDeniedException;
@@ -160,6 +163,18 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
     }
 
+    @ExceptionHandler(InvalidProjectPostException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidProjectPost(InvalidProjectPostException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ProjectPostAccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleProjectPostAccessDenied(ProjectPostAccessDeniedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ErrorResponse.of(403, "Forbidden", ex.getMessage()));
+    }
+
     @ExceptionHandler(UserProfileLinkAlreadyExistsException.class)
     public ResponseEntity<ErrorResponse> handleUserProfileLinkAlreadyExists(UserProfileLinkAlreadyExistsException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
@@ -174,13 +189,81 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserProfileLinkEditNotAllowedException.class)
     public ResponseEntity<ErrorResponse> handleUserProfileLinkEditNotAllowed(UserProfileLinkEditNotAllowedException ex) {
+
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(ErrorResponse.of(403, "Forbidden", ex.getMessage()));
     }
 
-    @ExceptionHandler(UserProfileLinkNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleUserProfileLinkNotFound(UserProfileLinkNotFoundException ex) {
+    @ExceptionHandler(ProjectPostNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleProjectPostNotFound(ProjectPostNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
+    }
+
+    @ExceptionHandler(UserProfileLinkNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleUserProfileLinkNotFound(UserProfileLinkNotFoundException ex) {
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ProjectFileNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleProjectFileNotFound(ProjectFileNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ProjectFileDoesNotBelongToProjectException.class)
+    public ResponseEntity<ErrorResponse> handleProjectFileDoesNotBelongToProject(ProjectFileDoesNotBelongToProjectException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ProjectFileTypeNotAllowedException.class)
+    public ResponseEntity<ErrorResponse> handleProjectFileTypeNotAllowed(ProjectFileTypeNotAllowedException ex) {
+        return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+                .body(ErrorResponse.of(415, "Unsupported Media Type", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ProjectFileUploadLimitExceededException.class)
+    public ResponseEntity<ErrorResponse> handleProjectFileUploadLimitExceeded(ProjectFileUploadLimitExceededException ex) {
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(ErrorResponse.of(422, "Unprocessable Entity", ex.getMessage()));
+    }
+
+    @ExceptionHandler(CannotFollowYourselfException.class)
+    public ResponseEntity<ErrorResponse> handleCannotFollowYourself(CannotFollowYourselfException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
+    }
+
+    @ExceptionHandler(UserAlreadyFollowingException.class)
+    public ResponseEntity<ErrorResponse> handleUserAlreadyFollowing(UserAlreadyFollowingException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
+    }
+
+    @ExceptionHandler(UserFollowNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleUserFollowNotFound(UserFollowNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ExceptionInvalidProjectUrl.class)
+    public ResponseEntity<ErrorResponse> handleInvalidProjectUrl(ExceptionInvalidProjectUrl ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ExceptionProjectUrlAlreadyExists.class)
+    public ResponseEntity<ErrorResponse> handleProjectUrlAlreadyExists(ExceptionProjectUrlAlreadyExists ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ExceptionProjectUrlGenerationFailed.class)
+    public ResponseEntity<ErrorResponse> handleProjectUrlGenerationFailed(ExceptionProjectUrlGenerationFailed ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ErrorResponse.of(500, "Internal Server Error", ex.getMessage()));
     }
 }

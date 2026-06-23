@@ -33,10 +33,8 @@ public class UserProfileLinkService {
     }
 
     @Transactional
-    public UserProfileLink createUserProfileLink(UUID userProfileId, UUID currentUserId, String label, String url) {
+    public UserProfileLink createUserProfileLink(UUID userProfileId, String label, String url) {
         UserProfile userProfile = getUserProfileOrThrowError(userProfileId);
-        checkUserProfileOwner(userProfile, currentUserId);
-
 
         String cleanedLabel = label.trim();
         String cleanedUrl = url.trim();
@@ -57,9 +55,8 @@ public class UserProfileLinkService {
     }
 
     @Transactional
-    public UserProfileLink updateUserProfileLink(UUID userProfileId, UUID currentUserId, UUID linkId, String label, String url) {
+    public UserProfileLink updateUserProfileLink(UUID userProfileId, UUID linkId, String label, String url) {
         UserProfile userProfile = getUserProfileOrThrowError(userProfileId);
-        checkUserProfileOwner(userProfile, currentUserId);
 
         UserProfileLinkEntity userProfileLinkEntity = getUserProfileLinkOrThrowError(linkId);
         checkLinkBelongsToUserProfile(userProfileLinkEntity, userProfileId);
@@ -84,10 +81,7 @@ public class UserProfileLinkService {
     }
 
     @Transactional
-    public void deleteUserProfileLink(UUID userProfileId, UUID currentUserId, UUID linkId) {
-        UserProfile userprofile = getUserProfileOrThrowError(userProfileId);
-        checkUserProfileOwner(userprofile, currentUserId);
-
+    public void deleteUserProfileLink(UUID userProfileId, UUID linkId) {
         UserProfileLinkEntity userProfileLinkEntity = getUserProfileLinkOrThrowError(linkId);
         checkLinkBelongsToUserProfile(userProfileLinkEntity, userProfileId);
 
@@ -103,11 +97,6 @@ public class UserProfileLinkService {
                 .orElseThrow(() -> new UserProfileNotFoundException(userProfileId.toString()));
     }
 
-    private void checkUserProfileOwner(UserProfile userProfile, UUID currentUserId){
-        if (!userProfile.getKeycloakId().equals(currentUserId)) {
-            throw new UserProfileLinkEditNotAllowedException("You are not allowed to edit this user profile");
-        }
-    }
 
     private UserProfileLinkEntity getUserProfileLinkOrThrowError(UUID linkId){
         return userProfileLinkRepository.findById(linkId)

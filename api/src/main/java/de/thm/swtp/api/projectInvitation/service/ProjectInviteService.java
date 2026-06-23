@@ -7,7 +7,6 @@ import de.thm.swtp.api.projectInvitation.domain.ProjectInvite;
 import de.thm.swtp.api.projectInvitation.domain.ProjectInviteStatus;
 import de.thm.swtp.api.projectInvitation.entity.ProjectInviteEntity;
 import de.thm.swtp.api.projectInvitation.exception.InvalidProjectInviteException;
-import de.thm.swtp.api.projectInvitation.exception.ProjectInviteAccessDeniedException;
 import de.thm.swtp.api.projectInvitation.exception.ProjectInviteNotFoundException;
 import de.thm.swtp.api.projectInvitation.mapper.ProjectInviteMapper;
 import de.thm.swtp.api.projectInvitation.repository.ProjectInviteRepository;
@@ -31,7 +30,7 @@ public class ProjectInviteService {
 
     /** Creates a new project invitation. Only the project owner is allowed to send an invitation.*/
     @Transactional
-    public ProjectInvite createProjectInvite(UUID projectId, UUID invitedUserId, String message, UUID senderId) {
+    public ProjectInvite createProjectInvite(UUID projectId, UUID invitedUserId, String message) {
 
         ProjectEntity projectEntity = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException(projectId));
@@ -39,7 +38,7 @@ public class ProjectInviteService {
         UserProfile invitedUserEntity = userProfileRepository.findById(invitedUserId)
                 .orElseThrow(() -> new UserProfileNotFoundException(invitedUserId.toString()));
 
-        checkValidInviteCreation(projectEntity, invitedUserId, senderId);
+        checkValidInviteCreation(projectEntity, invitedUserId);
         checkNoPendingInviteExists(projectId, invitedUserId);
 
         ProjectInviteEntity projectInviteEntity = createPendingInvite(projectEntity, invitedUserEntity, message);
@@ -59,13 +58,9 @@ public class ProjectInviteService {
 
     /** Returns all invitations that were sent from a given project.*/
     @Transactional(readOnly = true)
-    public List<ProjectInvite> getInvitesForProject(UUID projectId, UUID currentUserId){
-        ProjectEntity projectEntity = projectRepository.findById(projectId)
+    public List<ProjectInvite> getInvitesForProject(UUID projectId){
+        projectRepository.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException(projectId));
-
-        if (!projectEntity.getOwner().getKeycloakId().equals(currentUserId)) {
-            throw new ProjectInviteAccessDeniedException("Only the Project-owner is allowed to see the project invitations for the project.");
-        }
 
         return projectInviteRepository.findByProjectId(projectId)
                 .stream()
@@ -76,12 +71,12 @@ public class ProjectInviteService {
 
     /** Updates the status of the given invitation. Can only be updated when the status is on pending */
     @Transactional
-    public ProjectInvite updateInviteStatus(UUID inviteId, ProjectInviteStatus newStatus, UUID currentUserId) {
+    public ProjectInvite updateInviteStatus(UUID inviteId, ProjectInviteStatus newStatus) {
         ProjectInviteEntity inviteEntity = projectInviteRepository.findById(inviteId)
                 .orElseThrow(() -> new ProjectInviteNotFoundException(inviteId));
         ProjectInvite invite = ProjectInviteMapper.toDomain(inviteEntity);
 
-        checkInviteStatus(invite, newStatus, currentUserId);
+        checkInviteStatus(invite, newStatus);
         inviteEntity.setStatus(newStatus);
 
 
@@ -98,13 +93,10 @@ public class ProjectInviteService {
 
 
 
-    private void checkValidInviteCreation(ProjectEntity projectEntity, UUID invitedUserId, UUID senderId) {
+    private void checkValidInviteCreation(ProjectEntity projectEntity, UUID invitedUserId) {
         UUID ownerId = projectEntity.getOwner().getKeycloakId();
 
-        if (!ownerId.equals(senderId)) {
-            throw new ProjectInviteAccessDeniedException("Only the project owner is allowed to create invitations.");
-        }
-        if (invitedUserId.equals(senderId)) {
+        if (ownerId.equals(invitedUserId)) {
             throw new InvalidProjectInviteException("The project owner cannot invite himself to the project.");
         }
     }
@@ -118,10 +110,7 @@ public class ProjectInviteService {
         }
     }
 
-    private void checkInviteStatus(ProjectInvite invite, ProjectInviteStatus newStatus, UUID currentUserId) {
-        if (!invite.getInvitedUserId().equals(currentUserId)) {
-            throw new ProjectInviteAccessDeniedException("Only the invited user can update the invitation status.");
-        }
+    private void checkInviteStatus(ProjectInvite invite, ProjectInviteStatus newStatus) {
         if (invite.getStatus() != ProjectInviteStatus.PENDING) {
             throw new InvalidProjectInviteException("Only invitations that are pending can be updated.");
         }

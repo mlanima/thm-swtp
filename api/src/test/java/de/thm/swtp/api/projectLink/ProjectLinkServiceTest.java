@@ -1,16 +1,16 @@
 package de.thm.swtp.api.projectLink;
 
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectLinkAlreadyExistsException;
+import de.thm.swtp.api.exceptionhandling.exceptions.ProjectLinkDoesNotBelongToProjectException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectLinkNotFoundException;
 import de.thm.swtp.api.links.domain.LinkVisibility;
-import de.thm.swtp.api.project.ProjectEntity;
-import de.thm.swtp.api.project.ProjectRepository;
-import de.thm.swtp.api.project.exception.ExceptionProjectEditNotAllowed;
-import de.thm.swtp.api.project.exception.ProjectNotFoundException;
 import de.thm.swtp.api.links.domain.ProjectLink;
 import de.thm.swtp.api.links.entity.ProjectLinkEntity;
 import de.thm.swtp.api.links.repository.ProjectLinkRepository;
 import de.thm.swtp.api.links.service.ProjectLinkService;
+import de.thm.swtp.api.project.ProjectEntity;
+import de.thm.swtp.api.project.ProjectRepository;
+import de.thm.swtp.api.project.exception.ProjectNotFoundException;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,7 +44,7 @@ public class ProjectLinkServiceTest {
     private UserProfile owner;
     private UserProfile member;
 
-    String url= "https://github.com/mlanima/thm-swtp";
+    String url = "https://github.com/mlanima/thm-swtp";
     String label = "Github";
 
     @BeforeEach
@@ -82,8 +82,7 @@ public class ProjectLinkServiceTest {
     }
 
     @Test
-    void createProjectLink_shouldCreateLink_whenCurrentUserIsOwnerAndUrlDoesNotExist() {
-
+    void createProjectLink_shouldCreateLink_whenUrlDoesNotExist() {
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
         when(projectLinkRepository.existsByProjectIdAndUrlIgnoreCase(
                 projectId,
@@ -101,7 +100,6 @@ public class ProjectLinkServiceTest {
 
         ProjectLink result = projectLinkService.createProjectLink(
                 projectId,
-                ownerId,
                 label,
                 url,
                 LinkVisibility.PUBLIC
@@ -123,26 +121,10 @@ public class ProjectLinkServiceTest {
 
         assertThatThrownBy(() -> projectLinkService.createProjectLink(
                 projectId,
-                ownerId,
                 label,
                 url,
                 LinkVisibility.PUBLIC
         )).isInstanceOf(ProjectNotFoundException.class);
-
-        verify(projectLinkRepository, never()).save(any());
-    }
-
-    @Test
-    void createProjectLink_shouldThrowAccessDenied_whenCurrentUserIsNotOwner() {
-        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
-
-        assertThatThrownBy(() -> projectLinkService.createProjectLink(
-                projectId,
-                otherUserId,
-                label,
-                url,
-                LinkVisibility.PUBLIC
-        )).isInstanceOf(ExceptionProjectEditNotAllowed.class);
 
         verify(projectLinkRepository, never()).save(any());
     }
@@ -157,13 +139,36 @@ public class ProjectLinkServiceTest {
 
         assertThatThrownBy(() -> projectLinkService.createProjectLink(
                 projectId,
-                ownerId,
                 label,
                 url,
                 LinkVisibility.PUBLIC
         )).isInstanceOf(ProjectLinkAlreadyExistsException.class);
 
         verify(projectLinkRepository, never()).save(any());
+    }
+
+    @Test
+    void createProjectLink_shouldDefaultToPublic_whenVisibilityIsNull() {
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(projectLinkRepository.existsByProjectIdAndUrlIgnoreCase(projectId, url)).thenReturn(false);
+
+        when(projectLinkRepository.save(any(ProjectLinkEntity.class)))
+                .thenAnswer(invocation -> {
+                    ProjectLinkEntity entity = invocation.getArgument(0);
+                    entity.setId(linkId);
+                    entity.setCreatedAt(LocalDateTime.now());
+                    entity.setUpdatedAt(LocalDateTime.now());
+                    return entity;
+                });
+
+        ProjectLink result = projectLinkService.createProjectLink(
+                projectId,
+                label,
+                url,
+                null
+        );
+
+        assertThat(result.getVisibility()).isEqualTo(LinkVisibility.PUBLIC);
     }
 
     @Test
@@ -267,41 +272,8 @@ public class ProjectLinkServiceTest {
     }
 
     @Test
-    void createProjectLink_shouldDefaultToPublic_whenVisibilityIsNull() {
-        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
-        when(projectLinkRepository.existsByProjectIdAndUrlIgnoreCase(projectId, url)).thenReturn(false);
-
-        when(projectLinkRepository.save(any(ProjectLinkEntity.class)))
-                .thenAnswer(invocation -> {
-                    ProjectLinkEntity entity = invocation.getArgument(0);
-                    entity.setId(linkId);
-                    entity.setCreatedAt(LocalDateTime.now());
-                    entity.setUpdatedAt(LocalDateTime.now());
-                    return entity;
-                });
-
-        ProjectLink result = projectLinkService.createProjectLink(
-                projectId,
-                ownerId,
-                label,
-                url,
-                null
-        );
-
-        assertThat(result.getVisibility()).isEqualTo(LinkVisibility.PUBLIC);
-    }
-
-    @Test
     void updateProjectLink_shouldUpdateOnlyLabel_whenUrlIsNull() {
-        ProjectLinkEntity link = ProjectLinkEntity.builder()
-                .id(linkId)
-                .project(project)
-                .label(label)
-                .url(url)
-                .visibility(LinkVisibility.PUBLIC)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
+        ProjectLinkEntity link = createProjectLinkEntity(url, label, LinkVisibility.PUBLIC);
 
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
         when(projectLinkRepository.findById(linkId)).thenReturn(Optional.of(link));
@@ -309,7 +281,6 @@ public class ProjectLinkServiceTest {
 
         ProjectLink result = projectLinkService.updateProjectLink(
                 projectId,
-                ownerId,
                 linkId,
                 "New Label",
                 null,
@@ -325,15 +296,7 @@ public class ProjectLinkServiceTest {
 
     @Test
     void updateProjectLink_shouldUpdateOnlyUrl_whenLabelIsNullAndUrlChanged() {
-        ProjectLinkEntity link = ProjectLinkEntity.builder()
-                .id(linkId)
-                .project(project)
-                .label(label)
-                .url(url)
-                .visibility(LinkVisibility.PUBLIC)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
+        ProjectLinkEntity link = createProjectLinkEntity(url, label, LinkVisibility.PUBLIC);
 
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
         when(projectLinkRepository.findById(linkId)).thenReturn(Optional.of(link));
@@ -345,7 +308,6 @@ public class ProjectLinkServiceTest {
 
         ProjectLink result = projectLinkService.updateProjectLink(
                 projectId,
-                ownerId,
                 linkId,
                 null,
                 "https://github.com/new-project",
@@ -364,15 +326,7 @@ public class ProjectLinkServiceTest {
 
     @Test
     void updateProjectLink_shouldUpdateLabelAndUrl_whenBothAreProvided() {
-        ProjectLinkEntity link = ProjectLinkEntity.builder()
-                .id(linkId)
-                .project(project)
-                .label(label)
-                .url(label)
-                .visibility(LinkVisibility.PUBLIC)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
+        ProjectLinkEntity link = createProjectLinkEntity(url, label, LinkVisibility.PUBLIC);
 
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
         when(projectLinkRepository.findById(linkId)).thenReturn(Optional.of(link));
@@ -384,7 +338,6 @@ public class ProjectLinkServiceTest {
 
         ProjectLink result = projectLinkService.updateProjectLink(
                 projectId,
-                ownerId,
                 linkId,
                 "New Label",
                 "https://github.com/new-project",
@@ -398,30 +351,12 @@ public class ProjectLinkServiceTest {
     }
 
     @Test
-    void updateProjectLink_shouldThrowAccessDenied_whenCurrentUserIsNotOwner() {
-        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
-
-        assertThatThrownBy(() -> projectLinkService.updateProjectLink(
-                projectId,
-                otherUserId,
-                linkId,
-                "New Label",
-                null,
-                null
-        )).isInstanceOf(ExceptionProjectEditNotAllowed.class);
-
-        verify(projectLinkRepository, never()).findById(any());
-        verify(projectLinkRepository, never()).save(any());
-    }
-
-    @Test
     void updateProjectLink_shouldThrowLinkNotFound_whenLinkDoesNotExist() {
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
         when(projectLinkRepository.findById(linkId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> projectLinkService.updateProjectLink(
                 projectId,
-                ownerId,
                 linkId,
                 "New Label",
                 null,
@@ -433,15 +368,7 @@ public class ProjectLinkServiceTest {
 
     @Test
     void updateProjectLink_shouldUpdateVisibility_whenVisibilityIsProvided() {
-        ProjectLinkEntity link = ProjectLinkEntity.builder()
-                .id(linkId)
-                .project(project)
-                .label(label)
-                .url(url)
-                .visibility(LinkVisibility.PUBLIC)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
+        ProjectLinkEntity link = createProjectLinkEntity(url, label, LinkVisibility.PUBLIC);
 
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
         when(projectLinkRepository.findById(linkId)).thenReturn(Optional.of(link));
@@ -449,7 +376,6 @@ public class ProjectLinkServiceTest {
 
         ProjectLink result = projectLinkService.updateProjectLink(
                 projectId,
-                ownerId,
                 linkId,
                 null,
                 null,
@@ -460,13 +386,23 @@ public class ProjectLinkServiceTest {
         verify(projectLinkRepository).save(link);
     }
 
+    @Test
+    void deleteProjectLink_shouldDeleteLink_whenLinkBelongsToProject() {
+        ProjectLinkEntity link = createProjectLinkEntity(url, label, LinkVisibility.PUBLIC);
 
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(projectLinkRepository.findById(linkId)).thenReturn(Optional.of(link));
+
+        projectLinkService.deleteProjectLink(projectId, linkId);
+
+        verify(projectLinkRepository).delete(link);
+    }
 
     @Test
-    void deleteProjectLink_shouldDeleteLink_whenCurrentUserIsOwnerAndLinkBelongsToProject() {
+    void deleteProjectLink_shouldThrow_whenLinkDoesNotBelongToProject() {
         ProjectLinkEntity link = ProjectLinkEntity.builder()
                 .id(linkId)
-                .project(project)
+                .project(otherProject)
                 .label(label)
                 .url(url)
                 .visibility(LinkVisibility.PUBLIC)
@@ -477,22 +413,24 @@ public class ProjectLinkServiceTest {
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
         when(projectLinkRepository.findById(linkId)).thenReturn(Optional.of(link));
 
-        projectLinkService.deleteProjectLink(projectId, ownerId, linkId);
+        assertThatThrownBy(() -> projectLinkService.deleteProjectLink(projectId, linkId))
+                .isInstanceOf(ProjectLinkDoesNotBelongToProjectException.class);
 
-        verify(projectLinkRepository).delete(link);
+        verify(projectLinkRepository, never()).delete(any());
     }
 
-    @Test
-    void deleteProjectLink_shouldThrowAccessDenied_whenCurrentUserIsNotOwner() {
-        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
-
-        assertThatThrownBy(() -> projectLinkService.deleteProjectLink(
-                projectId,
-                otherUserId,
-                linkId
-        )).isInstanceOf(ExceptionProjectEditNotAllowed.class);
-
-        verify(projectLinkRepository, never()).findById(any());
-        verify(projectLinkRepository, never()).delete(any());
+    private ProjectLinkEntity createProjectLinkEntity(
+            String url,
+            String label,
+            LinkVisibility visibility) {
+        return ProjectLinkEntity.builder()
+                .id(linkId)
+                .project(project)
+                .label(label)
+                .url(url)
+                .visibility(visibility)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
     }
 }

@@ -9,6 +9,7 @@ import de.thm.swtp.api.projectView.service.ProjectViewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +27,7 @@ public class ProjectFavoriteController {
     private final ProjectViewService projectViewService;
 
     @PostMapping("/{projectId}")
+    @PreAuthorize("@security.canFavoriteProject(#projectId, authentication)")
     public ResponseEntity<Void> addFavorite(
             @PathVariable UUID projectId,
             @AuthenticationPrincipal Jwt jwt) {

@@ -49,8 +49,9 @@ public class UserProfileService {
 
     @Transactional
     public void deleteProfile(String username) {
+        UserProfile profile = findOrThrow(username);
         // TODO: will throw FK constraint violation if the user owns projects — handle cascade or block deletion first
-        userProfileRepository.delete(findOrThrow(username));
+        userProfileRepository.delete(profile);
     }
 
     private UserProfile findOrThrow(String username) {

@@ -5,6 +5,8 @@ import { AuthPanelComponent } from './auth-panel/auth-panel.component';
 import { SidebarService } from '../sidebar/sidebar.service';
 import { AuthService } from '../../feature/auth/auth.service';
 import { RouterLink } from '@angular/router';
+import { LanguageService, AppLanguage } from '../../services/language.service';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-header',
@@ -13,7 +15,8 @@ import { RouterLink } from '@angular/router';
     // FeatureComponent,
     AuthPanelComponent,
     FeatureComponent,
-    RouterLink
+    RouterLink,
+    TranslatePipe
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css',
@@ -23,4 +26,13 @@ export class HeaderComponent {
   auth = inject(AuthService);
 
   isAuthenticated = () => this.auth.isLoggedIn();
+
+  private readonly languageService = inject(LanguageService);
+
+  currentLanguage = this.languageService.currentLanguage;
+
+  changeLanguage(language: AppLanguage): void {
+    this.languageService.changeLanguage(language);
+    this.currentLanguage.set(language);
+  }
 }

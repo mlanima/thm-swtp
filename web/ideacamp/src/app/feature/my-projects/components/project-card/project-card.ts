@@ -2,11 +2,12 @@ import { Component, input, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ProjectResponse } from '../../../../models/project.model';
 import { FavoriteButton } from '../../../../shared/favorite-button/favorite-button';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-project-card',
   standalone: true,
-  imports: [RouterLink, FavoriteButton],
+  imports: [RouterLink, FavoriteButton, TranslatePipe],
   templateUrl: './project-card.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: [

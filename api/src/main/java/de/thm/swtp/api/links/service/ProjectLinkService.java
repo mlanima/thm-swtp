@@ -6,7 +6,6 @@ import de.thm.swtp.api.exceptionhandling.exceptions.ProjectLinkNotFoundException
 import de.thm.swtp.api.links.domain.LinkVisibility;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
-import de.thm.swtp.api.project.exception.ExceptionProjectEditNotAllowed;
 import de.thm.swtp.api.project.exception.ProjectNotFoundException;
 import de.thm.swtp.api.links.repository.ProjectLinkRepository;
 import de.thm.swtp.api.links.domain.ProjectLink;
@@ -47,9 +46,8 @@ public class ProjectLinkService {
     }
 
     @Transactional
-    public ProjectLink createProjectLink(UUID projectId, UUID currentUserId, String label, String url, LinkVisibility visibility){
+    public ProjectLink createProjectLink(UUID projectId, String label, String url, LinkVisibility visibility){
         ProjectEntity projectEntity = getProjectOrThrowError(projectId);
-        checkProjectOwner(projectEntity, currentUserId);
 
         String cleanedLabel = label.trim();
         String cleanedUrl = url.trim();
@@ -74,9 +72,8 @@ public class ProjectLinkService {
 
 
     @Transactional
-    public ProjectLink updateProjectLink(UUID projectId, UUID currentUserId, UUID linkId, String label, String url, LinkVisibility visibility){
+    public ProjectLink updateProjectLink(UUID projectId, UUID linkId, String label, String url, LinkVisibility visibility){
         ProjectEntity projectEntity = getProjectOrThrowError(projectId);
-        checkProjectOwner(projectEntity, currentUserId);
 
         ProjectLinkEntity projectLinkEntity = getProjectLinkOrThrowError(linkId);
         checkLinkBelongsToProject(projectLinkEntity, projectId);
@@ -88,7 +85,7 @@ public class ProjectLinkService {
         if (url != null) {
             String cleanedUrl = url.trim();
 
-            boolean changedUrl = !projectLinkEntity.getUrl().equals(cleanedUrl);
+            boolean changedUrl = !projectLinkEntity.getUrl().equalsIgnoreCase(cleanedUrl);
 
             if (changedUrl && projectLinkRepository.existsByProjectIdAndUrlIgnoreCase(projectEntity.getId(), cleanedUrl)) {
                 throw new ProjectLinkAlreadyExistsException();
@@ -106,23 +103,14 @@ public class ProjectLinkService {
     }
 
     @Transactional
-    public void deleteProjectLink(UUID projectId, UUID currentUserId, UUID linkId){
-        ProjectEntity projectEntity = getProjectOrThrowError(projectId);
-        checkProjectOwner(projectEntity, currentUserId);
+    public void deleteProjectLink(UUID projectId, UUID linkId){
+        getProjectOrThrowError(projectId);
 
         ProjectLinkEntity projectLinkEntity = getProjectLinkOrThrowError(linkId);
         checkLinkBelongsToProject(projectLinkEntity, projectId);
         projectLinkRepository.delete(projectLinkEntity);
     }
 
-
-    private void checkProjectOwner(ProjectEntity projectEntity, UUID currentUserId){
-        UUID ownerId = projectEntity.getOwner().getKeycloakId();
-
-        if (!ownerId.equals(currentUserId)){
-            throw new ExceptionProjectEditNotAllowed(currentUserId, projectEntity.getId());
-        }
-    }
 
     private ProjectEntity getProjectOrThrowError(UUID projectId){
         return projectRepository.findById(projectId)

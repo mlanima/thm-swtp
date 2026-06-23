@@ -6,21 +6,21 @@
   </header>
 
 
-  <main class="px-8 py-12">
+  <main class="px-4 py-12 sm:px-8">
 
     <h1 class="mb-10 text-center text-3xl font-bold text-slate-800">
-      Erstelle ein neues Projekt
+      {{ 'PROJECTCREATE.PAGE_TITLE' | translate }}
     </h1>
 
-    <div class="mx-auto flex max-w-5xl items-start justify-center gap-8">
+    <div class="mx-auto flex max-w-5xl flex-col items-stretch justify-center gap-8 md:flex-row md:items-start">
 
 
-      <aside class="w-60 rounded-xl bg-white p-6 shadow-md">
+      <aside class="w-full rounded-xl bg-white p-6 shadow-md md:w-60">
         <ng-content select="[sidebar]"></ng-content>
       </aside>
 
 
-      <section class="w-155 rounded-xl bg-white p-8 shadow-md">
+      <section class="w-full rounded-xl bg-white p-8 shadow-md md:w-155">
         <ng-content></ng-content>
       </section>
 

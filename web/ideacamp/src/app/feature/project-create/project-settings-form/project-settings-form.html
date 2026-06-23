@@ -1,8 +1,8 @@
-<form class="space-y-6">
+<form class="space-y-6" (submit)="$event.preventDefault(); submit()">
 
   <div>
     <label for="project-url" class="mb-1 block text-sm font-medium text-slate-700">
-      Projekt-URL (Dein Projekt wird unter /project/dein-input verfügbar sein)
+      {{ 'PROJECTCREATE.PROJECT_URL_LABEL' | translate }}
     </label>
 
     <input
@@ -10,7 +10,7 @@
       type="text"
       name="projectUrl"
       [(ngModel)]="formData.projectUrl"
-      placeholder="z.B. mein-projekt"
+      [placeholder]="'PROJECTCREATE.PROJECT_URL_PLACEHOLDER' | translate"
       (ngModelChange)="onProjectUrlChange($event)"
       class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none"
       [class.border-red-500]="errors.projectUrl || projectUrlExists()"
@@ -20,31 +20,31 @@
 
     @if (errors.projectUrl){
       <p class ="mt-1 text-sm text-red-600">
-        {{errors.projectUrl}}
+        {{errors.projectUrl | translate }}
       </p>
     }
 
     @if (isCheckingProjectUrl()) {
       <p class="mt-1 text-xs text-slate-400">
-        Projekt-URL wird geprüft...
+        {{ 'PROJECTCREATE.CHECKING_PROJECT_URL' | translate }}
       </p>
     }
 
     @if (projectUrlCheckFinished() && projectUrlExists()) {
       <p class="mt-1 text-xs text-red-600">
-        Diese Projekt-URL ist bereits vergeben.
+        {{ 'PROJECTCREATE.PROJECT_URL_EXISTS' | translate }}
       </p>
     }
 
     @if (projectUrlCheckFinished() && !projectUrlExists()) {
       <p class="mt-1 text-xs text-green-600">
-        Diese Projekt-URL ist verfügbar.
+        {{ 'PROJECTCREATE.PROJECT_URL_AVAILABLE' | translate }}
       </p>
     }
 
     @if (projectUrlCheckError()) {
       <p class="mt-1 text-xs text-red-600">
-        {{ projectUrlCheckError() }}
+        {{ projectUrlCheckError()! | translate }}
       </p>
     }
   </div>
@@ -53,11 +53,11 @@
 
     <div>
       <h3 class="text-sm font-bold text-slate-800">
-        Privat
+        {{ 'COMMON.PRIVATE' | translate }}
       </h3>
 
       <p class="mt-1 text-xs text-slate-500">
-        Nur eingeladene Nutzer werden das Projekt sehen können
+        {{ 'PROJECTCREATE.PRIVATE_DESCRIPTION' | translate }}
       </p>
     </div>
 
@@ -82,15 +82,14 @@
       type="button"
       (click)="goBack()"
       class="text-sm text-slate-500 hover:text-slate-800">
-      Zurück
+      {{ 'COMMON.BACK' | translate }}
     </button>
 
     <button
-      type="button"
-      (click)="submit()"
+      type="submit"
       [disabled]="isCheckingProjectUrl() || projectUrlExists()"
       class="rounded-lg bg-lime-500 px-5 py-2 text-sm font-semibold text-white hover:bg-lime-600 disabled:cursor-not-allowed disabled:opacity-50">
-      Weiter
+      {{ 'COMMON.CONTINUE' | translate }}
     </button>
 
   </div>

@@ -1,0 +1,167 @@
+name: CD Review Apps
+
+on:
+  pull_request:
+    branches: [main, developer]
+    types: [opened, synchronize, reopened, closed]
+
+permissions:
+  contents: read
+  packages: write
+  pull-requests: write
+
+concurrency:
+  group: review-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  namespace:
+    name: Resolve GHCR namespace
+    runs-on: ubuntu-latest
+    outputs:
+      namespace: ${{ steps.lower.outputs.namespace }}
+    steps:
+      - id: lower
+        run: echo "namespace=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+
+  # ── Change detection (skip on close) ──────────────────────────────────────
+  detect-changes:
+    name: Detect changes
+    if: github.event.action != 'closed'
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          filters: |
+            backend:
+              - 'api/**'
+            frontend:
+              - 'web/ideacamp/**'
+
+  # ── Build images tagged with PR number ────────────────────────────────────
+  build-backend:
+    name: Build & Push Backend (PR)
+    needs: [namespace, detect-changes]
+    if: needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/setup-buildx-action@v4
+
+      - uses: docker/build-push-action@v7
+        with:
+          context: ./api
+          push: true
+          tags: ghcr.io/${{ needs.namespace.outputs.namespace }}/swtp-api:pr-${{ github.event.pull_request.number }}
+
+  build-frontend:
+    name: Build & Push Frontend (PR)
+    needs: [namespace, detect-changes]
+    if: needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/setup-buildx-action@v4
+
+      - uses: docker/build-push-action@v7
+        with:
+          context: ./web/ideacamp
+          push: true
+          build-args: |
+            API_URL=https://pr-${{ github.event.pull_request.number }}-api.review.swtp-ss26.de/api
+          tags: ghcr.io/${{ needs.namespace.outputs.namespace }}/swtp-web:pr-${{ github.event.pull_request.number }}
+
+  # ── Deploy review environment ──────────────────────────────────────────────
+  deploy-review:
+    name: Deploy Review App
+    needs: [namespace, build-backend, build-frontend]
+    if: |
+      always() &&
+      github.event.action != 'closed' &&
+      (needs.build-backend.result == 'success' || needs.build-frontend.result == 'success')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key -p 2105 tosch@mail.schalz.de \
+            "review-deploy ${{ needs.namespace.outputs.namespace }} ${{ github.event.pull_request.number }}"
+
+      - name: Comment on PR
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const pr    = context.payload.pull_request.number;
+            const hasBe = '${{ needs.build-backend.result }}'  === 'success';
+            const hasFe = '${{ needs.build-frontend.result }}' === 'success';
+
+            let body = '## 🚀 Review App\n\n';
+            body += '| Service | URL |\n|---|---|\n';
+            if (hasFe) body += `| **Frontend** | https://pr-${pr}.review.swtp-ss26.de |\n`;
+            if (hasBe) body += `| **Backend** | https://pr-${pr}-api.review.swtp-ss26.de |\n`;
+            body += `| **Logs** | https://pr-${pr}-logs.review.swtp-ss26.de |\n`;
+            body += `| **Dashboard** | https://status.swtp-ss26.de |\n`;
+            const now = new Intl.DateTimeFormat('sv-SE', {
+              timeZone: 'Europe/Berlin', year: 'numeric', month: '2-digit', day: '2-digit',
+              hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false,
+              timeZoneName: 'short',
+            }).format(new Date());
+            body += `\n_Aktualisiert: ${now}_`;
+
+            const { data: comments } = await github.rest.issues.listComments({
+              ...context.repo,
+              issue_number: pr,
+            });
+            const existing = comments.find(c =>
+              c.user.login === 'github-actions[bot]' &&
+              c.body.includes('## 🚀 Review App')
+            );
+            if (existing) {
+              await github.rest.issues.updateComment({
+                ...context.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                ...context.repo,
+                issue_number: pr,
+                body,
+              });
+            }
+
+  # ── Teardown on PR close / merge ──────────────────────────────────────────
+  teardown-review:
+    name: Teardown Review App
+    needs: namespace
+    if: github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Teardown via SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key -p 2105 tosch@mail.schalz.de \
+            "review-teardown ${{ needs.namespace.outputs.namespace }} ${{ github.event.pull_request.number }}"

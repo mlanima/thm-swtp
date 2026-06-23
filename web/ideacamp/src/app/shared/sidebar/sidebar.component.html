@@ -18,20 +18,20 @@
       </div>
 
       <menu class="flex-1 overflow-y-auto px-6 py-6">
-        <p class="text-xs font-semibold uppercase tracking-wider text-zinc-400">Menü</p>
+        <p class="text-xs font-semibold uppercase tracking-wider text-zinc-400">{{ 'SIDEBAR.MENU' | translate }}</p>
 
         <!--TODO: Connect to pages, delete unused-->
         <div class="mt-4 space-y-1">
           <a routerLink="/search" (click)="requestClose()">
           <app-menu-link>
              <i class="pi pi-compass text-sm text-zinc-400"></i>
-             <span>Erkunden</span>
+             <span>{{ 'NAV.SEARCH' | translate }}</span>
            </app-menu-link>
           </a>
           <a routerLink="/my-projects" (click)="requestClose()">
           <app-menu-link>
              <i class="pi pi-folder text-sm text-zinc-400"></i>
-             <span>Meine Projekte @if (pendingInvitations() > 0) {
+             <span>{{ 'SIDEBAR.MYPROJECTS' | translate }} @if (pendingInvitations() > 0) {
                <span class="text-lime-400">({{ pendingInvitations() }})</span>
              }</span>
            </app-menu-link>
@@ -39,13 +39,13 @@
           <a routerLink="/favorites" (click)="requestClose()">
           <app-menu-link>
              <i class="pi pi-heart text-sm text-zinc-400"></i>
-             <span>Favoriten</span>
+             <span>{{ 'SIDEBAR.FAVORITE' | translate }}</span>
            </app-menu-link>
           </a>
           <a [routerLink]="['/profiles', auth.username()]" (click)="requestClose()">
           <app-menu-link>
             <i class="pi pi-user text-sm text-zinc-400"></i>
-            <span>Mein Profil</span>
+            <span>{{ 'SIDEBAR.PROFILE' | translate }}</span>
           </app-menu-link>
           </a>
           <!--<app-menu-link>
@@ -68,13 +68,13 @@
         <a routerLink="/impressum" (click)="requestClose()">
         <app-menu-link>
           <i class="pi pi-file text-sm text-zinc-400"></i>
-          <span>Impressum</span>
+          <span>{{ 'SIDEBAR.IMPRESSUM' | translate }}</span>
         </app-menu-link>
         </a>
 
         <app-menu-link (click)="logout()">
           <i class="pi pi-sign-out text-sm text-red-400"></i>
-          <span>Logout</span>
+          <span>{{ 'NAV.LOGOUT' | translate }}</span>
         </app-menu-link>
       </footer>
     </aside>

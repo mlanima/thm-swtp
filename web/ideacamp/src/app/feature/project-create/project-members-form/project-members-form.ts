@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject, ViewChild } from '@angular/core';
 import {FormsModule } from '@angular/forms';
-
+import { TranslatePipe } from '@ngx-translate/core';
 import { ProjectInviteMember } from '../../../models/project-invite-member.model';
 import {UserSearchResult} from '../../search/models/user-search-result.model';
 import { UserSearchPick } from '../../../shared/user-search-pick/user-search-pick';
@@ -10,7 +10,7 @@ import { UserProfileService } from '../../../services/user-profile.service';
 @Component({
   selector: 'app-project-members-form',
   standalone : true,
-  imports: [FormsModule, UserSearchPick],
+  imports: [FormsModule, UserSearchPick, TranslatePipe],
   templateUrl: './project-members-form.html',
 })
 

@@ -14,7 +14,10 @@ import java.util.UUID;
 
 /** JPA entity representing an invitation to a project. */
 @Entity
-@Table(name="project_invitations")
+@Table(name = "project_invitations", uniqueConstraints = {
+        @UniqueConstraint(name = "UK_invitations_project_user_status",
+                columnNames = {"project_id", "invited_user_id", "status"})
+})
 @Getter
 @Setter
 @NoArgsConstructor

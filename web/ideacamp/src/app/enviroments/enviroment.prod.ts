@@ -1,5 +1,5 @@
 export const environment = {
-  apiUrl: 'https://api.swtp-ss26.de/api',
+  apiUrl: '__API_URL__',
   keycloakUrl: 'https://auth.swtp-ss26.de',
   issuer: 'https://auth.swtp-ss26.de/realms/swtp',
   clientId: 'swtp-frontend',

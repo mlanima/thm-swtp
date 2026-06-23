@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { provideTranslateTesting } from '../../../../testing/translate-testing.provider';
 import { ProfileBanner } from './profile-banner';
 
 describe('ProfileBanner', () => {
@@ -9,6 +9,9 @@ describe('ProfileBanner', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ProfileBanner],
+      providers: [
+        provideTranslateTesting(),
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(ProfileBanner);
