@@ -124,7 +124,10 @@
   .links a .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
   .dot.fe { background: var(--accent); }
   .dot.be { background: var(--accent2); }
+  .dot.keycloak { background: #e8872a; }
+  .dot.maildev { background: #3ddc97; }
   .dot.logs { background: var(--fg-dim); }
+  .dot.pr_url { background: var(--fg-dim); }
   .meta {
     font-size: .75rem;
     color: var(--fg-dim);
@@ -164,17 +167,22 @@
 
 <script>
 const ICONS = {
-  fe: "🖥",
-  be: "⚙",
-  logs: "📜",
-  pr_url: "🔗"
+  fe:       "🖥",
+  be:       "⚙",
+  keycloak: "🔐",
+  maildev:  "📬",
+  logs:     "📜",
+  pr_url:   "🔗"
 };
 const LABELS = {
-  fe: "Frontend",
-  be: "Backend",
-  logs: "Logs",
-  pr_url: "Pull Request"
+  fe:       "Frontend",
+  be:       "Backend",
+  keycloak: "Keycloak",
+  maildev:  "Maildev",
+  logs:     "Logs",
+  pr_url:   "Pull Request"
 };
+const KEY_ORDER = ["fe", "be", "keycloak", "maildev", "logs", "pr_url"];
 
 function linkRow(kind, url) {
   if (!url) return "";
@@ -185,8 +193,7 @@ function linkRow(kind, url) {
 
 function card(title, env) {
   if (!env) return "";
-  const keys = env.hide_be ? ["fe", "logs", "pr_url"] : ["fe", "be", "logs", "pr_url"];
-  const links = keys.map(k => linkRow(k, env[k])).join("");
+  const links = KEY_ORDER.map(k => linkRow(k, env[k])).join("");
   const updated = env.updated_at ? `Stand: ${env.updated_at}` : "";
   return `<div class="card">
     <h3>${title} <span class="badge">live</span></h3>
