@@ -62,6 +62,5 @@ public class ProjectLinkController {
 
     private UUID getCurrentUserId(Jwt jwt) {
         return UUID.fromString(jwt.getSubject());
-        }
-
+    }
 }
