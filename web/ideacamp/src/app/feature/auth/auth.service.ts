@@ -65,7 +65,7 @@ export class AuthService {
     const authConfig: AuthConfig = {
       issuer: env.issuer ?? '',
       redirectUri: this.redirectUri,
-      postLogoutRedirectUri: `${window.location.origin}/impressum`,
+      postLogoutRedirectUri: `${window.location.origin}/landing`,
       clientId: env.clientId ?? '',
       responseType: 'code',
       scope: env.scope ?? 'openid profile email',
