@@ -80,8 +80,17 @@
     "ERROR_AUTH_REQUIRED": "Bitte melde dich an, um dieses Profil anzuzeigen.",
     "ERROR_LOAD_PROFILE": "Profilinformationen konnten nicht geladen werden. Bitte versuche es später erneut.",
     "ERROR_EDIT_FORBIDDEN": "Du bist nicht berechtigt, dieses Profil zu bearbeiten.",
+<<<<<<< HEAD
     "FOLLOWERS": "{{ count }} Follower",
     "ERROR_UPDATE_PROFILE": "Das Profil konnte nicht aktualisiert werden. Bitte versuche es später erneut."
+=======
+    "ERROR_UPDATE_PROFILE": "Das Profil konnte nicht aktualisiert werden. Bitte versuche es später erneut.",
+    "FOLLOWERS": "Follower",
+    "FOLLOW": "Folgen",
+    "FOLLOWING": "Folge ich",
+    "UNFOLLOW": "Entfolgen",
+    "INVITE": "Einladen"
+>>>>>>> developer
   },
   "CONTACT-REQUESTS": {
     "CONTACT": "Kontaktanfragen",

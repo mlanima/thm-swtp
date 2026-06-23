@@ -77,7 +77,7 @@ public class ProfessorRequestService {
         }
 
         entity.setStatus(ProfessorRequestStatus.ACCEPTED);
-        entity.getRequestingUser().setRole("PROFESSOR");
+        entity.getRequestingUser().setProfessor(true); // Grant professor role to the user
         ProfessorRequestEntity saved = professorRequestRepository.save(entity);
         return ProfessorRequestMapper.toDomain(saved);
     }

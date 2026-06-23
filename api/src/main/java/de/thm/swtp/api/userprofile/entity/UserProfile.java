@@ -32,7 +32,6 @@ public class UserProfile {
 
     private String location;
 
-    // TODO: followers is not implemented yet — placeholder until a follow system is built
     @Column(columnDefinition = "INTEGER DEFAULT 0")
     private int followers;
 
@@ -42,8 +41,9 @@ public class UserProfile {
     @Column(columnDefinition = "TEXT")
     private String experience;
 
-    // TODO: role is a placeholder until a proper role/authority system is implemented
-    private String role;
+    @Builder.Default
+    @Column(name = "is_professor", nullable = false)
+    private boolean isProfessor = false;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
@@ -55,5 +55,6 @@ public class UserProfile {
 
     @ManyToMany
     @JoinTable(name = "user_profile_tags", joinColumns = @JoinColumn(name = "user_profile_keycloak_id"), inverseJoinColumns = @JoinColumn(name = "tag_name"))
+    @Builder.Default
     private Set<TagEntity> tags = new HashSet<>();
 }

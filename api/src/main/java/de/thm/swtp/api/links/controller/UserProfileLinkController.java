@@ -7,8 +7,7 @@ import de.thm.swtp.api.links.service.UserProfileLinkService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,35 +29,28 @@ public class UserProfileLinkController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public UserProfileLinkResponse createUserProfileLink(@PathVariable UUID userId, @AuthenticationPrincipal Jwt jwt,
+    @PreAuthorize("@security.canCreateUserProfileLinks(#userId, authentication)")
+    public UserProfileLinkResponse createUserProfileLink(@PathVariable UUID userId,
                                                  @Valid @RequestBody CreateLinkRequest createLinkRequest) {
-        UUID currentUserId = getCurrentUserId(jwt);
-
-        return UserProfileLinkResponse.toResponse(userProfileLinkService.createUserProfileLink(userId, currentUserId,
+        return UserProfileLinkResponse.toResponse(userProfileLinkService.createUserProfileLink(userId,
                 createLinkRequest.label(), createLinkRequest.url()));
     }
 
     @PatchMapping("/{linkId}")
-    public UserProfileLinkResponse updateUserProfileLink(@PathVariable UUID userId, @AuthenticationPrincipal Jwt jwt, @PathVariable UUID linkId,
+    @PreAuthorize("@security.canEditUserProfileLinks(#userId, authentication)")
+    public UserProfileLinkResponse updateUserProfileLink(@PathVariable UUID userId, @PathVariable UUID linkId,
                                                  @Valid @RequestBody UpdateLinkRequest updateLinkRequest) {
-        UUID currentUserId = getCurrentUserId(jwt);
 
-        return UserProfileLinkResponse.toResponse(userProfileLinkService.updateUserProfileLink(userId, currentUserId,
+        return UserProfileLinkResponse.toResponse(userProfileLinkService.updateUserProfileLink(userId,
                 linkId, updateLinkRequest.label(), updateLinkRequest.url()));
     }
 
     @DeleteMapping("/{linkId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteUserProfileLink(@PathVariable UUID userId, @PathVariable UUID linkId, @AuthenticationPrincipal Jwt jwt) {
-        UUID currentUserId = getCurrentUserId(jwt);
-        userProfileLinkService.deleteUserProfileLink(userId, currentUserId, linkId);
+    @PreAuthorize("@security.canDeleteUserProfileLinks(#userId, authentication)")
+    public void deleteUserProfileLink(@PathVariable UUID userId, @PathVariable UUID linkId) {
+        userProfileLinkService.deleteUserProfileLink(userId, linkId);
     }
 
-
-
-
-    private UUID getCurrentUserId(Jwt jwt){
-        return UUID.fromString(jwt.getSubject());
-    }
 }
 

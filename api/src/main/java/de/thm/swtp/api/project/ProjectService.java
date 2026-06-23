@@ -2,7 +2,6 @@ package de.thm.swtp.api.project;
 
 
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectMemberNotFoundException;
-import de.thm.swtp.api.exceptionhandling.exceptions.ProjectOwnerCannotBeRemovedException;
 import de.thm.swtp.api.project.dto.request.*;
 import de.thm.swtp.api.project.dto.response.*;
 import de.thm.swtp.api.project.exception.*;
@@ -70,20 +69,33 @@ public class ProjectService {
     }
 
     @Transactional
-    public ProjectResponse createProject(CreateProjectRequest request, String username) {
+    public ProjectResponse createProject(CreateProjectRequest request, UUID currentUserId) {
 
         if (projectRepository.existsByName(request.name())) {
             throw new ExceptionProjectResponse(request.name());
         }
 
-        UserProfile owner = userProfileRepository.findByUsername(username)
-                .orElseThrow(() -> new UserProfileNotFoundException(username));
+        UserProfile owner = userProfileRepository.findById(currentUserId)
+                .orElseThrow(() -> new UserProfileNotFoundException(currentUserId.toString()));
+
+        String projectUrl;
+        if (request.projectUrl() == null || request.projectUrl().isBlank()) {
+            projectUrl = resolveUniqueUrl(ProjectUrlUtils.generateProjectUrl(request.name()));
+        } else {
+            if (!ProjectUrlUtils.isValidUrl(request.projectUrl())) {
+                throw new ExceptionInvalidProjectUrl(request.projectUrl());
+            }
+            if (projectRepository.existsByProjectUrl(request.projectUrl())) {
+                throw new ExceptionProjectUrlAlreadyExists(request.projectUrl());
+            }
+            projectUrl = request.projectUrl();
+        }
 
         ProjectEntity project = ProjectEntity.builder()
                 .name(request.name())
                 .description(request.description())
                 .shortDescription(request.shortDescription())
-                .projectUrl(request.projectUrl())
+                .projectUrl(projectUrl)
                 .isPrivateProject(request.isPrivateProject())
                 .owner(owner)
                 .build();
@@ -95,21 +107,42 @@ public class ProjectService {
         return toResponse(saved);
     }
 
+    private String resolveUniqueUrl(String baseSlug) {
+        if (baseSlug == null || baseSlug.isBlank()) {
+            baseSlug = "projekt";
+        }
+        if (baseSlug.length() < 3) {
+            baseSlug = baseSlug + "-projekt";
+        }
+
+        if (!projectRepository.existsByProjectUrl(baseSlug)) {
+            return baseSlug;
+        }
+
+        int counter = 1;
+        String candidate;
+        do {
+            String suffix = "-" + counter;
+            int baseLength = Math.min(baseSlug.length(), 30 - suffix.length());
+            candidate = baseSlug.substring(0, baseLength) + suffix;
+            counter++;
+        } while (projectRepository.existsByProjectUrl(candidate) && counter <= 99);
+
+        if (projectRepository.existsByProjectUrl(candidate)) {
+            throw new ExceptionProjectUrlGenerationFailed(baseSlug);
+        }
+
+        return candidate;
+    }
+
     @Transactional
-    public DeleteProjectResponse deleteProject(UUID projectId, String username) {
+    public DeleteProjectResponse deleteProject(UUID projectId) {
 
         ProjectEntity project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ExceptionProjectNotFound(projectId));
 
         if (project.getDeletedAt() != null) {
             throw new ExceptionProjectAlreadyDeleted(projectId);
-        }
-
-        UserProfile requester = userProfileRepository.findByUsername(username)
-                .orElseThrow(() -> new UserProfileNotFoundException(username));
-
-        if (!project.getOwner().getKeycloakId().equals(requester.getKeycloakId())) {
-            throw new ExceptionProjectDeleteNotAllowed(requester.getKeycloakId(), projectId);
         }
 
         projectFavoriteRepository.deleteByProjectId(projectId);
@@ -165,20 +198,13 @@ public class ProjectService {
     }
 
     @Transactional
-    public ProjectResponse editProject(UUID projectId, UpdateProjectRequest request, String username) {
+    public ProjectResponse editProject(UUID projectId, UpdateProjectRequest request) {
 
         ProjectEntity project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ExceptionProjectNotFound(projectId));
 
         if (project.getDeletedAt() != null) {
             throw new ExceptionProjectAlreadyDeleted(projectId);
-        }
-
-        UserProfile requester = userProfileRepository.findByUsername(username)
-                .orElseThrow(() -> new UserProfileNotFoundException(username));
-
-        if (!project.getOwner().getKeycloakId().equals(requester.getKeycloakId())) {
-            throw new ExceptionProjectEditNotAllowed(requester.getKeycloakId(), projectId);
         }
 
         if (request.getName() != null &&
@@ -197,6 +223,13 @@ public class ProjectService {
             project.setShortDescription(request.getShortDescription());
         }
         if (request.getProjectUrl() != null) {
+            if (!ProjectUrlUtils.isValidUrl(request.getProjectUrl())) {
+                throw new ExceptionInvalidProjectUrl(request.getProjectUrl());
+            }
+            if (!request.getProjectUrl().equals(project.getProjectUrl()) &&
+                    projectRepository.existsByProjectUrl(request.getProjectUrl())) {
+                throw new ExceptionProjectUrlAlreadyExists(request.getProjectUrl());
+            }
             project.setProjectUrl(request.getProjectUrl());
         }
         project.setPrivateProject(request.isPrivateProject());
@@ -222,33 +255,14 @@ public class ProjectService {
                 .toList();
     }
 
-    private void createProjectInvites(ProjectEntity project, UserProfile owner, Set <UUID> invitedUserIds) {
-        if (invitedUserIds == null || invitedUserIds.isEmpty()) {
-            return;
-        }
-
-        invitedUserIds.stream()
-                .filter(userId -> !userId.equals(owner.getKeycloakId()))
-                .distinct()
-                .forEach(userId -> projectInviteService.createProjectInvite(
-                        project.getId(),
-                        userId,
-                        PROJECT_CREATION_INVITE_MESSAGE,
-                        owner.getKeycloakId()
-                ));
-    }
 
     @Transactional
-    public ProjectResponse updateAllowJoinRequests(UUID projectId, boolean allow, UUID currentUserId) {
+    public ProjectResponse updateAllowJoinRequests(UUID projectId, boolean allow) {
         ProjectEntity project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ExceptionProjectNotFound(projectId));
 
         if (project.getDeletedAt() != null) {
             throw new ExceptionProjectAlreadyDeleted(projectId);
-        }
-
-        if (!project.getOwner().getKeycloakId().equals(currentUserId)) {
-            throw new ExceptionProjectEditNotAllowed(currentUserId, projectId);
         }
 
         project.setAllowJoinRequests(allow);
@@ -266,14 +280,9 @@ public class ProjectService {
     }
 
     @Transactional
-    public void deleteProjectMember(UUID projectId, UUID currentUserId, UUID memberId){
+    public void deleteProjectMember(UUID projectId, UUID memberId){
         ProjectEntity projectEntity =  projectRepository.findById(projectId)
                 .orElseThrow(() -> new ExceptionProjectNotFound(projectId));
-
-        checkProjectOwner(projectEntity, currentUserId);
-        if (currentUserId.equals(memberId)) {
-            throw new ProjectOwnerCannotBeRemovedException(currentUserId, projectId);
-        }
 
         UserProfile member = userProfileRepository.findById(memberId)
                 .orElseThrow(() -> new UserProfileNotFoundException(memberId.toString()));
@@ -291,12 +300,18 @@ public class ProjectService {
     }
 
 
-
-    private void checkProjectOwner(ProjectEntity projectEntity, UUID currentUserId){
-        UUID ownerId = projectEntity.getOwner().getKeycloakId();
-
-        if (!ownerId.equals(currentUserId)) {
-            throw new ExceptionProjectEditNotAllowed(currentUserId, projectEntity.getId());
+    private void createProjectInvites(ProjectEntity project, UserProfile owner, Set <UUID> invitedUserIds) {
+        if (invitedUserIds == null || invitedUserIds.isEmpty()) {
+            return;
         }
+
+        invitedUserIds.stream()
+                .filter(userId -> !userId.equals(owner.getKeycloakId()))
+                .distinct()
+                .forEach(userId -> projectInviteService.createProjectInvite(
+                        project.getId(),
+                        userId,
+                        PROJECT_CREATION_INVITE_MESSAGE
+                ));
     }
 }

@@ -1,6 +1,5 @@
 package de.thm.swtp.api.userprofile.controller;
 
-import de.thm.swtp.api.exceptionhandling.exceptions.ProfileAccessDeniedException;
 import de.thm.swtp.api.project.ProjectService;
 import de.thm.swtp.api.project.dto.response.ProjectResponse;
 import de.thm.swtp.api.userprofile.dto.UserProfileRequest;
@@ -12,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
@@ -38,37 +38,31 @@ public class UserProfileController {
     }
 
     @GetMapping("/api/users/{username}/projects")
-    public List<ProjectResponse> getProjects(@PathVariable String username, @AuthenticationPrincipal Jwt jwt) {
-        verifyOwnership(username, jwt);
+    @PreAuthorize("@security.canViewUserProjects(#username, authentication)")
+    public List<ProjectResponse> getProjects(@PathVariable String username) {
         return projectService.getProjectsByUsername(username);
     }
 
     @GetMapping("/api/users/{username}/projects/all")
-    public List<ProjectResponse> getAllProjects(@PathVariable String username, @AuthenticationPrincipal Jwt jwt) {
-        verifyOwnership(username, jwt);
+    @PreAuthorize("@security.canViewUserProjects(#username, authentication)")
+    public List<ProjectResponse> getAllProjects(@PathVariable String username) {
         return projectService.getAllProjectsByUsername(username);
     }
 
     @PutMapping("/api/users/{username}/profile")
+    @PreAuthorize("@security.canEditUserProfile(#username,authentication)")
     public UserProfileResponse updateProfile(
             @PathVariable String username,
-            @AuthenticationPrincipal Jwt jwt,
             @RequestBody UserProfileRequest request) {
-        verifyOwnership(username, jwt);
         return userProfileMapper.toResponse(userProfileService.updateProfile(username, request.title(), request.location(), request.about(), request.experience()));
     }
 
     @DeleteMapping("/api/users/{username}/profile")
+    @PreAuthorize("@security.canDeleteUserProfile(#username, authentication)")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteProfile(@PathVariable String username, @AuthenticationPrincipal Jwt jwt) {
-        verifyOwnership(username, jwt);
+    public void deleteProfile(@PathVariable String username) {
         userProfileService.deleteProfile(username);
     }
 
-    private void verifyOwnership(String username, Jwt jwt) {
-        if (!jwt.getClaimAsString("preferred_username").equals(username)) {
-            throw new ProfileAccessDeniedException();
-        }
-    }
 
 }

@@ -83,8 +83,17 @@
     "ERROR_AUTH_REQUIRED": "Please log in to view this profile.",
     "ERROR_LOAD_PROFILE": "Profile information could not be loaded. Please try again later.",
     "ERROR_EDIT_FORBIDDEN": "You are not authorized to edit this profile.",
+<<<<<<< HEAD
     "FOLLOWERS": "{{ count }} Followers",
     "ERROR_UPDATE_PROFILE": "The profile could not be updated. Please try again later."
+=======
+    "ERROR_UPDATE_PROFILE": "The profile could not be updated. Please try again later.",
+    "FOLLOWERS": "Followers",
+    "FOLLOW": "Follow",
+    "FOLLOWING": "Following",
+    "UNFOLLOW": "Unfollow",
+    "INVITE": "Invite"
+>>>>>>> developer
   },
   "CONTACT-REQUESTS": {
     "CONTACT": "Contact Requests",

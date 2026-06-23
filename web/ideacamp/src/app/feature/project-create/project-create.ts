@@ -11,6 +11,7 @@ import {ProjectFinishForm} from './project-finish-form/project-finish-form';
 import { ProjectService } from '../project-site/project.service';
 
 import {ProjectGeneralData, ProjectSettingsData, ProjectCreateData, projectCreateSchema} from './schemas/project-create.schema';
+import {generateProjectUrl} from './project-url.utils';
 import {ProjectInviteMember } from '../../models/project-invite-member.model';
 
 @Component({
@@ -86,7 +87,14 @@ export class ProjectCreate {
 
   /** Saves the validated general-form data and goes to the next wizard step.*/
   saveGeneralFormAndContinue(data: ProjectGeneralData) {
-    this.projectData = { ...this.projectData, ...data };
+    const oldName = this.projectData.name;
+    const currentUrl = this.projectData.projectUrl ?? '';
+    if (oldName && data.name !== oldName && currentUrl === generateProjectUrl(oldName)) {
+      this.projectData = { ...this.projectData, ...data, projectUrl: '' };
+    } else {
+      this.projectData = { ...this.projectData, ...data };
+    }
+
     this.nextStep();
   }
 
@@ -127,7 +135,9 @@ export class ProjectCreate {
     this.projectService.createProject({ ...res.data, shortDescription: res.data.shortDescription ?? null, description: res.data.description ?? null,memberIds: this.invitedMembers.map(member => member.keycloakId), tagIds: [] }).subscribe({
       next: (project) => {
         this.isLoading = false;
-        this.successMessage = this.invitedMembers.length > 0 ? 'PROJECTCREATE.SUCCESS_CREATED_WITH_INVITES' : 'PROJECTCREATE.SUCCESS_CREATED';
+        this.successMessage = this.translateService.instant(
+          this.invitedMembers.length > 0 ? 'PROJECTCREATE.SUCCESS_CREATED_WITH_INVITES' : 'PROJECTCREATE.SUCCESS_CREATED',
+        );
         setTimeout(() => {
           this.router.navigate(['/project', project.projectUrl]);
         }, 1500);

@@ -7,7 +7,6 @@ import de.thm.swtp.api.projectInvitation.domain.ProjectInvite;
 import de.thm.swtp.api.projectInvitation.domain.ProjectInviteStatus;
 import de.thm.swtp.api.projectInvitation.entity.ProjectInviteEntity;
 import de.thm.swtp.api.projectInvitation.exception.InvalidProjectInviteException;
-import de.thm.swtp.api.projectInvitation.exception.ProjectInviteAccessDeniedException;
 import de.thm.swtp.api.projectInvitation.exception.ProjectInviteNotFoundException;
 import de.thm.swtp.api.projectInvitation.repository.ProjectInviteRepository;
 import de.thm.swtp.api.projectInvitation.service.ProjectInviteService;
@@ -97,7 +96,7 @@ public class ProjectEntityInviteServiceTest {
             return entity;
         });
 
-        ProjectInvite res = projectInviteService.createProjectInvite(projectId,invitedUserId, "Hello, please join my project.", ownerId);
+        ProjectInvite res = projectInviteService.createProjectInvite(projectId,invitedUserId, "Hello, please join my project.");
 
         assertThat(res.getId()).isEqualTo(inviteId);
         assertThat(res.getProjectId()).isEqualTo(projectId);
@@ -116,20 +115,6 @@ public class ProjectEntityInviteServiceTest {
     }
 
     @Test
-    void createProjectInvite_shouldThrow_whenSenderIsNotProjectOwner(){
-        UUID otherUserId = UUID.randomUUID();
-        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
-        when(userProfileRepository.findById(invitedUserId)).thenReturn(Optional.of(invitedUser));
-
-        assertThatThrownBy(() -> projectInviteService.createProjectInvite(projectId,invitedUserId, "Hello, please join my project.", otherUserId))
-                .isInstanceOf(ProjectInviteAccessDeniedException.class)
-                .hasMessage("Only the project owner is allowed to create invitations.");
-
-        verify(projectInviteRepository, never()).save(any());
-    }
-
-
-    @Test
     void createProjectInvite_shouldThrow_whenOwnerInvitesHimself() {
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
         when(userProfileRepository.findById(ownerId)).thenReturn(Optional.of(owner));
@@ -137,8 +122,7 @@ public class ProjectEntityInviteServiceTest {
         assertThatThrownBy(() -> projectInviteService.createProjectInvite(
                 projectId,
                 ownerId,
-                "Hello, please join my project.",
-                ownerId
+                "Hello, please join my project."
         ))
                 .isInstanceOf(InvalidProjectInviteException.class)
                 .hasMessage("The project owner cannot invite himself to the project.");
@@ -155,7 +139,7 @@ public class ProjectEntityInviteServiceTest {
         when(projectInviteRepository.findByProjectIdAndInvitedUserKeycloakIdAndStatus(projectId,invitedUserId, ProjectInviteStatus.PENDING))
                 .thenReturn(Optional.of(existingInvite));
 
-        assertThatThrownBy(() -> projectInviteService.createProjectInvite(projectId,invitedUserId, "Hello, please join my project.", ownerId))
+        assertThatThrownBy(() -> projectInviteService.createProjectInvite(projectId,invitedUserId, "Hello, please join my project."))
                 .isInstanceOf(InvalidProjectInviteException.class)
                 .hasMessage("User already has a pending invitation for this project.");
 
@@ -166,7 +150,7 @@ public class ProjectEntityInviteServiceTest {
     void createProjectInvite_shouldThrow_whenProjectDoesNotExist(){
         when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> projectInviteService.createProjectInvite(projectId,invitedUserId, "Hello, please join my project.", ownerId))
+        assertThatThrownBy(() -> projectInviteService.createProjectInvite(projectId,invitedUserId, "Hello, please join my project."))
                 .isInstanceOf(ProjectNotFoundException.class)
                 .hasMessage("Project not found: " + projectId);
 
@@ -178,7 +162,7 @@ public class ProjectEntityInviteServiceTest {
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
         when(userProfileRepository.findById(invitedUserId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(()-> projectInviteService.createProjectInvite(projectId,invitedUserId, "Hello, please join my project.", ownerId))
+        assertThatThrownBy(()-> projectInviteService.createProjectInvite(projectId,invitedUserId, "Hello, please join my project."))
                 .isInstanceOf(UserProfileNotFoundException.class)
                 .hasMessage("Profile not found for user: " + invitedUserId);
 
@@ -189,7 +173,7 @@ public class ProjectEntityInviteServiceTest {
     void updateInviteStatus_shouldThrow_whenInviteDoesNotExist(){
         when(projectInviteRepository.findById(inviteId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> projectInviteService.updateInviteStatus(inviteId,ProjectInviteStatus.ACCEPTED,invitedUserId))
+        assertThatThrownBy(() -> projectInviteService.updateInviteStatus(inviteId,ProjectInviteStatus.ACCEPTED))
                 .isInstanceOf(ProjectInviteNotFoundException.class)
                 .hasMessage("Project invite not found: " + inviteId);
     }
@@ -202,7 +186,7 @@ public class ProjectEntityInviteServiceTest {
         when(projectInviteRepository.save(any(ProjectInviteEntity.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
-        ProjectInvite res = projectInviteService.updateInviteStatus(inviteId,ProjectInviteStatus.ACCEPTED, invitedUserId);
+        ProjectInvite res = projectInviteService.updateInviteStatus(inviteId,ProjectInviteStatus.ACCEPTED);
 
         assertThat(res.getStatus()).isEqualTo(ProjectInviteStatus.ACCEPTED);
         assertThat(invite.getStatus()).isEqualTo(ProjectInviteStatus.ACCEPTED);
@@ -219,8 +203,7 @@ public class ProjectEntityInviteServiceTest {
 
         ProjectInvite res = projectInviteService.updateInviteStatus(
                 inviteId,
-                ProjectInviteStatus.REJECTED,
-                invitedUserId
+                ProjectInviteStatus.REJECTED
         );
 
         assertThat(res.getStatus()).isEqualTo(ProjectInviteStatus.REJECTED);
@@ -228,28 +211,13 @@ public class ProjectEntityInviteServiceTest {
     }
 
 
-
-    @Test
-    void updateInviteStatus_shouldThrow_whenCurrentUserIsNotInvitedUser(){
-        ProjectInviteEntity invite = createPendingInviteEntity();
-        UUID otherUserId = UUID.randomUUID();
-
-        when(projectInviteRepository.findById(inviteId)).thenReturn(Optional.of(invite));
-        when(projectInviteRepository.save(any(ProjectInviteEntity.class)))
-                .thenAnswer(invocation -> invocation.getArgument(0));
-
-        assertThatThrownBy(() -> projectInviteService.updateInviteStatus(inviteId,ProjectInviteStatus.ACCEPTED, otherUserId))
-                .isInstanceOf(ProjectInviteAccessDeniedException.class)
-                .hasMessage("Only the invited user can update the invitation status.");
-    }
-
     @Test
     void updateInviteStatus_shouldThrow_whenNewStatusIsPending(){
         ProjectInviteEntity invite = createPendingInviteEntity();
 
         when(projectInviteRepository.findById(inviteId)).thenReturn(Optional.of(invite));
 
-        assertThatThrownBy(() -> projectInviteService.updateInviteStatus(inviteId,ProjectInviteStatus.PENDING, invitedUserId))
+        assertThatThrownBy(() -> projectInviteService.updateInviteStatus(inviteId,ProjectInviteStatus.PENDING))
                 .isInstanceOf(InvalidProjectInviteException.class)
                 .hasMessage("Invalid invitation status.");
     }
@@ -261,7 +229,7 @@ public class ProjectEntityInviteServiceTest {
 
         when(projectInviteRepository.findById(inviteId)).thenReturn(Optional.of(invite));
 
-        assertThatThrownBy(() -> projectInviteService.updateInviteStatus(inviteId,ProjectInviteStatus.REJECTED,invitedUserId))
+        assertThatThrownBy(() -> projectInviteService.updateInviteStatus(inviteId,ProjectInviteStatus.REJECTED))
                 .isInstanceOf(InvalidProjectInviteException.class)
                 .hasMessage("Only invitations that are pending can be updated.");
     }

@@ -4,7 +4,7 @@ import de.thm.swtp.api.exceptionhandling.exceptions.ProjectLinkAlreadyExistsExce
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectLinkNotFoundException;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
-import de.thm.swtp.api.project.exception.ExceptionProjectEditNotAllowed;
+
 import de.thm.swtp.api.project.exception.ProjectNotFoundException;
 import de.thm.swtp.api.links.domain.ProjectLink;
 import de.thm.swtp.api.links.entity.ProjectLinkEntity;
@@ -33,7 +33,6 @@ public class ProjectLinkServiceTest {
     private UUID projectId;
     private UUID otherProjectId;
     private UUID ownerId;
-    private UUID otherUserId;
     private UUID linkId;
 
     private ProjectEntity project;
@@ -56,7 +55,6 @@ public class ProjectLinkServiceTest {
         projectId = UUID.randomUUID();
         otherProjectId = UUID.randomUUID();
         ownerId = UUID.randomUUID();
-        otherUserId = UUID.randomUUID();
         linkId = UUID.randomUUID();
 
         owner = new UserProfile();
@@ -91,7 +89,6 @@ public class ProjectLinkServiceTest {
 
         ProjectLink result = projectLinkService.createProjectLink(
                 projectId,
-                ownerId,
                 label,
                 url
         );
@@ -111,24 +108,9 @@ public class ProjectLinkServiceTest {
 
         assertThatThrownBy(() -> projectLinkService.createProjectLink(
                 projectId,
-                ownerId,
                 label,
                 url
         )).isInstanceOf(ProjectNotFoundException.class);
-
-        verify(projectLinkRepository, never()).save(any());
-    }
-
-    @Test
-    void createProjectLink_shouldThrowAccessDenied_whenCurrentUserIsNotOwner() {
-        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
-
-        assertThatThrownBy(() -> projectLinkService.createProjectLink(
-                projectId,
-                otherUserId,
-                label,
-                url
-        )).isInstanceOf(ExceptionProjectEditNotAllowed.class);
 
         verify(projectLinkRepository, never()).save(any());
     }
@@ -143,7 +125,6 @@ public class ProjectLinkServiceTest {
 
         assertThatThrownBy(() -> projectLinkService.createProjectLink(
                 projectId,
-                ownerId,
                 label,
                 url
         )).isInstanceOf(ProjectLinkAlreadyExistsException.class);
@@ -202,7 +183,6 @@ public class ProjectLinkServiceTest {
 
         ProjectLink result = projectLinkService.updateProjectLink(
                 projectId,
-                ownerId,
                 linkId,
                 "New Label",
                 null
@@ -236,7 +216,6 @@ public class ProjectLinkServiceTest {
 
         ProjectLink result = projectLinkService.updateProjectLink(
                 projectId,
-                ownerId,
                 linkId,
                 null,
                 "https://github.com/new-project"
@@ -273,7 +252,6 @@ public class ProjectLinkServiceTest {
 
         ProjectLink result = projectLinkService.updateProjectLink(
                 projectId,
-                ownerId,
                 linkId,
                 "New Label",
                 "https://github.com/new-project"
@@ -285,21 +263,6 @@ public class ProjectLinkServiceTest {
         verify(projectLinkRepository).save(link);
     }
 
-    @Test
-    void updateProjectLink_shouldThrowAccessDenied_whenCurrentUserIsNotOwner() {
-        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
-
-        assertThatThrownBy(() -> projectLinkService.updateProjectLink(
-                projectId,
-                linkId,
-                otherUserId,
-                "New Label",
-                null
-        )).isInstanceOf(ExceptionProjectEditNotAllowed.class);
-
-        verify(projectLinkRepository, never()).findById(any());
-        verify(projectLinkRepository, never()).save(any());
-    }
 
     @Test
     void updateProjectLink_shouldThrowLinkNotFound_whenLinkDoesNotExist() {
@@ -308,7 +271,6 @@ public class ProjectLinkServiceTest {
 
         assertThatThrownBy(() -> projectLinkService.updateProjectLink(
                 projectId,
-                ownerId,
                 linkId,
                 "New Label",
                 null
@@ -331,22 +293,8 @@ public class ProjectLinkServiceTest {
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
         when(projectLinkRepository.findById(linkId)).thenReturn(Optional.of(link));
 
-        projectLinkService.deleteProjectLink(projectId, ownerId, linkId);
+        projectLinkService.deleteProjectLink(projectId, linkId);
 
         verify(projectLinkRepository).delete(link);
-    }
-
-    @Test
-    void deleteProjectLink_shouldThrowAccessDenied_whenCurrentUserIsNotOwner() {
-        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
-
-        assertThatThrownBy(() -> projectLinkService.deleteProjectLink(
-                projectId,
-                linkId,
-                otherUserId
-        )).isInstanceOf(ExceptionProjectEditNotAllowed.class);
-
-        verify(projectLinkRepository, never()).findById(any());
-        verify(projectLinkRepository, never()).delete(any());
     }
 }
