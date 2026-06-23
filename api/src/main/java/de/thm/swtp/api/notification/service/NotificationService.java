@@ -50,7 +50,7 @@ public class NotificationService {
         String hint = messageSource.getMessage("mail.invite.hint", null, locale);
         String footer = messageSource.getMessage("mail.invite.footer", null, locale);
 
-        String ctaUrl = frontendUrl + "/invitations";
+        String ctaUrl = frontendUrl + "/my-projects";
 
         String template = new ClassPathResource("templates/emails/invite.html")
                 .getContentAsString(StandardCharsets.UTF_8);
