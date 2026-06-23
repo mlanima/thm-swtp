@@ -17,6 +17,7 @@ import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.context.ApplicationEventPublisher;
 
 
 import java.time.LocalDateTime;
@@ -35,6 +36,7 @@ public class ProjectEntityInviteServiceTest {
     private ProjectInviteRepository projectInviteRepository;
     private ProjectRepository projectRepository;
     private UserProfileRepository userProfileRepository;
+    private ApplicationEventPublisher eventPublisher;
 
     private ProjectInviteService projectInviteService;
 
@@ -52,8 +54,9 @@ public class ProjectEntityInviteServiceTest {
         projectInviteRepository = mock(ProjectInviteRepository.class);
         projectRepository = mock(ProjectRepository.class);
         userProfileRepository = mock(UserProfileRepository.class);
+        eventPublisher = mock(ApplicationEventPublisher.class);
 
-        projectInviteService = new ProjectInviteService(projectInviteRepository, projectRepository, userProfileRepository);
+        projectInviteService = new ProjectInviteService(projectInviteRepository, projectRepository, userProfileRepository, eventPublisher);
 
         projectId = UUID.randomUUID();
         ownerId = UUID.randomUUID();
