@@ -120,9 +120,16 @@ export class ProjectFiles implements OnChanges {
     return this.ALLOWED_EXTENSIONS.includes(ext);
   }
 
+  private readonly MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
+
   private upload(file: File): void {
     if (!this.isAllowedFile(file)) {
       this.errorMessage.set(this.translateService.instant('PROJECTSITE.FILES.ERROR_TYPE_NOT_ALLOWED'));
+      return;
+    }
+
+    if (file.size > this.MAX_FILE_SIZE_BYTES) {
+      this.errorMessage.set(this.translateService.instant('PROJECTSITE.FILES.ERROR_FILE_TOO_LARGE'));
       return;
     }
 

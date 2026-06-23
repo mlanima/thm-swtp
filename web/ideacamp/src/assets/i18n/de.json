@@ -340,6 +340,7 @@
       "DOWNLOAD_FILE": "Datei herunterladen",
       "DELETE_FILE": "Datei löschen",
       "ERROR_TYPE_NOT_ALLOWED": "Dateityp nicht erlaubt. Erlaubt: PDF, PNG, JPG, DOCX, TXT, MD",
+      "ERROR_FILE_TOO_LARGE": "Datei ist zu groß. Maximale Dateigröße: 10 MB.",
       "ERROR_LOAD": "Dateien konnten nicht geladen werden.",
       "ERROR_UPLOAD": "Datei konnte nicht hochgeladen werden.",
       "ERROR_DELETE": "Datei konnte nicht gelöscht werden.",
