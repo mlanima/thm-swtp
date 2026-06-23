@@ -20,6 +20,9 @@ export const authGuard: CanActivateFn = async () => {
   }
 
   if (authService.isAuthenticated()) {
+    if (authService.isModerator()) {
+      return router.createUrlTree(['/moderator']);
+    }
     return true;
   }
 
