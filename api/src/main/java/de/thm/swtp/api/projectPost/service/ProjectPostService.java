@@ -15,6 +15,7 @@ import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ProjectPostService {
     private final ProjectPostRepository projectPostRepository;
@@ -60,7 +62,9 @@ public class ProjectPostService {
                 .publishedAt(status == ProjectPostStatus.PUBLISHED ? LocalDateTime.now() : null)
                 .build();
 
-        return ProjectPostMapper.toDomain(projectPostRepository.saveAndFlush(projectPostEntity));
+        ProjectPost post = ProjectPostMapper.toDomain(projectPostRepository.saveAndFlush(projectPostEntity));
+        log.info("Post created: project={}, post={}, author={}", projectId, post.getId(), authorId);
+        return post;
     }
 
     @Transactional
@@ -80,7 +84,9 @@ public class ProjectPostService {
         }
         postEntity.setArchivedAt(null);
 
-        return ProjectPostMapper.toDomain(projectPostRepository.save(postEntity));
+        ProjectPost post = ProjectPostMapper.toDomain(projectPostRepository.save(postEntity));
+        log.info("Post published: project={}, post={}", projectId, postId);
+        return post;
     }
 
     @Transactional
@@ -96,7 +102,9 @@ public class ProjectPostService {
         postEntity.setStatus(ProjectPostStatus.ARCHIVED);
         postEntity.setArchivedAt(LocalDateTime.now());
 
-        return ProjectPostMapper.toDomain(projectPostRepository.save(postEntity));
+        ProjectPost post = ProjectPostMapper.toDomain(projectPostRepository.save(postEntity));
+        log.info("Post archived: project={}, post={}", projectId, postId);
+        return post;
     }
 
     @Transactional
@@ -105,7 +113,7 @@ public class ProjectPostService {
         assertPostBelongsToProject(postEntity, projectId);
 
         projectPostRepository.delete(postEntity);
-
+        log.info("Post deleted: project={}, post={}", projectId, postId);
     }
 
 

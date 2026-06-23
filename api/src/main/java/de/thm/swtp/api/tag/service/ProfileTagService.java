@@ -9,6 +9,7 @@ import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ProfileTagService {
 
@@ -44,6 +46,7 @@ public class ProfileTagService {
         TagEntity tag = getOrCreateTag(tagName);
         profile.getTags().add(tag);
 
+        log.info("Tag added to profile: user={}, tag={}", userId, tag.getName());
         return TagMapper.toDomain(tag);
     }
 
@@ -54,7 +57,10 @@ public class ProfileTagService {
                 .orElseThrow(() -> new UserProfileNotFoundException(userId.toString()));
 
         tagRepository.findByNameIgnoreCase(tagName.trim())
-                .ifPresent(tag -> profile.getTags().remove(tag));
+                .ifPresent(tag -> {
+                    profile.getTags().remove(tag);
+                    log.info("Tag removed from profile: user={}, tag={}", userId, tag.getName());
+                });
     }
 
     private TagEntity getOrCreateTag(String tagName) {

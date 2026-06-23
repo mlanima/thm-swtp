@@ -15,12 +15,14 @@ import de.thm.swtp.api.projectView.repository.ProjectViewRepository;
 
 import jakarta.transaction.*;
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 import java.util.*;
 import java.time.*;
 
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ProjectService {
 
@@ -104,6 +106,7 @@ public class ProjectService {
 
         createProjectInvites(saved, owner, request.memberIds());
 
+        log.info("Project created: project={}, owner={}", saved.getId(), currentUserId);
         return toResponse(saved);
     }
 
@@ -149,6 +152,7 @@ public class ProjectService {
         projectViewRepository.deleteByProjectId(projectId);
         projectRepository.delete(project);
 
+        log.info("Project deleted: project={}", projectId);
         return DeleteProjectResponse.builder()
                 .projectId(projectId)
                 .message("Projekt erfolgreich gelöscht.")
@@ -236,6 +240,7 @@ public class ProjectService {
 
         ProjectEntity saved = projectRepository.save(project);
 
+        log.info("Project updated: project={}", projectId);
         return toResponse(saved);
     }
 
@@ -266,7 +271,9 @@ public class ProjectService {
         }
 
         project.setAllowJoinRequests(allow);
-        return toResponse(projectRepository.save(project));
+        ProjectResponse saved = toResponse(projectRepository.save(project));
+        log.info("AllowJoinRequests updated: project={}, allow={}", projectId, allow);
+        return saved;
     }
 
     @Transactional
@@ -297,6 +304,7 @@ public class ProjectService {
 
         projectEntity.getMembers().remove(member);
         projectRepository.save(projectEntity);
+        log.info("Project member removed: project={}, member={}", projectId, memberId);
     }
 
 
