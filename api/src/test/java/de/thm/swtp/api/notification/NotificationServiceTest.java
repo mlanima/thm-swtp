@@ -43,7 +43,7 @@ class NotificationServiceTest {
     }
 
     @Test
-    void sendInviteMail_shouldSendMailWithCorrectRecipient() throws Exception {
+    void sendInviteMail_shouldSendMailWithCorrectRecipient() {
         MimeMessage mimeMessage = mock(MimeMessage.class);
         when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
         when(messageSource.getMessage(anyString(), any(), any(Locale.class))).thenReturn("test");

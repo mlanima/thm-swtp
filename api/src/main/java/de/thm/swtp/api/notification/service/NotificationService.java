@@ -46,7 +46,7 @@ public class NotificationService {
 
     // 3 Retries bei jedem Fehler: nach ~10s, ~60s, ~5min — danach @Recover (warn + swallow)
     @Retryable(retryFor = Exception.class, maxAttempts = 4, backoff = @Backoff(delay = 10_000, multiplier = 6, maxDelay = 300_000))
-    public void sendInviteMail(ProjectInviteCreatedEvent event) throws Exception {
+    public void sendInviteMail(ProjectInviteCreatedEvent event) {
         ProjectInvite invite = event.invite();
         Locale locale = Locale.forLanguageTag(mailLanguage);
 
