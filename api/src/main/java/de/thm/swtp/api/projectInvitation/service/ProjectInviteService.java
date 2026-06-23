@@ -1,5 +1,6 @@
 package de.thm.swtp.api.projectInvitation.service;
 
+import de.thm.swtp.api.notification.event.ProjectInviteCreatedEvent;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
 import de.thm.swtp.api.project.exception.ProjectNotFoundException;
@@ -11,7 +12,6 @@ import de.thm.swtp.api.projectInvitation.exception.ProjectInviteAccessDeniedExce
 import de.thm.swtp.api.projectInvitation.exception.ProjectInviteNotFoundException;
 import de.thm.swtp.api.projectInvitation.mapper.ProjectInviteMapper;
 import de.thm.swtp.api.projectInvitation.repository.ProjectInviteRepository;
-import de.thm.swtp.api.notification.event.ProjectInviteCreatedEvent;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
