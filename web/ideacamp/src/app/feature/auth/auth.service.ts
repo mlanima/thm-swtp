@@ -35,6 +35,8 @@ export class AuthService {
   /** True when a valid access token is present. */
   readonly isLoggedIn: WritableSignal<boolean> = signal(false);
   readonly isLoggingOut = signal(false);
+  /** True when the user has the MODERATOR realm role. */
+  readonly isModerator: WritableSignal<boolean> = signal(false);
   /** Minimal authenticated user representation for UI components. */
   readonly user: WritableSignal<User | null> = signal(null);
 
@@ -158,6 +160,12 @@ export class AuthService {
     if (hasToken) {
       this.isLoggingOut.set(false);
 
+      const token = oauthService.getAccessToken?.() ?? null;
+      const isModerator = token !== null && this.hasModeratorRole(token);
+      if (this.isModerator() !== isModerator) {
+        this.isModerator.set(isModerator);
+      }
+
       const claims = oauthService.getIdentityClaims?.() as Record<string, unknown> | null;
       const preferred = claims?.['preferred_username'];
       const username = typeof preferred === 'string' ? preferred : '';
@@ -171,12 +179,27 @@ export class AuthService {
         this.user.set({ username, id });
       }
     } else {
+      if (this.isModerator() !== false) {
+        this.isModerator.set(false);
+      }
       if (this.username() !== '') {
         this.username.set('');
       }
       if (this.user() !== null) {
         this.user.set(null);
       }
+    }
+  }
+
+  /** Decodes the access token and returns true if the MODERATOR realm role is present. */
+  private hasModeratorRole(token: string): boolean {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const realmAccess = payload['realm_access'];
+      const roles: string[] = realmAccess?.['roles'] ?? [];
+      return roles.includes('MODERATOR');
+    } catch {
+      return false;
     }
   }
 
@@ -242,6 +265,7 @@ export class AuthService {
     this.isLoggingOut.set(true);
 
     this.isLoggedIn.set(false);
+    this.isModerator.set(false);
     this.user.set(null);
     this.username.set('');
 

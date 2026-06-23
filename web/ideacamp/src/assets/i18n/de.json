@@ -134,10 +134,15 @@
     "ADD_TITLE": "Zu Favoriten hinzufügen",
     "ERROR_LOAD": "Deine Favoriten konnten nicht geladen werden."
   },
+  "MODERATOR": {
+    "TITLE": "Moderator-Bereich",
+    "DESCRIPTION": "Willkommen im Moderator-Bereich. Hier können zukünftig Benutzer und Projekte verwaltet werden."
+  },
   "SIDEBAR": {
     "MYPROJECTS": "Meine Projekte",
     "FAVORITE": "Favoriten",
     "PROFILE": "Mein Profil",
+    "MODERATOR": "Moderator",
     "IMPRESSUM": "Impressum",
     "MENU": "Menü"
   },
