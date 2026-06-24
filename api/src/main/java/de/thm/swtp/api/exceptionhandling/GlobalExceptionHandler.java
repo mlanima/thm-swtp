@@ -1,5 +1,6 @@
 package de.thm.swtp.api.exceptionhandling;
 
+import de.thm.swtp.api.common.LogSafe;
 import de.thm.swtp.api.exceptionhandling.exceptions.*;
 import de.thm.swtp.api.professorRequest.exception.ProfessorRequestAlreadyExistsException;
 import de.thm.swtp.api.professorRequest.exception.ProfessorRequestInvalidStatusException;
@@ -34,9 +35,10 @@ import java.util.stream.Collectors;
 @Slf4j
 public class GlobalExceptionHandler {
 
-    // ex.getMessage() is logged unstripped: domain messages carry UUID-validated path
-    // params, @Pattern-secured strings, or HTTP-parsed values (no CRLF survives). The only
-    // free-text vectors (search queries, upload filenames) are sanitized at source via LogSafe.
+    // ex.getMessage() is logged unstripped except for messages embedding raw free-text
+    // request fields (project name, project URL) — those sanitize via LogSafe.clean.
+    // Everything else is UUID/enums/HTTP-parsed (no CRLF survives). Free text that never
+    // reaches a handler message (search queries, upload filenames) is sanitized at source.
 
     @ExceptionHandler(ProfileAccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDenied(ProfileAccessDeniedException ex) {
@@ -54,7 +56,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ExceptionProjectResponse.class)
     public ResponseEntity<ErrorResponse> handleProjectAlreadyExists(ExceptionProjectResponse ex) {
-        log.debug("Conflict (409): {}", ex.getMessage());
+        log.debug("Conflict (409): {}", LogSafe.clean(ex.getMessage()));
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
     }
@@ -89,7 +91,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ExceptionProjectNameAlreadyExists.class)
     public ResponseEntity<ErrorResponse> handleProjectNameAlreadyExists(ExceptionProjectNameAlreadyExists ex) {
-        log.debug("Conflict (409): {}", ex.getMessage());
+        log.debug("Conflict (409): {}", LogSafe.clean(ex.getMessage()));
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
     }
@@ -200,7 +202,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ProjectNotFoundByUrlException.class)
     public ResponseEntity<ErrorResponse> handleProjectNotFoundByUrl(ProjectNotFoundByUrlException ex) {
-        log.debug("Not Found (404): {}", ex.getMessage());
+        log.debug("Not Found (404): {}", LogSafe.clean(ex.getMessage()));
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
     }
@@ -256,18 +258,21 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ProfessorRequestAlreadyExistsException.class)
     public ResponseEntity<ErrorResponse> handleProfessorRequestAlreadyExists(ProfessorRequestAlreadyExistsException ex) {
+        log.debug("Conflict (409): {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
     }
 
     @ExceptionHandler(ProfessorRequestNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleProfessorRequestNotFound(ProfessorRequestNotFoundException ex) {
+        log.debug("Not Found (404): {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
     }
 
     @ExceptionHandler(ProfessorRequestInvalidStatusException.class)
     public ResponseEntity<ErrorResponse> handleProfessorRequestInvalidStatus(ProfessorRequestInvalidStatusException ex) {
+        log.debug("Conflict (409): {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
     }
@@ -323,14 +328,14 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ExceptionInvalidProjectUrl.class)
     public ResponseEntity<ErrorResponse> handleInvalidProjectUrl(ExceptionInvalidProjectUrl ex) {
-        log.debug("Bad Request (400): {}", ex.getMessage());
+        log.debug("Bad Request (400): {}", LogSafe.clean(ex.getMessage()));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
     }
 
     @ExceptionHandler(ExceptionProjectUrlAlreadyExists.class)
     public ResponseEntity<ErrorResponse> handleProjectUrlAlreadyExists(ExceptionProjectUrlAlreadyExists ex) {
-        log.debug("Conflict (409): {}", ex.getMessage());
+        log.debug("Conflict (409): {}", LogSafe.clean(ex.getMessage()));
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
     }

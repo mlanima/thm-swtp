@@ -4,12 +4,10 @@ package de.thm.swtp.api.common;
  * Sanitizes client-controlled free text before it reaches a log line, so a
  * CR/LF in user input cannot forge fake log entries (log injection).
  *
- * <p>Use only at genuine free-text sources (search query params, upload
- * filenames). Most log sites carry UUID-validated path params, @Pattern-secured
- * strings, or HTTP-parsed values (e.g. multipart Content-Type), where raw CRLF
- * cannot survive upstream validation/parsing — see the policy comment in
- * {@code GlobalExceptionHandler}. Strip at the source, not scattered across
- * every {@code log.x(ex.getMessage())} site.
+ * <p>Use at genuine free-text sources (search queries, upload filenames) and at handler log
+ * sites whose exception message embeds raw request fields (project name, project URL). Other
+ * sites carry UUID/enums/HTTP-parsed values with no CRLF — see {@code GlobalExceptionHandler}.
+ * Strip at the source, not scattered across every {@code log.x(ex.getMessage())} call.
  */
 public final class LogSafe {
 

@@ -181,6 +181,7 @@ public class ProjectFileService {
                 log.warn("Delete: file missing on disk, DB record removed: project={}, file={}",
                         projectId, fileId);
             } else {
+                // disk delete is already done above; this only logs the DB commit succeeded.
                 TxLogger.afterCommit(log, "Delete: project={}, file={}, storage={}",
                         projectId, fileId, fileEntity.getStorageName());
             }

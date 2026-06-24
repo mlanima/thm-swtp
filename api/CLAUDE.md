@@ -10,24 +10,12 @@ Spring Boot application, Java 25, built with Maven.
 
 ## Logging conventions
 
-- Logger: Lombok `@Slf4j` on the service/handler class. No `System.out`, no manual `LoggerFactory`.
-- Placeholders over concatenation: `log.info("Project created: id={}", id)`, never string concat.
-- Levels:
-  - `error` — unexpected, technical failure (e.g. `GlobalExceptionHandler` catch-all, IO errors).
-  - `warn` — expected but notable: denied ownership/access, business-rule violations, orphaned state.
-  - `info` — lifecycle events: create/update/delete/status transitions, with resource id (+ actor where available).
-  - `debug` — query parameters & hit counts (search); off in production, no prod noise.
-- `GlobalExceptionHandler` maps by status: `AccessDenied`/`Forbidden` and server-enforced
-  business-policy 4xx (upload-size 413, file-type 415, upload-limit 422) → `warn`; expected
-  client 4xx (404/409/400/410) → `debug`; 5xx and catch-all → `error`.
-- The `AccessDeniedException` handler returns the same generic body as `RestAccessDeniedHandler`
-  so 403 is uniform across method- and URL-based denials.
-- Division of labour: services log business/Fachfehler; `GlobalExceptionHandler` logs
-  technical/unexpected exceptions once. Domain exceptions are not re-logged in the handler.
-- Read paths stay silent unless the log answers an incident question.
-- Dev visibility: set `BE_LOG_LEVEL=DEBUG` (maps to `logging.level.de.thm.swtp`)
-  to see every request via `RequestLoggingFilter` plus search/query debug logs.
-  Production stays at INFO, so reads are silent in prod.
+- Lombok `@Slf4j` on the service/handler. No `System.out`, no manual `LoggerFactory`. Placeholders over concatenation.
+- Levels: `error` unexpected/technical (catch-all, IO); `warn` denied access, business-rule violations, orphaned state; `info` lifecycle (create/update/delete/status) with resource id; `debug` query params & hit counts (search), off in prod.
+- `GlobalExceptionHandler` maps by status: 403/413/415/422 → `warn`; 400/404/409/410 → `debug`; 5xx → `error`. Services log Fachfehler, the handler logs technical/unexpected once; domain exceptions aren't re-logged.
+- 403 is uniform: `GlobalExceptionHandler` (method-security) and `RestAccessDeniedHandler` (URL-based, filter chain) both return the same generic body and log at `warn`.
+- Free-text that reaches a log line is sanitized via `LogSafe.clean`: search queries, upload filenames, and handler messages embedding raw request fields (project name, project URL). Other `ex.getMessage()` is logged unstripped (UUID/enums/HTTP-parsed — no CRLF survives).
+- Reads stay silent unless a log answers an incident question. Dev visibility: `BE_LOG_LEVEL=DEBUG` (→ `logging.level.de.thm.swtp`) turns on `RequestLoggingFilter` + search debug; prod stays INFO.
 
 ## Review focus
 
