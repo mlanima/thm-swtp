@@ -28,7 +28,7 @@
       "LABEL_PLACEHOLDER": "Beispielseite",
       "URL_PLACEHOLDER": "z.B. beispiel.com",
       "LOADING": "Links werden geladen...",
-      "EMPTY": "Keine öffentlichen Links verfügbar.",
+      "EMPTY": "Keine Links vorhanden.",
       "EDIT_LINK": "Link bearbeiten",
       "DELETE_LINK": "Link löschen",
       "VISIBILITY": "Sichtbarkeit",
@@ -367,29 +367,6 @@
       "ALL_MEMBERS": "Alle Mitglieder",
       "NO_MEMBERS": "Noch keine Mitglieder."
     },
-    "QUICKLINKS": {
-      "TITLE": "Links",
-      "ADD": "Hinzufügen",
-      "LABEL": "Bezeichnung",
-      "LABEL_PLACEHOLDER": "Beispielseite",
-      "URL_PLACEHOLDER": "z.B. beispiel.com",
-      "LOADING": "Links werden geladen...",
-      "EMPTY": "Keine öffentlichen Links verfügbar.",
-      "EDIT_LINK": "Link bearbeiten",
-      "DELETE_LINK": "Link löschen",
-      "ERROR_LOAD": "Links konnten nicht geladen werden.",
-      "ERROR_ADD": "Link konnte nicht hinzugefügt werden.",
-      "ERROR_UPDATE": "Link konnte nicht aktualisiert werden.",
-      "ERROR_DELETE": "Link konnte nicht gelöscht werden.",
-      "ERROR_INVALID": "Ungültige Linkdaten.",
-      "VALIDATION_LABEL_REQUIRED": "Bezeichnung erforderlich.",
-      "VALIDATION_LABEL_TOO_LONG": "Die Bezeichnung darf nicht länger als 100 Zeichen sein.",
-      "VALIDATION_LABEL_NO_QUOTES": "Die Bezeichnung darf keine Anführungszeichen enthalten.",
-      "VALIDATION_URL_REQUIRED": "URL erforderlich.",
-      "VALIDATION_URL_TOO_LONG": "Die URL darf nicht länger als 300 Zeichen sein.",
-      "URL_LABEL": "URL",
-      "VALIDATION_URL_INVALID": "Die URL muss gültig sein."
-    },
     "TAGS": {
       "ERROR_INVALID_CHARS": "Tag enthält ungültige Zeichen. Erlaubt: Buchstaben, Zahlen, Leerzeichen, Bindestrich und Punkt.",
       "ERROR_DUPLICATE": "Tag ist bereits in diesem Projekt enthalten.",
@@ -434,6 +411,40 @@
   },
   "USER_SEARCH": {
     "EMPTY": "Keine Nutzer gefunden"
+  },
+  "PROJECTPOSTS": {
+    "SUBTITLE": "Neuigkeiten und Updates zu diesem Projekt.",
+    "ADD_POST": "Post hinzufügen",
+    "TITLE_LABEL": "Titel",
+    "TITLE_PLACEHOLDER": "Titel des Posts",
+    "CONTENT_LABEL": "Inhalt",
+    "CONTENT_PLACEHOLDER": "Was gibt es Neues?",
+    "CREATING": "Wird erstellt…",
+    "PUBLISH": "Veröffentlichen",
+    "LOADING": "Posts werden geladen…",
+    "EMPTY": "Für dieses Projekt gibt es noch keine Posts.",
+    "AUTHOR_PREFIX": "Von",
+    "UNKNOWN_AUTHOR": "Unbekannt",
+    "LOAD_MORE": "Mehr laden",
+    "ERRORS": {
+      "LOAD": "Posts konnten nicht geladen werden.",
+      "EMPTY_FIELDS": "Titel und Inhalt dürfen nicht leer sein.",
+      "CREATE": "Post konnte nicht erstellt werden.",
+      "DELETE": "Post konnte nicht gelöscht werden."
+    },
+    "PLAIN_TEXT": "Klartext",
+    "MARKDOWN_HINT": "Du kannst Markdown verwenden, z.B. Überschriften, Listen, Links und Hervorhebungen.",
+    "TOOLBAR": {
+      "BOLD": "Fett",
+      "ITALIC": "Kursiv",
+      "HEADING": "Überschrift",
+      "LIST": "Liste",
+      "LINK": "Link",
+      "QUOTE": "Zitat"
+    },
+    "DELETE_POST": "Post löschen",
+    "DELETING": "Wird gelöscht…",
+    "DELETE_SUCCESS": "Post erfolgreich gelöscht."
   },
   "USER_SETTINGS": {
     "TITLE": "Einstellungen",

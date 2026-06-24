@@ -28,7 +28,7 @@
       "LABEL_PLACEHOLDER": "Example page",
       "URL_PLACEHOLDER": "e.g. example.com",
       "LOADING": "Links are loading...",
-      "EMPTY": "No public links available.",
+      "EMPTY": "No links available.",
       "EDIT_LINK": "Edit link",
       "DELETE_LINK": "Delete link",
       "VISIBILITY": "Visibility",
@@ -367,29 +367,6 @@
       "ALL_MEMBERS": "All members",
       "NO_MEMBERS": "No members yet."
     },
-    "QUICKLINKS": {
-      "TITLE": "Links",
-      "ADD": "Add",
-      "LABEL": "Label",
-      "LABEL_PLACEHOLDER": "Example page",
-      "URL_PLACEHOLDER": "e.g. example.com",
-      "LOADING": "Links are loading...",
-      "EMPTY": "No public links available.",
-      "EDIT_LINK": "Edit link",
-      "DELETE_LINK": "Delete link",
-      "ERROR_LOAD": "Links could not be loaded.",
-      "ERROR_ADD": "Link could not be added.",
-      "ERROR_UPDATE": "Link could not be updated.",
-      "ERROR_DELETE": "Link could not be deleted.",
-      "ERROR_INVALID": "Invalid link data.",
-      "VALIDATION_LABEL_REQUIRED": "Label is required.",
-      "VALIDATION_LABEL_TOO_LONG": "The label must not be longer than 100 characters.",
-      "VALIDATION_LABEL_NO_QUOTES": "The label must not contain quotation marks.",
-      "VALIDATION_URL_REQUIRED": "URL is required.",
-      "VALIDATION_URL_TOO_LONG": "The URL must not be longer than 300 characters.",
-      "URL_LABEL": "URL",
-      "VALIDATION_URL_INVALID": "The URL must be valid."
-    },
     "TAGS": {
       "ERROR_INVALID_CHARS": "Tag contains invalid characters. Allowed: letters, numbers, spaces, hyphen and dot.",
       "ERROR_DUPLICATE": "Tag is already included in this project.",
@@ -434,6 +411,40 @@
   },
   "USER_SEARCH": {
     "EMPTY": "No users found"
+  },
+  "PROJECTPOSTS": {
+    "SUBTITLE": "News and updates for this project.",
+    "ADD_POST": "Add post",
+    "TITLE_LABEL": "Title",
+    "TITLE_PLACEHOLDER": "Post title",
+    "CONTENT_LABEL": "Content",
+    "CONTENT_PLACEHOLDER": "What is new?",
+    "CREATING": "Creating…",
+    "PUBLISH": "Publish",
+    "LOADING": "Posts are loading…",
+    "EMPTY": "There are no posts for this project yet.",
+    "AUTHOR_PREFIX": "By",
+    "UNKNOWN_AUTHOR": "Unknown",
+    "LOAD_MORE": "Load more",
+    "ERRORS": {
+      "LOAD": "Posts could not be loaded.",
+      "EMPTY_FIELDS": "Title and content must not be empty.",
+      "CREATE": "Post could not be created.",
+      "DELETE": "Post could not be deleted."
+    },
+    "PLAIN_TEXT": "Plain text",
+    "MARKDOWN_HINT": "You can use Markdown, e.g. headings, lists, links and emphasis.",
+    "TOOLBAR": {
+      "BOLD": "Bold",
+      "ITALIC": "Italic",
+      "HEADING": "Heading",
+      "LIST": "List",
+      "LINK": "Link",
+      "QUOTE": "Quote"
+    },
+    "DELETE_POST": "Delete post",
+    "DELETING": "Deleting…",
+    "DELETE_SUCCESS": "Post deleted successfully."
   },
   "USER_SETTINGS": {
     "TITLE": "Settings",

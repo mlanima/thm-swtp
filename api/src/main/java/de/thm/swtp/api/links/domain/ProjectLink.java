@@ -16,5 +16,5 @@ public class ProjectLink {
     private String url;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    LinkVisibility visibility;
+    private LinkVisibility visibility;
 }

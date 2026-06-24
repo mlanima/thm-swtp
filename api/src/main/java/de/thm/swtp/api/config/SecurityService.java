@@ -116,21 +116,24 @@ public class SecurityService {
         return projectInviteRepository.existsByIdAndInvitedUserKeycloakId(inviteId, currentUserId);
     }
 
-
     // Project link permissions
 
+    /** Allowed to view project-links.*/
     public boolean canViewProjectLinks(UUID projectId, Authentication authentication) {
         return canViewProject(projectId, authentication);
     }
 
+    /** Allowed to create project-links.*/
     public boolean canCreateProjectLink(UUID projectId, Authentication authentication) {
         return canEditProject(projectId, authentication);
     }
 
+    /** Allowed to edit project-links.*/
     public boolean canEditProjectLink(UUID projectId, Authentication authentication) {
         return canEditProject(projectId, authentication);
     }
 
+    /** Allowed to delete project-links.*/
     public boolean canDeleteProjectLink(UUID projectId, Authentication authentication) {
         return canEditProject(projectId, authentication);
     }
