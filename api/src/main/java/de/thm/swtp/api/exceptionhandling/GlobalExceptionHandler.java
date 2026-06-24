@@ -34,6 +34,10 @@ import java.util.stream.Collectors;
 @Slf4j
 public class GlobalExceptionHandler {
 
+    // ex.getMessage() is logged unstripped: domain messages carry UUID-validated path
+    // params, @Pattern-secured strings, or HTTP-parsed values (no CRLF survives). The only
+    // free-text vectors (search queries, upload filenames) are sanitized at source via LogSafe.
+
     @ExceptionHandler(ProfileAccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDenied(ProfileAccessDeniedException ex) {
         log.warn("Forbidden (403): {}", ex.getMessage());

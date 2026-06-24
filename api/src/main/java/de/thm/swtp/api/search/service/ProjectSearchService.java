@@ -1,5 +1,6 @@
 package de.thm.swtp.api.search.service;
 
+import de.thm.swtp.api.common.LogSafe;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.projectFavorite.repository.ProjectFavoriteRepository;
 import de.thm.swtp.api.search.repository.ProjectSearchRepository;
@@ -49,7 +50,7 @@ public class ProjectSearchService {
                 projectSearchRepository::searchIdsByQuery,
                 projectSearchRepository::findAllWithTagsById
         );
-        log.debug("Project search: queries={}, hits={}", queries, result.size());
+        log.debug("Project search: queries={}, hits={}", queries.stream().map(LogSafe::clean).toList(), result.size());
         return result;
     }
 
@@ -77,7 +78,7 @@ public class ProjectSearchService {
                 ProjectEntity::getId
         );
         log.debug("Project search (paged): queries={}, hits={}, page={}/{}",
-                queries, page.getNumberOfElements(), pageable.getPageNumber(), page.getTotalPages());
+                queries.stream().map(LogSafe::clean).toList(), page.getNumberOfElements(), pageable.getPageNumber(), page.getTotalPages());
         return page;
     }
 

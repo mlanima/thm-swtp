@@ -1,5 +1,6 @@
 package de.thm.swtp.api.projectFiles.service;
 
+import de.thm.swtp.api.common.LogSafe;
 import de.thm.swtp.api.common.TxLogger;
 import de.thm.swtp.api.exceptionhandling.exceptions.*;
 import de.thm.swtp.api.project.ProjectEntity;
@@ -94,7 +95,7 @@ public class ProjectFileService {
                 ? file.getOriginalFilename()
                 : "file";
         String originalName = rawName.length() > 255 ? rawName.substring(0, 255) : rawName;
-        String logName = originalName.replaceAll("\\p{Cntrl}", "_"); // strip control chars (CR/LF/...) for log output — originalName is client-controlled
+        String logName = LogSafe.clean(originalName); // strip control chars for log output — originalName is client-controlled
         String extension = getExtension(originalName);
         String storageName = UUID.randomUUID() + (extension.isEmpty() ? "" : "." + extension);
         Path filePath = uploadDir.resolve(storageName);
