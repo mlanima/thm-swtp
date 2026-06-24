@@ -25,7 +25,7 @@ export interface UpdateProjectRequest {
 @Injectable({ providedIn: 'root' })
 export class ProjectService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = `${environment.apiUrl}/projects`;
+  private readonly baseUrl = `${environment.apiUrl}/v1/projects`;
 
   createProject(data: CreateProjectRequest): Observable<ProjectResponse> {
     return this.http.post<ProjectResponse>(this.baseUrl, data);
