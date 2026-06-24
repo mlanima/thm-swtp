@@ -20,6 +20,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.*;
 import java.time.*;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -243,6 +245,10 @@ public class ProjectService {
 
         TxLogger.afterCommit(log, "Project updated: project={}", projectId);
         return toResponse(saved);
+    }
+
+    public Page<ProjectResponse> getAllProjects(Pageable pageable) {
+        return projectRepository.findAll(pageable).map(this::toResponse);
     }
 
     @Transactional

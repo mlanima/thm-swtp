@@ -30,7 +30,6 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, UUID> {
      */
     @Query("SELECT DISTINCT p FROM projects p LEFT JOIN p.members m WHERE (p.owner.username = :username OR m.username = :username) AND p.deletedAt IS NULL ORDER BY p.createdAt DESC")
     List<ProjectEntity> findAllByOwnerOrMemberUsernameAndDeletedAtIsNull(@Param("username") String username);
-
     boolean existsByProjectUrl(String projectUrl);
 
     boolean existsByIdAndIsPrivateProjectFalse(UUID id);
