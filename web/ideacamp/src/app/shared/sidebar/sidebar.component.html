@@ -29,6 +29,13 @@
               <span>{{ 'SIDEBAR.MODERATOR' | translate }}</span>
             </app-menu-link>
             </a>
+
+            <a routerLink="/moderator/users" (click)="requestClose()">
+              <app-menu-link>
+                <i class="pi pi-users text-sm text-zinc-400"></i>
+                <span>{{ 'SIDEBAR.USER_MANAGEMENT' | translate }}</span>
+              </app-menu-link>
+            </a>
           } @else {
             <a routerLink="/search" (click)="requestClose()">
             <app-menu-link>
