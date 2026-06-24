@@ -1,53 +1,69 @@
 import { DatePipe } from '@angular/common';
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
+import { ManagedUser } from '../models/managed-user.model';
+import { UserManagementService } from '../service/user-management.service';
 
 type ModTab = 'active' | 'banned';
 
-interface ModUser {
-  id: string;
-  name: string;
-  email: string;
-  role: 'Mod' | 'Member';
-  joinedAt: Date;
-  initials: string;
-  banned: boolean;
-  bannedAt?: Date;
-  bannedBy?: string;
-  banReason?: string;
-}
 
 @Component({
   selector: 'app-user-management',
   standalone: true,
   imports: [DatePipe, TranslatePipe],
-  templateUrl: './user-management.html'
+  templateUrl: './user-management.html',
 })
-export class UserManagement {
-  private readonly maxBanReasonLength = 250;
+export class UserManagement implements OnInit {
+  private readonly userManagementService = inject(UserManagementService);
+
+  private readonly maxBanReasonLength = 1000;
   private readonly banReasonPreviewLength = 50;
 
   activeTab = signal<ModTab>('active');
 
-  users = signal<ModUser[]>([
-    {
-      id: '1',
-      name: 'Felix Wagner',
-      email: 'f.wagner@thm.de',
-      role: 'Member',
-      joinedAt: new Date(2026, 2, 3),
-      initials: 'FW',
-      banned: false,
-    },
-  ]);
+  activeUsers = signal<ManagedUser[]>([]);
+  bannedUsers = signal<ManagedUser[]>([]);
+  isLoading = signal(false);
+  errorMessage = signal<string | null>(null);
 
-  selectedUser = signal<ModUser | null>(null);
+  selectedUser = signal<ManagedUser | null>(null);
   banReason = signal('');
 
-  activeUsers = computed(() => this.users().filter(user => !user.banned));
-  bannedUsers = computed(() => this.users().filter(user => user.banned));
+  activeUserCount = computed(() => this.activeUsers().length);
+  bannedUserCount = computed(() => this.bannedUsers().length);
 
-  openBanDialog(user: ModUser): void {
+  ngOnInit() {
+    this.loadUsers();
+  }
+
+  loadUsers(): void {
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
+
+    this.userManagementService.getUsers('ACTIVE').subscribe({
+      next: (response) => {
+        this.activeUsers.set(response.content);
+      },
+      error: () => {
+        this.errorMessage.set('MODERATOR.USER_MANAGEMENT.ERROR_LOAD');
+        this.isLoading.set(false);
+      },
+      complete: () => {
+        this.isLoading.set(false);
+      },
+    });
+
+    this.userManagementService.getUsers('BANNED').subscribe({
+      next: (response) => {
+        this.bannedUsers.set(response.content);
+      },
+      error: () => {
+        this.errorMessage.set('MODERATOR.USER_MANAGEMENT.ERROR_LOAD');
+      },
+    });
+  }
+
+  openBanDialog(user: ManagedUser): void {
     this.selectedUser.set(user);
     this.banReason.set('');
   }
@@ -64,47 +80,33 @@ export class UserManagement {
       return;
     }
 
-    const trimmedReason = this.banReason()
-      .trim()
-      .slice(0, this.maxBanReasonLength);
+    const trimmedReason = this.banReason().trim().slice(0, this.maxBanReasonLength);
 
-    this.users.update(users =>
-      users.map(currentUser =>
-        currentUser.id === user.id
-          ? {
-            ...currentUser,
-            banned: true,
-            bannedAt: new Date(),
-            bannedBy: 'Mod',
-            banReason: trimmedReason || undefined,
-          }
-          : currentUser,
-      ),
-    );
-
-    this.closeBanDialog();
-    this.activeTab.set('banned');
+    this.userManagementService.banUser(user.keycloakId, trimmedReason || undefined).subscribe({
+      next: () => {
+        this.closeBanDialog();
+        this.activeTab.set('banned');
+        this.loadUsers();
+      },
+      error: () => {
+        this.errorMessage.set('MODERATOR.USER_MANAGEMENT.ERROR_BAN');
+      },
+    });
   }
 
-  unbanUser(user: ModUser): void {
-    this.users.update(users =>
-      users.map(currentUser =>
-        currentUser.id === user.id
-          ? {
-            ...currentUser,
-            banned: false,
-            bannedAt: undefined,
-            bannedBy: undefined,
-            banReason: undefined,
-          }
-          : currentUser,
-      ),
-    );
-
-    this.activeTab.set('active');
+  unbanUser(user: ManagedUser): void {
+    this.userManagementService.unbanUser(user.keycloakId).subscribe({
+      next: () => {
+        this.activeTab.set('active');
+        this.loadUsers();
+      },
+      error: () => {
+        this.errorMessage.set('MODERATOR.USER_MANAGEMENT.ERROR_UNBAN');
+      },
+    });
   }
 
-  getBanReasonPreview(reason?: string): string | undefined {
+  getBanReasonPreview(reason?: string | null | undefined): string | undefined {
     if (!reason) {
       return undefined;
     }
@@ -112,5 +114,20 @@ export class UserManagement {
     return reason.length > this.banReasonPreviewLength
       ? `${reason.slice(0, this.banReasonPreviewLength)}...`
       : reason;
+  }
+
+  getInitials(username: string): string {
+    return username
+      .split(/[.\s_-]+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase())
+      .join('');
+  }
+
+  getRoleTranslationKey(user: ManagedUser): string {
+    return user.isProfessor
+      ? 'MODERATOR.USER_MANAGEMENT.ROLES.PROFESSOR'
+      : 'MODERATOR.USER_MANAGEMENT.ROLES.MEMBER';
   }
 }
