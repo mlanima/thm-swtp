@@ -14,7 +14,8 @@ public class ManagedUserMapper {
                 userProfile.isProfessor(),
                 userProfile.getStatus(),
                 userProfile.getBanReason(),
-                userProfile.getBannedAt()
+                userProfile.getBannedAt(),
+                userProfile.getCreatedAt()
         );
     }
 }

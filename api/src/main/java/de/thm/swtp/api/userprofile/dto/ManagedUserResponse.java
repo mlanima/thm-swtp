@@ -12,5 +12,6 @@ public record ManagedUserResponse(
         boolean isProfessor,
         UserStatus status,
         String banReason,
-        LocalDateTime bannedAt
+        LocalDateTime bannedAt,
+        LocalDateTime createdAt
 ) {}
