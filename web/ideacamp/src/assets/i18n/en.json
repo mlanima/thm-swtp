@@ -519,16 +519,11 @@
         "JOINED_AT": "Joined",
         "ACTIONS": "Actions",
         "BANNED_AT": "Banned at",
-        "REASON": "Reason",
-        "STATUS": "Status"
+        "REASON": "Reason"
       },
       "ROLES": {
         "PROFESSOR": "Professor",
         "MEMBER": "Member"
-      },
-      "STATUS": {
-        "ACTIVE": "Active",
-        "BANNED": "Banned"
       },
       "ACTIONS": {
         "BAN": "Ban",

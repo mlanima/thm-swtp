@@ -519,16 +519,11 @@
         "JOINED_AT": "Beigetreten",
         "ACTIONS": "Aktionen",
         "BANNED_AT": "Gebannt am",
-        "REASON": "Grund",
-        "STATUS": "Status"
+        "REASON": "Grund"
       },
       "ROLES": {
         "PROFESSOR": "Professor",
         "MEMBER": "Mitglied"
-      },
-      "STATUS": {
-        "ACTIVE": "Aktiv",
-        "BANNED": "Gebannt"
       },
       "ACTIONS": {
         "BAN": "Bannen",
