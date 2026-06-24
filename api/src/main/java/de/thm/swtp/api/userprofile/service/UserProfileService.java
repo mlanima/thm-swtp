@@ -1,5 +1,6 @@
 package de.thm.swtp.api.userprofile.service;
 
+import de.thm.swtp.api.common.LogSafe;
 import de.thm.swtp.api.common.TxLogger;
 import de.thm.swtp.api.userprofile.domain.UserStatus;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
@@ -93,7 +94,8 @@ public class UserProfileService {
         userProfile.setBannedAt(LocalDateTime.now());
 
         UserProfile saved =  userProfileRepository.save(userProfile);
-        TxLogger.afterCommit(log, "User banned: username={}, userId={}, reason={}", userProfile.getUsername(), userId, reason);
+
+        TxLogger.afterCommit(log, "User banned: username={}, userId={}", userProfile.getUsername(), userId);
         return saved;
     }
 

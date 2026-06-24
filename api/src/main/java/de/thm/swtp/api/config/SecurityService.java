@@ -321,15 +321,20 @@ public class SecurityService {
         }
 
         UUID currentUserId = getCurrentUserId(authentication);
-        return !currentUserId.equals(userId);
+        if (currentUserId.equals(userId)) {
+            return false;
+        }
+
+        return userProfileRepository.existsByKeycloakIdAndStatus(userId, UserStatus.ACTIVE);
     }
 
     /** Allowed to unban users.*/
     public boolean canUnbanUser(UUID userId, Authentication authentication) {
-        if (!hasAuthenticationContext(userId, authentication)) {
+        if (!hasAuthenticationContext(userId, authentication) || !hasModeratorRole(authentication)) {
             return false;
         }
-        return hasModeratorRole(authentication);
+
+        return userProfileRepository.existsByKeycloakIdAndStatus(userId, UserStatus.BANNED);
     }
 
 

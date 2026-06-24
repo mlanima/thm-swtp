@@ -37,7 +37,7 @@ public class UserManagementController {
 
     @PatchMapping("/{userId}/ban")
     @PreAuthorize("@security.canBanUser(#userId, authentication)")
-    public UserProfileResponse banUser(@PathVariable UUID userId, @Valid @RequestBody BanUserRequest banUserRequest) {
+    public UserProfileResponse banUser(@PathVariable UUID userId, @Valid @RequestBody(required = false) BanUserRequest banUserRequest) {
         String banReason = banUserRequest == null ? null : banUserRequest.reason();
         return userProfileMapper.toResponse(userProfileService.banUser(userId, banReason));
     }
