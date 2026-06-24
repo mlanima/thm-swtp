@@ -52,7 +52,7 @@ describe('authGuard', () => {
     authServiceMock.isLoggingOut.mockReturnValue(true);
 
     const result = await TestBed.runInInjectionContext(() => authGuard(mockRoute, mockState));
-    expect(result).toEqual(router.parseUrl('/impressum'));
+    expect(result).toEqual(router.parseUrl('/landing'));
   });
 
   it('should call login when not authenticated', async () => {
