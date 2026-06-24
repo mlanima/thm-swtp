@@ -25,9 +25,9 @@ Spring Boot application, Java 25, built with Maven.
 - Division of labour: services log business/Fachfehler; `GlobalExceptionHandler` logs
   technical/unexpected exceptions once. Domain exceptions are not re-logged in the handler.
 - Read paths stay silent unless the log answers an incident question.
-- Dev visibility: set `LOGGING_LEVEL_DE_THM_SWTP_API=DEBUG` (or
-  `logging.level.de.thm.swtp.api=debug`) to see every request via `RequestLoggingFilter` plus
-  search/query debug logs. Production stays at INFO, so reads are silent in prod.
+- Dev visibility: set `BE_LOG_LEVEL=DEBUG` (maps to `logging.level.de.thm.swtp`)
+  to see every request via `RequestLoggingFilter` plus search/query debug logs.
+  Production stays at INFO, so reads are silent in prod.
 
 ## Review focus
 

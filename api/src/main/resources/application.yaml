@@ -40,6 +40,10 @@ spring:
 server:
   forward-headers-strategy: framework
 
+logging:
+  level:
+    de.thm.swtp: ${BE_LOG_LEVEL:INFO}
+
 app:
   uploads:
     dir: ./uploads

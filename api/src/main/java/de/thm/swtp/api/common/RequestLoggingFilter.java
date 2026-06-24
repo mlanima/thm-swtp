@@ -13,8 +13,8 @@ import java.io.IOException;
 /**
  * Logs every HTTP request at debug level: {@code METHOD uri -> status in Xms}.
  *
- * <p>Dev visibility: set {@code LOGGING_LEVEL_DE_THM_SWTP_API=DEBUG} (or
- * {@code logging.level.de.thm.swtp.api=debug}) to see every click. At the production
+ * <p>Dev visibility: set {@code BE_LOG_LEVEL=DEBUG} (maps to
+ * {@code logging.level.de.thm.swtp}) to see every click. At the production
  * default (INFO) this filter is silent, so read paths stay quiet in prod — see
  * {@code api/CLAUDE.md}. Lives at the HTTP boundary so it sees every request,
  * including reads, 401s and framework routes, without per-service instrumentation.
