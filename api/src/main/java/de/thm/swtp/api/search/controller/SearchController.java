@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
  * </ul>
  */
 @RestController
-@RequestMapping("/api/search")
+@RequestMapping("/api/v1/search")
 @RequiredArgsConstructor
 public class SearchController {
 

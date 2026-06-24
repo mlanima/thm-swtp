@@ -17,13 +17,13 @@ export class SearchService {
 
   searchUsers(queries: string[]): Observable<UserSearchResult[]> {
     return this.http
-      .get<unknown>(`${environment.apiUrl}/search/users`, { params: { q: queries } })
+      .get<unknown>(`${environment.apiUrl}/v1/search/users`, { params: { q: queries } })
       .pipe(map((data) => z.array(UserSearchResultSchema).parse(data)));
   }
 
   searchProjectsPaged(queries: string[], page: number, size = 20): Observable<Page<ProjectSearchResult>> {
     return this.http
-      .get<unknown>(`${environment.apiUrl}/search/projects/paged`, {
+      .get<unknown>(`${environment.apiUrl}/v1/search/projects/paged`, {
         params: { q: queries, page: page.toString(), size: size.toString() },
       })
       .pipe(map((data) => PageSchema(ProjectSearchResultSchema).parse(data)));
@@ -31,7 +31,7 @@ export class SearchService {
 
   searchUsersPaged(queries: string[], page: number, size = 20): Observable<Page<UserSearchResult>> {
     return this.http
-      .get<unknown>(`${environment.apiUrl}/search/users/paged`, {
+      .get<unknown>(`${environment.apiUrl}/v1/search/users/paged`, {
         params: { q: queries, page: page.toString(), size: size.toString() },
       })
       .pipe(map((data) => PageSchema(UserSearchResultSchema).parse(data)));
@@ -41,7 +41,7 @@ export class SearchService {
     return this.http
       .get<
         { name: string }[]
-      >(`${environment.apiUrl}/tags`, { params: { q: query, limit: limit.toString() } })
+      >(`${environment.apiUrl}/v1/tags`, { params: { q: query, limit: limit.toString() } })
       .pipe(map((tags) => tags.map((t) => t.name)));
   }
 
