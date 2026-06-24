@@ -44,8 +44,10 @@ public class SearchController {
      *
      * @param q one or more search terms (AND logic across terms)
      * @return list of project search results
+     * @deprecated Use {@link #searchProjectsPaged(List, Pageable)} instead.
      */
-    @GetMapping("/projects")
+    @Deprecated
+    // @GetMapping("/projects")
     public List<ProjectSearchResult> searchProjects(@RequestParam List<String> q) {
         return projectSearchService.searchProjects(q)
                 .stream()
