@@ -1,5 +1,5 @@
-import { DatePipe } from '@angular/common';
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { DatePipe, isPlatformBrowser } from '@angular/common';
+import { Component, computed, inject, OnInit, PLATFORM_ID, signal } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ManagedUser } from '../models/managed-user.model';
 import { UserManagementService } from '../service/user-management.service';
@@ -15,6 +15,7 @@ type ModTab = 'active' | 'banned';
 })
 export class UserManagement implements OnInit {
   private readonly userManagementService = inject(UserManagementService);
+  private readonly platformId = inject(PLATFORM_ID);
 
   private readonly maxBanReasonLength = 1000;
   private readonly banReasonPreviewLength = 50;
@@ -33,6 +34,10 @@ export class UserManagement implements OnInit {
   bannedUserCount = computed(() => this.bannedUsers().length);
 
   ngOnInit() {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
     this.loadUsers();
   }
 
