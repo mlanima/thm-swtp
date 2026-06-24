@@ -21,7 +21,7 @@ export interface ProjectSearchParams {
 @Injectable({ providedIn: 'root' })
 export class ModeratorProjectsService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = `${environment.apiUrl}/projects`;
+  private readonly baseUrl = `${environment.apiUrl}/v1/projects`;
 
   getAllProjects(params: ProjectSearchParams): Observable<PageResponse<ProjectResponse>> {
     let httpParams = new HttpParams()
