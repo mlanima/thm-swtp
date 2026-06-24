@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -21,6 +22,7 @@ import java.io.IOException;
  */
 @Slf4j
 @Component
+@Order(-101) // before Spring Security's filter chain (default order -100) so 401/403 are logged too
 public class RequestLoggingFilter extends OncePerRequestFilter {
 
     @Override

@@ -36,9 +36,10 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     // ex.getMessage() is logged unstripped except for messages embedding raw free-text
-    // request fields (project name, project URL) — those sanitize via LogSafe.clean.
-    // Everything else is UUID/enums/HTTP-parsed (no CRLF survives). Free text that never
-    // reaches a handler message (search queries, upload filenames) is sanitized at source.
+    // request fields (project name, project URL, upload Content-Type) — those sanitize
+    // via LogSafe.clean. Everything else is UUID/enums/HTTP-parsed (no CRLF survives).
+    // Free text that never reaches a handler message (search queries, upload filenames)
+    // is sanitized at source.
 
     @ExceptionHandler(ProfileAccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDenied(ProfileAccessDeniedException ex) {
@@ -293,7 +294,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ProjectFileTypeNotAllowedException.class)
     public ResponseEntity<ErrorResponse> handleProjectFileTypeNotAllowed(ProjectFileTypeNotAllowedException ex) {
-        log.warn("Unsupported Media Type (415): {}", ex.getMessage());
+        log.warn("Unsupported Media Type (415): {}", LogSafe.clean(ex.getMessage()));
         return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
                 .body(ErrorResponse.of(415, "Unsupported Media Type", ex.getMessage()));
     }
