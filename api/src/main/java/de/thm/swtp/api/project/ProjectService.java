@@ -6,8 +6,10 @@ import de.thm.swtp.api.exceptionhandling.exceptions.ProjectMemberNotFoundExcepti
 import de.thm.swtp.api.project.dto.request.*;
 import de.thm.swtp.api.project.dto.response.*;
 import de.thm.swtp.api.project.exception.*;
+import de.thm.swtp.api.projectInvitation.repository.ProjectInviteRepository;
 import de.thm.swtp.api.projectInvitation.service.ProjectInviteService;
 import de.thm.swtp.api.projectFavorite.repository.ProjectFavoriteRepository;
+import de.thm.swtp.api.projectJoinRequest.repository.ProjectJoinRequestRepository;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.projectView.entity.ProjectViewEntity;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
@@ -32,6 +34,8 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
     private final UserProfileRepository userProfileRepository;
     private final ProjectInviteService projectInviteService;
+    private final ProjectInviteRepository projectInviteRepository;
+    private final ProjectJoinRequestRepository projectJoinRequestRepository;
     private static final String PROJECT_CREATION_INVITE_MESSAGE = "You have been invited to join this project.";
     private final ProjectFavoriteRepository projectFavoriteRepository;
     private final ProjectViewRepository projectViewRepository;
@@ -153,6 +157,8 @@ public class ProjectService {
 
         projectFavoriteRepository.deleteByProjectId(projectId);
         projectViewRepository.deleteByProjectId(projectId);
+        projectInviteRepository.deleteByProjectId(projectId);
+        projectJoinRequestRepository.deleteByProjectId(projectId);
         projectRepository.delete(project);
 
         TxLogger.afterCommit(log, "Project deleted: project={}", projectId);
