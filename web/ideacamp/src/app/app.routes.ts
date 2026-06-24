@@ -15,6 +15,7 @@ import { LandingPage } from './feature/landing-page/pages/landing-page/landing-p
 import { UserSettings } from './feature/user-settings/user-settings';
 import { ModeratorPage } from './feature/moderator/moderator-page';
 import { ProjectsComponent } from './feature/moderator/projects/projects.component';
+import { UserManagement } from './feature/user-management/pages/user-management';
 
 export const routes: Routes = [
   {path: '', redirectTo: 'landing', pathMatch: 'full' },
@@ -33,4 +34,5 @@ export const routes: Routes = [
   {path: 'favorites', component: FavoritesPage, canActivate: [authGuard]},
   {path: 'settings', component: UserSettings, canActivate: [authGuard]},
   {path: 'professor-request', redirectTo: 'settings', pathMatch: 'full'},
+  {path: 'moderator/users', component: UserManagement, canActivate: [moderatorGuard]}
 ];
