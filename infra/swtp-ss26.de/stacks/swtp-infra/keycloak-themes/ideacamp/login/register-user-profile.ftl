@@ -1,7 +1,5 @@
 <#import "template.ftl" as layout>
-<@layout.registrationLayout
-  displayMessage=!messagesPerField.existsError('firstName','lastName','email','username','password','password-confirm')
-  displayInfo=true; section>
+<@layout.registrationLayout displayMessage=true displayInfo=true; section>
 
   <#if section = "header">
     <h2 class="auth-title">${msg("registerTitle")}</h2>
@@ -9,68 +7,26 @@
 
     <form id="kc-register-form" action="${url.registrationAction}" method="post">
 
-      <div class="form-group">
-        <label class="form-label" for="firstName">${msg("firstName")} <span class="required-mark">*</span></label>
-        <input
-          type="text"
-          id="firstName"
-          name="firstName"
-          value="${(register.formData['firstName']!'')}"
-          autocomplete="given-name"
-          autofocus
-          class="form-input<#if messagesPerField.existsError('firstName')> form-input-error</#if>"
-        />
-        <#if messagesPerField.existsError('firstName')>
-          <p class="field-error">${kcSanitize(messagesPerField.getFirstError('firstName'))?no_esc}</p>
-        </#if>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" for="lastName">${msg("lastName")} <span class="required-mark">*</span></label>
-        <input
-          type="text"
-          id="lastName"
-          name="lastName"
-          value="${(register.formData['lastName']!'')}"
-          autocomplete="family-name"
-          class="form-input<#if messagesPerField.existsError('lastName')> form-input-error</#if>"
-        />
-        <#if messagesPerField.existsError('lastName')>
-          <p class="field-error">${kcSanitize(messagesPerField.getFirstError('lastName'))?no_esc}</p>
-        </#if>
-      </div>
-
-      <#if !realm.registrationEmailAsUsername>
+      <#list profile.attributes as attribute>
         <div class="form-group">
-          <label class="form-label" for="username">${msg("username")} <span class="required-mark">*</span></label>
+          <label class="form-label" for="${attribute.name}">
+            ${advancedMsg(attribute.displayName!'')}
+            <#if attribute.required><span class="required-mark">*</span></#if>
+          </label>
           <input
-            type="text"
-            id="username"
-            name="username"
-            value="${(register.formData['username']!'')}"
-            autocomplete="username"
-            class="form-input<#if messagesPerField.existsError('username')> form-input-error</#if>"
+            type="${attribute.inputType!'text'}"
+            id="${attribute.name}"
+            name="${attribute.name}"
+            value="${(attribute.value!'')}"
+            <#if attribute?is_first>autofocus</#if>
+            <#if attribute.readOnly!false>disabled</#if>
+            class="form-input<#if messagesPerField.existsError(attribute.name)> form-input-error</#if>"
           />
-          <#if messagesPerField.existsError('username')>
-            <p class="field-error">${kcSanitize(messagesPerField.getFirstError('username'))?no_esc}</p>
+          <#if messagesPerField.existsError(attribute.name)>
+            <p class="field-error">${kcSanitize(messagesPerField.getFirstError(attribute.name))?no_esc}</p>
           </#if>
         </div>
-      </#if>
-
-      <div class="form-group">
-        <label class="form-label" for="email">${msg("email")} <span class="required-mark">*</span></label>
-        <input
-          type="email"
-          id="email"
-          name="email"
-          value="${(register.formData['email']!'')}"
-          autocomplete="email"
-          class="form-input<#if messagesPerField.existsError('email')> form-input-error</#if>"
-        />
-        <#if messagesPerField.existsError('email')>
-          <p class="field-error">${kcSanitize(messagesPerField.getFirstError('email'))?no_esc}</p>
-        </#if>
-      </div>
+      </#list>
 
       <#if passwordRequired??>
         <div class="form-group">
@@ -108,7 +64,7 @@
 
   <#elseif section = "info">
     <p class="auth-info-text">
-      <a class="form-link" href="${url.loginUrl}">← Back to Login</a>
+      <a class="form-link" href="${url.loginUrl}">${msg("backToLogin")?no_esc}</a>
     </p>
   </#if>
 
