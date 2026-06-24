@@ -1,7 +1,6 @@
 package de.thm.swtp.api.userprofile.dto;
 
 import lombok.Builder;
-
 import java.util.UUID;
 
 @Builder

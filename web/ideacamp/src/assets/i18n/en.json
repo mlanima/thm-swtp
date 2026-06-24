@@ -134,15 +134,12 @@
     "ADD_TITLE": "Add to favorites",
     "ERROR_LOAD": "Your favorites could not be loaded."
   },
-  "MODERATOR": {
-    "TITLE": "Moderator Area",
-    "DESCRIPTION": "Welcome to the moderator area. Users and projects can be managed here in the future."
-  },
   "SIDEBAR": {
     "MYPROJECTS": "My projects",
     "FAVORITE": "Favorites",
     "PROFILE": "My profile",
     "MODERATOR": "Moderator",
+    "USER_MANAGEMENT": "User management",
     "IMPRESSUM": "Legal notice",
     "MENU": "Menu"
   },
@@ -481,5 +478,50 @@
   },
   "TAGS": {
     "TITLE": "Tags"
+  },
+  "MODERATOR": {
+    "TITLE": "Moderator Area",
+    "DESCRIPTION": "Welcome to the moderator area. Users and projects can be managed here in the future.",
+    "USER_MANAGEMENT": {
+      "TITLE": "User Management",
+      "BADGE": "Moderator",
+      "DESCRIPTION": "View and manage all registered users.",
+      "TABS": {
+        "ACTIVE_USERS": "Active users",
+        "BANNED_USERS": "Banned users"
+      },
+      "TABLE": {
+        "USER": "User",
+        "ROLE": "Role",
+        "JOINED_AT": "Joined",
+        "ACTIONS": "Actions",
+        "BANNED_AT": "Banned at",
+        "REASON": "Reason"
+      },
+      "ROLES": {
+        "PROFESSOR": "Professor",
+        "MEMBER": "Member"
+      },
+      "ACTIONS": {
+        "BAN": "Ban",
+        "BAN_USER": "Ban user",
+        "UNBAN": "Unban"
+      },
+      "EMPTY_BANNED_TITLE": "No banned users available.",
+      "EMPTY_BANNED_DESCRIPTION": "Banned users appear here and can no longer access the platform.",
+      "ERROR_LOAD": "Users could not be loaded.",
+      "ERROR_BAN": "User could not be banned.",
+      "ERROR_UNBAN": "Ban could not be removed.",
+      "NO_REASON": "No reason provided",
+      "LOADING": "Loading users...",
+      "EMPTY_ACTIVE_TITLE": "No active users available.",
+      "EMPTY_ACTIVE_DESCRIPTION": "Active users appear here and can be banned if necessary.",
+      "MODAL": {
+        "TITLE": "Ban user",
+        "DESCRIPTION": "The user will be blocked and can no longer use the platform. The account remains in the system.",
+        "REASON_LABEL": "Reason for the ban (optional)",
+        "REASON_PLACEHOLDER": "e.g. violation of terms of use..."
+      }
+    }
   }
 }

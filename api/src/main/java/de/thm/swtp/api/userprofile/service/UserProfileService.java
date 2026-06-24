@@ -1,14 +1,18 @@
 package de.thm.swtp.api.userprofile.service;
 
 import de.thm.swtp.api.common.TxLogger;
+import de.thm.swtp.api.userprofile.domain.UserStatus;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -73,4 +77,40 @@ public class UserProfileService {
         return userProfileRepository.findByUsername(username)
                 .orElseThrow(() -> new UserProfileNotFoundException(username));
     }
+
+    @Transactional(readOnly = true)
+    public Page<UserProfile> getUsersByStatus(UserStatus status, Pageable pageable) {
+        return userProfileRepository.findByStatus(status, pageable);
+    }
+
+    @Transactional
+    public UserProfile banUser(UUID userId, String reason){
+        UserProfile userProfile = userProfileRepository.findById(userId)
+                .orElseThrow(() -> new UserProfileNotFoundException(userId.toString()));
+
+        userProfile.setStatus(UserStatus.BANNED);
+        userProfile.setBanReason(reason);
+        userProfile.setBannedAt(LocalDateTime.now());
+
+        UserProfile saved =  userProfileRepository.save(userProfile);
+
+        TxLogger.afterCommit(log, "User banned: username={}, userId={}", userProfile.getUsername(), userId);
+        return saved;
+    }
+
+    @Transactional
+    public UserProfile unbanUser(UUID userId){
+        UserProfile userProfile = userProfileRepository.findById(userId)
+                .orElseThrow(() -> new UserProfileNotFoundException(userId.toString()));
+
+        userProfile.setStatus(UserStatus.ACTIVE);
+        userProfile.setBanReason(null);
+        userProfile.setBannedAt(null);
+
+        UserProfile saved =  userProfileRepository.save(userProfile);
+        TxLogger.afterCommit(log, "User unbanned: username={}, userId={}", userProfile.getUsername(), userId);
+        return saved;
+    }
+
+
 }
