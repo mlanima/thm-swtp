@@ -1,5 +1,6 @@
 package de.thm.swtp.api.userprofile.dto;
 
+import de.thm.swtp.api.userprofile.domain.UserStatus;
 import lombok.Builder;
 
 import java.util.UUID;
@@ -14,5 +15,6 @@ public record UserProfileResponse(
         int followers,
         String about,
         String experience,
-        boolean isProfessor
+        boolean isProfessor,
+        UserStatus status
 ) {}
