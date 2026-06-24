@@ -137,6 +137,8 @@
   "MODERATOR": {
     "TITLE": "Moderator-Bereich",
     "DESCRIPTION": "Willkommen im Moderator-Bereich. Hier können zukünftig Benutzer und Projekte verwaltet werden.",
+    "PROJECTS_LINK_TITLE": "Projektverwaltung",
+    "PROJECTS_LINK_DESCRIPTION": "Alle Projekte einsehen, suchen und löschen.",
     "PROJECTS": {
       "TITLE": "Projektverwaltung",
       "SUBTITLE": "Alle Projekte einsehen, suchen und bei Bedarf löschen.",
@@ -170,6 +172,7 @@
     "FAVORITE": "Favoriten",
     "PROFILE": "Mein Profil",
     "MODERATOR": "Moderator",
+    "MODERATOR_PROJECTS": "Projektverwaltung",
     "IMPRESSUM": "Impressum",
     "MENU": "Menü"
   },

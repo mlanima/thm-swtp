@@ -137,6 +137,8 @@
   "MODERATOR": {
     "TITLE": "Moderator Area",
     "DESCRIPTION": "Welcome to the moderator area. Users and projects can be managed here in the future.",
+    "PROJECTS_LINK_TITLE": "Project Management",
+    "PROJECTS_LINK_DESCRIPTION": "View, search, and delete all projects.",
     "PROJECTS": {
       "TITLE": "Project Management",
       "SUBTITLE": "View, search, and delete projects as needed.",
@@ -170,6 +172,7 @@
     "FAVORITE": "Favorites",
     "PROFILE": "My profile",
     "MODERATOR": "Moderator",
+    "MODERATOR_PROJECTS": "Project Management",
     "IMPRESSUM": "Legal notice",
     "MENU": "Menu"
   },
