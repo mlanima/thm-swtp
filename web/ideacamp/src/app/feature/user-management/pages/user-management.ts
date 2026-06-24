@@ -1,5 +1,5 @@
 import { DatePipe, isPlatformBrowser } from '@angular/common';
-import { Component, computed, inject, OnInit, PLATFORM_ID, signal } from '@angular/core';
+import { Component, inject, OnInit, PLATFORM_ID, signal } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ManagedUser } from '../models/managed-user.model';
 import { UserManagementService } from '../service/user-management.service';
