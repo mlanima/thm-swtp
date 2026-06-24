@@ -8,6 +8,7 @@ import de.thm.swtp.api.projectJoinRequest.repository.ProjectJoinRequestRepositor
 import de.thm.swtp.api.projectPost.domain.ProjectPostStatus;
 import de.thm.swtp.api.projectPost.entity.ProjectPostEntity;
 import de.thm.swtp.api.projectPost.repository.ProjectPostRepository;
+import de.thm.swtp.api.userprofile.domain.UserStatus;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -64,6 +65,9 @@ class SecurityServiceTest {
         for (String role : extraRoles) {
             authorities.add(new SimpleGrantedAuthority(role));
         }
+
+        lenient().when(userProfileRepository.existsByKeycloakIdAndStatus(userId, UserStatus.ACTIVE))
+                .thenReturn(true);
 
         return new UsernamePasswordAuthenticationToken(
                 userId.toString(), null, authorities);
@@ -321,5 +325,43 @@ class SecurityServiceTest {
         assertThat(securityService.canCreateUserProfileLinks(userId, auth)).isTrue();
         assertThat(securityService.canEditUserProfileLinks(userId, auth)).isTrue();
         assertThat(securityService.canDeleteUserProfileLinks(userId, auth)).isTrue();
+    }
+
+    @Test
+    void canViewManagedUsers_shouldAllowModerator() {
+        assertThat(securityService.canViewManagedUsers(authentication("ROLE_MODERATOR")))
+                .isTrue();
+    }
+
+    @Test
+    void canBanUser_shouldDenyModerator_whenBanningSelf() {
+        assertThat(securityService.canBanUser(userId, authentication("ROLE_MODERATOR")))
+                .isFalse();
+    }
+
+    @Test
+    void canBanUser_shouldDenyRegularUser() {
+        UUID otherUserId = UUID.randomUUID();
+
+        assertThat(securityService.canBanUser(otherUserId, authentication()))
+                .isFalse();
+    }
+
+    @Test
+    void canBanUser_shouldAllowModerator_whenBanningOtherUser() {
+        UUID otherUserId = UUID.randomUUID();
+
+        assertThat(securityService.canBanUser(otherUserId, authentication("ROLE_MODERATOR")))
+                .isTrue();
+    }
+
+    @Test
+    void canCreateProject_shouldDenyBannedUser() {
+        Authentication auth = authentication();
+
+        when(userProfileRepository.existsByKeycloakIdAndStatus(userId, UserStatus.ACTIVE))
+                .thenReturn(false);
+
+        assertThat(securityService.canCreateProject(auth)).isFalse();
     }
 }
