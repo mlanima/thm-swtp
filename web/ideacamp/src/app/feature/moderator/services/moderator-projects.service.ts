@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { environment } from '../../../enviroments/enviroment.dev';
 import { ProjectResponse } from '../../../models/project.model';
 
@@ -22,6 +23,7 @@ export interface ProjectSearchParams {
 export class ModeratorProjectsService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/projects`;
+  private readonly v1BaseUrl = `${environment.apiUrl}/v1/projects`;
 
   getAllProjects(params: ProjectSearchParams): Observable<PageResponse<ProjectResponse>> {
     let httpParams = new HttpParams()
@@ -32,10 +34,14 @@ export class ModeratorProjectsService {
       httpParams = httpParams.set('name', params.name);
     }
 
-    return this.http.get<PageResponse<ProjectResponse>>(this.baseUrl, { params: httpParams });
+    return this.http.get<PageResponse<ProjectResponse>>(this.baseUrl, { params: httpParams }).pipe(
+      catchError(() => this.http.get<PageResponse<ProjectResponse>>(this.v1BaseUrl, { params: httpParams })),
+    );
   }
 
   deleteProject(projectId: string): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${projectId}`);
+    return this.http.delete<void>(`${this.baseUrl}/${projectId}`).pipe(
+      catchError(() => this.http.delete<void>(`${this.v1BaseUrl}/${projectId}`)),
+    );
   }
 }
