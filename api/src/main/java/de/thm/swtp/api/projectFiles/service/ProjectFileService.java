@@ -1,5 +1,7 @@
 package de.thm.swtp.api.projectFiles.service;
 
+import de.thm.swtp.api.common.LogSafe;
+import de.thm.swtp.api.common.TxLogger;
 import de.thm.swtp.api.exceptionhandling.exceptions.*;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
@@ -10,8 +12,9 @@ import de.thm.swtp.api.projectFiles.entity.ProjectFileEntity;
 import de.thm.swtp.api.projectFiles.mapper.ProjectFileMapper;
 import de.thm.swtp.api.projectFiles.repository.ProjectFileRepository;
 import jakarta.annotation.PostConstruct;
-import org.apache.tika.Tika;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -31,6 +34,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProjectFileService {
 
     private static final Set<String> ALLOWED_MIME_TYPES = Set.of(
@@ -91,6 +95,7 @@ public class ProjectFileService {
                 ? file.getOriginalFilename()
                 : "file";
         String originalName = rawName.length() > 255 ? rawName.substring(0, 255) : rawName;
+        String logName = LogSafe.clean(originalName); // strip control chars for log output — originalName is client-controlled
         String extension = getExtension(originalName);
         String storageName = UUID.randomUUID() + (extension.isEmpty() ? "" : "." + extension);
         Path filePath = uploadDir.resolve(storageName);
@@ -98,6 +103,7 @@ public class ProjectFileService {
         try {
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
+            log.error("Upload failed (write): project={}, file={}", projectId, logName, e);
             throw new RuntimeException("Failed to write file to storage", e);
         }
 
@@ -131,7 +137,10 @@ public class ProjectFileService {
                 .build();
 
         try {
-            return ProjectFileMapper.toDomain(projectFileRepository.save(entity));
+            ProjectFile saved = ProjectFileMapper.toDomain(projectFileRepository.save(entity));
+            TxLogger.afterCommit(log, "Upload: project={}, file={}, bytes={}, mime={}",
+                    projectId, logName, file.getSize(), mimeType);
+            return saved;
         } catch (Exception e) {
             try {
                 Files.deleteIfExists(filePath);
@@ -167,8 +176,17 @@ public class ProjectFileService {
         // but never a DB record pointing to a missing file (unrecoverable crash on next download).
         projectFileRepository.delete(fileEntity);
         try {
-            Files.deleteIfExists(uploadDir.resolve(fileEntity.getStorageName()));
+            boolean removed = Files.deleteIfExists(uploadDir.resolve(fileEntity.getStorageName()));
+            if (!removed) {
+                log.warn("Delete: file missing on disk, DB record removed: project={}, file={}",
+                        projectId, fileId);
+            } else {
+                // disk delete is already done above; this only logs the DB commit succeeded.
+                TxLogger.afterCommit(log, "Delete: project={}, file={}, storage={}",
+                        projectId, fileId, fileEntity.getStorageName());
+            }
         } catch (IOException e) {
+            log.error("Delete failed (disk): project={}, file={}", projectId, fileId, e);
             throw new RuntimeException("Failed to delete file from storage", e);
         }
     }

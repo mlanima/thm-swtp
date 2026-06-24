@@ -1,5 +1,6 @@
 package de.thm.swtp.api.projectPost.service;
 
+import de.thm.swtp.api.common.TxLogger;
 import de.thm.swtp.api.exceptionhandling.exceptions.InvalidProjectPostException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectPostNotFoundException;
 import de.thm.swtp.api.project.ProjectEntity;
@@ -15,6 +16,7 @@ import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +26,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProjectPostService {
     private final ProjectPostRepository projectPostRepository;
     private final ProjectRepository projectRepository;
@@ -60,7 +63,9 @@ public class ProjectPostService {
                 .publishedAt(status == ProjectPostStatus.PUBLISHED ? LocalDateTime.now() : null)
                 .build();
 
-        return ProjectPostMapper.toDomain(projectPostRepository.saveAndFlush(projectPostEntity));
+        ProjectPost post = ProjectPostMapper.toDomain(projectPostRepository.saveAndFlush(projectPostEntity));
+        TxLogger.afterCommit(log, "Post created: project={}, post={}, author={}", projectId, post.getId(), authorId);
+        return post;
     }
 
     @Transactional
@@ -80,7 +85,9 @@ public class ProjectPostService {
         }
         postEntity.setArchivedAt(null);
 
-        return ProjectPostMapper.toDomain(projectPostRepository.save(postEntity));
+        ProjectPost post = ProjectPostMapper.toDomain(projectPostRepository.save(postEntity));
+        TxLogger.afterCommit(log, "Post published: project={}, post={}", projectId, postId);
+        return post;
     }
 
     @Transactional
@@ -96,7 +103,9 @@ public class ProjectPostService {
         postEntity.setStatus(ProjectPostStatus.ARCHIVED);
         postEntity.setArchivedAt(LocalDateTime.now());
 
-        return ProjectPostMapper.toDomain(projectPostRepository.save(postEntity));
+        ProjectPost post = ProjectPostMapper.toDomain(projectPostRepository.save(postEntity));
+        TxLogger.afterCommit(log, "Post archived: project={}, post={}", projectId, postId);
+        return post;
     }
 
     @Transactional
@@ -105,7 +114,7 @@ public class ProjectPostService {
         assertPostBelongsToProject(postEntity, projectId);
 
         projectPostRepository.delete(postEntity);
-
+        TxLogger.afterCommit(log, "Post deleted: project={}, post={}", projectId, postId);
     }
 
 
