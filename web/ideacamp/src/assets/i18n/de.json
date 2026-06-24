@@ -504,5 +504,45 @@
   },
   "TAGS": {
     "TITLE": "Tags"
+  },
+  "MODERATOR": {
+    "TITLE": "Moderator-Bereich",
+    "DESCRIPTION": "Willkommen im Moderator-Bereich. Hier können zukünftig Benutzer und Projekte verwaltet werden.",
+    "USER_MANAGEMENT": {
+      "TITLE": "Nutzerverwaltung",
+      "BADGE": "Moderator",
+      "DESCRIPTION": "Alle registrierten Nutzer einsehen und verwalten.",
+      "TABS": {
+        "ACTIVE_USERS": "Aktive Nutzer",
+        "BANNED_USERS": "Gebannte Nutzer"
+      },
+      "TABLE": {
+        "USER": "Nutzer",
+        "ROLE": "Rolle",
+        "JOINED_AT": "Beigetreten",
+        "ACTIONS": "Aktionen",
+        "BANNED_AT": "Gebannt am",
+        "REASON": "Grund",
+        "STATUS": "Status"
+      },
+      "ROLES": {
+        "Mod": "Moderator",
+        "Member": "Mitglied"
+      },
+      "ACTIONS": {
+        "BAN": "Bannen",
+        "BAN_USER": "Nutzer bannen",
+        "UNBAN": "Entbannen"
+      },
+      "EMPTY_BANNED_TITLE": "Keine gebannten Nutzer vorhanden.",
+      "EMPTY_BANNED_DESCRIPTION": "Gebannte Nutzer erscheinen hier und können nicht mehr auf die Plattform zugreifen.",
+      "NO_REASON": "Kein Grund angegeben",
+      "MODAL": {
+        "TITLE": "Nutzer bannen",
+        "DESCRIPTION": "Der Nutzer wird gesperrt und kann sich nicht mehr anmelden. Der Account bleibt im System erhalten.",
+        "REASON_LABEL": "Grund für den Ban (optional)",
+        "REASON_PLACEHOLDER": "z. B. Verstoß gegen Nutzungsbedingungen..."
+      }
+    }
   }
 }
