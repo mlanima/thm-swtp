@@ -75,6 +75,7 @@
     "PRIVATE": "Private",
     "PUBLIC": "Public",
     "OWNER": "Owner",
+    "MEMBER": "Member",
     "FILTER_ALL": "All projects",
     "FILTER_OWNED": "Owned",
     "LOADING": "Your projects are loading…",
