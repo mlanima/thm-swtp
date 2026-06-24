@@ -9,6 +9,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.*;
 import java.util.*;
@@ -24,7 +25,7 @@ public class ProjectController {
     @PreAuthorize("@security.hasModeratorRole(authentication)")
     public ResponseEntity<Page<ProjectResponse>> getAllProjects(
             @RequestParam(required = false) String name,
-            Pageable pageable) {
+            @PageableDefault(size = 20) Pageable pageable) {
         return ResponseEntity.ok(projectService.getAllProjects(name, pageable));
     }
 
