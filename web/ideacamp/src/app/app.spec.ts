@@ -24,6 +24,7 @@ describe('App', () => {
           useValue: {
             waitUntilAuthReady: () => Promise.resolve(),
             isLoggedIn: () => false,
+            isModerator: () => false,
             username: () => '',
             user: () => null,
             login: () => undefined,

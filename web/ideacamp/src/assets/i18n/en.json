@@ -134,10 +134,15 @@
     "ADD_TITLE": "Add to favorites",
     "ERROR_LOAD": "Your favorites could not be loaded."
   },
+  "MODERATOR": {
+    "TITLE": "Moderator Area",
+    "DESCRIPTION": "Welcome to the moderator area. Users and projects can be managed here in the future."
+  },
   "SIDEBAR": {
     "MYPROJECTS": "My projects",
     "FAVORITE": "Favorites",
     "PROFILE": "My profile",
+    "MODERATOR": "Moderator",
     "IMPRESSUM": "Legal notice",
     "MENU": "Menu"
   },

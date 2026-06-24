@@ -26,6 +26,7 @@ export class HeaderComponent {
   auth = inject(AuthService);
 
   isAuthenticated = () => this.auth.isLoggedIn();
+  isModerator = () => this.auth.isModerator();
 
   private readonly languageService = inject(LanguageService);
 

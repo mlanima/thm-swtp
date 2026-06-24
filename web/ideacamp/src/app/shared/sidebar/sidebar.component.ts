@@ -26,6 +26,9 @@ export class SidebarComponent {
   constructor() {
     if (isPlatformBrowser(this.platformId)) {
       this.auth.waitUntilAuthReady().then(() => {
+        if (this.auth.isModerator()) {
+          return;
+        }
         this.invitationService.getInvitations().subscribe({
           next: (invitations) =>
             this.pendingInvitations.set(
