@@ -19,15 +19,11 @@
           <span class="logo-name">IdeaCamp</span>
         </div>
         <#if realm.internationalizationEnabled && locale.supported?size gt 1>
-          <div class="locale-switcher">
-            <#list locale.supported as l>
-              <#if l.languageTag = locale.currentLanguageTag>
-                <span class="locale-item locale-item-active">${l.label}</span>
-              <#else>
-                <a class="locale-item" href="${l.url}">${l.label}</a>
-              </#if>
-            </#list>
-          </div>
+          <#list locale.supported as l>
+            <#if l.languageTag != locale.currentLanguageTag>
+              <a class="locale-btn" href="${l.url}">${locale.currentLanguageTag?upper_case}</a>
+            </#if>
+          </#list>
         </#if>
       </div>
 

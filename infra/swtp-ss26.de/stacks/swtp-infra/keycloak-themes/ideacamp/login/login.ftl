@@ -12,24 +12,27 @@
 
         <#if !usernameHidden??>
           <div class="form-group">
-            <label for="username" class="form-label">
-              <#if !realm.loginWithEmailAllowed>
-                ${msg("username")}
-              <#elseif !realm.registrationEmailAsUsername>
-                ${msg("usernameOrEmail")}
-              <#else>
-                ${msg("email")}
-              </#if>
-            </label>
-            <input
-              id="username"
-              name="username"
-              type="text"
-              autocomplete="username"
-              value="${(login.username!'')}"
-              autofocus
-              class="form-input<#if messagesPerField.existsError('username','password')> form-input-error</#if>"
-            />
+            <div class="form-float">
+              <input
+                id="username"
+                name="username"
+                type="text"
+                autocomplete="username"
+                value="${(login.username!'')}"
+                placeholder=" "
+                autofocus
+                class="form-input form-input-float<#if messagesPerField.existsError('username','password')> form-input-error</#if>"
+              />
+              <label for="username" class="form-label-float">
+                <#if !realm.loginWithEmailAllowed>
+                  ${msg("username")}
+                <#elseif !realm.registrationEmailAsUsername>
+                  ${msg("usernameOrEmail")}
+                <#else>
+                  ${msg("email")}
+                </#if>
+              </label>
+            </div>
             <#if messagesPerField.existsError('username')>
               <p class="field-error">${kcSanitize(messagesPerField.getFirstError('username'))?no_esc}</p>
             </#if>
@@ -37,21 +40,22 @@
         </#if>
 
         <div class="form-group">
-          <div class="form-label-row">
-            <label for="password" class="form-label">${msg("password")}</label>
-            <#if realm.resetPasswordAllowed>
-              <a href="${url.loginResetCredentialsUrl}" class="form-link form-link-sm">${msg("doForgotPassword")}</a>
-            </#if>
+          <div class="form-float">
+            <input
+              id="password"
+              name="password"
+              type="password"
+              autocomplete="current-password"
+              placeholder=" "
+              class="form-input form-input-float<#if messagesPerField.existsError('username','password')> form-input-error</#if>"
+            />
+            <label for="password" class="form-label-float">${msg("password")}</label>
           </div>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            autocomplete="current-password"
-            class="form-input<#if messagesPerField.existsError('username','password')> form-input-error</#if>"
-          />
           <#if messagesPerField.existsError('password')>
             <p class="field-error">${kcSanitize(messagesPerField.getFirstError('password'))?no_esc}</p>
+          </#if>
+          <#if realm.resetPasswordAllowed>
+            <a href="${url.loginResetCredentialsUrl}" class="form-link form-link-sm forgot-password-link">${msg("doForgotPassword")}</a>
           </#if>
         </div>
 
