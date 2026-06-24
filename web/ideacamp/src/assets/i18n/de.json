@@ -136,7 +136,34 @@
   },
   "MODERATOR": {
     "TITLE": "Moderator-Bereich",
-    "DESCRIPTION": "Willkommen im Moderator-Bereich. Hier können zukünftig Benutzer und Projekte verwaltet werden."
+    "DESCRIPTION": "Willkommen im Moderator-Bereich. Hier können zukünftig Benutzer und Projekte verwaltet werden.",
+    "PROJECTS": {
+      "TITLE": "Projektverwaltung",
+      "SUBTITLE": "Alle Projekte einsehen, suchen und bei Bedarf löschen.",
+      "SEARCH_PLACEHOLDER": "Projekte suchen …",
+      "COLUMN_PROJECT": "Projekt",
+      "COLUMN_OWNER": "Ersteller",
+      "COLUMN_CREATED": "Erstellt am",
+      "COLUMN_STATUS": "Status",
+      "COLUMN_ACTION": "Aktion",
+      "MEMBERS": "Mitglieder",
+      "STATUS_PRIVATE": "Privat",
+      "STATUS_PUBLIC": "Öffentlich",
+      "DELETE": "Löschen",
+      "DELETING": "Löschen …",
+      "NO_RESULTS": "Keine Projekte gefunden.",
+      "SHOWING_OF": "von",
+      "TOTAL_PROJECTS": "Projekten angezeigt",
+      "LOADING": "Projekte werden geladen …",
+      "ERROR_LOAD": "Projekte konnten nicht geladen werden.",
+      "ERROR_DELETE": "Projekt konnte nicht gelöscht werden.",
+      "CONFIRM_DELETE_TITLE": "Projekt löschen",
+      "CONFIRM_DELETE_SUBTITLE": "Diese Aktion kann nicht rückgängig gemacht werden.",
+      "CONFIRM_DELETE_TEXT": "Das Projekt \"{{ projectName }}\" wird dauerhaft gel\u00F6scht. Alle zugeh\u00F6rigen Daten gehen dabei verloren.",
+      "CONFIRM_DELETE_LABEL": "Gib zur Bestätigung den Projektnamen ein",
+      "CONFIRM_DELETE_PLACEHOLDER": "Gib zur Bestätigung den Projektnamen ein",
+      "CONFIRM_DELETE_HINT_FILLED": "Der Projektname muss eingegeben werden"
+    }
   },
   "SIDEBAR": {
     "MYPROJECTS": "Meine Projekte",

@@ -136,7 +136,34 @@
   },
   "MODERATOR": {
     "TITLE": "Moderator Area",
-    "DESCRIPTION": "Welcome to the moderator area. Users and projects can be managed here in the future."
+    "DESCRIPTION": "Welcome to the moderator area. Users and projects can be managed here in the future.",
+    "PROJECTS": {
+      "TITLE": "Project Management",
+      "SUBTITLE": "View, search, and delete projects as needed.",
+      "SEARCH_PLACEHOLDER": "Search projects …",
+      "COLUMN_PROJECT": "Project",
+      "COLUMN_OWNER": "Owner",
+      "COLUMN_CREATED": "Created",
+      "COLUMN_STATUS": "Status",
+      "COLUMN_ACTION": "Action",
+      "MEMBERS": "members",
+      "STATUS_PRIVATE": "Private",
+      "STATUS_PUBLIC": "Public",
+      "DELETE": "Delete",
+      "DELETING": "Deleting …",
+      "NO_RESULTS": "No projects found.",
+      "SHOWING_OF": "of",
+      "TOTAL_PROJECTS": "projects displayed",
+      "LOADING": "Loading projects …",
+      "ERROR_LOAD": "Failed to load projects.",
+      "ERROR_DELETE": "Failed to delete project.",
+      "CONFIRM_DELETE_TITLE": "Delete project",
+      "CONFIRM_DELETE_SUBTITLE": "This action cannot be undone.",
+      "CONFIRM_DELETE_TEXT": "The project \"{{ projectName }}\" will be permanently deleted. All associated data will be lost.",
+      "CONFIRM_DELETE_LABEL": "Type the project name to confirm",
+      "CONFIRM_DELETE_PLACEHOLDER": "Type the project name to confirm",
+      "CONFIRM_DELETE_HINT_FILLED": "The project name must be entered"
+    }
   },
   "SIDEBAR": {
     "MYPROJECTS": "My projects",
