@@ -165,6 +165,47 @@
       "CONFIRM_DELETE_LABEL": "Gib zur Bestätigung den Projektnamen ein",
       "CONFIRM_DELETE_PLACEHOLDER": "Gib zur Bestätigung den Projektnamen ein",
       "CONFIRM_DELETE_HINT_FILLED": "Der Projektname muss eingegeben werden"
+    },
+    "USER_MANAGEMENT": {
+      "TITLE": "Nutzerverwaltung",
+      "BADGE": "Moderator",
+      "DESCRIPTION": "Alle registrierten Nutzer einsehen und verwalten.",
+      "TABS": {
+        "ACTIVE_USERS": "Aktive Nutzer",
+        "BANNED_USERS": "Gebannte Nutzer"
+      },
+      "TABLE": {
+        "USER": "Nutzer",
+        "ROLE": "Rolle",
+        "JOINED_AT": "Beigetreten",
+        "ACTIONS": "Aktionen",
+        "BANNED_AT": "Gebannt am",
+        "REASON": "Grund"
+      },
+      "ROLES": {
+        "PROFESSOR": "Professor",
+        "MEMBER": "Mitglied"
+      },
+      "ACTIONS": {
+        "BAN": "Bannen",
+        "BAN_USER": "Nutzer bannen",
+        "UNBAN": "Entbannen"
+      },
+      "EMPTY_BANNED_TITLE": "Keine gebannten Nutzer vorhanden.",
+      "EMPTY_BANNED_DESCRIPTION": "Gebannte Nutzer erscheinen hier und können nicht mehr auf die Plattform zugreifen.",
+      "ERROR_LOAD": "Nutzer konnten nicht geladen werden.",
+      "ERROR_BAN": "Nutzer konnte nicht gebannt werden.",
+      "ERROR_UNBAN": "Bann konnte nicht aufgehoben werden.",
+      "NO_REASON": "Kein Grund angegeben",
+      "LOADING": "Nutzer werden geladen...",
+      "EMPTY_ACTIVE_TITLE": "Keine aktiven Nutzer vorhanden.",
+      "EMPTY_ACTIVE_DESCRIPTION": "Aktive Nutzer erscheinen hier und können bei Bedarf gebannt werden.",
+      "MODAL": {
+        "TITLE": "Nutzer bannen",
+        "DESCRIPTION": "Der Nutzer wird gesperrt und kann die Plattform nicht mehr nutzen. Der Account bleibt im System erhalten.",
+        "REASON_LABEL": "Grund für den Ban (optional)",
+        "REASON_PLACEHOLDER": "z. B. Verstoß gegen Nutzungsbedingungen..."
+      }
     }
   },
   "SIDEBAR": {
@@ -512,50 +553,5 @@
   },
   "TAGS": {
     "TITLE": "Tags"
-  },
-  "MODERATOR": {
-    "TITLE": "Moderator-Bereich",
-    "DESCRIPTION": "Willkommen im Moderator-Bereich. Hier können zukünftig Benutzer und Projekte verwaltet werden.",
-    "USER_MANAGEMENT": {
-      "TITLE": "Nutzerverwaltung",
-      "BADGE": "Moderator",
-      "DESCRIPTION": "Alle registrierten Nutzer einsehen und verwalten.",
-      "TABS": {
-        "ACTIVE_USERS": "Aktive Nutzer",
-        "BANNED_USERS": "Gebannte Nutzer"
-      },
-      "TABLE": {
-        "USER": "Nutzer",
-        "ROLE": "Rolle",
-        "JOINED_AT": "Beigetreten",
-        "ACTIONS": "Aktionen",
-        "BANNED_AT": "Gebannt am",
-        "REASON": "Grund"
-      },
-      "ROLES": {
-        "PROFESSOR": "Professor",
-        "MEMBER": "Mitglied"
-      },
-      "ACTIONS": {
-        "BAN": "Bannen",
-        "BAN_USER": "Nutzer bannen",
-        "UNBAN": "Entbannen"
-      },
-      "EMPTY_BANNED_TITLE": "Keine gebannten Nutzer vorhanden.",
-      "EMPTY_BANNED_DESCRIPTION": "Gebannte Nutzer erscheinen hier und können nicht mehr auf die Plattform zugreifen.",
-      "ERROR_LOAD": "Nutzer konnten nicht geladen werden.",
-      "ERROR_BAN": "Nutzer konnte nicht gebannt werden.",
-      "ERROR_UNBAN": "Bann konnte nicht aufgehoben werden.",
-      "NO_REASON": "Kein Grund angegeben",
-      "LOADING": "Nutzer werden geladen...",
-      "EMPTY_ACTIVE_TITLE": "Keine aktiven Nutzer vorhanden.",
-      "EMPTY_ACTIVE_DESCRIPTION": "Aktive Nutzer erscheinen hier und können bei Bedarf gebannt werden.",
-      "MODAL": {
-        "TITLE": "Nutzer bannen",
-        "DESCRIPTION": "Der Nutzer wird gesperrt und kann die Plattform nicht mehr nutzen. Der Account bleibt im System erhalten.",
-        "REASON_LABEL": "Grund für den Ban (optional)",
-        "REASON_PLACEHOLDER": "z. B. Verstoß gegen Nutzungsbedingungen..."
-      }
-    }
   }
 }
