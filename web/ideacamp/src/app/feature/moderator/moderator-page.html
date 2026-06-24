@@ -11,5 +11,25 @@
     <p class="mx-auto mt-4 max-w-md leading-7 text-gray-600">
       {{ 'MODERATOR.DESCRIPTION' | translate }}
     </p>
+
+    <div class="mt-8 flex flex-col gap-3">
+      <a
+        routerLink="/moderator/projects"
+        class="flex items-center gap-4 rounded-xl border border-gray-200 bg-gray-50 p-4 text-left transition hover:border-gray-300 hover:bg-gray-100"
+      >
+        <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-indigo-100 text-lg text-indigo-600">
+          <i class="pi pi-folder"></i>
+        </div>
+        <div>
+          <h2 class="text-base font-semibold text-gray-900">
+            {{ 'MODERATOR.PROJECTS_LINK_TITLE' | translate }}
+          </h2>
+          <p class="text-sm text-gray-500">
+            {{ 'MODERATOR.PROJECTS_LINK_DESCRIPTION' | translate }}
+          </p>
+        </div>
+        <i class="pi pi-chevron-right ml-auto text-gray-400"></i>
+      </a>
+    </div>
   </div>
 </section>

@@ -22,4 +22,7 @@ public interface ProjectJoinRequestRepository extends JpaRepository<ProjectJoinR
 
     /** Checks if a join-requests exists and belongs to a project owned by the specified user.*/
     boolean existsByIdAndProjectOwnerKeycloakId(UUID requestId, UUID ownerId);
+
+    /** Deletes all join-requests for a given project. */
+    void deleteByProjectId(UUID projectId);
 }

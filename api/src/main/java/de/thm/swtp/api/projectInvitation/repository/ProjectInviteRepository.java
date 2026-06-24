@@ -20,4 +20,6 @@ public interface ProjectInviteRepository extends JpaRepository<ProjectInviteEnti
     /** Checks if a project-invitation exists for a given user.*/
     boolean existsByIdAndInvitedUserKeycloakId(UUID inviteId, UUID invitedUserId);
 
+    /** Deletes all invitations for a given project. */
+    void deleteByProjectId(UUID projectId);
 }

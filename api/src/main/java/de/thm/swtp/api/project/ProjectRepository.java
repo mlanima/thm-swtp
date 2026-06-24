@@ -1,13 +1,17 @@
 package de.thm.swtp.api.project;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.domain.Page;
 import java.util.UUID;
 import java.util.Optional;
 import java.util.List;
 
 public interface ProjectRepository extends JpaRepository<ProjectEntity, UUID> {
+
+    Page<ProjectEntity> findByNameContainingIgnoreCase(String name, Pageable pageable);
 
     boolean existsByName(String name);
     boolean existsByNameAndIdNot(String name, UUID id);
@@ -30,7 +34,6 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, UUID> {
      */
     @Query("SELECT DISTINCT p FROM projects p LEFT JOIN p.members m WHERE (p.owner.username = :username OR m.username = :username) AND p.deletedAt IS NULL ORDER BY p.createdAt DESC")
     List<ProjectEntity> findAllByOwnerOrMemberUsernameAndDeletedAtIsNull(@Param("username") String username);
-
     boolean existsByProjectUrl(String projectUrl);
 
     boolean existsByIdAndIsPrivateProjectFalse(UUID id);
