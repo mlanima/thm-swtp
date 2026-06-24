@@ -39,103 +39,16 @@
         <p class="text-sm font-medium text-red-700">{{ errorMessage() }}</p>
       </div>
     } @else {
-      <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-        <table class="w-full text-left text-sm">
-          <thead>
-            <tr class="border-b border-slate-200 text-xs font-semibold uppercase tracking-wider text-slate-500">
-              <th class="px-6 py-3">{{ 'MODERATOR.PROJECTS.COLUMN_PROJECT' | translate }}</th>
-              <th class="px-6 py-3">{{ 'MODERATOR.PROJECTS.COLUMN_OWNER' | translate }}</th>
-              <th class="px-6 py-3">{{ 'MODERATOR.PROJECTS.COLUMN_CREATED' | translate }}</th>
-              <th class="px-6 py-3">{{ 'MODERATOR.PROJECTS.COLUMN_STATUS' | translate }}</th>
-              <th class="px-6 py-3">{{ 'MODERATOR.PROJECTS.COLUMN_ACTION' | translate }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (project of projects(); track project.id) {
-              <tr class="border-b border-slate-100 transition-colors hover:bg-slate-50">
-                <td class="px-6 py-4">
-                  <div class="font-medium text-slate-700">{{ project.name }}</div>
-                  <div class="text-xs text-slate-400">
-                    {{ project.memberCount }} {{ 'MODERATOR.PROJECTS.MEMBERS' | translate }}
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="flex items-center gap-3">
-                    <div
-                      class="flex h-8 w-8 items-center justify-center rounded-full bg-slate-700 text-xs font-medium text-white"
-                    >
-                      {{ project.ownerInitials }}
-                    </div>
-                    <div>
-                      <div class="font-medium text-slate-700">{{ project.ownerUsername }}</div>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4 text-slate-500">{{ project.createdAt }}</td>
-                <td class="px-6 py-4">
-                  <span
-                    class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
-                    [class]="project.isPrivate
-                      ? 'bg-amber-50 text-amber-700'
-                      : 'bg-green-50 text-green-700'"
-                  >
-                    {{ project.isPrivate
-                      ? ('MODERATOR.PROJECTS.STATUS_PRIVATE' | translate)
-                      : ('MODERATOR.PROJECTS.STATUS_PUBLIC' | translate) }}
-                  </span>
-                </td>
-                <td class="px-6 py-4">
-                  <button
-                    (click)="openDeleteDialog(project.id, project.name)"
-                    class="inline-flex cursor-pointer items-center gap-1.5 text-sm font-medium text-red-500 transition-colors hover:text-red-700"
-                  >
-                    <i class="pi pi-trash text-xs"></i>
-                    {{ 'MODERATOR.PROJECTS.DELETE' | translate }}
-                  </button>
-                </td>
-              </tr>
-            } @empty {
-              <tr>
-                <td colspan="5" class="px-6 py-12 text-center text-sm text-slate-400">
-                  {{ 'MODERATOR.PROJECTS.NO_RESULTS' | translate }}
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
+      <app-project-table
+        [projects]="projects()"
+        (deleteProject)="openDeleteDialog($event)"
+      />
 
-      @if (totalPages() > 1) {
-        <div class="mt-4 flex items-center justify-center gap-2">
-          <button
-            (click)="onPageChange(currentPage() - 1)"
-            [disabled]="currentPage() === 0"
-            class="inline-flex cursor-pointer items-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            <i class="pi pi-chevron-left text-xs"></i>
-          </button>
-
-          @for (page of getPageNumbers(); track page) {
-            <button
-              (click)="onPageChange(page)"
-              class="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg text-sm font-medium transition-colors"
-              [class]="page === currentPage()
-                ? 'bg-slate-700 text-white'
-                : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50'"
-            >
-              {{ page + 1 }}
-            </button>
-          }
-
-          <button
-            (click)="onPageChange(currentPage() + 1)"
-            [disabled]="currentPage() >= totalPages() - 1"
-            class="inline-flex cursor-pointer items-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            <i class="pi pi-chevron-right text-xs"></i>
-          </button>
-        </div>
-      }
+      <app-pagination
+        [currentPage]="currentPage()"
+        [totalPages]="totalPages()"
+        (pageChange)="onPageChange($event)"
+      />
 
       <p class="mt-4 text-center text-sm text-slate-400">
         {{ projects().length }} {{ 'MODERATOR.PROJECTS.SHOWING_OF' | translate }}
@@ -146,79 +59,14 @@
 </section>
 
 @if (deleteState(); as state) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-    <div class="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
-      <button
-        (click)="closeDeleteDialog()"
-        class="absolute right-4 top-4 cursor-pointer text-slate-400 hover:text-slate-700"
-      >
-        <i class="pi pi-times text-sm"></i>
-      </button>
-
-      <div class="flex items-center gap-3">
-        <div class="flex h-9 w-9 items-center justify-center rounded-full bg-red-100">
-          <i class="pi pi-trash text-sm text-red-500"></i>
-        </div>
-        <div>
-          <h2 class="font-semibold text-slate-800">
-            {{ 'MODERATOR.PROJECTS.CONFIRM_DELETE_TITLE' | translate }}
-          </h2>
-          <p class="text-xs text-slate-400">
-            {{ 'MODERATOR.PROJECTS.CONFIRM_DELETE_SUBTITLE' | translate }}
-          </p>
-        </div>
-      </div>
-
-      <div class="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2">
-        <p class="text-xs text-red-600">
-          {{ 'MODERATOR.PROJECTS.CONFIRM_DELETE_TEXT' | translate:{ projectName: state.projectName } }}
-        </p>
-      </div>
-
-      <div class="mt-4">
-        <p class="mb-1.5 text-sm font-medium text-slate-700">
-          {{ 'MODERATOR.PROJECTS.CONFIRM_DELETE_LABEL' | translate }}
-        </p>
-        <input
-          type="text"
-          [placeholder]="'MODERATOR.PROJECTS.CONFIRM_DELETE_PLACEHOLDER' | translate"
-          [value]="deleteConfirmInput()"
-          (input)="deleteConfirmInput.set($any($event.target).value)"
-          class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:border-slate-400 focus:outline-none"
-        />
-        <ul class="mt-2 space-y-0.5">
-          @if (deleteConfirmInput().length === 0) {
-            <li class="flex items-center gap-1.5 text-xs text-slate-400">
-              <span class="text-[10px]">&#8226;</span>
-              {{ 'MODERATOR.PROJECTS.CONFIRM_DELETE_HINT_FILLED' | translate }}
-            </li>
-          }
-        </ul>
-      </div>
-
-      @if (deleteError()) {
-        <p class="mt-3 text-xs text-red-600">{{ deleteError() }}</p>
-      }
-
-      <div class="mt-5 flex gap-3">
-        <button
-          (click)="closeDeleteDialog()"
-          class="flex-1 cursor-pointer rounded-lg border border-slate-200 bg-white py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
-        >
-          {{ 'COMMON.CANCEL' | translate }}
-        </button>
-        <button
-          (click)="confirmDelete()"
-          [disabled]="!isDeleteEnabled() || isDeleting()"
-          class="flex-1 rounded-lg py-2 text-sm font-medium text-white transition-colors
-                 enabled:cursor-pointer enabled:bg-red-500 enabled:hover:bg-red-600
-                 disabled:cursor-not-allowed disabled:bg-red-200"
-        >
-          {{ isDeleting()
-            ? ('MODERATOR.PROJECTS.DELETING' | translate)
-            : ('MODERATOR.PROJECTS.DELETE' | translate) }}
-        </button>
-      </div>
-    </div>
-  </div>
+  <app-delete-dialog
+    [state]="state"
+    [confirmInput]="deleteConfirmInput()"
+    [isDeleting]="isDeleting()"
+    [isDeleteEnabled]="isDeleteEnabled()"
+    [deleteError]="deleteError()"
+    (close)="closeDeleteDialog()"
+    (confirm)="confirmDelete()"
+    (confirmInputChange)="deleteConfirmInput.set($event)"
+  />
 }

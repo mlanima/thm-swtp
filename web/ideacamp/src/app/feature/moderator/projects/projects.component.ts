@@ -1,31 +1,23 @@
 import { Component, OnInit, signal, computed, inject, DestroyRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { ModeratorProjectsService, ProjectSearchParams } from '../services/moderator-projects.service';
+import {
+  ModeratorProjectsService,
+  ProjectSearchParams,
+} from '../services/moderator-projects.service';
 import { ProjectResponse } from '../../../models/project.model';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
-
-interface ProjectView {
-  id: string;
-  name: string;
-  memberCount: number;
-  ownerUsername: string;
-  ownerInitials: string;
-  createdAt: string;
-  isPrivate: boolean;
-}
-
-interface DeleteState {
-  projectId: string;
-  projectName: string;
-}
+import { ProjectView, DeleteState } from './projects.types';
+import { ProjectTable } from './project-table/project-table';
+import { Pagination } from './pagination/pagination';
+import { DeleteDialog } from './delete-dialog/delete-dialog';
 
 const PAGE_SIZE = 10;
 
 @Component({
   selector: 'app-projects',
   standalone: true,
-  imports: [FormsModule, TranslatePipe],
+  imports: [FormsModule, TranslatePipe, ProjectTable, Pagination, DeleteDialog],
   templateUrl: './projects.component.html',
   styleUrl: './projects.component.css',
 })
@@ -77,20 +69,10 @@ export class ProjectsComponent implements OnInit {
     this.loadProjects(page, this.searchQuery());
   }
 
-  getPageNumbers(): number[] {
-    const total = this.totalPages();
-    const current = this.currentPage();
-    const pages: number[] = [];
-    const start = Math.max(0, current - 2);
-    const end = Math.min(total - 1, current + 2);
-    for (let i = start; i <= end; i++) {
-      pages.push(i);
-    }
-    return pages;
-  }
-
-  openDeleteDialog(projectId: string, projectName: string): void {
-    this.deleteState.set({ projectId, projectName });
+  openDeleteDialog(projectId: string): void {
+    const project = this.projects().find((p) => p.id === projectId);
+    if (!project) return;
+    this.deleteState.set({ projectId: project.id, projectName: project.name });
     this.deleteConfirmInput.set('');
     this.deleteError.set('');
   }
@@ -115,9 +97,7 @@ export class ProjectsComponent implements OnInit {
         this.closeDeleteDialog();
       },
       error: () => {
-        this.deleteError.set(
-          this.translateService.instant('MODERATOR.PROJECTS.ERROR_DELETE'),
-        );
+        this.deleteError.set(this.translateService.instant('MODERATOR.PROJECTS.ERROR_DELETE'));
         this.isDeleting.set(false);
       },
     });
@@ -141,9 +121,7 @@ export class ProjectsComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: () => {
-        this.errorMessage.set(
-          this.translateService.instant('MODERATOR.PROJECTS.ERROR_LOAD'),
-        );
+        this.errorMessage.set(this.translateService.instant('MODERATOR.PROJECTS.ERROR_LOAD'));
         this.isLoading.set(false);
       },
     });

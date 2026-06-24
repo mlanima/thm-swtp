@@ -31,10 +31,10 @@
     <div class="flex justify-end flex-1">
       @if (isAuthenticated()) {
         @if (isModerator()) {
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-3">
             <div class="flex flex-col items-end text-sm">
               <div class="font-semibold">{{ auth.username() }}</div>
-              <div class="text-xs text-gray-500">{{ 'NAV.AUTH' | translate }}</div>
+              <span class="inline-flex items-center rounded-md bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700 leading-none">MODERATOR</span>
             </div>
             <button
               type="button"
