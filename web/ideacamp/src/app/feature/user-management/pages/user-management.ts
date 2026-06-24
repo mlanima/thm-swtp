@@ -30,8 +30,8 @@ export class UserManagement implements OnInit {
   selectedUser = signal<ManagedUser | null>(null);
   banReason = signal('');
 
-  activeUserCount = computed(() => this.activeUsers().length);
-  bannedUserCount = computed(() => this.bannedUsers().length);
+  activeUserCount = signal(0);
+  bannedUserCount = signal(0);
 
   ngOnInit() {
     if (!isPlatformBrowser(this.platformId)) {
@@ -48,6 +48,7 @@ export class UserManagement implements OnInit {
     this.userManagementService.getUsers('ACTIVE').subscribe({
       next: (response) => {
         this.activeUsers.set(response.content);
+        this.activeUserCount.set(response.totalElements);
       },
       error: () => {
         this.errorMessage.set('MODERATOR.USER_MANAGEMENT.ERROR_LOAD');
@@ -61,6 +62,7 @@ export class UserManagement implements OnInit {
     this.userManagementService.getUsers('BANNED').subscribe({
       next: (response) => {
         this.bannedUsers.set(response.content);
+        this.bannedUserCount.set(response.totalElements);
       },
       error: () => {
         this.errorMessage.set('MODERATOR.USER_MANAGEMENT.ERROR_LOAD');
