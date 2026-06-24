@@ -1,5 +1,6 @@
 package de.thm.swtp.api.tag.service;
 
+import de.thm.swtp.api.common.TxLogger;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
 import de.thm.swtp.api.project.exception.ProjectNotFoundException;
@@ -8,6 +9,7 @@ import de.thm.swtp.api.tag.entity.TagEntity;
 import de.thm.swtp.api.tag.mapper.TagMapper;
 import de.thm.swtp.api.tag.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +18,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProjectTagService {
 
     private final TagRepository tagRepository;
@@ -43,6 +46,7 @@ public class ProjectTagService {
         TagEntity tagEntity = getOrCreateTag(tagName);
         project.getTags().add(tagEntity);
 
+        TxLogger.afterCommit(log, "Tag added to project: project={}, tag={}", projectId, tagEntity.getName());
         return TagMapper.toDomain(tagEntity);
     }
 
@@ -53,7 +57,10 @@ public class ProjectTagService {
                 .orElseThrow(() -> new ProjectNotFoundException(projectId));
 
         tagRepository.findByNameIgnoreCase(tagName.trim())
-                .ifPresent(tag -> project.getTags().remove(tag));
+                .ifPresent(tag -> {
+                    project.getTags().remove(tag);
+                    TxLogger.afterCommit(log, "Tag removed from project: project={}, tag={}", projectId, tag.getName());
+                });
     }
 
     private TagEntity getOrCreateTag(String tagName) {

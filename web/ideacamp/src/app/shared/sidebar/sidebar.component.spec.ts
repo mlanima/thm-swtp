@@ -17,7 +17,7 @@ describe('SidebarComponent', () => {
 
     await TestBed.configureTestingModule({
       providers: [
-        { provide: AuthService, useValue: { logout: () => logoutCalls++, waitUntilAuthReady: () => Promise.resolve() } },
+        { provide: AuthService, useValue: { logout: () => logoutCalls++, waitUntilAuthReady: () => Promise.resolve(), isModerator: () => false } },
         { provide: ProjectInvitationService, useValue: { getInvitations: () => of([]) } },
       ],
       imports: [SidebarComponent],

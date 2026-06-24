@@ -23,6 +23,11 @@ export class SuccessComponent implements OnInit {
       return;
     }
 
+    if (this.authService.isModerator()) {
+      await this.router.navigateByUrl('/moderator');
+      return;
+    }
+
     this.userProfileService.getMyProfile().subscribe();
   }
 }

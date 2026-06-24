@@ -22,41 +22,41 @@
 
         <!--TODO: Connect to pages, delete unused-->
         <div class="mt-4 space-y-1">
-          <a routerLink="/search" (click)="requestClose()">
-          <app-menu-link>
-             <i class="pi pi-compass text-sm text-zinc-400"></i>
-             <span>{{ 'NAV.SEARCH' | translate }}</span>
-           </app-menu-link>
-          </a>
-          <a routerLink="/my-projects" (click)="requestClose()">
-          <app-menu-link>
-             <i class="pi pi-folder text-sm text-zinc-400"></i>
-             <span>{{ 'SIDEBAR.MYPROJECTS' | translate }} @if (pendingInvitations() > 0) {
-               <span class="text-lime-400">({{ pendingInvitations() }})</span>
-             }</span>
-           </app-menu-link>
-          </a>
-          <a routerLink="/favorites" (click)="requestClose()">
-          <app-menu-link>
-             <i class="pi pi-heart text-sm text-zinc-400"></i>
-             <span>{{ 'SIDEBAR.FAVORITE' | translate }}</span>
-           </app-menu-link>
-          </a>
-          <a [routerLink]="['/profiles', auth.username()]" (click)="requestClose()">
-          <app-menu-link>
-            <i class="pi pi-user text-sm text-zinc-400"></i>
-            <span>{{ 'SIDEBAR.PROFILE' | translate }}</span>
-          </app-menu-link>
-          </a>
-          <!--<app-menu-link>
-            <i class="pi pi-users text-sm text-zinc-400"></i>
-            <span>Kontakten</span>
-          </app-menu-link>-->
-
-          <!--<app-menu-link>
-            <i class="pi pi-folder text-sm text-zinc-400"></i>
-            <span>Meine Projekte</span>
-          </app-menu-link>-->
+          @if (auth.isModerator()) {
+            <a routerLink="/moderator" (click)="requestClose()">
+            <app-menu-link>
+              <i class="pi pi-shield text-sm text-zinc-400"></i>
+              <span>{{ 'SIDEBAR.MODERATOR' | translate }}</span>
+            </app-menu-link>
+            </a>
+          } @else {
+            <a routerLink="/search" (click)="requestClose()">
+            <app-menu-link>
+               <i class="pi pi-compass text-sm text-zinc-400"></i>
+               <span>{{ 'NAV.SEARCH' | translate }}</span>
+             </app-menu-link>
+            </a>
+            <a routerLink="/my-projects" (click)="requestClose()">
+            <app-menu-link>
+               <i class="pi pi-folder text-sm text-zinc-400"></i>
+               <span>{{ 'SIDEBAR.MYPROJECTS' | translate }} @if (pendingInvitations() > 0) {
+                 <span class="text-lime-400">({{ pendingInvitations() }})</span>
+               }</span>
+             </app-menu-link>
+            </a>
+            <a routerLink="/favorites" (click)="requestClose()">
+            <app-menu-link>
+               <i class="pi pi-heart text-sm text-zinc-400"></i>
+               <span>{{ 'SIDEBAR.FAVORITE' | translate }}</span>
+             </app-menu-link>
+            </a>
+            <a [routerLink]="['/profiles', auth.username()]" (click)="requestClose()">
+            <app-menu-link>
+              <i class="pi pi-user text-sm text-zinc-400"></i>
+              <span>{{ 'SIDEBAR.PROFILE' | translate }}</span>
+            </app-menu-link>
+            </a>
+          }
         </div>
 
         <!--TODO: Recent Projects-->
@@ -65,12 +65,14 @@
       </menu>
 
       <footer class="space-y-2 border-t border-zinc-700 px-6 py-5">
-        <a routerLink="/impressum" (click)="requestClose()">
-        <app-menu-link>
-          <i class="pi pi-file text-sm text-zinc-400"></i>
-          <span>{{ 'SIDEBAR.IMPRESSUM' | translate }}</span>
-        </app-menu-link>
-        </a>
+        @if (!auth.isModerator()) {
+          <a routerLink="/settings" (click)="requestClose()">
+          <app-menu-link>
+            <i class="pi pi-cog text-sm text-zinc-400"></i>
+            <span>{{ 'USER_SETTINGS.TITLE' | translate }}</span>
+          </app-menu-link>
+          </a>
+        }
 
         <app-menu-link (click)="logout()">
           <i class="pi pi-sign-out text-sm text-red-400"></i>

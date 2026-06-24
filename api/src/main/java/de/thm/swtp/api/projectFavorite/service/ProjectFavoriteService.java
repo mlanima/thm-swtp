@@ -1,5 +1,6 @@
 package de.thm.swtp.api.projectFavorite.service;
 
+import de.thm.swtp.api.common.TxLogger;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
 import de.thm.swtp.api.project.exception.ExceptionProjectAlreadyDeleted;
@@ -12,6 +13,7 @@ import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +22,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProjectFavoriteService {
 
     private final ProjectFavoriteRepository projectFavoriteRepository;
@@ -48,6 +51,7 @@ public class ProjectFavoriteService {
                         .project(project)
                         .build()
         );
+        TxLogger.afterCommit(log, "Favorite added: project={}, user={}", projectId, userId);
     }
 
     @Transactional
@@ -58,6 +62,7 @@ public class ProjectFavoriteService {
 
         ProjectEntity project = favorite.getProject();
         projectFavoriteRepository.delete(favorite);
+        TxLogger.afterCommit(log, "Favorite removed: project={}, user={}", projectId, userId);
     }
 
     @Transactional(readOnly = true)

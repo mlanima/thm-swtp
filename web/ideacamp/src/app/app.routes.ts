@@ -6,17 +6,21 @@ import { ProjectSite } from './feature/project-site/project-site';
 import { ProjectCreate } from './feature/project-create/project-create';
 import { SuccessComponent } from './feature/auth/success/success.component';
 import {authGuard} from './feature/auth/auth.guard'
+import {moderatorGuard} from './feature/auth/moderator.guard'
 import { SearchPage } from './feature/search/pages/search-page/search-page';
 import { MyProjectsPage } from './feature/my-projects/pages/my-projects-page/my-projects-page';
 import { ProjectSettings } from './feature/project-settings/project-settings';
 import { FavoritesPage } from './feature/favorites/pages/favorites-page/favorites-page';
 import { LandingPage } from './feature/landing-page/pages/landing-page/landing-page';
+import { UserSettings } from './feature/user-settings/user-settings';
+import { ModeratorPage } from './feature/moderator/moderator-page';
 
 export const routes: Routes = [
   {path: '', redirectTo: 'landing', pathMatch: 'full' },
   {path: 'success', component: SuccessComponent},
   {path: 'impressum', component: Impressum},
   {path: 'landing', component: LandingPage},
+  {path: 'moderator', component: ModeratorPage, canActivate: [moderatorGuard]},
   {path: 'profiles/:username', component: UserProfile, canActivate: [authGuard]},
   {path: 'contact-requests', component: ContactRequests, canActivate: [authGuard]},
   {path: 'project/:projectUrl', component: ProjectSite, canActivate: [authGuard]},
@@ -25,4 +29,6 @@ export const routes: Routes = [
   {path: 'createProject', component: ProjectCreate, canActivate: [authGuard]},
   {path: 'my-projects', component: MyProjectsPage, canActivate: [authGuard]},
   {path: 'favorites', component: FavoritesPage, canActivate: [authGuard]},
+  {path: 'settings', component: UserSettings, canActivate: [authGuard]},
+  {path: 'professor-request', redirectTo: 'settings', pathMatch: 'full'},
 ];

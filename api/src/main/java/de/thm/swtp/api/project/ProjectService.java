@@ -1,6 +1,7 @@
 package de.thm.swtp.api.project;
 
 
+import de.thm.swtp.api.common.TxLogger;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectMemberNotFoundException;
 import de.thm.swtp.api.project.dto.request.*;
 import de.thm.swtp.api.project.dto.response.*;
@@ -15,6 +16,7 @@ import de.thm.swtp.api.projectView.repository.ProjectViewRepository;
 
 import jakarta.transaction.*;
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 import java.util.*;
 import java.time.*;
 
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
@@ -104,6 +107,7 @@ public class ProjectService {
 
         createProjectInvites(saved, owner, request.memberIds());
 
+        TxLogger.afterCommit(log, "Project created: project={}, owner={}", saved.getId(), currentUserId);
         return toResponse(saved);
     }
 
@@ -149,6 +153,7 @@ public class ProjectService {
         projectViewRepository.deleteByProjectId(projectId);
         projectRepository.delete(project);
 
+        TxLogger.afterCommit(log, "Project deleted: project={}", projectId);
         return DeleteProjectResponse.builder()
                 .projectId(projectId)
                 .message("Projekt erfolgreich gelöscht.")
@@ -236,6 +241,7 @@ public class ProjectService {
 
         ProjectEntity saved = projectRepository.save(project);
 
+        TxLogger.afterCommit(log, "Project updated: project={}", projectId);
         return toResponse(saved);
     }
 
@@ -266,7 +272,9 @@ public class ProjectService {
         }
 
         project.setAllowJoinRequests(allow);
-        return toResponse(projectRepository.save(project));
+        ProjectResponse saved = toResponse(projectRepository.save(project));
+        TxLogger.afterCommit(log, "AllowJoinRequests updated: project={}, allow={}", projectId, allow);
+        return saved;
     }
 
     @Transactional
@@ -297,6 +305,7 @@ public class ProjectService {
 
         projectEntity.getMembers().remove(member);
         projectRepository.save(projectEntity);
+        TxLogger.afterCommit(log, "Project member removed: project={}, member={}", projectId, memberId);
     }
 
 
