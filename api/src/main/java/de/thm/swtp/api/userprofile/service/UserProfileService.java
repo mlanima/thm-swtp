@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -84,14 +85,16 @@ public class UserProfileService {
     }
 
     @Transactional
-    public UserProfile banUser(UUID userId){
+    public UserProfile banUser(UUID userId, String reason){
         UserProfile userProfile = userProfileRepository.findById(userId)
                 .orElseThrow(() -> new UserProfileNotFoundException(userId.toString()));
 
         userProfile.setStatus(UserStatus.BANNED);
+        userProfile.setBanReason(reason);
+        userProfile.setBannedAt(LocalDateTime.now());
 
         UserProfile saved =  userProfileRepository.save(userProfile);
-        TxLogger.afterCommit(log, "User banned: username={}, userId={}", userProfile.getUsername(), userId);
+        TxLogger.afterCommit(log, "User banned: username={}, userId={}, reason={}", userProfile.getUsername(), userId, reason);
         return saved;
     }
 
@@ -101,6 +104,8 @@ public class UserProfileService {
                 .orElseThrow(() -> new UserProfileNotFoundException(userId.toString()));
 
         userProfile.setStatus(UserStatus.ACTIVE);
+        userProfile.setBanReason(null);
+        userProfile.setBannedAt(null);
 
         UserProfile saved =  userProfileRepository.save(userProfile);
         TxLogger.afterCommit(log, "User unbanned: username={}, userId={}", userProfile.getUsername(), userId);

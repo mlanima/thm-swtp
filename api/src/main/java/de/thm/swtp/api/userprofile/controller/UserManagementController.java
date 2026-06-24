@@ -2,9 +2,11 @@ package de.thm.swtp.api.userprofile.controller;
 
 import de.thm.swtp.api.common.PageResponse;
 import de.thm.swtp.api.userprofile.domain.UserStatus;
+import de.thm.swtp.api.userprofile.dto.BanUserRequest;
 import de.thm.swtp.api.userprofile.dto.UserProfileResponse;
 import de.thm.swtp.api.userprofile.mapper.UserProfileMapper;
 import de.thm.swtp.api.userprofile.service.UserProfileService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,8 +37,9 @@ public class UserManagementController {
 
     @PatchMapping("/{userId}/ban")
     @PreAuthorize("@security.canBanUser(#userId, authentication)")
-    public UserProfileResponse banUser(@PathVariable UUID userId){
-        return userProfileMapper.toResponse(userProfileService.banUser(userId));
+    public UserProfileResponse banUser(@PathVariable UUID userId, @Valid @RequestBody BanUserRequest banUserRequest) {
+        String banReason = banUserRequest == null ? null : banUserRequest.reason();
+        return userProfileMapper.toResponse(userProfileService.banUser(userId, banReason));
     }
 
     @PatchMapping("/{userId}/unban")

@@ -61,5 +61,11 @@ public class UserProfile {
 
     @Enumerated(EnumType.STRING)
     @Builder.Default
+    @Column(nullable = false)
     private UserStatus status = UserStatus.ACTIVE;
+
+    @Column(columnDefinition = "TEXT")
+    private String banReason;
+
+    private LocalDateTime bannedAt;
 }
