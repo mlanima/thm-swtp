@@ -1,10 +1,12 @@
 import { Injectable, signal, WritableSignal, inject, PLATFORM_ID, ApplicationRef, NgZone } from '@angular/core';
 import { decodeJwtPayload } from './jwt-utils';
 import { isPlatformBrowser } from '@angular/common';
-import { filter, take } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { filter, take, tap } from 'rxjs';
 import { OAuthService, AuthConfig } from 'angular-oauth2-oidc';
 import { environment } from '../../enviroments/enviroment.dev';
 import { User } from '../../shared/types/user.type';
+import { UserBanStatusModel } from '../../models/user-ban-status.model';
 
 type OAuthServiceBridge = Partial<Pick<
   OAuthService,
@@ -41,11 +43,14 @@ export class AuthService {
   /** Minimal authenticated user representation for UI components. */
   readonly user: WritableSignal<User | null> = signal(null);
 
+  currentBanStatus = signal<UserBanStatusModel | null>(null);
+
   /** Convenience signal for showing the current username in the UI. */
   readonly username = signal('');
   private readonly platformId = inject(PLATFORM_ID);
   private readonly appRef = inject(ApplicationRef);
   private readonly ngZone = inject(NgZone);
+  private readonly http = inject(HttpClient);
   private updateStateTimer: ReturnType<typeof setTimeout> | null = null;
   // Resolve OAuthService inside the constructor so TestBed providers/mocks are
   // available when the service is instantiated in tests.
@@ -268,6 +273,7 @@ export class AuthService {
     this.isModerator.set(false);
     this.user.set(null);
     this.username.set('');
+    this.currentBanStatus.set(null);
 
     const oauthService = this.oauthService as OAuthServiceBridge;
     oauthService.logOut?.();
@@ -287,4 +293,9 @@ export class AuthService {
     return oauthService.hasValidAccessToken?.() ?? false;
   }
 
+  loadCurrentBanStatus() {
+    return this.http.get<UserBanStatusModel>(`${environment.apiUrl}/v1/users/me/ban-status`).pipe(
+      tap(status => this.currentBanStatus.set(status)),
+    );
+  }
 }

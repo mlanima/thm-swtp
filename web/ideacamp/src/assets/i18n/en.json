@@ -523,5 +523,13 @@
         "REASON_PLACEHOLDER": "e.g. violation of terms of use..."
       }
     }
+  },
+  "BANNED_ACCOUNT": {
+    "TITLE": "Your account has been banned",
+    "DESCRIPTION": "You cannot use the platform right now because your account has been banned.",
+    "REASON_LABEL": "Reason:",
+    "NO_REASON": "No reason provided",
+    "BANNED_AT": "Banned on:",
+    "CONTACT_HINT": "If you have any questions, please contact the project team."
   }
 }

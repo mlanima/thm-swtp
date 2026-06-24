@@ -1,6 +1,7 @@
 import { CanActivateFn, Router } from '@angular/router';
 import { inject, PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common'
+import { isPlatformBrowser } from '@angular/common';
+import { firstValueFrom } from 'rxjs';
 import { AuthService } from './auth.service';
 
 export const moderatorGuard: CanActivateFn = async () => {
@@ -17,6 +18,12 @@ export const moderatorGuard: CanActivateFn = async () => {
   if (!authService.isAuthenticated()) {
     authService.login()
     return false;
+  }
+
+  const banStatus = await firstValueFrom(authService.loadCurrentBanStatus());
+
+  if (banStatus.banned) {
+    return router.createUrlTree(['/account-banned']);
   }
 
   if (authService.isModerator()) {

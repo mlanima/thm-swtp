@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -112,5 +113,8 @@ public class UserProfileService {
         return saved;
     }
 
-
+    @Transactional(readOnly = true)
+    public Optional<UserProfile> findProfileByKeycloakId(UUID keycloakId) {
+        return userProfileRepository.findById(keycloakId);
+    }
 }
