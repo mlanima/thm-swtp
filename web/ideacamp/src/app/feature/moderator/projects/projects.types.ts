@@ -5,6 +5,7 @@ export interface ProjectView {
   ownerUsername: string;
   ownerInitials: string;
   createdAt: string;
+  createdAtShort: string;
   isPrivate: boolean;
 }
 

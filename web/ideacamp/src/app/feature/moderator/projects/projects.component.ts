@@ -135,6 +135,7 @@ export class ProjectsComponent implements OnInit {
       ownerUsername: p.ownerUsername,
       ownerInitials: this.getInitials(p.ownerUsername),
       createdAt: this.formatDate(p.createdAt),
+      createdAtShort: this.formatDateShort(p.createdAt),
       isPrivate: p.isPrivateProject,
     };
   }
@@ -149,6 +150,15 @@ export class ProjectsComponent implements OnInit {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
+    });
+  }
+
+  private formatDateShort(iso: string): string {
+    const date = new Date(iso);
+    return date.toLocaleDateString('de-DE', {
+      day: 'numeric',
+      month: 'numeric',
+      year: '2-digit',
     });
   }
 }
