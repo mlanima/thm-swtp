@@ -14,7 +14,6 @@ import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import de.thm.swtp.api.projectView.repository.ProjectViewRepository;
 
-import jakarta.transaction.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import java.util.*;
@@ -23,6 +22,7 @@ import java.time.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
