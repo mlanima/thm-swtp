@@ -22,8 +22,10 @@ public class ProjectController {
 
     @GetMapping
     @PreAuthorize("@security.hasModeratorRole(authentication)")
-    public ResponseEntity<Page<ProjectResponse>> getAllProjects(Pageable pageable) {
-        return ResponseEntity.ok(projectService.getAllProjects(pageable));
+    public ResponseEntity<Page<ProjectResponse>> getAllProjects(
+            @RequestParam(required = false) String name,
+            Pageable pageable) {
+        return ResponseEntity.ok(projectService.getAllProjects(name, pageable));
     }
 
     @PostMapping

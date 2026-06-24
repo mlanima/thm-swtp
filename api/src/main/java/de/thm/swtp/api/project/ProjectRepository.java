@@ -1,13 +1,17 @@
 package de.thm.swtp.api.project;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.domain.Page;
 import java.util.UUID;
 import java.util.Optional;
 import java.util.List;
 
 public interface ProjectRepository extends JpaRepository<ProjectEntity, UUID> {
+
+    Page<ProjectEntity> findByNameContainingIgnoreCase(String name, Pageable pageable);
 
     boolean existsByName(String name);
     boolean existsByNameAndIdNot(String name, UUID id);

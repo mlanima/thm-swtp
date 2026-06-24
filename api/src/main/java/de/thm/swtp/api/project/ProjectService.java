@@ -247,7 +247,11 @@ public class ProjectService {
         return toResponse(saved);
     }
 
-    public Page<ProjectResponse> getAllProjects(Pageable pageable) {
+    @Transactional
+    public Page<ProjectResponse> getAllProjects(String name, Pageable pageable) {
+        if (name != null && !name.isBlank()) {
+            return projectRepository.findByNameContainingIgnoreCase(name, pageable).map(this::toResponse);
+        }
         return projectRepository.findAll(pageable).map(this::toResponse);
     }
 
