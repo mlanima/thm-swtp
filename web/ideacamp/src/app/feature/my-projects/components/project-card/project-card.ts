@@ -1,8 +1,9 @@
-import { Component, input, ChangeDetectionStrategy } from '@angular/core';
+import { Component, input, ChangeDetectionStrategy, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ProjectResponse } from '../../../../models/project.model';
 import { FavoriteButton } from '../../../../shared/favorite-button/favorite-button';
 import { TranslatePipe } from '@ngx-translate/core';
+import { AuthService } from '../../../auth/auth.service';
 
 @Component({
   selector: 'app-project-card',
@@ -32,6 +33,7 @@ export class ProjectCard {
   readonly project = input.required<ProjectResponse>();
   readonly tags = input.required<string[]>();
   readonly animationDelay = input(0);
+  private readonly authService = inject(AuthService);
 
   getInitials(name: string): string {
     return name
@@ -57,5 +59,10 @@ export class ProjectCard {
       hash = char.codePointAt(0)! + ((hash << 5) - hash);
     }
     return colors[Math.abs(hash) % colors.length];
+  }
+
+  get isOwner() : boolean {
+    const user = this.authService.user();
+    return user?.id === this.project().ownerId;
   }
 }

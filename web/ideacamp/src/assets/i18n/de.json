@@ -75,6 +75,7 @@
     "PRIVATE": "Privat",
     "PUBLIC": "Öffentlich",
     "OWNER": "Gründer",
+    "MEMBER": "Mitglied",
     "FILTER_ALL": "Alle Projekte",
     "FILTER_OWNED": "Im Besitz",
     "LOADING": "Deine Projekte werden geladen…",
