@@ -50,10 +50,6 @@ describe('authGuard', () => {
     expect(result).toEqual(router.parseUrl('/moderator'));
   });
 
-  it('should redirect to /impressum when logging out', async () => {
-    authServiceMock.isAuthenticated.mockReturnValue(false);
-    authServiceMock.isModerator.mockReturnValue(false);
-  });
   
   it('should redirect to /landing when logging out', async () => {
     authServiceMock.isLoggingOut.mockReturnValue(true);
