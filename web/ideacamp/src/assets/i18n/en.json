@@ -405,6 +405,40 @@
   "USER_SEARCH": {
     "EMPTY": "No users found"
   },
+  "PROJECTPOSTS": {
+    "SUBTITLE": "News and updates for this project.",
+    "ADD_POST": "Add post",
+    "TITLE_LABEL": "Title",
+    "TITLE_PLACEHOLDER": "Post title",
+    "CONTENT_LABEL": "Content",
+    "CONTENT_PLACEHOLDER": "What is new?",
+    "CREATING": "Creating…",
+    "PUBLISH": "Publish",
+    "LOADING": "Posts are loading…",
+    "EMPTY": "There are no posts for this project yet.",
+    "AUTHOR_PREFIX": "By",
+    "UNKNOWN_AUTHOR": "Unknown",
+    "LOAD_MORE": "Load more",
+    "ERRORS": {
+      "LOAD": "Posts could not be loaded.",
+      "EMPTY_FIELDS": "Title and content must not be empty.",
+      "CREATE": "Post could not be created.",
+      "DELETE": "Post could not be deleted."
+    },
+    "PLAIN_TEXT": "Plain text",
+    "MARKDOWN_HINT": "You can use Markdown, e.g. headings, lists, links and emphasis.",
+    "TOOLBAR": {
+      "BOLD": "Bold",
+      "ITALIC": "Italic",
+      "HEADING": "Heading",
+      "LIST": "List",
+      "LINK": "Link",
+      "QUOTE": "Quote"
+    },
+    "DELETE_POST": "Delete post",
+    "DELETING": "Deleting…",
+    "DELETE_SUCCESS": "Post deleted successfully."
+  },
   "USER_SETTINGS": {
     "TITLE": "Settings",
     "TABS": {
@@ -470,5 +504,45 @@
   },
   "TAGS": {
     "TITLE": "Tags"
+  },
+  "MODERATOR": {
+    "TITLE": "Moderator Area",
+    "DESCRIPTION": "Welcome to the moderator area. Users and projects can be managed here in the future.",
+    "USER_MANAGEMENT": {
+      "TITLE": "User Management",
+      "BADGE": "Moderator",
+      "DESCRIPTION": "View and manage all registered users.",
+      "TABS": {
+        "ACTIVE_USERS": "Active users",
+        "BANNED_USERS": "Banned users"
+      },
+      "TABLE": {
+        "USER": "User",
+        "ROLE": "Role",
+        "JOINED_AT": "Joined",
+        "ACTIONS": "Actions",
+        "BANNED_AT": "Banned at",
+        "REASON": "Reason",
+        "STATUS": "Status"
+      },
+      "ROLES": {
+        "Mod": "Moderator",
+        "Member": "Member"
+      },
+      "ACTIONS": {
+        "BAN": "Ban",
+        "BAN_USER": "Ban user",
+        "UNBAN": "Unban"
+      },
+      "EMPTY_BANNED_TITLE": "No banned users available.",
+      "EMPTY_BANNED_DESCRIPTION": "Banned users appear here and can no longer access the platform.",
+      "NO_REASON": "No reason provided",
+      "MODAL": {
+        "TITLE": "Ban user",
+        "DESCRIPTION": "The user will be blocked and can no longer log in. The account remains in the system.",
+        "REASON_LABEL": "Reason for the ban (optional)",
+        "REASON_PLACEHOLDER": "e.g. violation of terms of use..."
+      }
+    }
   }
 }

@@ -405,6 +405,40 @@
   "USER_SEARCH": {
     "EMPTY": "Keine Nutzer gefunden"
   },
+  "PROJECTPOSTS": {
+    "SUBTITLE": "Neuigkeiten und Updates zu diesem Projekt.",
+    "ADD_POST": "Post hinzufügen",
+    "TITLE_LABEL": "Titel",
+    "TITLE_PLACEHOLDER": "Titel des Posts",
+    "CONTENT_LABEL": "Inhalt",
+    "CONTENT_PLACEHOLDER": "Was gibt es Neues?",
+    "CREATING": "Wird erstellt…",
+    "PUBLISH": "Veröffentlichen",
+    "LOADING": "Posts werden geladen…",
+    "EMPTY": "Für dieses Projekt gibt es noch keine Posts.",
+    "AUTHOR_PREFIX": "Von",
+    "UNKNOWN_AUTHOR": "Unbekannt",
+    "LOAD_MORE": "Mehr laden",
+    "ERRORS": {
+      "LOAD": "Posts konnten nicht geladen werden.",
+      "EMPTY_FIELDS": "Titel und Inhalt dürfen nicht leer sein.",
+      "CREATE": "Post konnte nicht erstellt werden.",
+      "DELETE": "Post konnte nicht gelöscht werden."
+    },
+    "PLAIN_TEXT": "Klartext",
+    "MARKDOWN_HINT": "Du kannst Markdown verwenden, z.B. Überschriften, Listen, Links und Hervorhebungen.",
+    "TOOLBAR": {
+      "BOLD": "Fett",
+      "ITALIC": "Kursiv",
+      "HEADING": "Überschrift",
+      "LIST": "Liste",
+      "LINK": "Link",
+      "QUOTE": "Zitat"
+    },
+    "DELETE_POST": "Post löschen",
+    "DELETING": "Wird gelöscht…",
+    "DELETE_SUCCESS": "Post erfolgreich gelöscht."
+  },
   "USER_SETTINGS": {
     "TITLE": "Einstellungen",
     "TABS": {
@@ -470,5 +504,45 @@
   },
   "TAGS": {
     "TITLE": "Tags"
+  },
+  "MODERATOR": {
+    "TITLE": "Moderator-Bereich",
+    "DESCRIPTION": "Willkommen im Moderator-Bereich. Hier können zukünftig Benutzer und Projekte verwaltet werden.",
+    "USER_MANAGEMENT": {
+      "TITLE": "Nutzerverwaltung",
+      "BADGE": "Moderator",
+      "DESCRIPTION": "Alle registrierten Nutzer einsehen und verwalten.",
+      "TABS": {
+        "ACTIVE_USERS": "Aktive Nutzer",
+        "BANNED_USERS": "Gebannte Nutzer"
+      },
+      "TABLE": {
+        "USER": "Nutzer",
+        "ROLE": "Rolle",
+        "JOINED_AT": "Beigetreten",
+        "ACTIONS": "Aktionen",
+        "BANNED_AT": "Gebannt am",
+        "REASON": "Grund",
+        "STATUS": "Status"
+      },
+      "ROLES": {
+        "Mod": "Moderator",
+        "Member": "Mitglied"
+      },
+      "ACTIONS": {
+        "BAN": "Bannen",
+        "BAN_USER": "Nutzer bannen",
+        "UNBAN": "Entbannen"
+      },
+      "EMPTY_BANNED_TITLE": "Keine gebannten Nutzer vorhanden.",
+      "EMPTY_BANNED_DESCRIPTION": "Gebannte Nutzer erscheinen hier und können nicht mehr auf die Plattform zugreifen.",
+      "NO_REASON": "Kein Grund angegeben",
+      "MODAL": {
+        "TITLE": "Nutzer bannen",
+        "DESCRIPTION": "Der Nutzer wird gesperrt und kann sich nicht mehr anmelden. Der Account bleibt im System erhalten.",
+        "REASON_LABEL": "Grund für den Ban (optional)",
+        "REASON_PLACEHOLDER": "z. B. Verstoß gegen Nutzungsbedingungen..."
+      }
+    }
   }
 }
