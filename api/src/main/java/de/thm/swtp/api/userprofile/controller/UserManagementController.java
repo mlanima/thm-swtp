@@ -26,7 +26,7 @@ public class UserManagementController {
 
     @GetMapping
     @PreAuthorize("@security.canViewManagedUsers(authentication)")
-    public PageResponse<UserProfileResponse> getUsers(@RequestParam UserStatus userStatus,
+    public PageResponse<UserProfileResponse> getUsers(@RequestParam(name = "status", defaultValue = "ACTIVE") UserStatus userStatus,
                                                       @PageableDefault(size = 20, sort = "username", direction = Sort.Direction.ASC) Pageable pageable) {
 
         Page<UserProfileResponse> users = userProfileService.getUsersByStatus(userStatus, pageable)

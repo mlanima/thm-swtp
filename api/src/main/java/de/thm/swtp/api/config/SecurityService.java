@@ -366,7 +366,7 @@ public class SecurityService {
     }
 
     private boolean isRegularUser(Authentication authentication) {
-        return hasUserRole(authentication) && isActiveUser(authentication) && !hasModeratorRole(authentication);
+        return hasUserRole(authentication) && !hasModeratorRole(authentication) && isActiveUser(authentication);
     }
 
     private boolean isActiveUser(Authentication authentication) {
