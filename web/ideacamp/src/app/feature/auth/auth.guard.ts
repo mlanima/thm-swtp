@@ -16,7 +16,7 @@ export const authGuard: CanActivateFn = async () => {
   await authService.waitUntilAuthReady();
 
   if (authService.isLoggingOut()) {
-    return router.createUrlTree(['/impressum']);
+    return router.createUrlTree(['/landing']);
   }
 
   if (authService.isAuthenticated()) {

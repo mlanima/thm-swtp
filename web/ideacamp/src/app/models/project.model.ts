@@ -1,3 +1,7 @@
+export type ProjectPostStatus = 'ARCHIVED' | 'DRAFT' | 'PUBLISHED';
+
+export type PostContentFormat = 'MARKDOWN' | 'PLAIN_TEXT';
+
 export interface ProjectStatsResponse {
   contributors: number;
   views: number;
@@ -20,4 +24,26 @@ export interface ProjectResponse {
   stats: ProjectStatsResponse;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface ProjectPostResponse {
+  id: string;
+  projectId: string;
+  authorId: string;
+  authorName: string;
+  title: string;
+  content: string;
+  contentFormat: PostContentFormat;
+  status: ProjectPostStatus;
+  publishedAt: string | null;
+  archivedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateProjectPostRequest {
+  title: string;
+  content: string;
+  contentFormat: PostContentFormat;
+  status: ProjectPostStatus;
 }
