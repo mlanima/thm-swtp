@@ -351,6 +351,8 @@ class SecurityServiceTest {
     void canBanUser_shouldAllowModerator_whenBanningOtherUser() {
         UUID otherUserId = UUID.randomUUID();
 
+        when(userProfileRepository.existsByKeycloakIdAndStatus(otherUserId, UserStatus.ACTIVE))
+                .thenReturn(true);
         assertThat(securityService.canBanUser(otherUserId, authentication("ROLE_MODERATOR")))
                 .isTrue();
     }
@@ -363,5 +365,35 @@ class SecurityServiceTest {
                 .thenReturn(false);
 
         assertThat(securityService.canCreateProject(auth)).isFalse();
+    }
+
+    @Test
+    void canUnbanUser_shouldAllowModerator_whenUserIsBanned() {
+        UUID bannedUserId = UUID.randomUUID();
+
+        when(userProfileRepository.existsByKeycloakIdAndStatus(bannedUserId, UserStatus.BANNED))
+                .thenReturn(true);
+
+        assertThat(securityService.canUnbanUser(bannedUserId, authentication("ROLE_MODERATOR")))
+                .isTrue();
+    }
+
+    @Test
+    void canUnbanUser_shouldDenyModerator_whenUserIsNotBanned() {
+        UUID activeUserId = UUID.randomUUID();
+
+        when(userProfileRepository.existsByKeycloakIdAndStatus(activeUserId, UserStatus.BANNED))
+                .thenReturn(false);
+
+        assertThat(securityService.canUnbanUser(activeUserId, authentication("ROLE_MODERATOR")))
+                .isFalse();
+    }
+
+    @Test
+    void canUnbanUser_shouldDenyRegularUser() {
+        UUID bannedUserId = UUID.randomUUID();
+
+        assertThat(securityService.canUnbanUser(bannedUserId, authentication()))
+                .isFalse();
     }
 }
