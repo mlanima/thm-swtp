@@ -42,17 +42,16 @@ export const serverRoutes: ServerRoute[] = [
   },
 
   {
-    path: 'project/:projectUrl/settings',
-    renderMode: RenderMode.Client,
-  },
-
-  {
     path: 'favorites',
     renderMode: RenderMode.Client,
   },
 
   {
     path: 'moderator/projects',
+    renderMode: RenderMode.Client,
+  },
+
+  {
     path: 'moderator',
     renderMode: RenderMode.Client,
   },
