@@ -24,7 +24,7 @@ public class UserProfileController {
     private final UserProfileMapper userProfileMapper;
     private final ProjectService projectService;
 
-    @PostMapping("/api/users/me")
+    @PostMapping("/api/v1/users/me")
     public UserProfileResponse syncProfile(@AuthenticationPrincipal Jwt jwt) {
         UUID keycloakId = UUID.fromString(jwt.getSubject());
         String username = jwt.getClaimAsString("preferred_username");
@@ -32,24 +32,24 @@ public class UserProfileController {
         return userProfileMapper.toResponse(userProfileService.getOrCreateProfile(keycloakId, username, email));
     }
 
-    @GetMapping("/api/users/{username}/profile")
+    @GetMapping("/api/v1/users/{username}/profile")
     public UserProfileResponse getProfile(@PathVariable String username) {
         return userProfileMapper.toResponse(userProfileService.getProfile(username));
     }
 
-    @GetMapping("/api/users/{username}/projects")
+    @GetMapping("/api/v1/users/{username}/projects")
     @PreAuthorize("@security.canViewUserProjects(#username, authentication)")
     public List<ProjectResponse> getProjects(@PathVariable String username) {
         return projectService.getProjectsByUsername(username);
     }
 
-    @GetMapping("/api/users/{username}/projects/all")
+    @GetMapping("/api/v1/users/{username}/projects/all")
     @PreAuthorize("@security.canViewUserProjects(#username, authentication)")
     public List<ProjectResponse> getAllProjects(@PathVariable String username) {
         return projectService.getAllProjectsByUsername(username);
     }
 
-    @PutMapping("/api/users/{username}/profile")
+    @PutMapping("/api/v1/users/{username}/profile")
     @PreAuthorize("@security.canEditUserProfile(#username,authentication)")
     public UserProfileResponse updateProfile(
             @PathVariable String username,
@@ -57,7 +57,7 @@ public class UserProfileController {
         return userProfileMapper.toResponse(userProfileService.updateProfile(username, request.title(), request.location(), request.about(), request.experience()));
     }
 
-    @DeleteMapping("/api/users/{username}/profile")
+    @DeleteMapping("/api/v1/users/{username}/profile")
     @PreAuthorize("@security.canDeleteUserProfile(#username, authentication)")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteProfile(@PathVariable String username) {

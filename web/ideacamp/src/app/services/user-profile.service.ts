@@ -21,7 +21,7 @@ export class UserProfileService {
    *
    * Built from the configured API URL and the '/users' resource path
    */
-  private readonly apiUrl = `${environment.apiUrl}/users`;
+  private readonly apiUrl = `${environment.apiUrl}/v1/users`;
 
 
   /** Angular HTTP client used to communicate with the backend */
