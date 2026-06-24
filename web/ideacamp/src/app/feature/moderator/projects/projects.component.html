@@ -65,7 +65,7 @@
     [isDeleting]="isDeleting()"
     [isDeleteEnabled]="isDeleteEnabled()"
     [deleteError]="deleteError()"
-    (close)="closeDeleteDialog()"
+    (closeDialog)="closeDeleteDialog()"
     (confirm)="confirmDelete()"
     (confirmInputChange)="deleteConfirmInput.set($event)"
   />

@@ -16,7 +16,7 @@ export class DeleteDialog {
   readonly isDeleteEnabled = input(false);
   readonly deleteError = input('');
 
-  readonly close = output<void>();
+  readonly closeDialog = output<void>();
   readonly confirm = output<void>();
   readonly confirmInputChange = output<string>();
 }

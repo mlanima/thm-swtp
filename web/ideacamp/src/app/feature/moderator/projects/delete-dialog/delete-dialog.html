@@ -1,7 +1,7 @@
 <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
   <div class="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
     <button
-      (click)="close.emit()"
+      (click)="closeDialog.emit()"
       class="absolute right-4 top-4 cursor-pointer text-slate-400 hover:text-slate-700"
     >
       <i class="pi pi-times text-sm"></i>
@@ -54,7 +54,7 @@
 
     <div class="mt-5 flex gap-3">
       <button
-        (click)="close.emit()"
+        (click)="closeDialog.emit()"
         class="flex-1 cursor-pointer rounded-lg border border-slate-200 bg-white py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
       >
         {{ 'COMMON.CANCEL' | translate }}
