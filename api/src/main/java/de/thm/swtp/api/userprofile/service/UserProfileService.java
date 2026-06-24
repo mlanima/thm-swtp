@@ -1,6 +1,5 @@
 package de.thm.swtp.api.userprofile.service;
 
-import de.thm.swtp.api.common.LogSafe;
 import de.thm.swtp.api.common.TxLogger;
 import de.thm.swtp.api.userprofile.domain.UserStatus;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
