@@ -18,9 +18,6 @@ public class UserProfileMapper {
                 .about(profile.getAbout())
                 .experience(profile.getExperience())
                 .isProfessor(profile.isProfessor())
-                .status(profile.getStatus())
-                .banReason(profile.getBanReason())
-                .bannedAt(profile.getBannedAt())
                 .build();
     }
 }
