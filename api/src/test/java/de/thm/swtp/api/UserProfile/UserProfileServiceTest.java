@@ -69,9 +69,11 @@ class UserProfileServiceTest {
         when(userProfileRepository.findById(userId)).thenReturn(Optional.of(userProfile));
         when(userProfileRepository.save(userProfile)).thenReturn(userProfile);
 
-        UserProfile result = userProfileService.banUser(userId);
+        UserProfile result = userProfileService.banUser(userId, "Spam");
 
         assertThat(result.getStatus()).isEqualTo(UserStatus.BANNED);
+        assertThat(result.getBanReason()).isEqualTo("Spam");
+        assertThat(result.getBannedAt()).isNotNull();
         assertThat(userProfile.getStatus()).isEqualTo(UserStatus.BANNED);
 
         verify(userProfileRepository).save(userProfile);
@@ -80,6 +82,8 @@ class UserProfileServiceTest {
     @Test
     void unbanUser_shouldSetStatusToActive() {
         userProfile.setStatus(UserStatus.BANNED);
+        userProfile.setBanReason("Spam");
+        userProfile.setBannedAt(java.time.LocalDateTime.now());
 
         when(userProfileRepository.findById(userId)).thenReturn(Optional.of(userProfile));
         when(userProfileRepository.save(userProfile)).thenReturn(userProfile);
@@ -87,7 +91,12 @@ class UserProfileServiceTest {
         UserProfile result = userProfileService.unbanUser(userId);
 
         assertThat(result.getStatus()).isEqualTo(UserStatus.ACTIVE);
+        assertThat(result.getBanReason()).isNull();
+        assertThat(result.getBannedAt()).isNull();
+
         assertThat(userProfile.getStatus()).isEqualTo(UserStatus.ACTIVE);
+        assertThat(userProfile.getBanReason()).isNull();
+        assertThat(userProfile.getBannedAt()).isNull();
 
         verify(userProfileRepository).save(userProfile);
     }
@@ -96,7 +105,7 @@ class UserProfileServiceTest {
     void banUser_shouldThrow_whenUserDoesNotExist() {
         when(userProfileRepository.findById(userId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> userProfileService.banUser(userId))
+        assertThatThrownBy(() -> userProfileService.banUser(userId, "Spam"))
                 .isInstanceOf(UserProfileNotFoundException.class);
 
         verify(userProfileRepository).findById(userId);
