@@ -2,9 +2,10 @@ package de.thm.swtp.api.userprofile.mapper;
 
 import de.thm.swtp.api.userprofile.dto.ManagedUserResponse;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ManagedUserMapper {
-
     public ManagedUserResponse toResponse(UserProfile userProfile) {
         return new ManagedUserResponse(
                 userProfile.getKeycloakId(),

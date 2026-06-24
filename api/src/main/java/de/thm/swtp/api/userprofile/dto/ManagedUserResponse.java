@@ -1,7 +1,6 @@
 package de.thm.swtp.api.userprofile.dto;
 
 import de.thm.swtp.api.userprofile.domain.UserStatus;
-import de.thm.swtp.api.userprofile.entity.UserProfile;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
