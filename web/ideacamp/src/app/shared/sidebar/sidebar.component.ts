@@ -19,16 +19,18 @@ export class SidebarComponent {
   private readonly invitationService = inject(ProjectInvitationService);
   isRendered = signal(false);
   isClosing = signal(false);
-  readonly pendingInvitations = signal(0);
 
   private readonly platformId = inject(PLATFORM_ID);
 
   constructor() {
     if (isPlatformBrowser(this.platformId)) {
       this.auth.waitUntilAuthReady().then(() => {
+        if (this.auth.isModerator()) {
+          return;
+        }
         this.invitationService.getInvitations().subscribe({
           next: (invitations) =>
-            this.pendingInvitations.set(
+            this.sidebarService.pendingInvitationsCount.set(
               invitations.filter((i) => i.status === 'PENDING').length,
             ),
         });

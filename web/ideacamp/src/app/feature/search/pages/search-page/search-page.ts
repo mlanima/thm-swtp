@@ -164,7 +164,7 @@ export class SearchPage implements OnInit, OnDestroy {
       this.searchService.searchProjectsPaged(this.currentQueries, page, PAGE_SIZE)
         .pipe(
           catchError(() => {
-            this.errorMessage.set('Die Suche ist fehlgeschlagen. Bitte versuche es erneut..');
+            this.errorMessage.set('SEARCH.ERROR_FAILED');
             return of(null);
           }),
           takeUntil(this.destroy$)
@@ -183,7 +183,7 @@ export class SearchPage implements OnInit, OnDestroy {
     this.searchService.searchUsersPaged(this.currentQueries, page, PAGE_SIZE)
       .pipe(
         catchError(() => {
-          this.errorMessage.set('Die Suche ist fehlgeschlagen. Bitte versuche es erneut..');
+          this.errorMessage.set('SEARCH.ERROR_FAILED');
           return of(null);
         }),
         takeUntil(this.destroy$)

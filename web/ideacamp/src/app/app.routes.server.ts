@@ -1,7 +1,6 @@
 import { RenderMode, ServerRoute } from '@angular/ssr';
 
 export const serverRoutes: ServerRoute[] = [
-
   {
     path: 'profiles/:username',
     renderMode: RenderMode.Client,
@@ -36,11 +35,6 @@ export const serverRoutes: ServerRoute[] = [
     path: 'my-projects',
     renderMode: RenderMode.Client,
   },
-  
-  {
-    path: 'project/:projectUrl/settings',
-    renderMode: RenderMode.Client,
-  },
 
   {
     path: 'project/:projectUrl/settings',
@@ -53,7 +47,22 @@ export const serverRoutes: ServerRoute[] = [
   },
 
   {
+    path: 'moderator/projects',
+    renderMode: RenderMode.Client,
+  },
+
+  {
+    path: 'moderator',
+    renderMode: RenderMode.Client,
+  },
+
+  {
+    path: 'moderator/users',
+    renderMode: RenderMode.Client,
+  },
+
+  {
     path: '**',
     renderMode: RenderMode.Prerender,
-  }
+  },
 ];

@@ -4,7 +4,8 @@
     "PROJECTS": "Projekte",
     "PROFILE": "Profil",
     "LOGOUT": "Abmelden",
-    "SEARCH": "Erkunden",
+    "LOGIN": "Login",
+    "SEARCH": "Suchen",
     "AUTH": "Eingeloggt"
   },
   "COMMON": {
@@ -27,7 +28,7 @@
       "LABEL_PLACEHOLDER": "Beispielseite",
       "URL_PLACEHOLDER": "z.B. beispiel.com",
       "LOADING": "Links werden geladen...",
-      "EMPTY": "Keine öffentlichen Links verfügbar.",
+      "EMPTY": "Keine Links vorhanden.",
       "EDIT_LINK": "Link bearbeiten",
       "DELETE_LINK": "Link löschen",
       "VISIBILITY": "Sichtbarkeit",
@@ -53,7 +54,7 @@
   "LANDING": {
     "H1": "Ideen teilen.\nTeams finden.\nProjekte verwirklichen.",
     "P": "Vernetze dich mit kreativen Köpfen und verwandle Ideen in erfolgreiche Zusammenarbeit.",
-    "BUTTON": "Logge dich jetzt ein, um Projekte zu entdecken, dein Profil zu bearbeiten und eigene Ideen zu teilen."
+    "BUTTON": "Loslegen"
   },
   "AUTH": {
     "P1": "Erfolgreich!",
@@ -64,13 +65,17 @@
     "TITLE": "Meine Projekte",
     "CREATE_PROJECT": "Projekt erstellen",
     "PROJECTS": "Projekte",
+    "PROJECTS_COUNT_LABEL": "Projekte",
     "OWNED_PROJECTS_COUNT_LABEL": "Projekte im Besitz",
     "INVITATIONS": "Projekteinladungen",
     "INVITED_BY": "Eingeladen von:",
     "ACCEPT": "Annehmen",
     "DECLINE": "Ablehnen",
     "NO_SHORT_DESCRIPTION": "Keine Kurzbeschreibung.",
+    "PRIVATE": "Privat",
+    "PUBLIC": "Öffentlich",
     "OWNER": "Gründer",
+    "MEMBER": "Mitglied",
     "FILTER_ALL": "Alle Projekte",
     "FILTER_OWNED": "Im Besitz",
     "LOADING": "Deine Projekte werden geladen…",
@@ -104,8 +109,8 @@
     "ERROR_AUTH_REQUIRED": "Bitte melde dich an, um dieses Profil anzuzeigen.",
     "ERROR_LOAD_PROFILE": "Profilinformationen konnten nicht geladen werden. Bitte versuche es später erneut.",
     "ERROR_EDIT_FORBIDDEN": "Du bist nicht berechtigt, dieses Profil zu bearbeiten.",
-    "ERROR_UPDATE_PROFILE": "Das Profil konnte nicht aktualisiert werden. Bitte versuche es später erneut.",
     "FOLLOWERS": "Follower",
+    "ERROR_UPDATE_PROFILE": "Das Profil konnte nicht aktualisiert werden. Bitte versuche es später erneut.",
     "FOLLOW": "Folgen",
     "FOLLOWING": "Folge ich",
     "UNFOLLOW": "Entfolgen",
@@ -122,14 +127,95 @@
     "LOADING": "Deine Favoriten werden geladen…",
     "EMPTY": "Noch keine Favoriten",
     "EMPTY_DESCRIPTION": "Sobald du ein Projekt favorisierst, erscheint es hier.",
+    "PRIVATE": "Privat",
+    "PUBLIC": "Öffentlich",
     "NO_DESCRIPTION": "Keine Beschreibung vorhanden.",
     "OPEN_PROJECT": "Projekt öffnen",
+    "REMOVE_TITLE": "Aus Favoriten entfernen",
+    "ADD_TITLE": "Zu Favoriten hinzufügen",
     "ERROR_LOAD": "Deine Favoriten konnten nicht geladen werden."
+  },
+  "MODERATOR": {
+    "TITLE": "Moderator-Bereich",
+    "DESCRIPTION": "Willkommen im Moderator-Bereich. Hier können zukünftig Benutzer und Projekte verwaltet werden.",
+    "PROJECTS_LINK_TITLE": "Projektverwaltung",
+    "PROJECTS_LINK_DESCRIPTION": "Alle Projekte einsehen, suchen und löschen.",
+    "PROJECTS": {
+      "TITLE": "Projektverwaltung",
+      "SUBTITLE": "Alle Projekte einsehen, suchen und bei Bedarf löschen.",
+      "SEARCH_PLACEHOLDER": "Projekte suchen …",
+      "COLUMN_PROJECT": "Projekt",
+      "COLUMN_OWNER": "Ersteller",
+      "COLUMN_CREATED": "Erstellt am",
+      "COLUMN_STATUS": "Status",
+      "COLUMN_ACTION": "Aktion",
+      "MEMBERS": "Mitglieder",
+      "STATUS_PRIVATE": "Privat",
+      "STATUS_PUBLIC": "Öffentlich",
+      "DELETE": "Löschen",
+      "DELETING": "Löschen …",
+      "NO_RESULTS": "Keine Projekte gefunden.",
+      "SHOWING_OF": "von",
+      "TOTAL_PROJECTS": "Projekten angezeigt",
+      "LOADING": "Projekte werden geladen …",
+      "ERROR_LOAD": "Projekte konnten nicht geladen werden.",
+      "ERROR_DELETE": "Projekt konnte nicht gelöscht werden.",
+      "CONFIRM_DELETE_TITLE": "Projekt löschen",
+      "CONFIRM_DELETE_SUBTITLE": "Diese Aktion kann nicht rückgängig gemacht werden.",
+      "CONFIRM_DELETE_TEXT": "Das Projekt \"{{ projectName }}\" wird dauerhaft gel\u00F6scht. Alle zugeh\u00F6rigen Daten gehen dabei verloren.",
+      "CONFIRM_DELETE_LABEL": "Gib zur Bestätigung den Projektnamen ein",
+      "CONFIRM_DELETE_PLACEHOLDER": "Gib zur Bestätigung den Projektnamen ein",
+      "CONFIRM_DELETE_HINT_FILLED": "Der Projektname muss eingegeben werden"
+    },
+    "USER_MANAGEMENT": {
+      "TITLE": "Nutzerverwaltung",
+      "BADGE": "Moderator",
+      "DESCRIPTION": "Alle registrierten Nutzer einsehen und verwalten.",
+      "TABS": {
+        "ACTIVE_USERS": "Aktive Nutzer",
+        "BANNED_USERS": "Gebannte Nutzer"
+      },
+      "TABLE": {
+        "USER": "Nutzer",
+        "ROLE": "Rolle",
+        "JOINED_AT": "Beigetreten",
+        "ACTIONS": "Aktionen",
+        "BANNED_AT": "Gebannt am",
+        "REASON": "Grund"
+      },
+      "ROLES": {
+        "PROFESSOR": "Professor",
+        "MEMBER": "Mitglied"
+      },
+      "ACTIONS": {
+        "BAN": "Bannen",
+        "BAN_USER": "Nutzer bannen",
+        "UNBAN": "Entbannen"
+      },
+      "EMPTY_BANNED_TITLE": "Keine gebannten Nutzer vorhanden.",
+      "EMPTY_BANNED_DESCRIPTION": "Gebannte Nutzer erscheinen hier und können nicht mehr auf die Plattform zugreifen.",
+      "ERROR_LOAD": "Nutzer konnten nicht geladen werden.",
+      "ERROR_BAN": "Nutzer konnte nicht gebannt werden.",
+      "ERROR_UNBAN": "Bann konnte nicht aufgehoben werden.",
+      "NO_REASON": "Kein Grund angegeben",
+      "LOADING": "Nutzer werden geladen...",
+      "EMPTY_ACTIVE_TITLE": "Keine aktiven Nutzer vorhanden.",
+      "EMPTY_ACTIVE_DESCRIPTION": "Aktive Nutzer erscheinen hier und können bei Bedarf gebannt werden.",
+      "MODAL": {
+        "TITLE": "Nutzer bannen",
+        "DESCRIPTION": "Der Nutzer wird gesperrt und kann die Plattform nicht mehr nutzen. Der Account bleibt im System erhalten.",
+        "REASON_LABEL": "Grund für den Ban (optional)",
+        "REASON_PLACEHOLDER": "z. B. Verstoß gegen Nutzungsbedingungen..."
+      }
+    }
   },
   "SIDEBAR": {
     "MYPROJECTS": "Meine Projekte",
     "FAVORITE": "Favoriten",
     "PROFILE": "Mein Profil",
+    "MODERATOR": "Moderator",
+    "MODERATOR_PROJECTS": "Projektverwaltung",
+    "USER_MANAGEMENT": "Nutzerverwaltung",
     "IMPRESSUM": "Impressum",
     "MENU": "Menü"
   },
@@ -152,6 +238,8 @@
     "CHECKING_PROJECT_URL": "Projekt-URL wird geprüft...",
     "PROJECT_URL_EXISTS": "Diese Projekt-URL ist bereits vergeben.",
     "PROJECT_URL_AVAILABLE": "Diese Projekt-URL ist verfügbar.",
+    "PRIVATE": "Privat",
+    "PUBLIC": "Öffentlich",
     "PRIVATE_DESCRIPTION": "Nur eingeladene Nutzer werden das Projekt sehen können",
     "MEMBERS": "Projektmitglieder",
     "ADD_MEMBER": "Mitglied hinzufügen",
@@ -202,6 +290,10 @@
     "USERS_SECTION": "Nutzer",
     "ADD_SEARCH_INPUT": "Sucheingabe hinzufügen",
     "INPUT_PLACEHOLDER": "Nach Nutzern oder Projekten suchen...",
+    "SHOW_ALL_PROJECTS": "Alle {{ count }} Projekte anzeigen",
+    "SHOW_ALL_USERS": "Alle {{ count }} Nutzer anzeigen",
+    "PREVIOUS": "Zurück",
+    "NEXT": "Weiter",
     "ERROR_FAILED": "Die Suche ist fehlgeschlagen. Bitte versuche es erneut."
   },
   "IMPRESSUM": {
@@ -318,7 +410,6 @@
       "ALL_MEMBERS": "Alle Mitglieder",
       "NO_MEMBERS": "Noch keine Mitglieder."
     },
-
     "TAGS": {
       "ERROR_INVALID_CHARS": "Tag enthält ungültige Zeichen. Erlaubt: Buchstaben, Zahlen, Leerzeichen, Bindestrich und Punkt.",
       "ERROR_DUPLICATE": "Tag ist bereits in diesem Projekt enthalten.",
@@ -363,5 +454,113 @@
   },
   "USER_SEARCH": {
     "EMPTY": "Keine Nutzer gefunden"
+  },
+  "PROJECTPOSTS": {
+    "SUBTITLE": "Neuigkeiten und Updates zu diesem Projekt.",
+    "ADD_POST": "Post hinzufügen",
+    "TITLE_LABEL": "Titel",
+    "TITLE_PLACEHOLDER": "Titel des Posts",
+    "CONTENT_LABEL": "Inhalt",
+    "CONTENT_PLACEHOLDER": "Was gibt es Neues?",
+    "CREATING": "Wird erstellt…",
+    "PUBLISH": "Veröffentlichen",
+    "LOADING": "Posts werden geladen…",
+    "EMPTY": "Für dieses Projekt gibt es noch keine Posts.",
+    "AUTHOR_PREFIX": "Von",
+    "UNKNOWN_AUTHOR": "Unbekannt",
+    "LOAD_MORE": "Mehr laden",
+    "ERRORS": {
+      "LOAD": "Posts konnten nicht geladen werden.",
+      "EMPTY_FIELDS": "Titel und Inhalt dürfen nicht leer sein.",
+      "CREATE": "Post konnte nicht erstellt werden.",
+      "DELETE": "Post konnte nicht gelöscht werden."
+    },
+    "PLAIN_TEXT": "Klartext",
+    "MARKDOWN_HINT": "Du kannst Markdown verwenden, z.B. Überschriften, Listen, Links und Hervorhebungen.",
+    "TOOLBAR": {
+      "BOLD": "Fett",
+      "ITALIC": "Kursiv",
+      "HEADING": "Überschrift",
+      "LIST": "Liste",
+      "LINK": "Link",
+      "QUOTE": "Zitat"
+    },
+    "DELETE_POST": "Post löschen",
+    "DELETING": "Wird gelöscht…",
+    "DELETE_SUCCESS": "Post erfolgreich gelöscht."
+  },
+  "USER_SETTINGS": {
+    "TITLE": "Einstellungen",
+    "TABS": {
+      "PROFESSOR_REQUEST": "Professor:in werden",
+      "CONTACT": "Kontakt",
+      "IMPRESSUM": "Impressum"
+    },
+    "CONTACT": {
+      "TITLE": "Kontakt",
+      "DESCRIPTION": "Bei Fragen oder Anliegen kannst du dich an uns wenden.",
+      "SEND_EMAIL": "E-Mail senden",
+      "COPIED": "Email kopiert",
+      "COPY": "Email kopieren"
+    }
+  },
+  "PROFESSOR_REQUEST": {
+    "LOADING": "Daten werden geladen",
+    "PENDING_TITLE": "Anfrage in Prüfung",
+    "PENDING_DESCRIPTION": "Ihre Anfrage wird bearbeitet. Sie bekommen eine Rückmeldung, sobald eine Entscheidung getroffen wurde.",
+    "PENDING_BADGE": "Ausstehend",
+    "YOUR_MESSAGE": "Ihre Nachricht",
+    "ACCEPTED_TITLE": "Anfrage bestätigt",
+    "ACCEPTED_DESCRIPTION": "Ihr Antrag wurde angenommen. Sie haben jetzt Zugriff auf alle erweiterten Funktionen.",
+    "ACCEPTED_BADGE": "Angenommen",
+    "REJECTED_TITLE": "Anfrage abgelehnt",
+    "REJECTED_DESCRIPTION": "Ihre Anfrage wurde leider abgelehnt. Sie können jederzeit eine neue Anfrage stellen.",
+    "NEW_REQUEST": "Neue Anfrage stellen",
+    "CARD_TITLE": "Professor:in werden",
+    "CARD_DESCRIPTION": "Erweiterte Funktionen für Abschlussarbeiten, Forschung und Studierendenkontakt.",
+    "FEATURE_THESIS": "Abschlussarbeiten betreuen",
+    "FEATURE_THESIS_DESC": "Erstelle Themen für Bachelor- und Masterarbeiten.",
+    "FEATURE_RESEARCH": "Forschung sichtbar machen",
+    "FEATURE_RESEARCH_DESC": "Teile Forschungsschwerpunkte für passende Angebote.",
+    "FEATURE_STUDENTS": "Studierende erreichen",
+    "FEATURE_STUDENTS_DESC": "Knüpfe Kontakt und begleite Abschlussprojekte.",
+    "FORM_TITLE": "Jetzt bewerben",
+    "FORM_DESCRIPTION": "Beschreiben Sie kurz, warum Sie Professor:innen-Rechte benötigen.",
+    "FORM_NAME": "Name *",
+    "FORM_NAME_PLACEHOLDER": "Ihr vollständiger Name",
+    "FORM_EMAIL": "E-Mail *",
+    "FORM_EMAIL_PLACEHOLDER": "ihre@hochschule.de",
+    "FORM_REASON": "Begründung *",
+    "FORM_REASON_PLACEHOLDER": "Schreiben Sie Ihr Anschreiben für die Anfrage...",
+    "SUBMITTING": "Wird gesendet",
+    "SUBMIT": "Anfrage senden",
+    "SUCCESS_TITLE": "Anfrage gesendet",
+    "SUCCESS_DESCRIPTION": "Ihre Anfrage wurde erfolgreich übermittelt. Wir melden uns bei Ihnen.",
+    "SUCCESS_CLOSE": "Schließen",
+    "ERROR_LOAD_USER": "Benutzer konnte nicht geladen werden.",
+    "ERROR_SEND": "Deine Anfrage konnte nicht gesendet werden. Bitte versuche es später erneut.",
+    "VALIDATION": {
+      "NAME_REQUIRED": "Bitte geben Sie Ihren Namen ein.",
+      "NAME_MAX": "Name darf höchstens 100 Zeichen lang sein.",
+      "EMAIL_REQUIRED": "Bitte geben Sie Ihre E-Mail-Adresse ein.",
+      "EMAIL_INVALID": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+      "TEXT_REQUIRED": "Bitte geben Sie eine Begründung ein.",
+      "TEXT_MAX": "Begründung darf höchstens 1000 Zeichen lang sein."
+    }
+  },
+  "FOOTER": {
+    "IMPRESSUM": "Impressum",
+    "CONTACT": "Kontakt"
+  },
+  "TAGS": {
+    "TITLE": "Tags"
+  },
+  "BANNED_ACCOUNT": {
+    "TITLE": "Dein Konto wurde gesperrt",
+    "DESCRIPTION": "Du kannst die Plattform derzeit nicht nutzen, weil dein Konto gesperrt wurde.",
+    "REASON_LABEL": "Grund:",
+    "NO_REASON": "Kein Grund angegeben",
+    "BANNED_AT": "Gesperrt am:",
+    "CONTACT_HINT": "Wenn du Fragen hast, wende dich bitte an das Projektteam."
   }
 }

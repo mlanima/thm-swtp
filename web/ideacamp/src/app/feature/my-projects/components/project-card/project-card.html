@@ -42,9 +42,15 @@
       <i class="pi text-xs" [class]="project().isPrivateProject ? 'pi-lock' : 'pi-globe'"></i>
       {{ project().isPrivateProject ? ('COMMON.PRIVATE' | translate) : ('COMMON.PUBLIC' | translate) }}
     </span>
-    <span class="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-700"
-        >{{ 'MYPROJECTS.OWNER' | translate }}</span>
-    >
+    @if (isOwner) {
+      <span class="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-700">
+    {{ 'MYPROJECTS.OWNER' | translate }}
+  </span>
+    } @else {
+      <span class="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
+    {{ 'MYPROJECTS.MEMBER' | translate }}
+  </span>
+    }
   </div>
 
   <app-favorite-button [projectId]="project().id" [count]="project().favoriteCount" />

@@ -10,11 +10,12 @@ import { InfoCard } from './components/info-card/info-card';
 import { ProjectSidebar } from './components/project-sidebar/project-sidebar';
 import {AuthService} from '../auth/auth.service';
 import { SuccessModal } from '../../shared/success-modal/success-modal';
+import { ProjectPosts } from './components/project-posts/project-posts';
 
 @Component({
   selector: 'app-project-site',
   standalone: true,
-  imports: [ProjectHeader, InfoCard, ProjectSidebar, FormsModule, CommonModule, SuccessModal, TranslatePipe],
+  imports: [ProjectHeader, InfoCard, ProjectSidebar, FormsModule, CommonModule, SuccessModal, TranslatePipe, ProjectPosts],
   templateUrl: './project-site.html',
 })
 export class ProjectSite  implements OnInit {
@@ -38,6 +39,10 @@ export class ProjectSite  implements OnInit {
     const proj = this.project();
     if (!user || !proj) return false;
     return user.id === proj.ownerId;
+  }
+
+  get canCreatePosts(): boolean {
+    return this.isOwner;
   }
 
   ngOnInit(): void {

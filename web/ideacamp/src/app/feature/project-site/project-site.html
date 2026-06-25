@@ -21,7 +21,7 @@
       (favoriteCountChanged)="onFavoriteCountChanged($event)"
     />
 
-    <main class="mx-auto grid max-w-6xl grid-cols-1 gap-6 px-6 py-10 lg:grid-cols-[1fr_320px]">
+    <main class="mx-auto grid max-w-6xl grid-cols-1 gap-6 px-6 py-10 lg:grid-cols-[1fr_320px] lg:grid-rows-[auto_auto] lg:items-start">
       <section class="space-y-6">
 
         <div class="rounded-2xl bg-white p-6 shadow-sm">
@@ -107,7 +107,14 @@
 <!--        <app-open-position-card />-->
       </section>
 
-      <app-sidebar [projectId]="project()!.id" [isOwner]="isOwner" [ownerId]="project()!.ownerId" [ownerUsername]="project()!.ownerUsername" />
+      <app-sidebar class="lg:col-start-2 lg:row-start-1 lg:row-span-2" [projectId]="project()!.id" [isOwner]="isOwner" [ownerId]="project()!.ownerId" [ownerUsername]="project()!.ownerUsername" />
+
+      <app-project-posts
+        class="lg:col-start-1 lg:row-start-2"
+        [project]="project()!"
+        [canCreatePosts]="isOwner">
+      </app-project-posts>
+
     </main>
   }
 

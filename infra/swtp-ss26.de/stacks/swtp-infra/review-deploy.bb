@@ -257,6 +257,7 @@
                         "-e"         (str "SPRING_DATASOURCE_URL=jdbc:mysql://swtp-db:3306/" db-name)
                         "-e"         "SPRING_MAIL_HOST=maildev"
                         "-e"         "SPRING_MAIL_PORT=1025"
+                        "-e"         "BE_LOG_LEVEL=DEBUG"
                         "-e"         (str "APP_FRONTEND_URL=https://" (subdomain *pr-num* nil))]})
     (log (str "Backend live -> https://" host))))
 

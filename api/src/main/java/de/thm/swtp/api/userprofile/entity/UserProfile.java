@@ -1,6 +1,7 @@
 package de.thm.swtp.api.userprofile.entity;
 
 import de.thm.swtp.api.tag.entity.TagEntity;
+import de.thm.swtp.api.userprofile.domain.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -55,5 +56,16 @@ public class UserProfile {
 
     @ManyToMany
     @JoinTable(name = "user_profile_tags", joinColumns = @JoinColumn(name = "user_profile_keycloak_id"), inverseJoinColumns = @JoinColumn(name = "tag_name"))
+    @Builder.Default
     private Set<TagEntity> tags = new HashSet<>();
+
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    @Column(nullable = false)
+    private UserStatus status = UserStatus.ACTIVE;
+
+    @Column(columnDefinition = "TEXT")
+    private String banReason;
+
+    private LocalDateTime bannedAt;
 }

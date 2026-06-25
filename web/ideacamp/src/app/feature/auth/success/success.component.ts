@@ -19,7 +19,12 @@ export class SuccessComponent implements OnInit {
     await this.authService.waitUntilAuthReady();
 
     if (!this.authService.isAuthenticated()) {
-      await this.router.navigateByUrl('/impressum');
+      await this.router.navigateByUrl('/landing');
+      return;
+    }
+
+    if (this.authService.isModerator()) {
+      await this.router.navigateByUrl('/moderator');
       return;
     }
 

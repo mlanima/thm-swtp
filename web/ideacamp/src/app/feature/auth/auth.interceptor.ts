@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
+import { decodeJwtPayload } from './jwt-utils';
 import { environment } from '../../enviroments/enviroment.dev';
 
 @Injectable()
@@ -12,8 +13,8 @@ export class AuthInterceptor implements HttpInterceptor {
     const token = this.auth.getAccessToken();
 
     if (token && req.url.startsWith(environment.apiUrl)) {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      const userId = payload['sub'] ?? '';
+      const payload = decodeJwtPayload(token);
+      const userId = (payload?.['sub'] as string) ?? '';
 
       const cloned = req.clone({
         setHeaders: {

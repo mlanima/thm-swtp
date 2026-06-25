@@ -10,13 +10,13 @@ export class MyProjectsService {
 
   getMyProjects(username: string): Observable<ProjectResponse[]> {
     return this.http.get<ProjectResponse[]>(
-      `${environment.apiUrl}/users/${encodeURIComponent(username)}/projects`,
+      `${environment.apiUrl}/v1/users/${encodeURIComponent(username)}/projects`,
     );
   }
 
   getAllProjects(username: string): Observable<ProjectResponse[]> {
     return this.http.get<ProjectResponse[]>(
-      `${environment.apiUrl}/users/${encodeURIComponent(username)}/projects/all`,
+      `${environment.apiUrl}/v1/users/${encodeURIComponent(username)}/projects/all`,
     );
   }
 }

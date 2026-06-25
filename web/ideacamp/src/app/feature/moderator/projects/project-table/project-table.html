@@ -1,0 +1,68 @@
+<div class="rounded-xl border border-slate-200 bg-white shadow-sm">
+  <table class="w-full text-left text-sm">
+    <thead>
+      <tr class="border-b border-slate-200 text-xs font-semibold uppercase tracking-wider text-slate-500">
+        <th class="px-1.5 py-1.5 md:px-6">{{ 'MODERATOR.PROJECTS.COLUMN_PROJECT' | translate }}</th>
+        <th class="hidden px-1.5 py-1.5 md:table-cell md:px-6">{{ 'MODERATOR.PROJECTS.COLUMN_OWNER' | translate }}</th>
+        <th class="px-1.5 py-1.5 text-center md:table-cell md:px-6">{{ 'MODERATOR.PROJECTS.COLUMN_CREATED' | translate }}</th>
+        <th class="px-1.5 py-1.5 text-center md:px-6">{{ 'MODERATOR.PROJECTS.COLUMN_STATUS' | translate }}</th>
+        <th class="px-1.5 py-1.5 text-center md:px-6">{{ 'MODERATOR.PROJECTS.COLUMN_ACTION' | translate }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (project of projects(); track project.id) {
+        <tr class="border-b border-slate-100 transition-colors hover:bg-slate-50">
+          <td class="px-1.5 py-1.5 md:px-6 md:py-4">
+            <div class="font-medium text-slate-700">{{ project.name }}</div>
+            <div class="flex flex-wrap items-center gap-x-1 gap-y-0.5 text-[10px] text-slate-400 md:text-xs">
+              <span>{{ project.memberCount }} {{ 'MODERATOR.PROJECTS.MEMBERS' | translate }}</span>
+              <span class="md:hidden">{{ project.ownerUsername }}</span>
+            </div>
+          </td>
+          <td class="hidden px-1.5 py-1.5 md:table-cell md:px-6">
+            <div class="flex items-center gap-3">
+              <div
+                class="flex h-8 w-8 items-center justify-center rounded-full bg-slate-700 text-xs font-medium text-white"
+              >
+                {{ project.ownerInitials }}
+              </div>
+              <div>
+                <div class="font-medium text-slate-700">{{ project.ownerUsername }}</div>
+              </div>
+            </div>
+          </td>
+          <td class="px-1.5 py-1.5 text-center text-[10px] text-slate-400 md:px-6 md:py-4 md:text-sm md:text-slate-500">
+            <span class="md:hidden">{{ project.createdAtShort }}</span>
+            <span class="hidden md:inline">{{ project.createdAt }}</span>
+          </td>
+          <td class="px-1.5 py-1.5 text-center md:px-6 md:py-4">
+            <span
+              class="inline-flex items-center rounded-full px-1 py-0.5 text-[10px] font-medium whitespace-nowrap md:px-2.5 md:text-xs"
+              [class]="project.isPrivate
+                ? 'bg-amber-50 text-amber-700'
+                : 'bg-green-50 text-green-700'"
+            >
+              {{ project.isPrivate
+                ? ('MODERATOR.PROJECTS.STATUS_PRIVATE' | translate)
+                : ('MODERATOR.PROJECTS.STATUS_PUBLIC' | translate) }}
+            </span>
+          </td>
+          <td class="px-1.5 py-1.5 text-center md:px-6 md:py-4">
+            <button
+              (click)="deleteProject.emit(project.id)"
+              class="inline-flex cursor-pointer items-center gap-1 text-sm font-medium text-red-500 transition-colors hover:text-red-700"
+            >
+              <i class="pi pi-trash text-xs"></i>
+            </button>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="5" class="px-1.5 py-12 text-center text-sm text-slate-400 md:px-6">
+            {{ 'MODERATOR.PROJECTS.NO_RESULTS' | translate }}
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

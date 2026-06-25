@@ -1,9 +1,11 @@
 package de.thm.swtp.api.search.service;
 
+import de.thm.swtp.api.common.LogSafe;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.projectFavorite.repository.ProjectFavoriteRepository;
 import de.thm.swtp.api.search.repository.ProjectSearchRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Collection;
 import java.util.List;
@@ -24,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProjectSearchService {
 
     private final ProjectSearchRepository projectSearchRepository;
@@ -42,11 +45,13 @@ public class ProjectSearchService {
      */
     @Transactional(readOnly = true)
     public List<ProjectEntity> searchProjects(List<String> queries) {
-        return searchService.search(
+        List<ProjectEntity> result = searchService.search(
                 queries,
                 projectSearchRepository::searchIdsByQuery,
                 projectSearchRepository::findAllWithTagsById
         );
+        log.debug("Project search: queries={}, hits={}", queries.stream().map(LogSafe::clean).toList(), result.size());
+        return result;
     }
 
     /**
@@ -64,7 +69,7 @@ public class ProjectSearchService {
      */
     @Transactional(readOnly = true)
     public Page<ProjectEntity> searchProjects(List<String> queries, Pageable pageable) {
-        return searchService.search(
+        Page<ProjectEntity> page = searchService.search(
                 queries,
                 projectSearchRepository::searchIdsByQuery,
                 projectSearchRepository::findAllWithTagsById,
@@ -72,6 +77,9 @@ public class ProjectSearchService {
                 this::favoriteCountsByProjectId,
                 ProjectEntity::getId
         );
+        log.debug("Project search (paged): queries={}, hits={}, page={}/{}",
+                queries.stream().map(LogSafe::clean).toList(), page.getNumberOfElements(), pageable.getPageNumber(), page.getTotalPages());
+        return page;
     }
 
     private Map<UUID, Long> favoriteCountsByProjectId(Collection<UUID> projectIds) {

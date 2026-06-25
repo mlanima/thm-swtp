@@ -1,9 +1,11 @@
 import { Component, Input, Output, EventEmitter, OnInit, inject, signal } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ProjectFavoriteService } from '../../services/project-favorite.service';
 
 @Component({
   selector: 'app-favorite-button',
   standalone: true,
+  imports: [TranslatePipe],
   templateUrl: './favorite-button.html',
 })
 export class FavoriteButton implements OnInit {

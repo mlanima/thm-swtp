@@ -4,6 +4,7 @@ import de.thm.swtp.api.project.ProjectRepository;
 import de.thm.swtp.api.projectInvitation.repository.ProjectInviteRepository;
 import de.thm.swtp.api.projectJoinRequest.repository.ProjectJoinRequestRepository;
 import de.thm.swtp.api.projectPost.repository.ProjectPostRepository;
+import de.thm.swtp.api.userprofile.domain.UserStatus;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -36,7 +37,14 @@ public class SecurityService {
         if (!hasAuthenticationContext(projectId, authentication)) {
             return false;
         }
-        return hasModeratorRole(authentication) || isProjectContributor(projectId, authentication) || isPublicProject(projectId);
+        if (hasModeratorRole(authentication)) {
+            return true;
+        }
+        if (!isRegularUser(authentication)) {
+            return false;
+        }
+
+        return isProjectContributor(projectId, authentication) || isPublicProject(projectId);
     }
 
     /** Allowed to see project by url.*/
@@ -64,16 +72,16 @@ public class SecurityService {
         if (!hasAuthenticationContext(projectId, authentication)) {
             return false;
         }
-        return isProjectOwner(projectId, authentication) || hasModeratorRole(authentication);
+        if (hasModeratorRole(authentication)) {
+            return true;
+        }
+
+        return isProjectOwner(projectId, authentication) && isRegularUser(authentication);
     }
 
     /** Allowed to see project members.*/
     public boolean canViewProjectMembers(UUID projectId, Authentication authentication) {
-        if (!hasAuthenticationContext(projectId, authentication)) {
-            return false;
-        }
-
-        return hasModeratorRole(authentication) || isProjectContributor(projectId, authentication) || isPublicProject(projectId);
+        return canViewProject(projectId, authentication);
     }
 
     /** Allowed to remove project members.
@@ -116,21 +124,24 @@ public class SecurityService {
         return projectInviteRepository.existsByIdAndInvitedUserKeycloakId(inviteId, currentUserId);
     }
 
-
     // Project link permissions
 
+    /** Allowed to view project-links.*/
     public boolean canViewProjectLinks(UUID projectId, Authentication authentication) {
         return canViewProject(projectId, authentication);
     }
 
+    /** Allowed to create project-links.*/
     public boolean canCreateProjectLink(UUID projectId, Authentication authentication) {
         return canEditProject(projectId, authentication);
     }
 
+    /** Allowed to edit project-links.*/
     public boolean canEditProjectLink(UUID projectId, Authentication authentication) {
         return canEditProject(projectId, authentication);
     }
 
+    /** Allowed to delete project-links.*/
     public boolean canDeleteProjectLink(UUID projectId, Authentication authentication) {
         return canEditProject(projectId, authentication);
     }
@@ -217,6 +228,41 @@ public class SecurityService {
         return isRegularUser(authentication) && canViewProject(projectId, authentication);
     }
 
+    // Professor-request permissions
+
+    /** Allowed to view all professor requests (moderator only). */
+    public boolean canViewAllProfessorRequests(Authentication authentication) {
+        return hasModeratorRole(authentication);
+    }
+
+    /** Allowed to view professor requests for a specific user (own or as moderator). */
+    public boolean canViewProfessorRequestForUser(UUID userId, Authentication authentication) {
+        if (!hasAuthenticationContext(userId, authentication)) {
+            return false;
+        }
+
+        if (hasModeratorRole(authentication)){
+            return true;
+        }
+
+        UUID currentUserId = getCurrentUserId(authentication);
+        return isRegularUser(authentication) && userId.equals(currentUserId);
+    }
+
+    /** Allowed to manage (accept/reject) professor requests (moderator only). */
+    public boolean canManageProfessorRequests(Authentication authentication) {
+        return hasModeratorRole(authentication);
+    }
+
+    /** Allowed to create a professor request (regular users who are not already professors). */
+    public boolean canCreateProfessorRequest(Authentication authentication) {
+        if (!isRegularUser(authentication)) {
+            return false;
+        }
+        UUID currentUserId = getCurrentUserId(authentication);
+        return !userProfileRepository.existsByKeycloakIdAndProfessorTrue(currentUserId);
+    }
+
     // User-profile permissions
 
     /** Allowed to view projects of a user.*/
@@ -249,26 +295,49 @@ public class SecurityService {
 
     /** Allowed to create user-profile links.*/
     public boolean canCreateUserProfileLinks(UUID userId, Authentication authentication) {
-        if (!hasAuthenticationContext(userId, authentication)) {
-            return false;
-        }
        return isProfileOwnerByUserId(userId, authentication);
     }
 
     /** Allowed to edit user-profile links.*/
     public boolean canEditUserProfileLinks(UUID userId, Authentication authentication) {
-        if (!hasAuthenticationContext(userId, authentication)) {
-            return false;
-        }
         return isProfileOwnerByUserId(userId, authentication);
     }
 
     /** Allowed to delete user-profile links.*/
     public boolean canDeleteUserProfileLinks(UUID userId, Authentication authentication) {
-        if (!hasAuthenticationContext(userId, authentication)) {
+        return isProfileOwnerByUserId(userId, authentication);
+    }
+
+
+
+    // User-management permissions
+
+    /** Allowed to view users in the user-management page*/
+    public boolean canViewManagedUsers(Authentication authentication) {
+        return hasModeratorRole(authentication);
+    }
+
+    /** Allowed to ban users. Moderators cannot ban themselves.*/
+    public boolean canBanUser(UUID userId, Authentication authentication) {
+        if (!hasAuthenticationContext(userId, authentication) || !hasModeratorRole(authentication)) {
             return false;
         }
-        return isProfileOwnerByUserId(userId, authentication);
+
+        UUID currentUserId = getCurrentUserId(authentication);
+        if (currentUserId.equals(userId)) {
+            return false;
+        }
+
+        return userProfileRepository.existsByKeycloakIdAndStatus(userId, UserStatus.ACTIVE);
+    }
+
+    /** Allowed to unban users.*/
+    public boolean canUnbanUser(UUID userId, Authentication authentication) {
+        if (!hasAuthenticationContext(userId, authentication) || !hasModeratorRole(authentication)) {
+            return false;
+        }
+
+        return userProfileRepository.existsByKeycloakIdAndStatus(userId, UserStatus.BANNED);
     }
 
 
@@ -300,7 +369,15 @@ public class SecurityService {
     }
 
     private boolean isRegularUser(Authentication authentication) {
-        return hasUserRole(authentication) && !hasModeratorRole(authentication);
+        return hasUserRole(authentication) && !hasModeratorRole(authentication) && isActiveUser(authentication);
+    }
+
+    private boolean isActiveUser(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return false;
+        }
+        UUID currentUserId =  getCurrentUserId(authentication);
+        return userProfileRepository.existsByKeycloakIdAndStatus(currentUserId, UserStatus.ACTIVE);
     }
 
     private boolean isProjectOwner(UUID projectId, Authentication authentication) {

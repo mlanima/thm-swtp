@@ -28,4 +28,7 @@ export interface UserProfileModel {
 
   /** Optional experience description written by the user */
   experience: string | null;
+
+  /** Whether the user has professor permissions */
+  isProfessor: boolean;
 }
