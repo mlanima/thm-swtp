@@ -25,7 +25,8 @@ describe('ProfileBanner', () => {
       location: '',
       followers: 0,
       about: '',
-      experience: ''
+      experience: '',
+      isProfessor: false,
     };
 
     fixture.detectChanges();

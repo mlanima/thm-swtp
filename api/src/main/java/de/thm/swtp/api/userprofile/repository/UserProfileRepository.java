@@ -29,4 +29,6 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, UUID> 
 
     Page<UserProfile> findByStatus(UserStatus status, Pageable pageable);
     boolean existsByKeycloakIdAndStatus(UUID keycloakId, UserStatus status);
+
+    Optional<UserProfile> findByKeycloakId(UUID keycloakId);
 }

@@ -3,9 +3,24 @@ import { ActivatedRouteSnapshot, Router, RouterStateSnapshot, provideRouter } fr
 import { AuthService } from './auth.service';
 import { authGuard } from './auth.guard';
 import { vi } from 'vitest';
+import { Observable,of } from 'rxjs';
+import { UserBanStatusModel } from '../../models/user-ban-status.model'
 
 const mockRoute = {} as ActivatedRouteSnapshot;
-const mockState = {} as RouterStateSnapshot;
+const mockState = { url: '/search'} as RouterStateSnapshot;
+
+
+const notBannedStatus: UserBanStatusModel = {
+  banned: false,
+  banReason: null,
+  bannedAt: null,
+};
+
+const bannedStatus: UserBanStatusModel = {
+  banned: true,
+  banReason: 'Violation',
+  bannedAt: '2026-06-25T10:00:00',
+};
 
 describe('authGuard', () => {
   let router: Router;
@@ -15,6 +30,7 @@ describe('authGuard', () => {
     isLoggingOut: vi.fn(() => false),
     isAuthenticated: vi.fn(() => false),
     isModerator: vi.fn(() => false),
+    loadCurrentBanStatus: vi.fn<() => Observable<UserBanStatusModel>>(() => of(notBannedStatus)),
     login: vi.fn(),
   };
 
@@ -23,6 +39,7 @@ describe('authGuard', () => {
     authServiceMock.isAuthenticated.mockReturnValue(false);
     authServiceMock.isModerator.mockReturnValue(false);
     authServiceMock.isLoggingOut.mockReturnValue(false);
+    authServiceMock.loadCurrentBanStatus.mockReturnValue(of(notBannedStatus));
     TestBed.configureTestingModule({
       providers: [
         provideRouter([]),
@@ -41,6 +58,14 @@ describe('authGuard', () => {
     expect(result).toBe(true);
   });
 
+  it('should redirect banned users to /account-banned', async () => {
+    authServiceMock.isAuthenticated.mockReturnValue(true);
+    authServiceMock.loadCurrentBanStatus.mockReturnValue(of(bannedStatus));
+
+    const result = await TestBed.runInInjectionContext(() => authGuard(mockRoute, mockState));
+    expect(result).toEqual(router.parseUrl('/account-banned'));
+  });
+
   it('should redirect moderators to /moderator', async () => {
     authServiceMock.isAuthenticated.mockReturnValue(true);
     authServiceMock.isModerator.mockReturnValue(true);
@@ -50,7 +75,7 @@ describe('authGuard', () => {
     expect(result).toEqual(router.parseUrl('/moderator'));
   });
 
-  
+
   it('should redirect to /landing when logging out', async () => {
     authServiceMock.isLoggingOut.mockReturnValue(true);
 

@@ -4,7 +4,9 @@ import de.thm.swtp.api.project.ProjectService;
 import de.thm.swtp.api.project.dto.response.ProjectResponse;
 import de.thm.swtp.api.userprofile.dto.UserProfileRequest;
 import de.thm.swtp.api.userprofile.dto.UserProfileResponse;
+import de.thm.swtp.api.userprofile.dto.UserStatusResponse;
 import de.thm.swtp.api.userprofile.mapper.UserProfileMapper;
+import de.thm.swtp.api.userprofile.mapper.UserStatusMapper;
 import de.thm.swtp.api.userprofile.service.UserProfileService;
 import lombok.RequiredArgsConstructor;
 
@@ -22,6 +24,7 @@ public class UserProfileController {
 
     private final UserProfileService userProfileService;
     private final UserProfileMapper userProfileMapper;
+    private final UserStatusMapper userStatusMapper;
     private final ProjectService projectService;
 
     @PostMapping("/api/v1/users/me")
@@ -65,4 +68,13 @@ public class UserProfileController {
     }
 
 
+
+    @GetMapping("/api/v1/users/me/ban-status")
+    public UserStatusResponse getCurrentUserBanStatus(@AuthenticationPrincipal Jwt jwt) {
+        UUID keycloakId = UUID.fromString(jwt.getSubject());
+
+        return userProfileService.findProfileByKeycloakId(keycloakId)
+                .map(userStatusMapper::toBannedResponse)
+                .orElseGet(userStatusMapper::toNotBannedResponse);
+    }
 }

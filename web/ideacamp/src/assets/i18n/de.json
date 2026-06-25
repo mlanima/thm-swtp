@@ -554,5 +554,13 @@
   },
   "TAGS": {
     "TITLE": "Tags"
+  },
+  "BANNED_ACCOUNT": {
+    "TITLE": "Dein Konto wurde gesperrt",
+    "DESCRIPTION": "Du kannst die Plattform derzeit nicht nutzen, weil dein Konto gesperrt wurde.",
+    "REASON_LABEL": "Grund:",
+    "NO_REASON": "Kein Grund angegeben",
+    "BANNED_AT": "Gesperrt am:",
+    "CONTACT_HINT": "Wenn du Fragen hast, wende dich bitte an das Projektteam."
   }
 }

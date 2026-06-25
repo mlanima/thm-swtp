@@ -1,4 +1,10 @@
-<app-header/>
-<app-sidebar/>
+@if (!hideLayout()) {
+  <app-header />
+  <app-sidebar />
+}
+
 <router-outlet />
-<app-footer/>
+
+@if (!hideLayout()) {
+  <app-footer />
+}

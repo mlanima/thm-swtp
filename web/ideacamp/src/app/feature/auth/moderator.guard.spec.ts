@@ -3,9 +3,17 @@ import { ActivatedRouteSnapshot, Router, RouterStateSnapshot, provideRouter } fr
 import { AuthService } from './auth.service';
 import { moderatorGuard } from './moderator.guard';
 import { vi } from 'vitest';
+import { Observable, of } from 'rxjs';
+import { UserBanStatusModel } from '../../models/user-ban-status.model';
 
 const mockRoute = {} as ActivatedRouteSnapshot;
 const mockState = {} as RouterStateSnapshot;
+
+const notBannedStatus: UserBanStatusModel = {
+  banned: false,
+  banReason: null,
+  bannedAt: null,
+};
 
 describe('moderatorGuard', () => {
   let router: Router;
@@ -14,11 +22,15 @@ describe('moderatorGuard', () => {
     waitUntilAuthReady: vi.fn(() => Promise.resolve()),
     isAuthenticated: vi.fn(() => false),
     isModerator: vi.fn(() => false),
+    loadCurrentBanStatus: vi.fn<() => Observable<UserBanStatusModel>>(),
     login: vi.fn(),
   };
 
   beforeEach(() => {
     vi.clearAllMocks();
+    authServiceMock.isAuthenticated.mockReturnValue(false);
+    authServiceMock.isModerator.mockReturnValue(false);
+    authServiceMock.loadCurrentBanStatus.mockReturnValue(of(notBannedStatus));
     TestBed.configureTestingModule({
       providers: [
         provideRouter([]),
