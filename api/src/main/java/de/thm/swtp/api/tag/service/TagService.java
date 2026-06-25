@@ -4,6 +4,7 @@ import de.thm.swtp.api.tag.domain.Tag;
 import de.thm.swtp.api.tag.mapper.TagMapper;
 import de.thm.swtp.api.tag.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,9 +19,8 @@ public class TagService {
     @Transactional(readOnly = true)
     public List<Tag> searchTags(String query, int limit) {
         if (query == null || query.isBlank()) {
-            return tagRepository.findAll()
+            return tagRepository.findPopularTags(PageRequest.of(0, limit))
                     .stream()
-                    .limit(limit)
                     .map(TagMapper::toDomain)
                     .toList();
         }
