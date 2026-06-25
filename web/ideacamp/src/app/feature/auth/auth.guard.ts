@@ -4,7 +4,7 @@ import { isPlatformBrowser } from '@angular/common'
 import { AuthService } from './auth.service';
 import { firstValueFrom, catchError, of } from 'rxjs';
 
-export const authGuard: CanActivateFn = async (_route, state) => {
+export const authGuard: CanActivateFn = async () => {
   const authService = inject(AuthService);
   const platformId = inject(PLATFORM_ID);
   const router = inject(Router);
