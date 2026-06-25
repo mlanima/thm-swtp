@@ -3,7 +3,7 @@ import { ActivatedRouteSnapshot, Router, RouterStateSnapshot, provideRouter } fr
 import { AuthService } from './auth.service';
 import { authGuard } from './auth.guard';
 import { vi } from 'vitest';
-import { of } from 'rxjs';
+import { Observable,of } from 'rxjs';
 import { UserBanStatusModel } from '../../models/user-ban-status.model'
 
 const mockRoute = {} as ActivatedRouteSnapshot;
@@ -81,7 +81,7 @@ describe('authGuard', () => {
     expect(result).toEqual(router.parseUrl('/moderator'));
   });
 
-  
+
   it('should redirect to /landing when logging out', async () => {
     authServiceMock.isLoggingOut.mockReturnValue(true);
 

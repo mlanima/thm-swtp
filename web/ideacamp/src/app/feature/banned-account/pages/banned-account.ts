@@ -9,7 +9,7 @@ import { AuthService } from '../../auth/auth.service';
   imports: [DatePipe, TranslatePipe],
   templateUrl: './banned-account.html',
 })
-export class BannedAccount implements OnInit{
+export class BannedAccount {
   private readonly authService = inject(AuthService);
   private readonly translateService = inject(TranslateService);
 
