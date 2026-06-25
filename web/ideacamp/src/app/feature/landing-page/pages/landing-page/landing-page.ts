@@ -12,7 +12,7 @@ import { catchError, of } from 'rxjs';
   templateUrl: './landing-page.html',
 })
 export class LandingPage implements OnInit {
-  auth = inject(AuthService);
+  private readonly authService= inject(AuthService);
   private readonly router = inject(Router);
 
   async ngOnInit(): Promise<void> {
