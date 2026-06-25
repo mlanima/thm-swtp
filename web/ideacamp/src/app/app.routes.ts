@@ -15,6 +15,7 @@ import { FavoritesPage } from './feature/favorites/pages/favorites-page/favorite
 import { LandingPage } from './feature/landing-page/pages/landing-page/landing-page';
 import { UserSettings } from './feature/user-settings/user-settings';
 import { ModeratorPage } from './feature/moderator/moderator-page';
+import { ProjectsComponent } from './feature/moderator/projects/projects.component';
 import { UserManagement } from './feature/user-management/pages/user-management';
 import { BannedAccount } from './feature/banned-account/pages/banned-account';
 
@@ -24,6 +25,7 @@ export const routes: Routes = [
   {path: 'impressum', component: Impressum},
   {path: 'landing', component: LandingPage},
   {path: 'moderator', component: ModeratorPage, canActivate: [moderatorGuard]},
+  {path: 'moderator/projects', component: ProjectsComponent, canActivate: [moderatorGuard]},
   {path: 'profiles/:username', component: UserProfile, canActivate: [authGuard]},
   {path: 'contact-requests', component: ContactRequests, canActivate: [authGuard]},
   {path: 'project/:projectUrl', component: ProjectSite, canActivate: [authGuard]},

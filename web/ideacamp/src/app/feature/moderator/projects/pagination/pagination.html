@@ -1,0 +1,31 @@
+@if (totalPages() > 1) {
+  <div class="mt-4 flex items-center justify-center gap-2">
+    <button
+      (click)="onPageClick(currentPage() - 1)"
+      [disabled]="currentPage() === 0"
+      class="inline-flex cursor-pointer items-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+    >
+      <i class="pi pi-chevron-left text-xs"></i>
+    </button>
+
+    @for (page of getPageNumbers(); track page) {
+      <button
+        (click)="onPageClick(page)"
+        class="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg text-sm font-medium transition-colors"
+        [class]="page === currentPage()
+          ? 'bg-slate-700 text-white'
+          : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50'"
+      >
+        {{ page + 1 }}
+      </button>
+    }
+
+    <button
+      (click)="onPageClick(currentPage() + 1)"
+      [disabled]="currentPage() >= totalPages() - 1"
+      class="inline-flex cursor-pointer items-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+    >
+      <i class="pi pi-chevron-right text-xs"></i>
+    </button>
+  </div>
+}
