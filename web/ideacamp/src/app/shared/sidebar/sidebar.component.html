@@ -52,9 +52,13 @@
             <a routerLink="/my-projects" (click)="requestClose()">
             <app-menu-link>
                <i class="pi pi-folder text-sm text-zinc-400"></i>
-               <span>{{ 'SIDEBAR.MYPROJECTS' | translate }} @if (pendingInvitations() > 0) {
-                 <span class="text-lime-400">({{ pendingInvitations() }})</span>
-               }</span>
+               <span>{{ 'SIDEBAR.MYPROJECTS' | translate }}</span>
+               @if (sidebarService.pendingInvitationsCount() > 0) {
+                 <span class="ml-auto inline-flex items-center gap-1 rounded-full bg-lime-400/15 px-2 py-0.5 text-[10px] font-semibold text-lime-400 ring-1 ring-inset ring-lime-400/30 invitation-pulse">
+                   <i class="pi pi-envelope text-[8px]"></i>
+                   {{ sidebarService.pendingInvitationsCount() }}
+                 </span>
+               }
              </app-menu-link>
             </a>
             <a routerLink="/favorites" (click)="requestClose()">
