@@ -2,7 +2,7 @@ import { CanActivateFn, Router } from '@angular/router';
 import { inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common'
 import { AuthService } from './auth.service';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, catchError } from 'rxjs';
 
 export const authGuard: CanActivateFn = async (_route, state) => {
   const authService = inject(AuthService);
@@ -21,7 +21,10 @@ export const authGuard: CanActivateFn = async (_route, state) => {
   }
 
   if (authService.isAuthenticated()) {
-    const banStatus = await firstValueFrom(authService.loadCurrentBanStatus());
+    const banStatus = await firstValueFrom(authService.loadCurrentBanStatus()
+      .pipe(catchError(() => of({ banned:false, banReason: null, bannedAt: null}))
+      )
+    );
 
     if (banStatus.banned && !state.url.startsWith('/account-banned')) {
       return router.createUrlTree(['/account-banned']);

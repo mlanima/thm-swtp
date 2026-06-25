@@ -3,9 +3,10 @@ import { ActivatedRouteSnapshot, Router, RouterStateSnapshot, provideRouter } fr
 import { AuthService } from './auth.service';
 import { authGuard } from './auth.guard';
 import { vi } from 'vitest';
+import { of } from 'rxjs';
 
 const mockRoute = {} as ActivatedRouteSnapshot;
-const mockState = {} as RouterStateSnapshot;
+const mockState = { url: '/search'} as RouterStateSnapshot;
 
 describe('authGuard', () => {
   let router: Router;
@@ -15,6 +16,7 @@ describe('authGuard', () => {
     isLoggingOut: vi.fn(() => false),
     isAuthenticated: vi.fn(() => false),
     isModerator: vi.fn(() => false),
+    loadCurrentBanStatus: vi.fn(() => of({ banned: false, banReason: null, bannedAt: null })),
     login: vi.fn(),
   };
 
@@ -23,6 +25,9 @@ describe('authGuard', () => {
     authServiceMock.isAuthenticated.mockReturnValue(false);
     authServiceMock.isModerator.mockReturnValue(false);
     authServiceMock.isLoggingOut.mockReturnValue(false);
+    authServiceMock.loadCurrentBanStatus.mockReturnValue(
+      of({ banned: false, banReason: null, bannedAt: null }),
+    );
     TestBed.configureTestingModule({
       providers: [
         provideRouter([]),
@@ -38,6 +43,20 @@ describe('authGuard', () => {
 
     const result = await TestBed.runInInjectionContext(() => authGuard(mockRoute, mockState));
     expect(result).toBe(true);
+  });
+
+  it('should redirect banned users to /account-banned', async () => {
+    authServiceMock.isAuthenticated.mockReturnValue(true);
+    authServiceMock.loadCurrentBanStatus.mockReturnValue(
+      of({
+        banned: true,
+        banReason: 'Violation',
+        bannedAt: '2026-06-25T10:00:00',
+      })
+    );
+
+    const result = await TestBed.runInInjectionContext(() => authGuard(mockRoute, mockState));
+    expect(result).toEqual(router.parseUrl('/account-banned'));
   });
 
   it('should redirect moderators to /moderator', async () => {
