@@ -39,7 +39,7 @@ describe('authGuard', () => {
     authServiceMock.isAuthenticated.mockReturnValue(false);
     authServiceMock.isModerator.mockReturnValue(false);
     authServiceMock.isLoggingOut.mockReturnValue(false);
-    authServiceMock.loadCurrentBanStatus.mockReturnValue(of(bannedStatus));
+    authServiceMock.loadCurrentBanStatus.mockReturnValue(of(notBannedStatus));
     TestBed.configureTestingModule({
       providers: [
         provideRouter([]),
@@ -60,13 +60,7 @@ describe('authGuard', () => {
 
   it('should redirect banned users to /account-banned', async () => {
     authServiceMock.isAuthenticated.mockReturnValue(true);
-    authServiceMock.loadCurrentBanStatus.mockReturnValue(
-      of({
-        banned: true,
-        banReason: 'Violation',
-        bannedAt: '2026-06-25T10:00:00',
-      })
-    );
+    authServiceMock.loadCurrentBanStatus.mockReturnValue(of(bannedStatus));
 
     const result = await TestBed.runInInjectionContext(() => authGuard(mockRoute, mockState));
     expect(result).toEqual(router.parseUrl('/account-banned'));
