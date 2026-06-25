@@ -3,6 +3,7 @@ import { ProjectInvitationService } from '../../services/project-invitation.serv
 import { ProjectInviteResponse } from '../../../../models/project-invite.model';
 import { InvitationCard } from '../invitation-card/invitation-card';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { SidebarService } from '../../../../shared/sidebar/sidebar.service';
 
 @Component({
   selector: 'app-invitations-section',
@@ -33,6 +34,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 export class InvitationsSection implements OnInit {
   private readonly invitationService = inject(ProjectInvitationService);
   private readonly translateService = inject(TranslateService);
+  private readonly sidebarService = inject(SidebarService);
   readonly invitations = signal<ProjectInviteResponse[]>([]);
   readonly isLoading = signal(false);
   readonly errorMessage = signal('');
@@ -50,6 +52,7 @@ export class InvitationsSection implements OnInit {
     this.invitationService.updateInvitationStatus(invite.id, 'ACCEPTED').subscribe({
       next: () => {
         this.invitations.update((list) => list.filter((i) => i.id !== invite.id));
+        this.sidebarService.pendingInvitationsCount.set(this.invitations().length);
       },
     });
   }
@@ -58,6 +61,7 @@ export class InvitationsSection implements OnInit {
     this.invitationService.updateInvitationStatus(invite.id, 'REJECTED').subscribe({
       next: () => {
         this.invitations.update((list) => list.filter((i) => i.id !== invite.id));
+        this.sidebarService.pendingInvitationsCount.set(this.invitations().length);
       },
     });
   }
