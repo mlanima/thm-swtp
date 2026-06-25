@@ -2,7 +2,6 @@ package de.thm.swtp.api.userprofile.controller;
 
 import de.thm.swtp.api.project.ProjectService;
 import de.thm.swtp.api.project.dto.response.ProjectResponse;
-import de.thm.swtp.api.userprofile.domain.UserStatus;
 import de.thm.swtp.api.userprofile.dto.UserProfileRequest;
 import de.thm.swtp.api.userprofile.dto.UserProfileResponse;
 import de.thm.swtp.api.userprofile.dto.UserStatusResponse;
