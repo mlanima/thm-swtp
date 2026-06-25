@@ -12,7 +12,7 @@ import { catchError, of } from 'rxjs';
   templateUrl: './landing-page.html',
 })
 export class LandingPage implements OnInit {
-  private readonly authService= inject(AuthService);
+  private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
   async ngOnInit(): Promise<void> {
@@ -30,5 +30,9 @@ export class LandingPage implements OnInit {
           this.router.navigateByUrl('/account-banned');
         }
       });
+  }
+
+  login(): void {
+    this.authService.login();
   }
 }
