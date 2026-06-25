@@ -14,7 +14,7 @@ import { catchError, of } from 'rxjs';
 export class LandingPage implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
-
+  auth = inject(AuthService);
   async ngOnInit(): Promise<void> {
     await this.authService.waitUntilAuthReady();
 
