@@ -25,7 +25,9 @@
     } @else {
       <div class="mt-8 grid gap-4">
         @for (project of projects(); track project.id) {
-          <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:border-slate-300 hover:shadow-md">
+          <a
+            [routerLink]="['/project', project.projectUrl]"
+            class="block rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:border-slate-300 hover:shadow-md">
             <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div class="space-y-2">
                 <div class="flex flex-wrap items-center gap-2">
@@ -39,23 +41,18 @@
                   </span>
                 </div>
 
-                <p class="max-w-3xl text-sm leading-6 text-slate-500">
+                <p class="max-w-3xl break-all text-sm leading-6 text-slate-500">
                   {{ project.description || ('FAVORITE.NO_DESCRIPTION' | translate) }}
                 </p>
 
                 <p class="text-xs text-slate-400">URL: /project/{{ project.projectUrl }}</p>
               </div>
 
-              <div class="flex items-center gap-2">
+              <div class="flex items-center justify-end gap-2 sm:justify-start">
                 <app-favorite-button [projectId]="project.id" [count]="project.favoriteCount" />
-                <a
-                  [routerLink]="['/project', project.projectUrl]"
-                  class="inline-flex items-center justify-center rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
-                  {{ 'FAVORITE.OPEN_PROJECT' | translate }}
-                </a>
               </div>
             </div>
-          </article>
+          </a>
         }
       </div>
     }

@@ -13,7 +13,7 @@
       @for (project of projects(); track project.id) {
         <tr class="border-b border-slate-100 transition-colors hover:bg-slate-50">
           <td class="px-1.5 py-1.5 md:px-6 md:py-4">
-            <div class="font-medium text-slate-700">{{ project.name }}</div>
+            <div class="break-all font-medium text-slate-700">{{ project.name }}</div>
             <div class="flex flex-wrap items-center gap-x-1 gap-y-0.5 text-[10px] text-slate-400 md:text-xs">
               <span>{{ project.memberCount }} {{ 'MODERATOR.PROJECTS.MEMBERS' | translate }}</span>
               <span class="md:hidden">{{ project.ownerUsername }}</span>
@@ -27,7 +27,7 @@
                 {{ project.ownerInitials }}
               </div>
               <div>
-                <div class="font-medium text-slate-700">{{ project.ownerUsername }}</div>
+                <div class="break-all font-medium text-slate-700">{{ project.ownerUsername }}</div>
               </div>
             </div>
           </td>
