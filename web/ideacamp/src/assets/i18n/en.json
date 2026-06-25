@@ -54,10 +54,7 @@
   "LANDING": {
     "H1": "Share ideas.\nFind teams.\nBring projects to life.",
     "P": "Connect with creative minds and turn ideas into successful collaborations.",
-    "BUTTON": "Get started",
-    "FEATURE_SHARE": "Share ideas with the community",
-    "FEATURE_TEAM": "Find the right team members",
-    "FEATURE_LAUNCH": "Collaborate and launch projects"
+    "BUTTON": "Get started"
   },
   "AUTH": {
     "P1": "Success!",

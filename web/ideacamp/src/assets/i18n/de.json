@@ -54,10 +54,7 @@
   "LANDING": {
     "H1": "Ideen teilen.\nTeams finden.\nProjekte verwirklichen.",
     "P": "Vernetze dich mit kreativen Köpfen und verwandle Ideen in erfolgreiche Zusammenarbeit.",
-    "BUTTON": "Loslegen",
-    "FEATURE_SHARE": "Ideen mit der Community teilen",
-    "FEATURE_TEAM": "Die richtigen Teammitglieder finden",
-    "FEATURE_LAUNCH": "Gemeinsam Projekte verwirklichen"
+    "BUTTON": "Loslegen"
   },
   "AUTH": {
     "P1": "Erfolgreich!",
