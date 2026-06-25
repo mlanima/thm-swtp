@@ -21,16 +21,17 @@ export const authGuard: CanActivateFn = async (_route, state) => {
   }
 
   if (authService.isAuthenticated()) {
-    const banStatus = await firstValueFrom(authService.loadCurrentBanStatus()
-      .pipe(catchError(() => of({ banned:false, banReason: null, bannedAt: null}))
-      )
+    const banStatus = await firstValueFrom(
+      authService
+        .loadCurrentBanStatus()
+        .pipe(catchError(() => of({ banned: false, banReason: null, bannedAt: null }))),
     );
 
-    if (banStatus.banned && !state.url.startsWith('/account-banned')) {
+    if (banStatus.banned) {
       return router.createUrlTree(['/account-banned']);
     }
 
-    if (authService.isModerator() && !state.url.startsWith('/moderator')) {
+    if (authService.isModerator()) {
       return router.createUrlTree(['/moderator']);
     }
     return true;

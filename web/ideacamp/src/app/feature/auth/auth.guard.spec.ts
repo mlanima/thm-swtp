@@ -4,9 +4,23 @@ import { AuthService } from './auth.service';
 import { authGuard } from './auth.guard';
 import { vi } from 'vitest';
 import { of } from 'rxjs';
+import { UserBanStatusModel } from '../../models/user-ban-status.model'
 
 const mockRoute = {} as ActivatedRouteSnapshot;
 const mockState = { url: '/search'} as RouterStateSnapshot;
+
+
+const notBannedStatus: UserBanStatusModel = {
+  banned: false,
+  banReason: null,
+  bannedAt: null,
+};
+
+const bannedStatus: UserBanStatusModel = {
+  banned: true,
+  banReason: 'Violation',
+  bannedAt: '2026-06-25T10:00:00',
+};
 
 describe('authGuard', () => {
   let router: Router;
@@ -16,7 +30,7 @@ describe('authGuard', () => {
     isLoggingOut: vi.fn(() => false),
     isAuthenticated: vi.fn(() => false),
     isModerator: vi.fn(() => false),
-    loadCurrentBanStatus: vi.fn(() => of({ banned: false, banReason: null, bannedAt: null })),
+    loadCurrentBanStatus: vi.fn<() => Observable<UserBanStatusModel>>(() => of(notBannedStatus)),
     login: vi.fn(),
   };
 
@@ -25,9 +39,7 @@ describe('authGuard', () => {
     authServiceMock.isAuthenticated.mockReturnValue(false);
     authServiceMock.isModerator.mockReturnValue(false);
     authServiceMock.isLoggingOut.mockReturnValue(false);
-    authServiceMock.loadCurrentBanStatus.mockReturnValue(
-      of({ banned: false, banReason: null, bannedAt: null }),
-    );
+    authServiceMock.loadCurrentBanStatus.mockReturnValue(of(bannedStatus));
     TestBed.configureTestingModule({
       providers: [
         provideRouter([]),
