@@ -5,10 +5,10 @@ import de.thm.swtp.api.project.dto.response.ProjectResponse;
 import de.thm.swtp.api.userprofile.domain.UserStatus;
 import de.thm.swtp.api.userprofile.dto.UserProfileRequest;
 import de.thm.swtp.api.userprofile.dto.UserProfileResponse;
-import de.thm.swtp.api.userprofile.dto.UserBanStatusResponse;
+import de.thm.swtp.api.userprofile.dto.UserStatusResponse;
 import de.thm.swtp.api.userprofile.mapper.UserProfileMapper;
+import de.thm.swtp.api.userprofile.mapper.UserStatusMapper;
 import de.thm.swtp.api.userprofile.service.UserProfileService;
-import de.thm.swtp.api.userprofile.entity.UserProfile;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -25,6 +25,7 @@ public class UserProfileController {
 
     private final UserProfileService userProfileService;
     private final UserProfileMapper userProfileMapper;
+    private final UserStatusMapper userStatusMapper;
     private final ProjectService projectService;
 
     @PostMapping("/api/v1/users/me")
@@ -67,23 +68,14 @@ public class UserProfileController {
         userProfileService.deleteProfile(username);
     }
 
+
+
     @GetMapping("/api/v1/users/me/ban-status")
-    public UserBanStatusResponse getCurrentUserBanStatus(@AuthenticationPrincipal Jwt jwt) {
+    public UserStatusResponse getCurrentUserBanStatus(@AuthenticationPrincipal Jwt jwt) {
         UUID keycloakId = UUID.fromString(jwt.getSubject());
 
-        var profileOptional = userProfileService.findProfileByKeycloakId(keycloakId);
-
-        if (profileOptional.isEmpty()) {
-            return new UserBanStatusResponse(false, null, null);
-        }
-
-        var profile = profileOptional.get();
-        boolean banned = profile.getStatus() == UserStatus.BANNED;
-
-        return new UserBanStatusResponse(
-                banned,
-                banned ? profile.getBanReason() : null,
-                banned ? profile.getBannedAt() : null
-        );
+        return userProfileService.findProfileByKeycloakId(keycloakId)
+                .map(userStatusMapper::toBannedResponse)
+                .orElseGet(userStatusMapper::toNotBannedResponse);
     }
 }

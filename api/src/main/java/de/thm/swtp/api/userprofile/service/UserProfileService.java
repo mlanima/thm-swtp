@@ -115,6 +115,6 @@ public class UserProfileService {
 
     @Transactional(readOnly = true)
     public Optional<UserProfile> findProfileByKeycloakId(UUID keycloakId) {
-        return userProfileRepository.findById(keycloakId);
+        return userProfileRepository.findByKeycloakId(keycloakId);
     }
 }
