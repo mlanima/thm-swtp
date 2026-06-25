@@ -23,39 +23,35 @@
         </p>
       </div>
     } @else {
-      <div class="mt-8 grid gap-4">
-        @for (project of projects(); track project.id) {
-          <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:border-slate-300 hover:shadow-md">
-            <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-              <div class="space-y-2">
-                <div class="flex flex-wrap items-center gap-2">
-                  <h2 class="text-xl font-semibold text-slate-700">{{ project.name }}</h2>
-                  <span class="rounded-full px-2.5 py-1 text-xs font-medium"
-                        [class.bg-emerald-100]="!project.isPrivateProject"
-                        [class.text-emerald-700]="!project.isPrivateProject"
-                        [class.bg-amber-100]="project.isPrivateProject"
-                        [class.text-amber-700]="project.isPrivateProject">
-                    {{ project.isPrivateProject ? ('COMMON.PRIVATE' | translate) : ('COMMON.PUBLIC' | translate) }}
-                  </span>
-                </div>
-
-                <p class="max-w-3xl text-sm leading-6 text-slate-500">
-                  {{ project.description || ('FAVORITE.NO_DESCRIPTION' | translate) }}
-                </p>
-
-                <p class="text-xs text-slate-400">URL: /project/{{ project.projectUrl }}</p>
-              </div>
-
-              <div class="flex items-center gap-2">
-                <app-favorite-button [projectId]="project.id" [count]="project.favoriteCount" />
-                <a
-                  [routerLink]="['/project', project.projectUrl]"
-                  class="inline-flex items-center justify-center rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
-                  {{ 'FAVORITE.OPEN_PROJECT' | translate }}
-                </a>
-              </div>
+      <div class="mt-4 flex flex-col gap-3">
+        @for (project of projects(); track project.id; let i = $index) {
+          <a
+            [routerLink]="['/project', project.projectUrl]"
+            class="favorite-card-animate flex items-center gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-green-300 hover:shadow-md"
+            [style.animation-delay.ms]="i * 50"
+          >
+            <div
+              class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
+              [class]="getAvatarColor(project.name)"
+            >
+              {{ getInitials(project.name) }}
             </div>
-          </article>
+
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-2">
+                <h3 class="truncate text-base font-semibold text-slate-700">
+                  {{ project.name }}
+                </h3>
+              </div>
+              <p class="mt-0.5 truncate text-sm text-slate-400">
+                {{ project.shortDescription || ('FAVORITE.NO_DESCRIPTION' | translate) }}
+              </p>
+            </div>
+
+            <app-favorite-button [projectId]="project.id" [count]="project.favoriteCount" />
+
+            <i class="pi pi-chevron-right text-sm text-slate-300"></i>
+          </a>
         }
       </div>
     }

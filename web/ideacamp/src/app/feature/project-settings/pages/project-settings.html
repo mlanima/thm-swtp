@@ -266,15 +266,14 @@
 
               <button
                 type="button"
-                class="relative h-6 w-11 rounded-full transition"
-                [class.bg-slate-700]="publicVisibility()"
-                [class.bg-slate-300]="!publicVisibility()"
+                class="flex h-6 w-12 items-center rounded-full p-1 transition"
+                [class.bg-lime-500]="publicVisibility()"
+                [class.bg-slate-600]="!publicVisibility()"
                 (click)="togglePublicVisibility()"
               >
                 <span
-                  class="absolute top-1 h-4 w-4 rounded-full bg-white transition"
-                  [class.left-6]="publicVisibility()"
-                  [class.left-1]="!publicVisibility()"
+                  class="h-4 w-4 rounded-full bg-white transition"
+                  [class.translate-x-6]="publicVisibility()"
                 ></span>
               </button>
             </div>
@@ -292,15 +291,14 @@
 
               <button
                 type="button"
-                class="relative h-6 w-11 rounded-full transition"
-                [class.bg-slate-700]="allowJoinRequests()"
-                [class.bg-slate-300]="!allowJoinRequests()"
+                class="flex h-6 w-12 items-center rounded-full p-1 transition"
+                [class.bg-lime-500]="allowJoinRequests()"
+                [class.bg-slate-600]="!allowJoinRequests()"
                 (click)="toggleJoinRequests()"
               >
                 <span
-                  class="absolute top-1 h-4 w-4 rounded-full bg-white transition"
-                  [class.left-6]="allowJoinRequests()"
-                  [class.left-1]="!allowJoinRequests()"
+                  class="h-4 w-4 rounded-full bg-white transition"
+                  [class.translate-x-6]="allowJoinRequests()"
                 ></span>
               </button>
             </div>

@@ -5,7 +5,7 @@
     "PROFILE": "Profile",
     "LOGOUT": "Logout",
     "LOGIN": "Login",
-    "SEARCH": "Discover",
+    "SEARCH": "Search",
     "AUTH": "Logged in"
   },
   "COMMON": {
@@ -54,7 +54,7 @@
   "LANDING": {
     "H1": "Share ideas.\nFind teams.\nBring projects to life.",
     "P": "Connect with creative minds and turn ideas into successful collaborations.",
-    "BUTTON": "Log in now to discover projects, edit your profile, and share your own ideas."
+    "BUTTON": "Get started"
   },
   "AUTH": {
     "P1": "Success!",
