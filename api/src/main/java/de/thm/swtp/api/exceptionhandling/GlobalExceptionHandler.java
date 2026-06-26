@@ -4,6 +4,7 @@ import de.thm.swtp.api.common.LogSafe;
 import de.thm.swtp.api.exceptionhandling.exceptions.*;
 import de.thm.swtp.api.professorRequest.exception.ProfessorRequestAlreadyExistsException;
 import de.thm.swtp.api.thesis.exception.ThesisInvalidUrlException;
+import de.thm.swtp.api.thesis.exception.ThesisUrlGenerationFailedException;
 import de.thm.swtp.api.thesis.exception.ThesisNotFoundException;
 import de.thm.swtp.api.thesis.exception.ThesisStudentAlreadyAssignedException;
 import de.thm.swtp.api.thesis.exception.ThesisStudentNotFoundException;
@@ -437,11 +438,11 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(413, "Payload Too Large", ex.getMessage()));
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleUnexpected(Exception ex) {
-        log.error("Unhandled exception: type={}, message={}", ex.getClass().getName(), ex.getMessage(), ex);
+    @ExceptionHandler(ThesisUrlGenerationFailedException.class)
+    public ResponseEntity<ErrorResponse> handleThesisUrlGenerationFailed(ThesisUrlGenerationFailedException ex) {
+        log.error("Thesis URL generation failed: {}", ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ErrorResponse.of(500, "Internal Server Error", "An unexpected error occurred."));
+                .body(ErrorResponse.of(500, "Internal Server Error", ex.getMessage()));
     }
 
     @ExceptionHandler(ThesisStudentAlreadyAssignedException.class)
@@ -456,5 +457,12 @@ public class GlobalExceptionHandler {
         log.debug("Not Found (404): {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleUnexpected(Exception ex) {
+        log.error("Unhandled exception: type={}, message={}", ex.getClass().getName(), ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ErrorResponse.of(500, "Internal Server Error", "An unexpected error occurred."));
     }
 }

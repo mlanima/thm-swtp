@@ -8,6 +8,7 @@ import de.thm.swtp.api.thesis.dto.request.CreateThesisRequest;
 import de.thm.swtp.api.thesis.dto.request.UpdateThesisRequest;
 import de.thm.swtp.api.thesis.dto.response.DeleteThesisResponse;
 import de.thm.swtp.api.thesis.exception.ThesisInvalidUrlException;
+import de.thm.swtp.api.thesis.exception.ThesisUrlGenerationFailedException;
 import de.thm.swtp.api.thesis.exception.ThesisNotFoundException;
 import de.thm.swtp.api.thesis.exception.ThesisStudentAlreadyAssignedException;
 import de.thm.swtp.api.thesis.exception.ThesisStudentNotFoundException;
@@ -20,6 +21,9 @@ import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.HashSet;
 import java.util.List;
@@ -35,11 +39,12 @@ public class ThesisService {
     private final TagRepository tagRepository;
 
     @Transactional(readOnly = true)
-    public List<Thesis> getAll() {
-        return thesisRepository.findAll()
-                .stream()
-                .map(ThesisMapper::toDomain)
-                .toList();
+    public Page<Thesis> getAll(String title, Pageable pageable) {
+        if (title != null && !title.isBlank()) {
+            return thesisRepository.findByTitleContainingIgnoreCase(title, pageable)
+                    .map(ThesisMapper::toDomain);
+        }
+        return thesisRepository.findAll(pageable).map(ThesisMapper::toDomain);
     }
 
     @Transactional(readOnly = true)
@@ -206,6 +211,10 @@ public class ThesisService {
             candidate = baseSlug.substring(0, baseLength) + suffix;
             counter++;
         } while (thesisRepository.existsByThesisUrl(candidate) && counter <= 99);
+
+        if (thesisRepository.existsByThesisUrl(candidate)) {
+            throw new ThesisUrlGenerationFailedException(baseSlug);
+        }
 
         return candidate;
     }

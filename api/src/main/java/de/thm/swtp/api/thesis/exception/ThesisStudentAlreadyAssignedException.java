@@ -4,6 +4,6 @@ import java.util.UUID;
 
 public class ThesisStudentAlreadyAssignedException extends RuntimeException {
     public ThesisStudentAlreadyAssignedException(UUID studentId, UUID thesisId) {
-        super("Student " + studentId + " is already assigned to thesis " + thesisId);
+        super("Student \"" + studentId + "\" ist der Abschlussarbeit \"" + thesisId + "\" bereits zugewiesen.");
     }
 }

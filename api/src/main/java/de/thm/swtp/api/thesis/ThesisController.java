@@ -6,6 +6,9 @@ import de.thm.swtp.api.thesis.dto.response.DeleteThesisResponse;
 import de.thm.swtp.api.thesis.dto.response.ThesisResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,6 +24,14 @@ import java.util.UUID;
 public class ThesisController {
 
     private final ThesisService thesisService;
+
+    @GetMapping
+    @PreAuthorize("@security.hasModeratorRole(authentication)")
+    public ResponseEntity<Page<ThesisResponse>> getAll(
+            @RequestParam(required = false) String title,
+            @PageableDefault(size = 20) Pageable pageable) {
+        return ResponseEntity.ok(thesisService.getAll(title, pageable).map(ThesisResponse::toResponse));
+    }
 
     @GetMapping("/{thesisId}")
     @PreAuthorize("@security.canViewThesis(#thesisId, authentication)")
