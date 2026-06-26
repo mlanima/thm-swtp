@@ -8,8 +8,7 @@ import { CreateProjectInviteRequest, ProjectInviteResponse } from '../../../mode
 @Injectable({ providedIn: 'root' })
 export class ProjectSettingsService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = `${environment.apiUrl}/projects`;
-  private readonly baseUrlV1 = `${environment.apiUrl}/v1/projects`;
+  private readonly baseUrl = `${environment.apiUrl}/v1/projects`;
 
   deleteProject(projectId: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${projectId}`);
@@ -24,11 +23,11 @@ export class ProjectSettingsService {
   }
 
   createProjectInvite(projectId: string, request: CreateProjectInviteRequest): Observable<void>{
-    return this.http.post<void>(`${this.baseUrlV1}/${projectId}/invitations`, request);
+    return this.http.post<void>(`${this.baseUrl}/${projectId}/invitations`, request);
   }
 
   getProjectInvites(projectId: string){
-    return this.http.get<ProjectInviteResponse[]>(`${this.baseUrlV1}/${projectId}/invitations`);
+    return this.http.get<ProjectInviteResponse[]>(`${this.baseUrl}/${projectId}/invitations`);
   }
 
 }

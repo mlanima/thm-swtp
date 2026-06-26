@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Subject, debounceTime, distinctUntilChanged, switchMap, catchError, of } from 'rxjs';
 import { SearchService } from '../../services/search.service';
 
-const SUGGESTED_TAGS_LIMIT = 32;
+const SUGGESTED_TAGS_LIMIT = 10;
 
 @Component({
   selector: 'app-search-input',

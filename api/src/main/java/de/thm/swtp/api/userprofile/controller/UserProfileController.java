@@ -6,7 +6,9 @@ import de.thm.swtp.api.thesis.ThesisService;
 import de.thm.swtp.api.thesis.dto.response.ThesisResponse;
 import de.thm.swtp.api.userprofile.dto.UserProfileRequest;
 import de.thm.swtp.api.userprofile.dto.UserProfileResponse;
+import de.thm.swtp.api.userprofile.dto.UserStatusResponse;
 import de.thm.swtp.api.userprofile.mapper.UserProfileMapper;
+import de.thm.swtp.api.userprofile.mapper.UserStatusMapper;
 import de.thm.swtp.api.userprofile.service.UserProfileService;
 import lombok.RequiredArgsConstructor;
 
@@ -24,10 +26,11 @@ public class UserProfileController {
 
     private final UserProfileService userProfileService;
     private final UserProfileMapper userProfileMapper;
+    private final UserStatusMapper userStatusMapper;
     private final ProjectService projectService;
     private final ThesisService thesisService;
 
-    @PostMapping("/api/users/me")
+    @PostMapping("/api/v1/users/me")
     public UserProfileResponse syncProfile(@AuthenticationPrincipal Jwt jwt) {
         UUID keycloakId = UUID.fromString(jwt.getSubject());
         String username = jwt.getClaimAsString("preferred_username");
@@ -35,18 +38,18 @@ public class UserProfileController {
         return userProfileMapper.toResponse(userProfileService.getOrCreateProfile(keycloakId, username, email));
     }
 
-    @GetMapping("/api/users/{username}/profile")
+    @GetMapping("/api/v1/users/{username}/profile")
     public UserProfileResponse getProfile(@PathVariable String username) {
         return userProfileMapper.toResponse(userProfileService.getProfile(username));
     }
 
-    @GetMapping("/api/users/{username}/projects")
+    @GetMapping("/api/v1/users/{username}/projects")
     @PreAuthorize("@security.canViewUserProjects(#username, authentication)")
     public List<ProjectResponse> getProjects(@PathVariable String username) {
         return projectService.getProjectsByUsername(username);
     }
 
-    @GetMapping("/api/users/{username}/projects/all")
+    @GetMapping("/api/v1/users/{username}/projects/all")
     @PreAuthorize("@security.canViewUserProjects(#username, authentication)")
     public List<ProjectResponse> getAllProjects(@PathVariable String username) {
         return projectService.getAllProjectsByUsername(username);
@@ -61,7 +64,7 @@ public class UserProfileController {
                 .toList();
     }
 
-    @PutMapping("/api/users/{username}/profile")
+    @PutMapping("/api/v1/users/{username}/profile")
     @PreAuthorize("@security.canEditUserProfile(#username,authentication)")
     public UserProfileResponse updateProfile(
             @PathVariable String username,
@@ -69,7 +72,7 @@ public class UserProfileController {
         return userProfileMapper.toResponse(userProfileService.updateProfile(username, request.title(), request.location(), request.about(), request.experience()));
     }
 
-    @DeleteMapping("/api/users/{username}/profile")
+    @DeleteMapping("/api/v1/users/{username}/profile")
     @PreAuthorize("@security.canDeleteUserProfile(#username, authentication)")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteProfile(@PathVariable String username) {
@@ -77,4 +80,13 @@ public class UserProfileController {
     }
 
 
+
+    @GetMapping("/api/v1/users/me/ban-status")
+    public UserStatusResponse getCurrentUserBanStatus(@AuthenticationPrincipal Jwt jwt) {
+        UUID keycloakId = UUID.fromString(jwt.getSubject());
+
+        return userProfileService.findProfileByKeycloakId(keycloakId)
+                .map(userStatusMapper::toBannedResponse)
+                .orElseGet(userStatusMapper::toNotBannedResponse);
+    }
 }

@@ -5,7 +5,7 @@
     "PROFILE": "Profil",
     "LOGOUT": "Abmelden",
     "LOGIN": "Login",
-    "SEARCH": "Erkunden",
+    "SEARCH": "Suchen",
     "AUTH": "Eingeloggt"
   },
   "COMMON": {
@@ -28,7 +28,7 @@
       "LABEL_PLACEHOLDER": "Beispielseite",
       "URL_PLACEHOLDER": "z.B. beispiel.com",
       "LOADING": "Links werden geladen...",
-      "EMPTY": "Keine öffentlichen Links verfügbar.",
+      "EMPTY": "Keine Links vorhanden.",
       "EDIT_LINK": "Link bearbeiten",
       "DELETE_LINK": "Link löschen",
       "VISIBILITY": "Sichtbarkeit",
@@ -54,7 +54,7 @@
   "LANDING": {
     "H1": "Ideen teilen.\nTeams finden.\nProjekte verwirklichen.",
     "P": "Vernetze dich mit kreativen Köpfen und verwandle Ideen in erfolgreiche Zusammenarbeit.",
-    "BUTTON": "Logge dich jetzt ein, um Projekte zu entdecken, dein Profil zu bearbeiten und eigene Ideen zu teilen."
+    "BUTTON": "Loslegen"
   },
   "AUTH": {
     "P1": "Erfolgreich!",
@@ -75,6 +75,7 @@
     "PRIVATE": "Privat",
     "PUBLIC": "Öffentlich",
     "OWNER": "Gründer",
+    "MEMBER": "Mitglied",
     "FILTER_ALL": "Alle Projekte",
     "FILTER_OWNED": "Im Besitz",
     "LOADING": "Deine Projekte werden geladen…",
@@ -134,10 +135,87 @@
     "ADD_TITLE": "Zu Favoriten hinzufügen",
     "ERROR_LOAD": "Deine Favoriten konnten nicht geladen werden."
   },
+  "MODERATOR": {
+    "TITLE": "Moderator-Bereich",
+    "DESCRIPTION": "Willkommen im Moderator-Bereich. Hier können zukünftig Benutzer und Projekte verwaltet werden.",
+    "PROJECTS_LINK_TITLE": "Projektverwaltung",
+    "PROJECTS_LINK_DESCRIPTION": "Alle Projekte einsehen, suchen und löschen.",
+    "PROJECTS": {
+      "TITLE": "Projektverwaltung",
+      "SUBTITLE": "Alle Projekte einsehen, suchen und bei Bedarf löschen.",
+      "SEARCH_PLACEHOLDER": "Projekte suchen …",
+      "COLUMN_PROJECT": "Projekt",
+      "COLUMN_OWNER": "Ersteller",
+      "COLUMN_CREATED": "Erstellt am",
+      "COLUMN_STATUS": "Status",
+      "COLUMN_ACTION": "Aktion",
+      "MEMBERS": "Mitglieder",
+      "STATUS_PRIVATE": "Privat",
+      "STATUS_PUBLIC": "Öffentlich",
+      "DELETE": "Löschen",
+      "DELETING": "Löschen …",
+      "NO_RESULTS": "Keine Projekte gefunden.",
+      "SHOWING_OF": "von",
+      "TOTAL_PROJECTS": "Projekten angezeigt",
+      "LOADING": "Projekte werden geladen …",
+      "ERROR_LOAD": "Projekte konnten nicht geladen werden.",
+      "ERROR_DELETE": "Projekt konnte nicht gelöscht werden.",
+      "CONFIRM_DELETE_TITLE": "Projekt löschen",
+      "CONFIRM_DELETE_SUBTITLE": "Diese Aktion kann nicht rückgängig gemacht werden.",
+      "CONFIRM_DELETE_TEXT": "Das Projekt \"{{ projectName }}\" wird dauerhaft gel\u00F6scht. Alle zugeh\u00F6rigen Daten gehen dabei verloren.",
+      "CONFIRM_DELETE_LABEL": "Gib zur Bestätigung den Projektnamen ein",
+      "CONFIRM_DELETE_PLACEHOLDER": "Gib zur Bestätigung den Projektnamen ein",
+      "CONFIRM_DELETE_HINT_FILLED": "Der Projektname muss eingegeben werden"
+    },
+    "USER_MANAGEMENT": {
+      "TITLE": "Nutzerverwaltung",
+      "BADGE": "Moderator",
+      "DESCRIPTION": "Alle registrierten Nutzer einsehen und verwalten.",
+      "TABS": {
+        "ACTIVE_USERS": "Aktive Nutzer",
+        "BANNED_USERS": "Gebannte Nutzer"
+      },
+      "TABLE": {
+        "USER": "Nutzer",
+        "ROLE": "Rolle",
+        "JOINED_AT": "Beigetreten",
+        "ACTIONS": "Aktionen",
+        "BANNED_AT": "Gebannt am",
+        "REASON": "Grund"
+      },
+      "ROLES": {
+        "PROFESSOR": "Professor",
+        "MEMBER": "Mitglied"
+      },
+      "ACTIONS": {
+        "BAN": "Bannen",
+        "BAN_USER": "Nutzer bannen",
+        "UNBAN": "Entbannen"
+      },
+      "EMPTY_BANNED_TITLE": "Keine gebannten Nutzer vorhanden.",
+      "EMPTY_BANNED_DESCRIPTION": "Gebannte Nutzer erscheinen hier und können nicht mehr auf die Plattform zugreifen.",
+      "ERROR_LOAD": "Nutzer konnten nicht geladen werden.",
+      "ERROR_BAN": "Nutzer konnte nicht gebannt werden.",
+      "ERROR_UNBAN": "Bann konnte nicht aufgehoben werden.",
+      "NO_REASON": "Kein Grund angegeben",
+      "LOADING": "Nutzer werden geladen...",
+      "EMPTY_ACTIVE_TITLE": "Keine aktiven Nutzer vorhanden.",
+      "EMPTY_ACTIVE_DESCRIPTION": "Aktive Nutzer erscheinen hier und können bei Bedarf gebannt werden.",
+      "MODAL": {
+        "TITLE": "Nutzer bannen",
+        "DESCRIPTION": "Der Nutzer wird gesperrt und kann die Plattform nicht mehr nutzen. Der Account bleibt im System erhalten.",
+        "REASON_LABEL": "Grund für den Ban (optional)",
+        "REASON_PLACEHOLDER": "z. B. Verstoß gegen Nutzungsbedingungen..."
+      }
+    }
+  },
   "SIDEBAR": {
     "MYPROJECTS": "Meine Projekte",
     "FAVORITE": "Favoriten",
     "PROFILE": "Mein Profil",
+    "MODERATOR": "Moderator",
+    "MODERATOR_PROJECTS": "Projektverwaltung",
+    "USER_MANAGEMENT": "Nutzerverwaltung",
     "IMPRESSUM": "Impressum",
     "MENU": "Menü"
   },
@@ -332,29 +410,6 @@
       "ALL_MEMBERS": "Alle Mitglieder",
       "NO_MEMBERS": "Noch keine Mitglieder."
     },
-    "QUICKLINKS": {
-      "TITLE": "Links",
-      "ADD": "Hinzufügen",
-      "LABEL": "Bezeichnung",
-      "LABEL_PLACEHOLDER": "Beispielseite",
-      "URL_PLACEHOLDER": "z.B. beispiel.com",
-      "LOADING": "Links werden geladen...",
-      "EMPTY": "Keine öffentlichen Links verfügbar.",
-      "EDIT_LINK": "Link bearbeiten",
-      "DELETE_LINK": "Link löschen",
-      "ERROR_LOAD": "Links konnten nicht geladen werden.",
-      "ERROR_ADD": "Link konnte nicht hinzugefügt werden.",
-      "ERROR_UPDATE": "Link konnte nicht aktualisiert werden.",
-      "ERROR_DELETE": "Link konnte nicht gelöscht werden.",
-      "ERROR_INVALID": "Ungültige Linkdaten.",
-      "VALIDATION_LABEL_REQUIRED": "Bezeichnung erforderlich.",
-      "VALIDATION_LABEL_TOO_LONG": "Die Bezeichnung darf nicht länger als 100 Zeichen sein.",
-      "VALIDATION_LABEL_NO_QUOTES": "Die Bezeichnung darf keine Anführungszeichen enthalten.",
-      "VALIDATION_URL_REQUIRED": "URL erforderlich.",
-      "VALIDATION_URL_TOO_LONG": "Die URL darf nicht länger als 300 Zeichen sein.",
-      "URL_LABEL": "URL",
-      "VALIDATION_URL_INVALID": "Die URL muss gültig sein."
-    },
     "TAGS": {
       "ERROR_INVALID_CHARS": "Tag enthält ungültige Zeichen. Erlaubt: Buchstaben, Zahlen, Leerzeichen, Bindestrich und Punkt.",
       "ERROR_DUPLICATE": "Tag ist bereits in diesem Projekt enthalten.",
@@ -399,6 +454,40 @@
   },
   "USER_SEARCH": {
     "EMPTY": "Keine Nutzer gefunden"
+  },
+  "PROJECTPOSTS": {
+    "SUBTITLE": "Neuigkeiten und Updates zu diesem Projekt.",
+    "ADD_POST": "Post hinzufügen",
+    "TITLE_LABEL": "Titel",
+    "TITLE_PLACEHOLDER": "Titel des Posts",
+    "CONTENT_LABEL": "Inhalt",
+    "CONTENT_PLACEHOLDER": "Was gibt es Neues?",
+    "CREATING": "Wird erstellt…",
+    "PUBLISH": "Veröffentlichen",
+    "LOADING": "Posts werden geladen…",
+    "EMPTY": "Für dieses Projekt gibt es noch keine Posts.",
+    "AUTHOR_PREFIX": "Von",
+    "UNKNOWN_AUTHOR": "Unbekannt",
+    "LOAD_MORE": "Mehr laden",
+    "ERRORS": {
+      "LOAD": "Posts konnten nicht geladen werden.",
+      "EMPTY_FIELDS": "Titel und Inhalt dürfen nicht leer sein.",
+      "CREATE": "Post konnte nicht erstellt werden.",
+      "DELETE": "Post konnte nicht gelöscht werden."
+    },
+    "PLAIN_TEXT": "Klartext",
+    "MARKDOWN_HINT": "Du kannst Markdown verwenden, z.B. Überschriften, Listen, Links und Hervorhebungen.",
+    "TOOLBAR": {
+      "BOLD": "Fett",
+      "ITALIC": "Kursiv",
+      "HEADING": "Überschrift",
+      "LIST": "Liste",
+      "LINK": "Link",
+      "QUOTE": "Zitat"
+    },
+    "DELETE_POST": "Post löschen",
+    "DELETING": "Wird gelöscht…",
+    "DELETE_SUCCESS": "Post erfolgreich gelöscht."
   },
   "USER_SETTINGS": {
     "TITLE": "Einstellungen",
@@ -465,5 +554,13 @@
   },
   "TAGS": {
     "TITLE": "Tags"
+  },
+  "BANNED_ACCOUNT": {
+    "TITLE": "Dein Konto wurde gesperrt",
+    "DESCRIPTION": "Du kannst die Plattform derzeit nicht nutzen, weil dein Konto gesperrt wurde.",
+    "REASON_LABEL": "Grund:",
+    "NO_REASON": "Kein Grund angegeben",
+    "BANNED_AT": "Gesperrt am:",
+    "CONTACT_HINT": "Wenn du Fragen hast, wende dich bitte an das Projektteam."
   }
 }

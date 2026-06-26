@@ -1,32 +1,41 @@
 package de.thm.swtp.api.project;
 
 
+import de.thm.swtp.api.common.TxLogger;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectMemberNotFoundException;
 import de.thm.swtp.api.project.dto.request.*;
 import de.thm.swtp.api.project.dto.response.*;
 import de.thm.swtp.api.project.exception.*;
+import de.thm.swtp.api.projectInvitation.repository.ProjectInviteRepository;
 import de.thm.swtp.api.projectInvitation.service.ProjectInviteService;
 import de.thm.swtp.api.projectFavorite.repository.ProjectFavoriteRepository;
+import de.thm.swtp.api.projectJoinRequest.repository.ProjectJoinRequestRepository;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.projectView.entity.ProjectViewEntity;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import de.thm.swtp.api.projectView.repository.ProjectViewRepository;
 
-import jakarta.transaction.*;
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 import java.util.*;
 import java.time.*;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
     private final UserProfileRepository userProfileRepository;
     private final ProjectInviteService projectInviteService;
+    private final ProjectInviteRepository projectInviteRepository;
+    private final ProjectJoinRequestRepository projectJoinRequestRepository;
     private static final String PROJECT_CREATION_INVITE_MESSAGE = "You have been invited to join this project.";
     private final ProjectFavoriteRepository projectFavoriteRepository;
     private final ProjectViewRepository projectViewRepository;
@@ -104,6 +113,7 @@ public class ProjectService {
 
         createProjectInvites(saved, owner, request.memberIds());
 
+        TxLogger.afterCommit(log, "Project created: project={}, owner={}", saved.getId(), currentUserId);
         return toResponse(saved);
     }
 
@@ -147,8 +157,11 @@ public class ProjectService {
 
         projectFavoriteRepository.deleteByProjectId(projectId);
         projectViewRepository.deleteByProjectId(projectId);
+        projectInviteRepository.deleteByProjectId(projectId);
+        projectJoinRequestRepository.deleteByProjectId(projectId);
         projectRepository.delete(project);
 
+        TxLogger.afterCommit(log, "Project deleted: project={}", projectId);
         return DeleteProjectResponse.builder()
                 .projectId(projectId)
                 .message("Projekt erfolgreich gelöscht.")
@@ -236,7 +249,16 @@ public class ProjectService {
 
         ProjectEntity saved = projectRepository.save(project);
 
+        TxLogger.afterCommit(log, "Project updated: project={}", projectId);
         return toResponse(saved);
+    }
+
+    @Transactional
+    public Page<ProjectResponse> getAllProjects(String name, Pageable pageable) {
+        if (name != null && !name.isBlank()) {
+            return projectRepository.findByNameContainingIgnoreCase(name, pageable).map(this::toResponse);
+        }
+        return projectRepository.findAll(pageable).map(this::toResponse);
     }
 
     @Transactional
@@ -266,7 +288,9 @@ public class ProjectService {
         }
 
         project.setAllowJoinRequests(allow);
-        return toResponse(projectRepository.save(project));
+        ProjectResponse saved = toResponse(projectRepository.save(project));
+        TxLogger.afterCommit(log, "AllowJoinRequests updated: project={}, allow={}", projectId, allow);
+        return saved;
     }
 
     @Transactional
@@ -297,6 +321,7 @@ public class ProjectService {
 
         projectEntity.getMembers().remove(member);
         projectRepository.save(projectEntity);
+        TxLogger.afterCommit(log, "Project member removed: project={}, member={}", projectId, memberId);
     }
 
 

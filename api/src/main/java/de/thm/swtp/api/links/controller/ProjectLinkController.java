@@ -60,8 +60,7 @@ public class ProjectLinkController {
         projectLinkService.deleteProjectLink(projectId, linkId);
     }
 
-        private UUID getCurrentUserId(Jwt jwt) {
-            return UUID.fromString(jwt.getSubject());
-        }
-
+    private UUID getCurrentUserId(Jwt jwt) {
+        return UUID.fromString(jwt.getSubject());
+    }
 }

@@ -1,5 +1,6 @@
 package de.thm.swtp.api.projectInvitation.service;
 
+import de.thm.swtp.api.common.TxLogger;
 import de.thm.swtp.api.notification.event.ProjectInviteCreatedEvent;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
@@ -49,6 +50,8 @@ public class ProjectInviteService {
         ProjectInviteEntity projectInviteEntity = createPendingInvite(projectEntity, invitedUserEntity, message);
 
         ProjectInviteEntity saved = projectInviteRepository.save(projectInviteEntity);
+        TxLogger.afterCommit(log, "Invite created: invite={}, project={}, from={}, to={}",
+                saved.getId(), projectId, projectEntity.getOwner().getKeycloakId(), invitedUserId);
         ProjectInvite invite = ProjectInviteMapper.toDomain(saved);
 
         if (invitedUserEntity.getEmail() != null) {
@@ -91,6 +94,7 @@ public class ProjectInviteService {
         ProjectInvite invite = ProjectInviteMapper.toDomain(inviteEntity);
 
         checkInviteStatus(invite, newStatus);
+        TxLogger.afterCommit(log, "Invite status: invite={}, {}->{}", inviteId, invite.getStatus(), newStatus);
         inviteEntity.setStatus(newStatus);
 
 
