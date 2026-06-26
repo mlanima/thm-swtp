@@ -17,6 +17,7 @@ public class Thesis {
     String shortDescription;
     UUID supervisorKeycloakId;
     Set<String> tags;
+    Set<UUID> studentKeycloakIds;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
 }

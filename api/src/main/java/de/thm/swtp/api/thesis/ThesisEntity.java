@@ -54,6 +54,19 @@ public class ThesisEntity {
     @Builder.Default
     private Set<TagEntity> tags = new HashSet<>();
 
+    @ManyToMany
+    @JoinTable(
+            name = "thesis_students",
+            joinColumns = @JoinColumn(name = "thesis_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_profile_keycloak_id"),
+            uniqueConstraints = @UniqueConstraint(
+                    name = "UK_thesis_students",
+                    columnNames = {"thesis_id", "user_profile_keycloak_id"}
+            )
+    )
+    @Builder.Default
+    private Set<UserProfile> students = new HashSet<>();
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;

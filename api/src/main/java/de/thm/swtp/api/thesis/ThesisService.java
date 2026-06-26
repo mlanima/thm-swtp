@@ -9,6 +9,8 @@ import de.thm.swtp.api.thesis.dto.request.UpdateThesisRequest;
 import de.thm.swtp.api.thesis.dto.response.DeleteThesisResponse;
 import de.thm.swtp.api.thesis.exception.ThesisInvalidUrlException;
 import de.thm.swtp.api.thesis.exception.ThesisNotFoundException;
+import de.thm.swtp.api.thesis.exception.ThesisStudentAlreadyAssignedException;
+import de.thm.swtp.api.thesis.exception.ThesisStudentNotFoundException;
 import de.thm.swtp.api.thesis.exception.ThesisTitleAlreadyExistsException;
 import de.thm.swtp.api.thesis.exception.ThesisUrlAlreadyExistsException;
 import de.thm.swtp.api.thesis.mapper.ThesisMapper;
@@ -134,6 +136,42 @@ public class ThesisService {
             thesis.setTags(resolveTags(request.getTags()));
         }
 
+        return ThesisMapper.toDomain(thesisRepository.save(thesis));
+    }
+
+    @Transactional
+    public Thesis addStudent(UUID thesisId, UUID studentKeycloakId) {
+        ThesisEntity thesis = thesisRepository.findById(thesisId)
+                .orElseThrow(() -> new ThesisNotFoundException(thesisId.toString()));
+
+        UserProfile student = userProfileRepository.findById(studentKeycloakId)
+                .orElseThrow(() -> new UserProfileNotFoundException(studentKeycloakId.toString()));
+
+        boolean alreadyAssigned = thesis.getStudents().stream()
+                .anyMatch(s -> s.getKeycloakId().equals(studentKeycloakId));
+        if (alreadyAssigned) {
+            throw new ThesisStudentAlreadyAssignedException(studentKeycloakId, thesisId);
+        }
+
+        thesis.getStudents().add(student);
+        return ThesisMapper.toDomain(thesisRepository.save(thesis));
+    }
+
+    @Transactional
+    public Thesis removeStudent(UUID thesisId, UUID studentKeycloakId) {
+        ThesisEntity thesis = thesisRepository.findById(thesisId)
+                .orElseThrow(() -> new ThesisNotFoundException(thesisId.toString()));
+
+        UserProfile student = userProfileRepository.findById(studentKeycloakId)
+                .orElseThrow(() -> new UserProfileNotFoundException(studentKeycloakId.toString()));
+
+        boolean assigned = thesis.getStudents().stream()
+                .anyMatch(s -> s.getKeycloakId().equals(studentKeycloakId));
+        if (!assigned) {
+            throw new ThesisStudentNotFoundException(studentKeycloakId, thesisId);
+        }
+
+        thesis.getStudents().remove(student);
         return ThesisMapper.toDomain(thesisRepository.save(thesis));
     }
 

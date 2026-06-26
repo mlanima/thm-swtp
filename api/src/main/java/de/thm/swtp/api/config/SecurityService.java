@@ -451,6 +451,11 @@ public class SecurityService {
         return hasModeratorRole(authentication) || isProfileOwnerByUsername(username, authentication);
     }
 
+    /** Allowed to add/remove students on a thesis (supervising professor only). */
+    public boolean canManageThesisStudents(UUID thesisId, Authentication authentication) {
+        return isProfessorUser(authentication) && isThesisSupervisor(thesisId, authentication);
+    }
+
     /** Allowed to create a thesis (professors only). */
     public boolean canCreateThesis(Authentication authentication) {
         return isProfessorUser(authentication);

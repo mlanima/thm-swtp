@@ -58,6 +58,22 @@ public class ThesisController {
         return ResponseEntity.ok(thesisService.delete(thesisId));
     }
 
+    @PostMapping("/{thesisId}/students/{studentKeycloakId}")
+    @PreAuthorize("@security.canManageThesisStudents(#thesisId, authentication)")
+    public ResponseEntity<ThesisResponse> addStudent(
+            @PathVariable UUID thesisId,
+            @PathVariable UUID studentKeycloakId) {
+        return ResponseEntity.ok(ThesisResponse.toResponse(thesisService.addStudent(thesisId, studentKeycloakId)));
+    }
+
+    @DeleteMapping("/{thesisId}/students/{studentKeycloakId}")
+    @PreAuthorize("@security.canManageThesisStudents(#thesisId, authentication)")
+    public ResponseEntity<ThesisResponse> removeStudent(
+            @PathVariable UUID thesisId,
+            @PathVariable UUID studentKeycloakId) {
+        return ResponseEntity.ok(ThesisResponse.toResponse(thesisService.removeStudent(thesisId, studentKeycloakId)));
+    }
+
     @GetMapping("/url-exists/{thesisUrl}")
     public ResponseEntity<Boolean> thesisUrlExists(@PathVariable String thesisUrl) {
         return ResponseEntity.ok(thesisService.thesisUrlExists(thesisUrl));

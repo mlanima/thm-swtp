@@ -5,6 +5,8 @@ import de.thm.swtp.api.exceptionhandling.exceptions.*;
 import de.thm.swtp.api.professorRequest.exception.ProfessorRequestAlreadyExistsException;
 import de.thm.swtp.api.thesis.exception.ThesisInvalidUrlException;
 import de.thm.swtp.api.thesis.exception.ThesisNotFoundException;
+import de.thm.swtp.api.thesis.exception.ThesisStudentAlreadyAssignedException;
+import de.thm.swtp.api.thesis.exception.ThesisStudentNotFoundException;
 import de.thm.swtp.api.thesis.exception.ThesisTitleAlreadyExistsException;
 import de.thm.swtp.api.thesis.exception.ThesisUrlAlreadyExistsException;
 import de.thm.swtp.api.professorRequest.exception.ProfessorRequestInvalidStatusException;
@@ -436,5 +438,17 @@ public class GlobalExceptionHandler {
         log.error("Unhandled exception: type={}, message={}", ex.getClass().getName(), ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ErrorResponse.of(500, "Internal Server Error", "An unexpected error occurred."));
+    }
+
+    @ExceptionHandler(ThesisStudentAlreadyAssignedException.class)
+    public ResponseEntity<ErrorResponse> handleThesisStudentAlreadyAssigned(ThesisStudentAlreadyAssignedException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ThesisStudentNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleThesisStudentNotFound(ThesisStudentNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
     }
 }
