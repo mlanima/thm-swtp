@@ -397,24 +397,28 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ThesisNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleThesisNotFound(ThesisNotFoundException ex) {
+        log.debug("Not Found (404): {}", LogSafe.clean(ex.getMessage()));
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
     }
 
     @ExceptionHandler(ThesisTitleAlreadyExistsException.class)
     public ResponseEntity<ErrorResponse> handleThesisTitleAlreadyExists(ThesisTitleAlreadyExistsException ex) {
+        log.debug("Conflict (409): {}", LogSafe.clean(ex.getMessage()));
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
     }
 
     @ExceptionHandler(ThesisUrlAlreadyExistsException.class)
     public ResponseEntity<ErrorResponse> handleThesisUrlAlreadyExists(ThesisUrlAlreadyExistsException ex) {
+        log.debug("Conflict (409): {}", LogSafe.clean(ex.getMessage()));
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
     }
 
     @ExceptionHandler(ThesisInvalidUrlException.class)
     public ResponseEntity<ErrorResponse> handleThesisInvalidUrl(ThesisInvalidUrlException ex) {
+        log.debug("Bad Request (400): {}", LogSafe.clean(ex.getMessage()));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
     }
@@ -442,12 +446,14 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ThesisStudentAlreadyAssignedException.class)
     public ResponseEntity<ErrorResponse> handleThesisStudentAlreadyAssigned(ThesisStudentAlreadyAssignedException ex) {
+        log.debug("Conflict (409): {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
     }
 
     @ExceptionHandler(ThesisStudentNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleThesisStudentNotFound(ThesisStudentNotFoundException ex) {
+        log.debug("Not Found (404): {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
     }
