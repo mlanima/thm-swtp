@@ -4,6 +4,7 @@ import de.thm.swtp.api.project.ProjectRepository;
 import de.thm.swtp.api.projectInvitation.repository.ProjectInviteRepository;
 import de.thm.swtp.api.projectJoinRequest.repository.ProjectJoinRequestRepository;
 import de.thm.swtp.api.projectPost.repository.ProjectPostRepository;
+import de.thm.swtp.api.thesis.ThesisRepository;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -28,6 +29,7 @@ public class SecurityService {
     private final ProjectInviteRepository projectInviteRepository;
     private final ProjectJoinRequestRepository projectJoinRequestRepository;
     private final ProjectPostRepository projectPostRepository;
+    private final ThesisRepository thesisRepository;
 
     // Project permissions
 
@@ -244,7 +246,7 @@ public class SecurityService {
             return false;
         }
         UUID currentUserId = getCurrentUserId(authentication);
-        return !userProfileRepository.existsByKeycloakIdAndProfessorTrue(currentUserId);
+        return !userProfileRepository.existsByKeycloakIdAndIsProfessorTrue(currentUserId);
     }
 
     // User-profile permissions
@@ -380,6 +382,60 @@ public class SecurityService {
         }
         UUID currentUserId = getCurrentUserId(authentication);
         return userId.equals(currentUserId);
+    }
+
+    // Thesis permissions
+
+    /** Allowed to view a thesis (any authenticated user). */
+    public boolean canViewThesis(UUID thesisId, Authentication authentication) {
+        return hasAuthenticationContext(thesisId, authentication);
+    }
+
+    /** Allowed to view a thesis by URL (any authenticated user). */
+    public boolean canViewThesisByUrl(String thesisUrl, Authentication authentication) {
+        return hasAuthenticationContext(thesisUrl, authentication);
+    }
+
+    /** Allowed to view theses of a user (own or as moderator). */
+    public boolean canViewUserTheses(String username, Authentication authentication) {
+        if (!hasAuthenticationContext(username, authentication)) {
+            return false;
+        }
+        return hasModeratorRole(authentication) || isProfileOwnerByUsername(username, authentication);
+    }
+
+    /** Allowed to create a thesis (professors only). */
+    public boolean canCreateThesis(Authentication authentication) {
+        return isProfessorUser(authentication);
+    }
+
+    /** Allowed to edit a thesis (only the supervising professor). */
+    public boolean canEditThesis(UUID thesisId, Authentication authentication) {
+        return isProfessorUser(authentication) && isThesisSupervisor(thesisId, authentication);
+    }
+
+    /** Allowed to delete a thesis (supervising professor or moderator). */
+    public boolean canDeleteThesis(UUID thesisId, Authentication authentication) {
+        if (!hasAuthenticationContext(thesisId, authentication)) {
+            return false;
+        }
+        return isThesisSupervisor(thesisId, authentication) || hasModeratorRole(authentication);
+    }
+
+    private boolean isProfessorUser(Authentication authentication) {
+        if (!isRegularUser(authentication)) {
+            return false;
+        }
+        UUID currentUserId = getCurrentUserId(authentication);
+        return userProfileRepository.existsByKeycloakIdAndIsProfessorTrue(currentUserId);
+    }
+
+    private boolean isThesisSupervisor(UUID thesisId, Authentication authentication) {
+        if (!hasAuthenticationContext(thesisId, authentication)) {
+            return false;
+        }
+        UUID currentUserId = getCurrentUserId(authentication);
+        return thesisRepository.existsByIdAndSupervisorKeycloakId(thesisId, currentUserId);
     }
 
 }

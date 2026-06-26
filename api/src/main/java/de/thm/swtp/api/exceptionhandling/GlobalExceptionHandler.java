@@ -2,6 +2,10 @@ package de.thm.swtp.api.exceptionhandling;
 
 import de.thm.swtp.api.exceptionhandling.exceptions.*;
 import de.thm.swtp.api.professorRequest.exception.ProfessorRequestAlreadyExistsException;
+import de.thm.swtp.api.thesis.exception.ThesisInvalidUrlException;
+import de.thm.swtp.api.thesis.exception.ThesisNotFoundException;
+import de.thm.swtp.api.thesis.exception.ThesisTitleAlreadyExistsException;
+import de.thm.swtp.api.thesis.exception.ThesisUrlAlreadyExistsException;
 import de.thm.swtp.api.professorRequest.exception.ProfessorRequestInvalidStatusException;
 import de.thm.swtp.api.professorRequest.exception.ProfessorRequestNotFoundException;
 import de.thm.swtp.api.projectFavorite.exception.ProjectAlreadyFavoritedException;
@@ -298,5 +302,29 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleProjectUrlGenerationFailed(ExceptionProjectUrlGenerationFailed ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ErrorResponse.of(500, "Internal Server Error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ThesisNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleThesisNotFound(ThesisNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ThesisTitleAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleThesisTitleAlreadyExists(ThesisTitleAlreadyExistsException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ThesisUrlAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleThesisUrlAlreadyExists(ThesisUrlAlreadyExistsException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ThesisInvalidUrlException.class)
+    public ResponseEntity<ErrorResponse> handleThesisInvalidUrl(ThesisInvalidUrlException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
     }
 }

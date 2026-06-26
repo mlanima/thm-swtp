@@ -12,7 +12,8 @@ import java.util.*;
 
 @Entity(name = "theses")
 @Table(name = "theses", uniqueConstraints = {
-        @UniqueConstraint(name = "UK_theses_title", columnNames = {"title"})
+        @UniqueConstraint(name = "UK_theses_title",      columnNames = {"title"}),
+        @UniqueConstraint(name = "UK_theses_thesis_url", columnNames = {"thesis_url"})
 })
 @Getter
 @Setter
@@ -27,6 +28,9 @@ public class ThesisEntity {
 
     @Column(nullable = false, length = 100)
     private String title;
+
+    @Column(name = "thesis_url", nullable = false, unique = true, length = 30)
+    private String thesisUrl;
 
     @Column(length = 2000)
     private String description;
