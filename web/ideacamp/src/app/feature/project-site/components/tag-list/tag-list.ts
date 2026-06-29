@@ -68,7 +68,7 @@ export class TagList implements OnInit, OnChanges {
       },
       error: (err) => {
         const apiError = err.error as { message?: string };
-        if (apiError?.message?.includes('not a valid')) {
+        if (err.status === 400 && apiError?.message?.includes('not a valid')) {
           this.errorMessage.set(
             this.translateService.instant('PROJECTSITE.TAGS.ERROR_NOT_VALID', { name: cleanedName })
           );
