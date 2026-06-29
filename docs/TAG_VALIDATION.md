@@ -139,7 +139,7 @@ Supported languages (28): ar, cs, da, de, en, eo, es, fa, fi, fil, fr, fr-CA-u-s
 |----------|----------|---------|-------------|
 | `SPRING_CACHE_TYPE` | No | `redis` | Set to `none` to disable Redis |
 | `SPRING_DATA_REDIS_HOST` | No | `redis.ser.mlanima.org` | Redis server hostname |
-| `SPRING_DATA_REDIS_PASSWORD` | In prod | empty | Redis `requirepass` value |
+| `SPRING_DATA_REDIS_PASSWORD` | No | empty | Redis password (not needed if auth is disabled) |
 | `STACKOVERFLOW_API_KEY` | If using SO | empty | StackExchange API app key |
 
 ---
@@ -233,7 +233,7 @@ SPRING_DATA_REDIS_HOST=localhost ./mvnw spring-boot:run
 ## CI/CD
 
 1. Push to `developer`/`main` triggers `cd-build-deploy.yml`
-2. Docker image built with `--build-arg SPRING_DATA_REDIS_PASSWORD` (and `STACKOVERFLOW_API_KEY` if SO source is used)
+2. Docker image built with `--build-arg STACKOVERFLOW_API_KEY` if SO source is used
 3. Image pushed to GHCR, deployed via `deploy-app.bb` on `swtp-ss26.de`
 
 GitHub Topics API requires no authentication (60 req/hr unauthenticated, sufficient with 1h cache).
