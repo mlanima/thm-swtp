@@ -65,7 +65,12 @@ app:
     language: de
   frontend-url: http://localhost:4200
   tags:
-    source: stackoverflow
+    source: github-blocklist
+
+github:
+  topics:
+    api:
+      base-url: https://api.github.com
 
 stackoverflow:
   api:

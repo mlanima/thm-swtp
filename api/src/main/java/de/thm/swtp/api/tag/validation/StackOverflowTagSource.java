@@ -13,10 +13,10 @@ import java.util.Optional;
 
 @Slf4j
 @Component
-@ConditionalOnProperty(name = "app.tags.source", havingValue = "stackoverflow", matchIfMissing = true)
+@ConditionalOnProperty(name = "app.tags.source", havingValue = "stackoverflow")
 public class StackOverflowTagSource implements TagSource {
 
-    private static final String TAG_INFO_URL = "/2.3/tags/{tags}/info?site=stackoverflow";
+    private static final String TAG_INFO_URL = "/tags/{tags}/info";
     private static final int QUOTA_WARN_THRESHOLD = 100;
 
     private final RestClient restClient;
@@ -39,7 +39,8 @@ public class StackOverflowTagSource implements TagSource {
     public boolean tagExists(final String tagName) {
         var response = restClient.get()
                 .uri(uriBuilder -> {
-                    var uri = uriBuilder.path(TAG_INFO_URL);
+                    var uri = uriBuilder.path(TAG_INFO_URL)
+                            .queryParam("site", "stackoverflow");
                     apiKey.ifPresent(key -> uri.queryParam("key", key));
                     return uri.build(tagName);
                 })
@@ -51,12 +52,12 @@ public class StackOverflowTagSource implements TagSource {
             throw new TagValidationException("StackOverflow API returned empty response");
         }
 
-        if (response.backoff() > 0) {
+        if (response.backoff() != null && response.backoff() > 0) {
             log.warn("StackOverflow API requested backoff of {}s for tag: {}",
                     response.backoff(), LogSafe.clean(tagName));
         }
 
-        if (response.quotaRemaining() < QUOTA_WARN_THRESHOLD) {
+        if (response.quotaRemaining() != null && response.quotaRemaining() < QUOTA_WARN_THRESHOLD) {
             log.warn("StackOverflow API quota nearly exhausted: {}/{} remaining",
                     response.quotaRemaining(), response.quotaMax());
         }
@@ -68,9 +69,9 @@ public class StackOverflowTagSource implements TagSource {
 
     private record StackOverflowResponse(
             @JsonProperty("items") List<StackOverflowItem> items,
-            @JsonProperty("backoff") int backoff,
-            @JsonProperty("quota_max") int quotaMax,
-            @JsonProperty("quota_remaining") int quotaRemaining) {}
+            @JsonProperty("backoff") Integer backoff,
+            @JsonProperty("quota_max") Integer quotaMax,
+            @JsonProperty("quota_remaining") Integer quotaRemaining) {}
 
     private record StackOverflowItem(
             @JsonProperty("name") String name,
