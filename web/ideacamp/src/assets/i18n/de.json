@@ -414,6 +414,7 @@
       "ERROR_INVALID_CHARS": "Tag enthält ungültige Zeichen. Erlaubt: Buchstaben, Zahlen, Leerzeichen, Bindestrich und Punkt.",
       "ERROR_DUPLICATE": "Tag ist bereits in diesem Projekt enthalten.",
       "ERROR_TOO_LONG": "Tag zu lang.",
+      "ERROR_NOT_VALID": "Tag '{{name}}' ist kein gültiger StackOverflow-Tag.",
       "ERROR_DELETE": "Tag konnte nicht gelöscht werden.",
       "ERROR_LOAD": "Tags konnten nicht geladen werden.",
       "LOADING": "Tags werden geladen…",

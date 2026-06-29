@@ -66,8 +66,15 @@ export class TagList implements OnInit, OnChanges {
         }
         this.isSaving.set(false);
       },
-      error: () => {
-        this.errorMessage.set(this.translateService.instant('PROJECTSITE.TAGS.ERROR_TOO_LONG'));
+      error: (err) => {
+        const apiError = err.error as { message?: string };
+        if (apiError?.message?.includes('not a valid')) {
+          this.errorMessage.set(
+            this.translateService.instant('PROJECTSITE.TAGS.ERROR_NOT_VALID', { name: cleanedName })
+          );
+        } else {
+          this.errorMessage.set(this.translateService.instant('PROJECTSITE.TAGS.ERROR_TOO_LONG'));
+        }
         this.isSaving.set(false);
       },
     });
