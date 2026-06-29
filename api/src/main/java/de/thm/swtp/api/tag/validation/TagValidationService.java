@@ -17,7 +17,7 @@ public class TagValidationService {
 
     @Cacheable(value = "tag-exists", key = "#tagName.toLowerCase()")
     public boolean isValidTag(final String tagName) {
-        log.info("Cache miss for tag '{}' \u2014 querying source", LogSafe.clean(tagName));
+        log.debug("Cache miss for tag '{}' \u2014 querying source", LogSafe.clean(tagName));
         return tagSource.tagExists(tagName);
     }
 }

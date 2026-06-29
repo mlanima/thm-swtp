@@ -47,7 +47,7 @@ public class StackOverflowTagSource implements TagSource {
                 .body(StackOverflowResponse.class);
 
         if (response == null) {
-            log.warn("StackOverflow API returned null response for tag: {}", LogSafe.clean(tagName));
+            log.error("StackOverflow API returned null response for tag: {}", LogSafe.clean(tagName));
             throw new TagValidationException("StackOverflow API returned empty response");
         }
 
