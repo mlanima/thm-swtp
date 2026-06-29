@@ -57,6 +57,9 @@ jobs:
         with:
           context: ./api
           push: true
+          build-args: |
+            SPRING_DATA_REDIS_PASSWORD=${{ secrets.SPRING_DATA_REDIS_PASSWORD }}
+            STACKOVERFLOW_API_KEY=${{ secrets.STACKOVERFLOW_API_KEY }}
           tags: |
             ghcr.io/${{ needs.namespace.outputs.namespace }}/swtp-api:${{ github.ref_name == 'main' && 'latest' || 'dev' }}
             ghcr.io/${{ needs.namespace.outputs.namespace }}/swtp-api:${{ github.run_number }}
