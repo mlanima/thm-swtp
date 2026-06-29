@@ -6,8 +6,10 @@ import de.thm.swtp.api.project.ProjectRepository;
 import de.thm.swtp.api.project.exception.ProjectNotFoundException;
 import de.thm.swtp.api.tag.domain.Tag;
 import de.thm.swtp.api.tag.entity.TagEntity;
+import de.thm.swtp.api.tag.exception.TagNotValidException;
 import de.thm.swtp.api.tag.mapper.TagMapper;
 import de.thm.swtp.api.tag.repository.TagRepository;
+import de.thm.swtp.api.tag.validation.TagValidationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,7 @@ public class ProjectTagService {
 
     private final TagRepository tagRepository;
     private final ProjectRepository projectRepository;
+    private final TagValidationService tagValidationService;
 
 
     /** Returns a list of all tags assigned to the given project. */
@@ -67,6 +70,11 @@ public class ProjectTagService {
         String cleaned = tagName.trim();
 
         return tagRepository.findByNameIgnoreCase(cleaned)
-                .orElseGet(() -> tagRepository.save(new TagEntity(cleaned)));
+                .orElseGet(() -> {
+                    if (!tagValidationService.isValidTag(cleaned)) {
+                        throw new TagNotValidException(cleaned);
+                    }
+                    return tagRepository.save(new TagEntity(cleaned));
+                });
     }
 }

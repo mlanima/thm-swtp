@@ -4,8 +4,10 @@ package de.thm.swtp.api.tag.service;
 import de.thm.swtp.api.common.TxLogger;
 import de.thm.swtp.api.tag.domain.Tag;
 import de.thm.swtp.api.tag.entity.TagEntity;
+import de.thm.swtp.api.tag.exception.TagNotValidException;
 import de.thm.swtp.api.tag.mapper.TagMapper;
 import de.thm.swtp.api.tag.repository.TagRepository;
+import de.thm.swtp.api.tag.validation.TagValidationService;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
@@ -24,6 +26,7 @@ public class ProfileTagService {
 
     private final TagRepository tagRepository;
     private final UserProfileRepository userProfileRepository;
+    private final TagValidationService tagValidationService;
 
 
     /** Returns a list of all tags assigned to the user profile. */
@@ -68,6 +71,11 @@ public class ProfileTagService {
         String cleaned = tagName.trim();
 
         return tagRepository.findByNameIgnoreCase(cleaned)
-                .orElseGet(() -> tagRepository.save(new TagEntity(cleaned)));
+                .orElseGet(() -> {
+                    if (!tagValidationService.isValidTag(cleaned)) {
+                        throw new TagNotValidException(cleaned);
+                    }
+                    return tagRepository.save(new TagEntity(cleaned));
+                });
     }
 }

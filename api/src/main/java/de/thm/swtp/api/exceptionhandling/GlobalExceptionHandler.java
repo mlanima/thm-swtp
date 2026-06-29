@@ -14,6 +14,8 @@ import de.thm.swtp.api.projectInvitation.exception.InvalidProjectInviteException
 import de.thm.swtp.api.projectInvitation.exception.ProjectInviteAccessDeniedException;
 import de.thm.swtp.api.projectInvitation.exception.ProjectInviteNotFoundException;
 import de.thm.swtp.api.tag.exception.TagAccessDeniedException;
+import de.thm.swtp.api.tag.exception.TagNotValidException;
+import de.thm.swtp.api.tag.validation.TagValidationException;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.project.exception.*;
 import lombok.extern.slf4j.Slf4j;
@@ -131,6 +133,20 @@ public class GlobalExceptionHandler {
         log.warn("Forbidden (403): {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(ErrorResponse.of(403, "Forbidden", ex.getMessage()));
+    }
+
+    @ExceptionHandler(TagNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleTagNotValid(TagNotValidException ex) {
+        log.debug("Bad Request (400): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
+    }
+
+    @ExceptionHandler(TagValidationException.class)
+    public ResponseEntity<ErrorResponse> handleTagValidationError(TagValidationException ex) {
+        log.error("Tag validation failed due to external API error: {}", ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                .body(ErrorResponse.of(502, "Bad Gateway", "Tag validation service temporarily unavailable."));
     }
 
     @ExceptionHandler(ProjectJoinRequestAccessDeniedException.class)
