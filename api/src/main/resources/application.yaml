@@ -44,6 +44,21 @@ logging:
   level:
     de.thm.swtp: ${BE_LOG_LEVEL:INFO}
 
+spring:
+  cache:
+    type: ${SPRING_CACHE_TYPE:redis}
+    redis:
+      time-to-live: 3600000
+      cache-null-values: false
+      key-prefix: "tags:"
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST:redis.ser.mlanima.org}
+      port: 6379
+      password: ${SPRING_DATA_REDIS_PASSWORD:}
+      timeout: 2000ms
+      connect-timeout: 1000ms
+
 app:
   uploads:
     dir: ./uploads
@@ -51,3 +66,10 @@ app:
     from: noreply@swtp-ss26.de
     language: de
   frontend-url: http://localhost:4200
+  tags:
+    source: stackoverflow
+
+stackoverflow:
+  api:
+    base-url: https://api.stackexchange.com/2.3
+    key: ${STACKOVERFLOW_API_KEY:}
