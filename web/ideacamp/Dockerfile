@@ -3,7 +3,7 @@ FROM node:24-alpine AS builder
 WORKDIR /app
 ARG API_URL=https://api.swtp-ss26.de/api
 COPY package.json package-lock.json ./
-RUN npm ci --ignore-scripts
+RUN npm ci
 COPY . .
 RUN sed -i "s|__API_URL__|${API_URL}|g" src/app/enviroments/enviroment.prod.ts
 RUN npm run build -- --configuration=production
