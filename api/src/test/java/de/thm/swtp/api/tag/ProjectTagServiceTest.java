@@ -41,6 +41,7 @@ class ProjectTagServiceTest {
         tagRepository = mock(TagRepository.class);
         projectRepository = mock(ProjectRepository.class);
         tagValidationService = mock(TagValidationService.class);
+        when(tagValidationService.isValidTag(any())).thenReturn(true);
 
         projectTagService = new ProjectTagService(tagRepository, projectRepository, tagValidationService);
 

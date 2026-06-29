@@ -37,6 +37,7 @@ class ProfileTagServiceTest {
         tagRepository = mock(TagRepository.class);
         userProfileRepository = mock(UserProfileRepository.class);
         tagValidationService = mock(TagValidationService.class);
+        when(tagValidationService.isValidTag(any())).thenReturn(true);
 
         profileTagService = new ProfileTagService(tagRepository, userProfileRepository, tagValidationService);
 
