@@ -7,6 +7,7 @@ import de.thm.swtp.api.tag.domain.Tag;
 import de.thm.swtp.api.tag.entity.TagEntity;
 import de.thm.swtp.api.tag.repository.TagRepository;
 import de.thm.swtp.api.tag.service.ProjectTagService;
+import de.thm.swtp.api.tag.validation.TagValidationService;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,6 +27,7 @@ class ProjectTagServiceTest {
 
     private TagRepository tagRepository;
     private ProjectRepository projectRepository;
+    private TagValidationService tagValidationService;
     private ProjectTagService projectTagService;
 
     private UUID projectId;
@@ -38,8 +40,9 @@ class ProjectTagServiceTest {
     void setup() {
         tagRepository = mock(TagRepository.class);
         projectRepository = mock(ProjectRepository.class);
+        tagValidationService = mock(TagValidationService.class);
 
-        projectTagService = new ProjectTagService(tagRepository, projectRepository);
+        projectTagService = new ProjectTagService(tagRepository, projectRepository, tagValidationService);
 
         projectId = UUID.randomUUID();
         ownerId = UUID.randomUUID();

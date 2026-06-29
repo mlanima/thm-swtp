@@ -319,7 +319,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ProjectFileUploadLimitExceededException.class)
     public ResponseEntity<ErrorResponse> handleProjectFileUploadLimitExceeded(ProjectFileUploadLimitExceededException ex) {
         log.warn("Unprocessable Entity (422): {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+        return ResponseEntity.status(HttpStatus.valueOf(422))
                 .body(ErrorResponse.of(422, "Unprocessable Entity", ex.getMessage()));
     }
 
@@ -415,7 +415,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<ErrorResponse> handleUploadTooLarge(MaxUploadSizeExceededException ex) {
         log.warn("Payload Too Large (413): {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
+        return ResponseEntity.status(HttpStatus.valueOf(413))
                 .body(ErrorResponse.of(413, "Payload Too Large", ex.getMessage()));
     }
 

@@ -1,8 +1,8 @@
 # Tag Validation
 
-New tags are validated against the StackExchange API before being persisted. Validation only runs when creating a tag that doesn't exist locally — once a tag is in the database, it's accepted without further checks. Results are cached in Redis (`redis.ser.mlanima.org`) with a 1-hour TTL.
+New tags are validated before being persisted. Validation only runs when creating a tag that doesn't exist locally — once a tag is in the database, it's accepted without further checks. Results are cached in Redis (`redis.ser.mlanima.org`) with a 1-hour TTL.
 
-The validation source is swappable via `app.tags.source` in `application.yaml`. The `TagSource` interface can be reimplemented (database-backed, GitHub Topics, static list) without modifying `ProjectTagService` or `ProfileTagService`.
+Three validation modes are available via `app.tags.source` in `application.yaml`. The `TagSource` interface can be further reimplemented without modifying `ProjectTagService` or `ProfileTagService`.
 
 ---
 
@@ -11,7 +11,14 @@ The validation source is swappable via `app.tags.source` in `application.yaml`. 
 ```
 TagSource (interface)
     │
-    └── StackOverflowTagSource      # RestClient → StackExchange API v2.3
+    ├── ModeratedTagSource (default)         # BlocklistService + GitHubTopicsClient
+    │       │
+    │       ├── BlocklistService             # LDNOOBW wordlist (27 languages)
+    │       └── GitHubTopicsClient           # RestClient → GitHub Search Topics API
+    │
+    ├── GitHubTopicsTagSource                # RestClient → GitHub Search Topics API (no blocklist)
+    │
+    └── StackOverflowTagSource               # RestClient → StackExchange API v2.3
             │
             ▼
     TagValidationService            # @Cacheable — delegates to TagSource
@@ -20,11 +27,21 @@ TagSource (interface)
     ProjectTagService / ProfileTagService   # calls isValidTag() on new tag only
 ```
 
-The active implementation is selected by `@ConditionalOnProperty(name = "app.tags.source")` on `StackOverflowTagSource`.
+Active implementation selected by `@ConditionalOnProperty(name = "app.tags.source")`.
 
 ---
 
-## Data Flow
+## Validation Modes
+
+| `app.tags.source` | Description |
+|---|---|
+| `github-blocklist` (default) | Checks LDNOOBW blocklist first, then queries GitHub Topics API |
+| `github` | Queries GitHub Topics API directly — no moderation |
+| `stackoverflow` | Queries StackExchange API v2.3 — implicitly clean (community-moderated) |
+
+---
+
+## Data Flow (github-blocklist mode)
 
 ```
 User submits "typescript"
@@ -35,12 +52,25 @@ User submits "typescript"
         → NOT FOUND → tagValidationService.isValidTag("typescript")
           → @Cacheable("tag-exists")
             → REDIS HIT → return cached true/false
-            → REDIS MISS → StackOverflowTagSource.tagExists("typescript")
-              → GET /2.3/tags/typescript/info?site=stackoverflow
+            → REDIS MISS → ModeratedTagSource.tagExists("typescript")
+              → BlocklistService.contains("typescript")?  no
+              → GitHubTopicsClient.tagExists("typescript")
+                → GET /search/topics?q=typescript
               → Cache result in Redis (TTL: 1 hour)
           → VALID → tagRepository.save(new TagEntity("typescript")) → 200
           → INVALID → throw TagNotValidException → 400
+
+User submits "fuck"
+  → ...tagValidationService.isValidTag("fuck")
+    → @Cacheable("tag-exists")
+      → REDIS HIT → return false (cached from previous)
+      → REDIS MISS → ModeratedTagSource.tagExists("fuck")
+        → BlocklistService.contains("fuck")?  yes → return false
+        → Cache result in Redis (TTL: 1 hour)
+    → INVALID → throw TagNotValidException → 400
 ```
+
+Blocked tags still get cached (as `false`) to avoid re-checking the blocklist on every attempt.
 
 ---
 
@@ -66,7 +96,12 @@ spring:
 
 app:
   tags:
-    source: stackoverflow
+    source: github-blocklist          # "github-blocklist" (default), "github", or "stackoverflow"
+
+github:
+  topics:
+    api:
+      base-url: https://api.github.com
 
 stackoverflow:
   api:
@@ -74,16 +109,35 @@ stackoverflow:
     key: ${STACKOVERFLOW_API_KEY:}    # optional; 300 req/day without, 10k with
 ```
 
+### Switching Modes
+
+| Mode | Config Change |
+|---|---|
+| Blocklist + GitHub (default) | `app.tags.source: github-blocklist` |
+| GitHub Topics (no moderation) | `app.tags.source: github` |
+| StackOverflow | `app.tags.source: stackoverflow` |
+
+The `@ConditionalOnProperty` on each implementation ensures only the matching source is active.
+
+### Blocklist Updates
+
+The LDNOOBW wordlist is downloaded at build time (`generate-resources` phase) via `exec-maven-plugin`. Each language file is cached on disk (`src/main/resources/bad-words/`) and only re-downloaded if missing. To force a refresh:
+
+```bash
+rm -rf src/main/resources/bad-words
+./mvnw generate-resources
+```
+
+Supported languages (28): ar, cs, da, de, en, eo, es, fa, fi, fil, fr, fr-CA-u-sd-caqc, hi, hu, it, ja, kab, ko, nl, no, pl, pt, ru, sv, th, tlh, tr, zh.
+
 ### Environment Variables
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `SPRING_CACHE_TYPE` | No | `redis` | Set to `none` to disable Redis caching |
+| `SPRING_CACHE_TYPE` | No | `redis` | Set to `none` to disable Redis |
 | `SPRING_DATA_REDIS_HOST` | No | `redis.ser.mlanima.org` | Redis server hostname |
 | `SPRING_DATA_REDIS_PASSWORD` | In prod | empty | Redis `requirepass` value |
-| `STACKOVERFLOW_API_KEY` | No | empty | StackExchange API app key |
-
-Secrets are baked into the Docker image via build args in the CI/CD pipeline. No server-side compose changes needed.
+| `STACKOVERFLOW_API_KEY` | If using SO | empty | StackExchange API app key |
 
 ---
 
@@ -91,7 +145,7 @@ Secrets are baked into the Docker image via build args in the CI/CD pipeline. No
 
 | Exception | HTTP | Log Level | Message |
 |-----------|------|-----------|---------|
-| `TagNotValidException` | 400 | debug | `"Tag 'xyz' is not a valid StackOverflow tag"` |
+| `TagNotValidException` | 400 | debug | `"Tag 'xyz' is not a valid tag"` |
 | `TagValidationException` | 502 | error | `"Tag validation service temporarily unavailable"` |
 
 Frontend: both `TagList` and `ProfileTagListComponent` check `err.status === 400` and the `not a valid` substring in the response body, then show `PROJECTSITE.TAGS.ERROR_NOT_VALID` with the tag name.
@@ -102,17 +156,24 @@ Frontend: both `TagList` and `ProfileTagListComponent` check `err.status === 400
 
 ```
 api/src/main/java/de/thm/swtp/api/
-├── config/CacheConfig.java               # @EnableCaching, RedisCacheManager
+├── config/CacheConfig.java               # @EnableCaching, RedisCacheManager, CacheErrorHandler
 ├── tag/
 │   ├── exception/TagNotValidException.java
-│   ├── service/ProjectTagService.java    # modified — injects TagValidationService
-│   ├── service/ProfileTagService.java    # modified — injects TagValidationService
+│   ├── service/ProjectTagService.java    # injects TagValidationService
+│   ├── service/ProfileTagService.java    # injects TagValidationService
 │   └── validation/
 │       ├── TagSource.java                # interface
-│       ├── StackOverflowTagSource.java
+│       ├── BlocklistService.java         # loads LDNOOBW wordlist at startup
+│       ├── GitHubTopicsClient.java       # shared GitHub API client
+│       ├── GitHubTopicsTagSource.java    # GitHub-only (no blocklist)
+│       ├── ModeratedTagSource.java       # default — blocklist + GitHub
+│       ├── StackOverflowTagSource.java   # alternative — StackExchange API
 │       ├── TagValidationService.java     # @Cacheable wrapper
 │       └── TagValidationException.java
-└── exceptionhandling/GlobalExceptionHandler.java  # modified — handles both exceptions
+├── scripts/
+│   ├── download-bad-words.sh             # Linux/macOS
+│   └── download-bad-words.ps1            # Windows
+└── exceptionhandling/GlobalExceptionHandler.java  # handles both exceptions
 ```
 
 ### Adding a New Source
@@ -128,19 +189,34 @@ public class DatabaseTagSource implements TagSource {
 
 Set `app.tags.source=database` in `application.yaml`. No other code changes.
 
+### Adding Blocklist-Only Validation
+
+To reject blocked tags without checking any external API, create a tag source that only checks `BlocklistService`:
+
+```java
+@Component
+@ConditionalOnProperty(name = "app.tags.source", havingValue = "blocklist-only")
+public class BlocklistOnlyTagSource implements TagSource {
+    private final BlocklistService blocklistService;
+    // tagExists() returns true only if tag is NOT in the blocklist
+}
+```
+
 ---
 
 ## Local Development
 
-The Redis instance (`redis.ser.mlanima.org`) is firewalled to `144.76.176.84/32` only — unreachable from local machines.
+Redis connections fail gracefully — if Redis is unreachable, the cache is skipped and the tag source is called directly. A warning is logged.
 
-### Disable Caching (Recommended)
+### No Redis (Works Out of the Box)
+
+No configuration needed. The default Redis host is firewalled, so the `CacheErrorHandler` degrades automatically.
+
+### Disable Caching
 
 ```bash
 SPRING_CACHE_TYPE=none ./mvnw spring-boot:run
 ```
-
-Every `isValidTag()` call goes directly to the StackExchange API. Acceptable for dev volumes.
 
 ### Local Redis
 
@@ -154,15 +230,15 @@ SPRING_DATA_REDIS_HOST=localhost ./mvnw spring-boot:run
 ## CI/CD
 
 1. Push to `developer`/`main` triggers `cd-build-deploy.yml`
-2. Docker image built with `--build-arg SPRING_DATA_REDIS_PASSWORD` and `--build-arg STACKOVERFLOW_API_KEY`
+2. Docker image built with `--build-arg SPRING_DATA_REDIS_PASSWORD` (and `STACKOVERFLOW_API_KEY` if SO source is used)
 3. Image pushed to GHCR, deployed via `deploy-app.bb` on `swtp-ss26.de`
+
+GitHub Topics API requires no authentication (60 req/hr unauthenticated, sufficient with 1h cache).
 
 ---
 
 ## Future Improvements
 
-- **`CacheErrorHandler`** — If Redis is unreachable, degrade to direct SO API calls instead of failing.
-- **Respect StackExchange `backoff`** — Sleep N+1 seconds after receiving `backoff: N`. Currently only logged; caching makes repeated calls rare.
-- **Cache warmup from SO data dump** — Stack Exchange publishes quarterly dumps (~100MB tags only) that can be imported to pre-populate the cache.
-- **Bloom filter pre-check** — ~1MB in-memory filter of all valid tags. Eliminates API calls for invalid tags entirely.
-- **StackExchange `filter` parameter** — Custom filters to reduce response payload (`?filter=!)`) and save bandwidth.
+- **GitHub token for higher rate limit** — Pass a `GITHUB_TOKEN` to get 5,000 req/hr instead of 60.
+- **Bloom filter pre-check** — ~1MB in-memory filter of all known tags. Eliminates API calls for invalid tags entirely.
+- **Cache warmup** — Pre-populate the Redis cache with commonly used tags on startup.

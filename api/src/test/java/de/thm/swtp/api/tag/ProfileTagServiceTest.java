@@ -4,6 +4,7 @@ import de.thm.swtp.api.tag.domain.Tag;
 import de.thm.swtp.api.tag.entity.TagEntity;
 import de.thm.swtp.api.tag.repository.TagRepository;
 import de.thm.swtp.api.tag.service.ProfileTagService;
+import de.thm.swtp.api.tag.validation.TagValidationService;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
@@ -25,6 +26,7 @@ class ProfileTagServiceTest {
 
     private TagRepository tagRepository;
     private UserProfileRepository userProfileRepository;
+    private TagValidationService tagValidationService;
     private ProfileTagService profileTagService;
 
     private UUID userId;
@@ -34,8 +36,9 @@ class ProfileTagServiceTest {
     void setup() {
         tagRepository = mock(TagRepository.class);
         userProfileRepository = mock(UserProfileRepository.class);
+        tagValidationService = mock(TagValidationService.class);
 
-        profileTagService = new ProfileTagService(tagRepository, userProfileRepository);
+        profileTagService = new ProfileTagService(tagRepository, userProfileRepository, tagValidationService);
 
         userId = UUID.randomUUID();
 

@@ -77,7 +77,7 @@ class GlobalExceptionHandlerTest {
     @Test
     void fileUploadLimitReturns422() {
         assertStatus(handler.handleProjectFileUploadLimitExceeded(
-                new ProjectFileUploadLimitExceededException(20)), HttpStatus.UNPROCESSABLE_ENTITY);
+                new ProjectFileUploadLimitExceededException(20)), HttpStatus.valueOf(422));
     }
 
     @Test
@@ -143,7 +143,7 @@ class GlobalExceptionHandlerTest {
     @Test
     void uploadTooLargeReturns413() {
         assertStatus(handler.handleUploadTooLarge(
-                new MaxUploadSizeExceededException(1024L)), HttpStatus.PAYLOAD_TOO_LARGE);
+                new MaxUploadSizeExceededException(1024L)), HttpStatus.valueOf(413));
     }
 
     // ── catch-all: 500 with a generic body, never the raw exception message ──
