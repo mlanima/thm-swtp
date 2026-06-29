@@ -121,11 +121,14 @@ The `@ConditionalOnProperty` on each implementation ensures only the matching so
 
 ### Blocklist Updates
 
-The LDNOOBW wordlist is downloaded at build time (`generate-resources` phase) via `exec-maven-plugin`. Each language file is cached on disk (`src/main/resources/bad-words/`) and only re-downloaded if missing. To force a refresh:
+Bad-word files are committed to the repository. To refresh them, run the platform-specific script from the `api/` directory:
 
 ```bash
-rm -rf src/main/resources/bad-words
-./mvnw generate-resources
+# Linux/macOS
+bash scripts/download-bad-words.sh
+
+# Windows
+.\scripts\download-bad-words.ps1
 ```
 
 Supported languages (28): ar, cs, da, de, en, eo, es, fa, fi, fil, fr, fr-CA-u-sd-caqc, hi, hu, it, ja, kab, ko, nl, no, pl, pt, ru, sv, th, tlh, tr, zh.
