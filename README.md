@@ -1,2 +1,2 @@
-# THM. Software Engineering: Realisierung. Gruppe 2
+# THM. Software Engineering: Realisierung. Gruppe 3
 
