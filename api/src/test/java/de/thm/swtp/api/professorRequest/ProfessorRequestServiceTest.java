@@ -57,7 +57,6 @@ public class ProfessorRequestServiceTest {
         user.setUsername("testuser");
     }
 
-    String name = "Prof. Test User";
     String email = "testuser@example.com";
     String text = "I would like professor rights to create courses.";
 
@@ -75,13 +74,12 @@ public class ProfessorRequestServiceTest {
                     return entity;
                 });
 
-        ProfessorRequest result = professorRequestService.createProfessorRequest(userId, name, email, text);
+        ProfessorRequest result = professorRequestService.createProfessorRequest(userId, email, text);
 
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(requestId);
         assertThat(result.getRequestingUserId()).isEqualTo(userId);
         assertThat(result.getRequestingUsername()).isEqualTo("testuser");
-        assertThat(result.getName()).isEqualTo(name);
         assertThat(result.getEmail()).isEqualTo(email);
         assertThat(result.getText()).isEqualTo(text);
         assertThat(result.getStatus()).isEqualTo(ProfessorRequestStatus.PENDING);
@@ -93,7 +91,7 @@ public class ProfessorRequestServiceTest {
     void createProfessorRequest_shouldThrowException_whenUserNotFound() {
         when(userProfileRepository.findById(userId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> professorRequestService.createProfessorRequest(userId, name, email, text))
+        assertThatThrownBy(() -> professorRequestService.createProfessorRequest(userId, email, text))
                 .isInstanceOf(UserProfileNotFoundException.class);
 
         verify(professorRequestRepository, never()).save(any());
@@ -104,7 +102,6 @@ public class ProfessorRequestServiceTest {
         ProfessorRequestEntity entity = ProfessorRequestEntity.builder()
                 .id(requestId)
                 .requestingUser(user)
-                .name(name)
                 .email(email)
                 .text(text)
                 .status(ProfessorRequestStatus.PENDING)
@@ -122,7 +119,7 @@ public class ProfessorRequestServiceTest {
         assertThat(result).isNotNull();
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getContent().getFirst().getId()).isEqualTo(requestId);
-        assertThat(result.getContent().getFirst().getName()).isEqualTo(name);
+        assertThat(result.getContent().getFirst().getRequestingUsername()).isEqualTo("testuser");
         assertThat(result.getContent().getFirst().getStatus()).isEqualTo(ProfessorRequestStatus.PENDING);
 
         verify(professorRequestRepository).findAllByOrderByCreatedAtDesc(pageable);
@@ -147,7 +144,6 @@ public class ProfessorRequestServiceTest {
         ProfessorRequestEntity entity = ProfessorRequestEntity.builder()
                 .id(requestId)
                 .requestingUser(user)
-                .name(name)
                 .email(email)
                 .text(text)
                 .status(ProfessorRequestStatus.PENDING)
@@ -180,7 +176,6 @@ public class ProfessorRequestServiceTest {
         ProfessorRequestEntity entity = ProfessorRequestEntity.builder()
                 .id(requestId)
                 .requestingUser(user)
-                .name(name)
                 .email(email)
                 .text(text)
                 .status(ProfessorRequestStatus.REJECTED)
@@ -201,7 +196,6 @@ public class ProfessorRequestServiceTest {
         ProfessorRequestEntity entity = ProfessorRequestEntity.builder()
                 .id(requestId)
                 .requestingUser(user)
-                .name(name)
                 .email(email)
                 .text(text)
                 .status(ProfessorRequestStatus.PENDING)
@@ -234,7 +228,6 @@ public class ProfessorRequestServiceTest {
         ProfessorRequestEntity entity = ProfessorRequestEntity.builder()
                 .id(requestId)
                 .requestingUser(user)
-                .name(name)
                 .email(email)
                 .text(text)
                 .status(ProfessorRequestStatus.ACCEPTED)
