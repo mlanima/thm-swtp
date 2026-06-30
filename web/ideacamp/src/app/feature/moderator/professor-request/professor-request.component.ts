@@ -5,7 +5,7 @@ import {
   ModeratorProfRequest,
   ProfRequestStatus,
 } from './models/moderator-professor-request.model';
-import { ModeratorProfessorRequestService } from './service/moderator-professor-request.service'
+import { ModeratorProfessorRequestService } from './service/moderator-professor-request.service';
 import { Pagination } from '../shared/pagination/pagination';
 
 type ProfRequestAction = 'accept' | 'reject';
@@ -37,7 +37,7 @@ export class ProfessorRequestComponent implements OnInit {
 
   readonly confirmTitle = computed(() => {
     return this.selectedAction() === 'accept'
-      ? 'MODERATOR.PROFESSOR_REQUESTS.CONFIRM_ACCEPT_TEXT'
+      ? 'MODERATOR.PROFESSOR_REQUESTS.CONFIRM_ACCEPT_TITLE'
       : 'MODERATOR.PROFESSOR_REQUESTS.CONFIRM_REJECT_TITLE';
   });
 
@@ -99,7 +99,7 @@ export class ProfessorRequestComponent implements OnInit {
     if (!req || !action || this.isSubmitting()) {
       return;
     }
-    this.isLoading.set(true);
+    this.isSubmitting.set(true);
     this.actionError.set('');
 
     const actionReq =
@@ -119,7 +119,7 @@ export class ProfessorRequestComponent implements OnInit {
             : 'MODERATOR.PROFESSOR_REQUESTS.ERROR_REJECT';
 
         this.actionError.set(this.translateService.instant(actionType));
-        this.isLoading.set(false);
+        this.isSubmitting.set(false);
       },
     });
   }

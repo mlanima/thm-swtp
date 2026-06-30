@@ -84,7 +84,7 @@ export class ProfessorRequestTab implements OnInit {
         this.isLoading.set(false);
       },
       error: () => {
-        this.errorMessage.set('PROFESSOR_REQUEST.ERROR_LOAD_USER');
+        this.errorMessage.set(this.translate.instant('PROFESSOR_REQUEST.ERROR_LOAD_USER'));
         this.isLoading.set(false);
       },
     });
