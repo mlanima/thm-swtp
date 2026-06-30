@@ -25,6 +25,7 @@ public class OpenAIModeratedGithubTagSource implements TagSource {
                 log.warn("Tag flagged by OpenAI moderation: {}", LogSafe.clean(tagName));
                 return false;
             }
+            log.info("Tag passed OpenAI moderation: {}", LogSafe.clean(tagName));
         } catch (TagValidationException e) {
             log.warn("OpenAI moderation unavailable, falling back to blocklist: {}",
                     LogSafe.clean(tagName));
@@ -35,6 +36,8 @@ public class OpenAIModeratedGithubTagSource implements TagSource {
             log.info("Blocklist passed, querying GitHub for tag: {}", LogSafe.clean(tagName));
         }
 
-        return gitHubTopicsClient.tagExists(cleaned);
+        var exists = gitHubTopicsClient.tagExists(cleaned);
+        log.info("GitHub topics check for '{}': {}", LogSafe.clean(tagName), exists);
+        return exists;
     }
 }
