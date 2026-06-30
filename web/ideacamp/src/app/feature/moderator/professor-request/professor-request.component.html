@@ -1,1 +1,203 @@
-<p>professor-request works!</p>
+<section class="min-h-screen bg-slate-100 px-6 py-8 text-slate-700">
+  <div class="mx-auto max-w-6xl">
+    <header class="mb-6">
+      <div class="flex items-center gap-3">
+        <h1 class="text-3xl font-bold text-slate-700">
+          {{ 'MODERATOR.PROFESSOR_REQUESTS.TITLE' | translate }}
+        </h1>
+
+        <span
+          class="inline-flex items-center rounded-md bg-slate-700 px-2.5 py-0.5 text-xs font-medium text-white"
+        >
+          MODERATOR
+        </span>
+      </div>
+
+      <p class="mt-1 text-sm text-slate-500">
+        {{ 'MODERATOR.PROFESSOR_REQUESTS.SUBTITLE' | translate }}
+      </p>
+    </header>
+
+    @if (isLoading()) {
+      <div
+        class="flex items-center justify-center rounded-xl border border-slate-200 bg-white px-6 py-16 shadow-sm"
+      >
+        <p class="text-sm text-slate-500">
+          {{ 'MODERATOR.PROFESSOR_REQUESTS.LOADING' | translate }}
+        </p>
+      </div>
+    } @else if (errorMessage()) {
+      <div
+        class="flex items-center justify-center rounded-xl border border-red-200 bg-red-50 px-6 py-12 shadow-sm"
+      >
+        <p class="text-sm font-medium text-red-700">
+          {{ errorMessage() }}
+        </p>
+      </div>
+    } @else {
+      <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-slate-200">
+            <thead class="bg-slate-50">
+            <tr>
+              <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                {{ 'MODERATOR.PROFESSOR_REQUESTS.COLUMN_USER' | translate }}
+              </th>
+              <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                {{ 'MODERATOR.PROFESSOR_REQUESTS.COLUMN_EMAIL' | translate }}
+              </th>
+              <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                {{ 'MODERATOR.PROFESSOR_REQUESTS.COLUMN_MESSAGE' | translate }}
+              </th>
+              <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                {{ 'MODERATOR.PROFESSOR_REQUESTS.COLUMN_CREATED' | translate }}
+              </th>
+              <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                {{ 'MODERATOR.PROFESSOR_REQUESTS.COLUMN_STATUS' | translate }}
+              </th>
+              <th class="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">
+                {{ 'MODERATOR.PROFESSOR_REQUESTS.COLUMN_ACTIONS' | translate }}
+              </th>
+            </tr>
+            </thead>
+
+            <tbody class="divide-y divide-slate-100 bg-white">
+              @for (request of requests(); track request.id) {
+                <tr class="transition-colors hover:bg-slate-50">
+                  <td class="px-5 py-4 align-top">
+                    <div class="font-medium text-slate-800">
+                      {{ request.requestingUsername }}
+                    </div>
+                    <div class="mt-1 text-xs text-slate-400">
+                      {{ request.requestingUserId }}
+                    </div>
+                  </td>
+
+                  <td class="px-5 py-4 align-top text-sm text-slate-600">
+                    {{ request.email }}
+                  </td>
+
+                  <td class="max-w-xs px-5 py-4 align-top text-sm text-slate-600">
+                    <p class="line-clamp-3 whitespace-pre-line">
+                      {{ request.text }}
+                    </p>
+                  </td>
+
+                  <td class="px-5 py-4 align-top text-sm text-slate-500">
+                    {{ request.createdAt | date: 'dd.MM.yyyy, HH:mm' }}
+                  </td>
+
+                  <td class="px-5 py-4 align-top">
+                    <span
+                      class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset"
+                      [class]="getStatusClasses(request.status)"
+                    >
+                      {{ getStatusTranslationKey(request.status) | translate }}
+                    </span>
+                  </td>
+
+                  <td class="px-5 py-4 align-top">
+                    <div class="flex justify-end gap-2">
+                      @if (request.status === 'PENDING') {
+                        <button
+                          type="button"
+                          class="rounded-lg bg-emerald-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-emerald-700"
+                          (click)="openConfirmDialog(request, 'accept')"
+                        >
+                          {{ 'MODERATOR.PROFESSOR_REQUESTS.ACCEPT' | translate }}
+                        </button>
+
+                        <button
+                          type="button"
+                          class="rounded-lg bg-red-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-red-700"
+                          (click)="openConfirmDialog(request, 'reject')"
+                        >
+                          {{ 'MODERATOR.PROFESSOR_REQUESTS.REJECT' | translate }}
+                        </button>
+                      } @else {
+                        <span class="text-xs text-slate-400">-</span>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="6" class="px-5 py-12 text-center text-sm text-slate-500">
+                    {{ 'MODERATOR.PROFESSOR_REQUESTS.NO_RESULTS' | translate }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <app-pagination
+        [currentPage]="currentPage()"
+        [totalPages]="totalPages()"
+        (pageChange)="onPageChange($event)"
+      />
+
+      <p class="mt-4 text-center text-sm text-slate-400">
+        {{ requests().length }}
+        {{ 'MODERATOR.PROFESSOR_REQUESTS.SHOWING_OF' | translate }}
+        {{ totalElements() }}
+        {{ 'MODERATOR.PROFESSOR_REQUESTS.TOTAL_REQUESTS' | translate }}
+      </p>
+    }
+  </div>
+</section>
+
+@if (selectedRequest(); as request) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4">
+    <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+      <div class="mb-4">
+        <h2 class="text-xl font-bold text-slate-800">
+          {{ confirmTitle() | translate }}
+        </h2>
+
+        <p class="mt-2 text-sm text-slate-500">
+          {{ confirmText() | translate }}
+        </p>
+      </div>
+
+      <div class="rounded-xl bg-slate-50 p-4 text-sm text-slate-600">
+        <div class="font-medium text-slate-800">
+          {{ request.requestingUsername }}
+        </div>
+        <div class="mt-1">
+          {{ request.email }}
+        </div>
+      </div>
+
+      @if (actionError()) {
+        <div class="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {{ actionError() }}
+        </div>
+      }
+
+      <div class="mt-6 flex justify-end gap-3">
+        <button
+          type="button"
+          class="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+          [disabled]="isSubmitting()"
+          (click)="closeConfirmDialog()"
+        >
+          {{ 'MODERATOR.PROFESSOR_REQUESTS.CANCEL' | translate }}
+        </button>
+
+        <button
+          type="button"
+          class="rounded-lg px-4 py-2 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-60"
+          [class]="selectedAction() === 'accept'
+            ? 'bg-emerald-600 hover:bg-emerald-700'
+            : 'bg-red-600 hover:bg-red-700'"
+          [disabled]="isSubmitting()"
+          (click)="confirmAction()"
+        >
+          {{ 'MODERATOR.PROFESSOR_REQUESTS.CONFIRM' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
