@@ -10,11 +10,6 @@ import { AuthService } from '../../../auth/auth.service';
 import { FormErrors, mapZodErrors } from '../../../project-create/schemas/zod-error.helper';
 
 const professorRequestSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(1, 'PROFESSOR_REQUEST.VALIDATION.NAME_REQUIRED')
-    .max(100, 'PROFESSOR_REQUEST.VALIDATION.NAME_MAX'),
   email: z
     .string()
     .trim()
@@ -63,37 +58,40 @@ export class ProfessorRequestTab implements OnInit {
 
   ngOnInit(): void {
     this.authService.waitUntilAuthReady().then(() => {
-      const user = this.authService.user();
-      if (!user) {
-        this.errorMessage.set(this.translate.instant('PROFESSOR_REQUEST.ERROR_LOAD_USER'));
+      this.loadUserAndRequest();
+    });
+  }
+  private loadUserAndRequest(): void {
+    const user = this.authService.user();
+
+    if (!user) {
+      setTimeout(() => this.loadUserAndRequest(), 100);
+      return;
+    }
+
+    this.userName.set(user.username);
+
+    this.requestService.getMyRequest(user.id).subscribe({
+      next: (existing) => {
+        this.existingRequest.set(existing);
+
+        if (!existing) {
+          this.userName.set(user.username);
+          this.userEmail.set('');
+          this.userText.set('');
+        }
+
         this.isLoading.set(false);
-        return;
-      }
-
-      this.userName.set(user.username);
-
-      this.requestService.getMyRequest(user.id).subscribe({
-        next: (existing) => {
-          this.existingRequest.set(existing);
-
-          if (!existing) {
-            this.userName.set(user.username);
-            this.userEmail.set('');
-            this.userText.set('');
-          }
-
-          this.isLoading.set(false);
-        },
-        error: () => {
-          this.isLoading.set(false);
-        },
-      });
+      },
+      error: () => {
+        this.errorMessage.set('PROFESSOR_REQUEST.ERROR_LOAD_USER');
+        this.isLoading.set(false);
+      },
     });
   }
 
   submitApplication(): void {
     const result = professorRequestSchema.safeParse({
-      name: this.userName(),
       email: this.userEmail(),
       text: this.userText(),
     });
@@ -109,7 +107,6 @@ export class ProfessorRequestTab implements OnInit {
 
     this.requestService
       .create({
-        name: result.data.name,
         email: result.data.email ?? '',
         text: result.data.text,
       })
