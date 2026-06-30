@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 
@@ -139,12 +140,19 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleTagNotValid(TagNotValidException ex) {
         log.debug("Bad Request (400): {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
+                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage(), "TAG_NOT_VALID"));
     }
 
     @ExceptionHandler(TagValidationException.class)
     public ResponseEntity<ErrorResponse> handleTagValidationError(TagValidationException ex) {
         log.error("Tag validation failed due to external API error: {}", ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                .body(ErrorResponse.of(502, "Bad Gateway", "Tag validation service temporarily unavailable."));
+    }
+
+    @ExceptionHandler(ResourceAccessException.class)
+    public ResponseEntity<ErrorResponse> handleResourceAccess(ResourceAccessException ex) {
+        log.error("External API unreachable: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
                 .body(ErrorResponse.of(502, "Bad Gateway", "Tag validation service temporarily unavailable."));
     }
