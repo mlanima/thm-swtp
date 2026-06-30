@@ -1,5 +1,6 @@
 package de.thm.swtp.api.thesis;
 
+import de.thm.swtp.api.common.TxLogger;
 import de.thm.swtp.api.project.ProjectUrlUtils;
 import de.thm.swtp.api.tag.entity.TagEntity;
 import de.thm.swtp.api.tag.repository.TagRepository;
@@ -7,18 +8,21 @@ import de.thm.swtp.api.thesis.domain.Thesis;
 import de.thm.swtp.api.thesis.dto.request.CreateThesisRequest;
 import de.thm.swtp.api.thesis.dto.request.UpdateThesisRequest;
 import de.thm.swtp.api.thesis.dto.response.DeleteThesisResponse;
+import de.thm.swtp.api.thesis.exception.ThesisInvalidStudentAssignmentException;
 import de.thm.swtp.api.thesis.exception.ThesisInvalidUrlException;
-import de.thm.swtp.api.thesis.exception.ThesisUrlGenerationFailedException;
+import de.thm.swtp.api.thesis.exception.ThesisNotFoundByIdException;
 import de.thm.swtp.api.thesis.exception.ThesisNotFoundException;
 import de.thm.swtp.api.thesis.exception.ThesisStudentAlreadyAssignedException;
 import de.thm.swtp.api.thesis.exception.ThesisStudentNotFoundException;
 import de.thm.swtp.api.thesis.exception.ThesisTitleAlreadyExistsException;
 import de.thm.swtp.api.thesis.exception.ThesisUrlAlreadyExistsException;
+import de.thm.swtp.api.thesis.exception.ThesisUrlGenerationFailedException;
 import de.thm.swtp.api.thesis.mapper.ThesisMapper;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +34,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ThesisService {
@@ -59,7 +64,7 @@ public class ThesisService {
     public Thesis getById(UUID id) {
         return thesisRepository.findById(id)
                 .map(ThesisMapper::toDomain)
-                .orElseThrow(() -> new ThesisNotFoundException(id.toString()));
+                .orElseThrow(() -> new ThesisNotFoundByIdException(id));
     }
 
     @Transactional(readOnly = true)
@@ -105,13 +110,15 @@ public class ThesisService {
                 .tags(resolveTags(request.tags()))
                 .build();
 
-        return ThesisMapper.toDomain(thesisRepository.save(thesis));
+        ThesisEntity saved = thesisRepository.save(thesis);
+        TxLogger.afterCommit(log, "Thesis created: thesis={}, supervisor={}", saved.getId(), supervisorId);
+        return ThesisMapper.toDomain(saved);
     }
 
     @Transactional
     public Thesis update(UUID id, UpdateThesisRequest request) {
         ThesisEntity thesis = thesisRepository.findById(id)
-                .orElseThrow(() -> new ThesisNotFoundException(id.toString()));
+                .orElseThrow(() -> new ThesisNotFoundByIdException(id));
 
         if (request.getTitle() != null && !request.getTitle().equals(thesis.getTitle())
                 && thesisRepository.existsByTitleAndIdNot(request.getTitle(), thesis.getId())) {
@@ -141,16 +148,25 @@ public class ThesisService {
             thesis.setTags(resolveTags(request.getTags()));
         }
 
-        return ThesisMapper.toDomain(thesisRepository.save(thesis));
+        ThesisEntity updated = thesisRepository.save(thesis);
+        TxLogger.afterCommit(log, "Thesis updated: thesis={}", id);
+        return ThesisMapper.toDomain(updated);
     }
 
     @Transactional
     public Thesis addStudent(UUID thesisId, UUID studentKeycloakId) {
         ThesisEntity thesis = thesisRepository.findById(thesisId)
-                .orElseThrow(() -> new ThesisNotFoundException(thesisId.toString()));
+                .orElseThrow(() -> new ThesisNotFoundByIdException(thesisId));
 
         UserProfile student = userProfileRepository.findById(studentKeycloakId)
                 .orElseThrow(() -> new UserProfileNotFoundException(studentKeycloakId.toString()));
+
+        if (student.isProfessor()) {
+            throw new ThesisInvalidStudentAssignmentException(studentKeycloakId);
+        }
+        if (studentKeycloakId.equals(thesis.getSupervisor().getKeycloakId())) {
+            throw new ThesisInvalidStudentAssignmentException(studentKeycloakId);
+        }
 
         boolean alreadyAssigned = thesis.getStudents().stream()
                 .anyMatch(s -> s.getKeycloakId().equals(studentKeycloakId));
@@ -159,13 +175,15 @@ public class ThesisService {
         }
 
         thesis.getStudents().add(student);
-        return ThesisMapper.toDomain(thesisRepository.save(thesis));
+        ThesisEntity saved = thesisRepository.save(thesis);
+        TxLogger.afterCommit(log, "Thesis student added: thesis={}, student={}", thesisId, studentKeycloakId);
+        return ThesisMapper.toDomain(saved);
     }
 
     @Transactional
     public Thesis removeStudent(UUID thesisId, UUID studentKeycloakId) {
         ThesisEntity thesis = thesisRepository.findById(thesisId)
-                .orElseThrow(() -> new ThesisNotFoundException(thesisId.toString()));
+                .orElseThrow(() -> new ThesisNotFoundByIdException(thesisId));
 
         UserProfile student = userProfileRepository.findById(studentKeycloakId)
                 .orElseThrow(() -> new UserProfileNotFoundException(studentKeycloakId.toString()));
@@ -177,14 +195,17 @@ public class ThesisService {
         }
 
         thesis.getStudents().remove(student);
-        return ThesisMapper.toDomain(thesisRepository.save(thesis));
+        ThesisEntity saved = thesisRepository.save(thesis);
+        TxLogger.afterCommit(log, "Thesis student removed: thesis={}, student={}", thesisId, studentKeycloakId);
+        return ThesisMapper.toDomain(saved);
     }
 
     @Transactional
     public DeleteThesisResponse delete(UUID id) {
         ThesisEntity thesis = thesisRepository.findById(id)
-                .orElseThrow(() -> new ThesisNotFoundException(id.toString()));
+                .orElseThrow(() -> new ThesisNotFoundByIdException(id));
         thesisRepository.delete(thesis);
+        TxLogger.afterCommit(log, "Thesis deleted: thesis={}", id);
         return DeleteThesisResponse.builder()
                 .thesisId(id)
                 .message("Abschlussarbeit erfolgreich gelöscht.")

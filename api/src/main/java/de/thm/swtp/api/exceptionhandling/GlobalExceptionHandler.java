@@ -10,6 +10,8 @@ import de.thm.swtp.api.thesis.exception.ThesisStudentAlreadyAssignedException;
 import de.thm.swtp.api.thesis.exception.ThesisStudentNotFoundException;
 import de.thm.swtp.api.thesis.exception.ThesisTitleAlreadyExistsException;
 import de.thm.swtp.api.thesis.exception.ThesisUrlAlreadyExistsException;
+import de.thm.swtp.api.thesis.exception.ThesisInvalidStudentAssignmentException;
+import de.thm.swtp.api.thesis.exception.ThesisNotFoundByIdException;
 import de.thm.swtp.api.professorRequest.exception.ProfessorRequestInvalidStatusException;
 import de.thm.swtp.api.professorRequest.exception.ProfessorRequestNotFoundException;
 import de.thm.swtp.api.projectFavorite.exception.ProjectAlreadyFavoritedException;
@@ -457,6 +459,20 @@ public class GlobalExceptionHandler {
         log.debug("Not Found (404): {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ThesisNotFoundByIdException.class)
+    public ResponseEntity<ErrorResponse> handleThesisNotFoundById(ThesisNotFoundByIdException ex) {
+        log.debug("Not Found (404): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ThesisInvalidStudentAssignmentException.class)
+    public ResponseEntity<ErrorResponse> handleThesisInvalidStudentAssignment(ThesisInvalidStudentAssignmentException ex) {
+        log.warn("Unprocessable Entity (422): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(ErrorResponse.of(422, "Unprocessable Entity", ex.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)
