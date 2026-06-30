@@ -7,6 +7,7 @@ import de.thm.swtp.api.tag.domain.Tag;
 import de.thm.swtp.api.tag.entity.TagEntity;
 import de.thm.swtp.api.tag.repository.TagRepository;
 import de.thm.swtp.api.tag.service.ProjectTagService;
+import de.thm.swtp.api.tag.service.TagTransactionService;
 import de.thm.swtp.api.tag.validation.TagValidationService;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,6 +29,7 @@ class ProjectTagServiceTest {
     private TagRepository tagRepository;
     private ProjectRepository projectRepository;
     private TagValidationService tagValidationService;
+    private TagTransactionService tagTransactionService;
     private ProjectTagService projectTagService;
 
     private UUID projectId;
@@ -41,9 +43,10 @@ class ProjectTagServiceTest {
         tagRepository = mock(TagRepository.class);
         projectRepository = mock(ProjectRepository.class);
         tagValidationService = mock(TagValidationService.class);
+        tagTransactionService = mock(TagTransactionService.class);
         when(tagValidationService.isValidTag(any())).thenReturn(true);
 
-        projectTagService = new ProjectTagService(tagRepository, projectRepository, tagValidationService);
+        projectTagService = new ProjectTagService(tagRepository, projectRepository, tagValidationService, tagTransactionService);
 
         projectId = UUID.randomUUID();
         ownerId = UUID.randomUUID();
@@ -83,60 +86,54 @@ class ProjectTagServiceTest {
 
     @Test
     void addTagToProject_shouldCreateAndAssignTag_whenTagDoesNotExistAndUserIsOwner() {
-        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
         when(tagRepository.findByNameIgnoreCase("Spring")).thenReturn(Optional.empty());
-        when(tagRepository.save(any(TagEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(tagTransactionService.addTagToProject(projectId, "Spring"))
+                .thenReturn(Tag.builder().name("Spring").build());
 
         Tag result = projectTagService.addTagToProject(projectId, "Spring");
 
         assertThat(result.getName()).isEqualTo("Spring");
-        assertThat(project.getTags())
-                .extracting(TagEntity::getName)
-                .containsExactly("Spring");
-
-        ArgumentCaptor<TagEntity> captor = ArgumentCaptor.forClass(TagEntity.class);
-        verify(tagRepository).save(captor.capture());
-        assertThat(captor.getValue().getName()).isEqualTo("Spring");
+        verify(tagValidationService).isValidTag("Spring");
+        verify(tagTransactionService).addTagToProject(projectId, "Spring");
     }
 
     @Test
     void addTagToProject_shouldUseExistingTag_whenTagAlreadyExistsAndUserIsOwner() {
         TagEntity existingTag = new TagEntity("Java");
-
-        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
         when(tagRepository.findByNameIgnoreCase("Java")).thenReturn(Optional.of(existingTag));
+        when(tagTransactionService.addTagToProject(projectId, "Java"))
+                .thenReturn(Tag.builder().name("Java").build());
 
         Tag result = projectTagService.addTagToProject(projectId, "Java");
 
         assertThat(result.getName()).isEqualTo("Java");
-        assertThat(project.getTags()).contains(existingTag);
-
-        verify(tagRepository, never()).save(any());
+        verify(tagValidationService, never()).isValidTag(any());
+        verify(tagTransactionService).addTagToProject(projectId, "Java");
     }
 
     @Test
     void addTagToProject_shouldTrimTagName_whenCreatingTag() {
-        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
         when(tagRepository.findByNameIgnoreCase("Spring")).thenReturn(Optional.empty());
-        when(tagRepository.save(any(TagEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(tagTransactionService.addTagToProject(projectId, "Spring"))
+                .thenReturn(Tag.builder().name("Spring").build());
 
         Tag result = projectTagService.addTagToProject(projectId, "  Spring  ");
 
         assertThat(result.getName()).isEqualTo("Spring");
-        assertThat(project.getTags())
-                .extracting(TagEntity::getName)
-                .containsExactly("Spring");
+        verify(tagValidationService).isValidTag("Spring");
+        verify(tagTransactionService).addTagToProject(projectId, "Spring");
     }
 
     @Test
     void addTagToProject_shouldThrow_whenProjectDoesNotExist() {
-        when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
+        when(tagTransactionService.addTagToProject(projectId, "Spring"))
+                .thenThrow(new ProjectNotFoundException(projectId));
 
         assertThatThrownBy(() -> projectTagService.addTagToProject(projectId, "Spring"))
                 .isInstanceOf(ProjectNotFoundException.class)
                 .hasMessage("Project not found: " + projectId);
 
-        verify(tagRepository, never()).save(any());
+        verify(tagTransactionService).addTagToProject(projectId, "Spring");
     }
 
     @Test

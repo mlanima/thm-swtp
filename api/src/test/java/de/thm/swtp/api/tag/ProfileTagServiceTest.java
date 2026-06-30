@@ -4,6 +4,7 @@ import de.thm.swtp.api.tag.domain.Tag;
 import de.thm.swtp.api.tag.entity.TagEntity;
 import de.thm.swtp.api.tag.repository.TagRepository;
 import de.thm.swtp.api.tag.service.ProfileTagService;
+import de.thm.swtp.api.tag.service.TagTransactionService;
 import de.thm.swtp.api.tag.validation.TagValidationService;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
@@ -27,6 +28,7 @@ class ProfileTagServiceTest {
     private TagRepository tagRepository;
     private UserProfileRepository userProfileRepository;
     private TagValidationService tagValidationService;
+    private TagTransactionService tagTransactionService;
     private ProfileTagService profileTagService;
 
     private UUID userId;
@@ -37,9 +39,10 @@ class ProfileTagServiceTest {
         tagRepository = mock(TagRepository.class);
         userProfileRepository = mock(UserProfileRepository.class);
         tagValidationService = mock(TagValidationService.class);
+        tagTransactionService = mock(TagTransactionService.class);
         when(tagValidationService.isValidTag(any())).thenReturn(true);
 
-        profileTagService = new ProfileTagService(tagRepository, userProfileRepository, tagValidationService);
+        profileTagService = new ProfileTagService(tagRepository, userProfileRepository, tagValidationService, tagTransactionService);
 
         userId = UUID.randomUUID();
 
@@ -74,60 +77,54 @@ class ProfileTagServiceTest {
 
     @Test
     void addTagToProfile_shouldCreateAndAssignTag_whenTagDoesNotExist() {
-        when(userProfileRepository.findById(userId)).thenReturn(Optional.of(userProfile));
         when(tagRepository.findByNameIgnoreCase("Spring")).thenReturn(Optional.empty());
-        when(tagRepository.save(any(TagEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(tagTransactionService.addTagToProfile(userId, "Spring"))
+                .thenReturn(Tag.builder().name("Spring").build());
 
         Tag result = profileTagService.addTagToProfile(userId, "Spring");
 
         assertThat(result.getName()).isEqualTo("Spring");
-        assertThat(userProfile.getTags())
-                .extracting(TagEntity::getName)
-                .containsExactly("Spring");
-
-        ArgumentCaptor<TagEntity> captor = ArgumentCaptor.forClass(TagEntity.class);
-        verify(tagRepository).save(captor.capture());
-        assertThat(captor.getValue().getName()).isEqualTo("Spring");
+        verify(tagValidationService).isValidTag("Spring");
+        verify(tagTransactionService).addTagToProfile(userId, "Spring");
     }
 
     @Test
     void addTagToProfile_shouldUseExistingTag_whenTagAlreadyExists() {
         TagEntity existingTag = new TagEntity("Java");
-
-        when(userProfileRepository.findById(userId)).thenReturn(Optional.of(userProfile));
         when(tagRepository.findByNameIgnoreCase("Java")).thenReturn(Optional.of(existingTag));
+        when(tagTransactionService.addTagToProfile(userId, "Java"))
+                .thenReturn(Tag.builder().name("Java").build());
 
         Tag result = profileTagService.addTagToProfile(userId, "Java");
 
         assertThat(result.getName()).isEqualTo("Java");
-        assertThat(userProfile.getTags()).contains(existingTag);
-
-        verify(tagRepository, never()).save(any());
+        verify(tagValidationService, never()).isValidTag(any());
+        verify(tagTransactionService).addTagToProfile(userId, "Java");
     }
 
     @Test
     void addTagToProfile_shouldTrimTagName_whenCreatingTag() {
-        when(userProfileRepository.findById(userId)).thenReturn(Optional.of(userProfile));
         when(tagRepository.findByNameIgnoreCase("Spring")).thenReturn(Optional.empty());
-        when(tagRepository.save(any(TagEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(tagTransactionService.addTagToProfile(userId, "Spring"))
+                .thenReturn(Tag.builder().name("Spring").build());
 
         Tag result = profileTagService.addTagToProfile(userId, "  Spring  ");
 
         assertThat(result.getName()).isEqualTo("Spring");
-        assertThat(userProfile.getTags())
-                .extracting(TagEntity::getName)
-                .containsExactly("Spring");
+        verify(tagValidationService).isValidTag("Spring");
+        verify(tagTransactionService).addTagToProfile(userId, "Spring");
     }
 
     @Test
     void addTagToProfile_shouldThrow_whenUserProfileDoesNotExist() {
-        when(userProfileRepository.findById(userId)).thenReturn(Optional.empty());
+        when(tagTransactionService.addTagToProfile(userId, "Spring"))
+                .thenThrow(new UserProfileNotFoundException(userId.toString()));
 
         assertThatThrownBy(() -> profileTagService.addTagToProfile(userId, "Spring"))
                 .isInstanceOf(UserProfileNotFoundException.class)
                 .hasMessage("Profile not found for user: " + userId);
 
-        verify(tagRepository, never()).save(any());
+        verify(tagTransactionService).addTagToProfile(userId, "Spring");
     }
 
     @Test
