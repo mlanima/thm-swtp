@@ -53,6 +53,13 @@ public class BlocklistService {
     }
 
     public boolean contains(final String word) {
-        return blockedWords.contains(word.toLowerCase().trim());
+        var cleaned = word.toLowerCase().trim();
+        var tokens = cleaned.split("[\\s-]+");
+        for (var token : tokens) {
+            if (blockedWords.contains(token)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
