@@ -47,14 +47,14 @@ public class StackOverflowTagSource implements TagSource {
                 .retrieve()
                 .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
                         (request, res) -> {
-                            log.error("StackOverflow API returned {} for tag: {}",
+                            log.debug("StackOverflow API returned {} for tag: {}",
                                     res.getStatusCode(), LogSafe.clean(tagName));
                             throw new TagValidationException("Tag validation service temporarily unavailable");
                         })
                 .body(StackOverflowResponse.class);
 
         if (response == null) {
-            log.error("StackOverflow API returned null response for tag: {}", LogSafe.clean(tagName));
+            log.debug("StackOverflow API returned null response for tag: {}", LogSafe.clean(tagName));
             throw new TagValidationException("StackOverflow API returned empty response");
         }
 

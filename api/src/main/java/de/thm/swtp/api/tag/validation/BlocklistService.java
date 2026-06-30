@@ -33,7 +33,7 @@ public class BlocklistService {
             }
             log.info("Loaded {} blocked words from {} language files", words.size(), resources.length);
         } catch (IOException e) {
-            log.warn("Could not load bad-words blocklist \u2014 blocklist is empty", e);
+            log.error("Could not load bad-words blocklist \u2014 blocklist is empty", e);
         }
         this.blockedWords = Set.copyOf(words);
     }

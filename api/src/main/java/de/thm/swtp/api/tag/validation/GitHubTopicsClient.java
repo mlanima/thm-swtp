@@ -39,14 +39,14 @@ public class GitHubTopicsClient {
                 .retrieve()
                 .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
                         (request, res) -> {
-                            log.error("GitHub Topics API returned {} for tag: {}",
+                            log.debug("GitHub Topics API returned {} for tag: {}",
                                     res.getStatusCode(), LogSafe.clean(tagName));
                             throw new TagValidationException("Tag validation service temporarily unavailable");
                         })
                 .body(GitHubSearchResponse.class);
 
         if (response == null) {
-            log.error("GitHub Topics API returned null response for tag: {}", LogSafe.clean(tagName));
+            log.debug("GitHub Topics API returned null response for tag: {}", LogSafe.clean(tagName));
             throw new TagValidationException("Tag validation service temporarily unavailable");
         }
 
