@@ -29,7 +29,7 @@ public class StackOverflowTagSource implements TagSource {
         this.restClient = RestClient.builder()
                 .baseUrl(baseUrl)
                 .requestInterceptor((request, body, execution) -> {
-                    log.debug("StackOverflow API request: {}", request.getURI());
+                    log.debug("StackOverflow API request: {} {}", request.getMethod(), request.getURI().getPath());
                     return execution.execute(request, body);
                 })
                 .build();

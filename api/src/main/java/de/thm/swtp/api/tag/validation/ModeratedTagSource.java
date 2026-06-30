@@ -25,7 +25,7 @@ public class ModeratedTagSource implements TagSource {
         var cleaned = tagName.toLowerCase().trim();
 
         if (blocklistService.contains(cleaned)) {
-            log.info("Blocked tag rejected: {}", LogSafe.clean(tagName));
+            log.warn("Blocked tag rejected: {}", LogSafe.clean(tagName));
             return false;
         }
 

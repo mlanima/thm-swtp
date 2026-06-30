@@ -1,5 +1,6 @@
 package de.thm.swtp.api.config;
 
+import de.thm.swtp.api.common.LogSafe;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.cache.Cache;
@@ -66,17 +67,17 @@ public class CacheConfig implements CachingConfigurer {
         return new CacheErrorHandler() {
             @Override
             public void handleCacheGetError(RuntimeException exception, Cache cache, Object key) {
-                log.warn("Cache get error for key '{}': {}", key, exception.getMessage());
+                log.warn("Cache get error for key '{}': {}", LogSafe.clean(String.valueOf(key)), exception.getMessage());
             }
 
             @Override
             public void handleCachePutError(RuntimeException exception, Cache cache, Object key, Object value) {
-                log.warn("Cache put error for key '{}': {}", key, exception.getMessage());
+                log.warn("Cache put error for key '{}': {}", LogSafe.clean(String.valueOf(key)), exception.getMessage());
             }
 
             @Override
             public void handleCacheEvictError(RuntimeException exception, Cache cache, Object key) {
-                log.warn("Cache evict error for key '{}': {}", key, exception.getMessage());
+                log.warn("Cache evict error for key '{}': {}", LogSafe.clean(String.valueOf(key)), exception.getMessage());
             }
 
             @Override
