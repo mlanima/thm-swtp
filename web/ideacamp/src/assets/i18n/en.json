@@ -140,6 +140,10 @@
     "DESCRIPTION": "Welcome to the moderator area. Users and projects can be managed here in the future.",
     "PROJECTS_LINK_TITLE": "Project Management",
     "PROJECTS_LINK_DESCRIPTION": "View, search, and delete all projects.",
+    "USERS_LINK_TITLE": "User Management",
+    "USERS_LINK_DESCRIPTION": "View and manage active and banned users.",
+    "PROFESSOR_REQUESTS_LINK_TITLE": "Professor Management",
+    "PROFESSOR_REQUESTS_LINK_DESCRIPTION": "Review, accept, or reject professor requests.",
     "PROJECTS": {
       "TITLE": "Project Management",
       "SUBTITLE": "View, search, and delete projects as needed.",
@@ -207,6 +211,34 @@
         "REASON_LABEL": "Reason for the ban (optional)",
         "REASON_PLACEHOLDER": "e.g. violation of terms of use..."
       }
+    },
+    "PROFESSOR_REQUESTS": {
+      "TITLE": "Professor-requests",
+      "SUBTITLE": "View and manage requests for professor privileges.",
+      "LOADING": "Loading requests...",
+      "ERROR_LOAD": "Professor request could not be loaded.",
+      "ERROR_ACCEPT": "Request could not be accepted.",
+      "ERROR_REJECT": "Request could not be rejected.",
+      "NO_RESULTS": "No professor requests found.",
+      "COLUMN_USER": "User",
+      "COLUMN_EMAIL": "E-Mail",
+      "COLUMN_MESSAGE": "Message",
+      "COLUMN_CREATED": "Created at",
+      "COLUMN_STATUS": "Status",
+      "COLUMN_ACTIONS": "Actions",
+      "ACCEPT": "Accept",
+      "REJECT": "Reject",
+      "STATUS_PENDING": "Pending",
+      "STATUS_ACCEPTED": "Accepted",
+      "STATUS_REJECTED": "Rejected",
+      "CONFIRM_ACCEPT_TITLE": "Accept request",
+      "CONFIRM_REJECT_TITLE": "Reject request",
+      "CONFIRM_ACCEPT_TEXT": "Do you really want to accept this professor request?",
+      "CONFIRM_REJECT_TEXT": "Do you really want to reject this professor request?",
+      "CANCEL": "Cancel",
+      "CONFIRM": "Confirm",
+      "SHOWING_OF": "From",
+      "TOTAL_REQUESTS": "Requests shown"
     }
   },
   "SIDEBAR": {
@@ -216,6 +248,7 @@
     "MODERATOR": "Moderator",
     "MODERATOR_PROJECTS": "Project Management",
     "USER_MANAGEMENT": "User management",
+    "PROFESSOR_REQUESTS": "Professor management",
     "IMPRESSUM": "Legal notice",
     "MENU": "Menu"
   },
@@ -526,8 +559,7 @@
     "FEATURE_STUDENTS_DESC": "Make contact and accompany final projects.",
     "FORM_TITLE": "Apply now",
     "FORM_DESCRIPTION": "Briefly describe why you need professor rights.",
-    "FORM_NAME": "Name *",
-    "FORM_NAME_PLACEHOLDER": "Your full name",
+    "FORM_NAME": "Username",
     "FORM_EMAIL": "Email *",
     "FORM_EMAIL_PLACEHOLDER": "your@university.edu",
     "FORM_REASON": "Reason *",
@@ -540,8 +572,6 @@
     "ERROR_LOAD_USER": "User could not be loaded.",
     "ERROR_SEND": "Your request could not be sent. Please try again later.",
     "VALIDATION": {
-      "NAME_REQUIRED": "Please enter your name.",
-      "NAME_MAX": "Name must not exceed 100 characters.",
       "EMAIL_REQUIRED": "Please enter your email address.",
       "EMAIL_INVALID": "Please enter a valid email address.",
       "TEXT_REQUIRED": "Please enter a reason.",
