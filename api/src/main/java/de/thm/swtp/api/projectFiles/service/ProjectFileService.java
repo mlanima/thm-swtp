@@ -44,6 +44,7 @@ public class ProjectFileService {
             "text/plain",
             "text/markdown",
             "text/x-markdown",
+            "text/x-web-markdown",
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     );
 
