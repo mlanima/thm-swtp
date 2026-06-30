@@ -51,16 +51,17 @@
        (remove str/blank?)))
 
 (defn- review-args
-  "Validates positional `<namespace> <pr>` and translates them into the flag
-   form the review-*.bb scripts expect. Throws ex-info on bad shape."
+  "Validates positional `<namespace> <pr> [api-key]` and translates them into
+   the flag form the review-*.bb scripts expect. Throws ex-info on bad shape."
   [subcommand tokens]
-  (let [[org pr & extra] tokens]
+  (let [[org pr api-key & extra] tokens]
     (when-not (and org (re-matches #"[A-Za-z0-9._-]+" org)
                    pr  (re-matches #"\d+" pr)
                    (empty? extra))
-      (throw (ex-info (str "usage: " subcommand " <namespace> <pr-number>")
+      (throw (ex-info (str "usage: " subcommand " <namespace> <pr-number> [api-key]")
                       {:subcommand subcommand :tokens tokens})))
-    ["--namespace" org "--pr" pr]))
+    (cond-> ["--namespace" org "--pr" pr]
+      api-key (into ["--openai-api-key" api-key]))))
 
 ;; =============================================================================
 ;; Routing
