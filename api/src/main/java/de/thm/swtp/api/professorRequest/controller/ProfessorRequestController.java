@@ -53,7 +53,7 @@ public class ProfessorRequestController {
             @AuthenticationPrincipal Jwt jwt) {
         UUID currentUserId = UUID.fromString(jwt.getSubject());
         ProfessorRequest professorRequest = professorRequestService.createProfessorRequest(
-                currentUserId, request.name(), request.email(), request.text());
+                currentUserId, request.email(), request.text());
 
         return ProfessorRequestResponse.toResponse(professorRequest);
     }

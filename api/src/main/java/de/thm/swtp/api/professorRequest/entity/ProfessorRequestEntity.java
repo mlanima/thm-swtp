@@ -29,9 +29,6 @@ public class ProfessorRequestEntity {
     private UserProfile requestingUser;
 
     @Column(nullable = false)
-    private String name;
-
-    @Column(nullable = false)
     private String email;
 
     @Column(length = 1000, nullable = false)

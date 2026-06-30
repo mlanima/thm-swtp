@@ -12,7 +12,6 @@ public class ProfessorRequestMapper {
                 .id(entity.getId())
                 .requestingUserId(entity.getRequestingUser().getKeycloakId())
                 .requestingUsername(entity.getRequestingUser().getUsername())
-                .name(entity.getName())
                 .email(entity.getEmail())
                 .text(entity.getText())
                 .createdAt(entity.getCreatedAt())

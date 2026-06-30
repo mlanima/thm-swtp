@@ -29,7 +29,7 @@ public class ProfessorRequestService {
 
     /** Creates a new professor-rights request with status PENDING for the given user. */
     @Transactional
-    public ProfessorRequest createProfessorRequest(UUID currentUserId, String name, String email, String text) {
+    public ProfessorRequest createProfessorRequest(UUID currentUserId, String email, String text) {
         if (professorRequestRepository.existsByRequestingUserKeycloakIdAndStatus(
                 currentUserId, ProfessorRequestStatus.PENDING)) {
             throw new ProfessorRequestAlreadyExistsException(currentUserId);
@@ -40,7 +40,6 @@ public class ProfessorRequestService {
 
         ProfessorRequestEntity entity = ProfessorRequestEntity.builder()
                 .requestingUser(requestingUser)
-                .name(name)
                 .email(email)
                 .text(text)
                 .build();

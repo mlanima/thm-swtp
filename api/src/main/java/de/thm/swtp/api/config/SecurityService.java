@@ -7,6 +7,7 @@ import de.thm.swtp.api.projectPost.repository.ProjectPostRepository;
 import de.thm.swtp.api.userprofile.domain.UserStatus;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
@@ -19,7 +20,6 @@ import java.util.UUID;
  *
  * <p>Authorization checks fail when permissions are missing.</p>
  */
-
 @Component("security")
 @RequiredArgsConstructor
 public class SecurityService {
@@ -260,7 +260,7 @@ public class SecurityService {
             return false;
         }
         UUID currentUserId = getCurrentUserId(authentication);
-        return !userProfileRepository.existsByKeycloakIdAndProfessorTrue(currentUserId);
+        return !userProfileRepository.existsByKeycloakIdAndIsProfessorTrue(currentUserId);
     }
 
     // User-profile permissions
