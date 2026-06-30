@@ -1,6 +1,6 @@
 # Tag Validation
 
-New tags are validated before being persisted. Validation only runs when creating a tag that doesn't exist locally — once a tag is in the database, it's accepted without further checks. Results are cached in Redis (`redis.ser.mlanima.org`) with a 1-hour TTL.
+New tags are validated before being persisted. Validation only runs when creating a tag that doesn't exist locally — once a tag is in the database, it's accepted without further checks. Results are cached in Redis (`redis.ser.mlanima.org`) with a 1-hour TTL. Only invalid tags (`false`) are cached — valid tags are persisted in the DB and found there on subsequent lookups. If Redis is unreachable at startup, the `CacheManager` falls back to `NoOpCacheManager` (no caching, full functionality preserved).
 
 Three validation modes are available via `app.tags.source` in `application.yaml`. The `TagSource` interface can be further reimplemented without modifying `ProjectTagService` or `ProfileTagService`.
 
@@ -50,13 +50,13 @@ User submits "typescript"
       → tagRepository.findByNameIgnoreCase("typescript")
         → FOUND → return existing TagEntity (no API call)
         → NOT FOUND → tagValidationService.isValidTag("typescript")
-          → @Cacheable("tag-exists")
-            → REDIS HIT → return cached true/false
+          → @Cacheable(value = "tag-exists", unless = "#result")
+            → REDIS HIT → return cached false (invalid tag)
             → REDIS MISS → ModeratedTagSource.tagExists("typescript")
               → BlocklistService.contains("typescript")?  no
               → GitHubTopicsClient.tagExists("typescript")
                 → GET /search/topics?q=typescript
-              → Cache result in Redis (TTL: 1 hour)
+              → valid → result is NOT cached (unless = "#result")
           → VALID → tagRepository.save(new TagEntity("typescript")) → 200
           → INVALID → throw TagNotValidException → 400
 
@@ -70,7 +70,7 @@ User submits "fuck"
     → INVALID → throw TagNotValidException → 400
 ```
 
-Blocked tags still get cached (as `false`) to avoid re-checking the blocklist on every attempt.
+Only invalid tags get cached (as `false`) to avoid re-checking the blocklist or external API on every attempt. Valid tags are not cached — they are persisted in the DB and found via `findByNameIgnoreCase` on subsequent lookups.
 
 ---
 
@@ -137,10 +137,10 @@ Supported languages (28): ar, cs, da, de, en, eo, es, fa, fi, fil, fr, fr-CA-u-s
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `SPRING_CACHE_TYPE` | No | `redis` | Set to `none` to disable Redis |
-| `SPRING_DATA_REDIS_HOST` | No | `redis.ser.mlanima.org` | Redis server hostname |
+| `SPRING_CACHE_TYPE` | No | `redis` | Ignored when custom `CacheManager` bean is defined; Redis detection is automatic |
+| `SPRING_DATA_REDIS_HOST` | No | `redis.ser.mlanima.org` | Redis server hostname (only used when Redis is reachable) |
 | `SPRING_DATA_REDIS_PASSWORD` | No | empty | Redis password (not needed if auth is disabled) |
-| `STACKOVERFLOW_API_KEY` | If using SO | empty | StackExchange API app key |
+| `STACKOVERFLOW_API_KEY` | If using SO | empty | StackExchange API app key — inject at runtime via Compose environment, **not** as Docker build-arg |
 
 ---
 
@@ -159,7 +159,7 @@ Frontend: both `TagList` and `ProfileTagListComponent` check `err.status === 400
 
 ```
 api/src/main/java/de/thm/swtp/api/
-├── config/CacheConfig.java               # @EnableCaching, RedisCacheManager, CacheErrorHandler
+├── config/CacheConfig.java               # @EnableCaching, CacheManager (Redis/NoOp), CacheErrorHandler
 ├── tag/
 │   ├── exception/TagNotValidException.java
 │   ├── service/ProjectTagService.java    # injects TagValidationService
@@ -209,17 +209,11 @@ public class BlocklistOnlyTagSource implements TagSource {
 
 ## Local Development
 
-Redis connections fail gracefully — if Redis is unreachable, the cache is skipped and the tag source is called directly. A warning is logged.
+Redis connections fail gracefully — if Redis is unreachable at startup, the `CacheManager` falls back to `NoOpCacheManager` (no caching, tag source called directly for every new tag). A warning is logged.
 
 ### No Redis (Works Out of the Box)
 
-No configuration needed. The default Redis host is firewalled, so the `CacheErrorHandler` degrades automatically.
-
-### Disable Caching
-
-```bash
-SPRING_CACHE_TYPE=none ./mvnw spring-boot:run
-```
+No configuration needed. The default Redis host is firewalled, so the `CacheManager` fallback kicks in automatically.
 
 ### Local Redis
 
@@ -233,7 +227,7 @@ SPRING_DATA_REDIS_HOST=localhost ./mvnw spring-boot:run
 ## CI/CD
 
 1. Push to `developer`/`main` triggers `cd-build-deploy.yml`
-2. Docker image built with `--build-arg STACKOVERFLOW_API_KEY` if SO source is used
+2. Docker image built without secrets; `STACKOVERFLOW_API_KEY` is injected at runtime via Docker Compose environment or `.env` file
 3. Image pushed to GHCR, deployed via `deploy-app.bb` on `swtp-ss26.de`
 
 GitHub Topics API requires no authentication (60 req/hr unauthenticated, sufficient with 1h cache).
