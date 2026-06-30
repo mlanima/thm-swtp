@@ -106,7 +106,7 @@ jobs:
           echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key -p 2105 tosch@mail.schalz.de \
-            "review-deploy ${{ needs.namespace.outputs.namespace }} ${{ github.event.pull_request.number }} ${{ secrets.OPENAI_API_KEY }}"
+            "review-deploy ${{ needs.namespace.outputs.namespace }} ${{ github.event.pull_request.number }}"
 
       - name: Comment on PR
         uses: actions/github-script@v9

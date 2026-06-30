@@ -52,8 +52,7 @@
       (throw (ex-info "Missing required args"
                {:usage "review-deploy.bb --namespace <namespace> --pr <pr-number>"})))
     {:org org
-     :pr-num    pr-num
-     :api-key   (:openai-api-key opts)}))
+     :pr-num    pr-num}))
 
 (def ^:dynamic *pr-num*
   "Current PR number, bound in -main."
@@ -405,7 +404,7 @@
    All helpers throw ex-info on failure."
   [& args]
   (try
-    (let [{:keys [pr-num org api-key]} (parse-args args)
+    (let [{:keys [pr-num org]} (parse-args args)
           env          (load-env!)
           db-root-pw   (env-get env "MYSQL_ROOT_PASSWORD")
           db-app-user  (or (get env "MYSQL_USER") "swtp")
@@ -413,7 +412,7 @@
           template-db  "swtp_template"
           kc-admin     (env-get env "KC_ADMIN")
           kc-admin-pw  (env-get env "KC_ADMIN_PASSWORD")
-          openai-key   (or api-key (System/getenv "OPENAI_API_KEY") (get env "OPENAI_API_KEY"))
+          openai-key   (or (System/getenv "OPENAI_API_KEY") (get env "OPENAI_API_KEY"))
           pr-origin    (str "https://" (subdomain pr-num nil))]
 
       (binding [*pr-num* pr-num]
