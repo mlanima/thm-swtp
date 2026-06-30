@@ -13,8 +13,6 @@ RUN java -Djarmode=layertools -jar target/*.jar extract --destination target/ext
 
 # Stage 3: Runtime
 FROM eclipse-temurin:25-jre-alpine
-ARG STACKOVERFLOW_API_KEY=
-ENV STACKOVERFLOW_API_KEY=$STACKOVERFLOW_API_KEY
 RUN addgroup -S app && adduser -S app -G app
 WORKDIR /app
 COPY --from=extractor /app/target/extracted/dependencies/ ./

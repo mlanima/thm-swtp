@@ -57,8 +57,6 @@ jobs:
         with:
           context: ./api
           push: true
-          build-args: |
-            STACKOVERFLOW_API_KEY=${{ secrets.STACKOVERFLOW_API_KEY }}
           tags: |
             ghcr.io/${{ needs.namespace.outputs.namespace }}/swtp-api:${{ github.ref_name == 'main' && 'latest' || 'dev' }}
             ghcr.io/${{ needs.namespace.outputs.namespace }}/swtp-api:${{ github.run_number }}
