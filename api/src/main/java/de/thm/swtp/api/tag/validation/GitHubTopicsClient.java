@@ -50,11 +50,9 @@ public class GitHubTopicsClient {
             throw new TagValidationException("Tag validation service temporarily unavailable");
         }
 
-        var exactMatch = response.items() != null
+        return response.items() != null
                 && response.items().stream()
                         .anyMatch(item -> item.name().equalsIgnoreCase(tagName));
-        log.debug("Tag '{}' exists on GitHub Topics: {}", LogSafe.clean(tagName), exactMatch);
-        return exactMatch;
     }
 
     record GitHubSearchResponse(

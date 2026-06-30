@@ -87,12 +87,9 @@ public class OpenAIModerationClient {
                 .anyMatch(score -> score >= threshold);
 
         if (result.flagged() || anyScoreAboveThreshold) {
-            log.debug("Input flagged by OpenAI moderation (flagged={}, scores={}): {}",
-                    result.flagged(), scores, LogSafe.clean(text));
             return true;
         }
 
-        log.debug("Input passed OpenAI moderation: {}", LogSafe.clean(text));
         return false;
     }
 
