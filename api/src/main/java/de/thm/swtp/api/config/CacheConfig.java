@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
-import org.springframework.cache.annotation.CachingConfigurer;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.interceptor.CacheErrorHandler;
 import org.springframework.cache.support.NoOpCacheManager;
@@ -23,7 +22,7 @@ import java.time.Duration;
 @Slf4j
 @Configuration
 @EnableCaching
-public class CacheConfig implements CachingConfigurer {
+public class CacheConfig {
 
     @Bean
     public CacheManager cacheManager(ObjectProvider<RedisConnectionFactory> redisConnectionFactoryProvider) {
@@ -62,8 +61,8 @@ public class CacheConfig implements CachingConfigurer {
                 .prefixCacheNameWith("tags:");
     }
 
-    @Override
-    public CacheErrorHandler errorHandler() {
+    @Bean
+    public CacheErrorHandler cacheErrorHandler() {
         return new CacheErrorHandler() {
             @Override
             public void handleCacheGetError(RuntimeException exception, Cache cache, Object key) {
