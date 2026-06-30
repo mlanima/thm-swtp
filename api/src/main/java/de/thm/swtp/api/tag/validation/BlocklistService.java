@@ -1,5 +1,7 @@
 package de.thm.swtp.api.tag.validation;
 
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -13,12 +15,16 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Slf4j
+@RequiredArgsConstructor
 @Component
 public class BlocklistService {
 
-    private final Set<String> blockedWords;
+    private final ResourcePatternResolver resourceLoader;
 
-    public BlocklistService(final ResourcePatternResolver resourceLoader) {
+    private Set<String> blockedWords = new HashSet<>();
+
+    @PostConstruct
+    void init() {
         var words = new HashSet<String>();
         try {
             var resources = resourceLoader.getResources("classpath:bad-words/*");
@@ -27,7 +33,7 @@ public class BlocklistService {
             }
             log.info("Loaded {} blocked words from {} language files", words.size(), resources.length);
         } catch (IOException e) {
-            log.warn("Could not load bad-words blocklist — blocklist is empty", e);
+            log.warn("Could not load bad-words blocklist \u2014 blocklist is empty", e);
         }
         this.blockedWords = Set.copyOf(words);
     }
