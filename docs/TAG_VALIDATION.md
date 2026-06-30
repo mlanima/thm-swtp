@@ -267,6 +267,9 @@ docker run -d -p 6379:6379 redis:7-alpine
 SPRING_DATA_REDIS_HOST=localhost ./mvnw spring-boot:run
 ```
 
+Or uncomment the `redis` service in `infra/swtp-ss26.de/stacks/swtp-infra/docker-compose.yml`
+to run it as part of the shared infra stack.
+
 ---
 
 ## CI/CD

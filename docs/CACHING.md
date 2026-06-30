@@ -4,6 +4,8 @@
 
 One cache exists: `tag-exists` (Redis, 1h TTL). Only invalid tags (`false`) are cached via `unless = "#result"`. Caching is optional — the `CacheManager` falls back to `NoOpCacheManager` when Redis is unreachable.
 
+Redis is defined in `infra/swtp-ss26.de/stacks/swtp-infra/docker-compose.yml` (commented out). On the server, a dedicated Redis instance at `redis.ser.mlanima.org` is used instead.
+
 ---
 
 ## Candidates
