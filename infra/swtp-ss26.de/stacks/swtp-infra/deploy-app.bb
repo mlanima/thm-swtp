@@ -47,7 +47,7 @@
 ;; ── Inject secrets ────────────────────────────────────────────────────────────
 (when api-key
   (let [env-file (str stack-dir "/.env")]
-    (spit env-file (str "OPENAI_API_KEY=" api-key "\n") :append true)
+    (spit env-file (str "OPENAI_API_KEY=" api-key "\n"))
     (log (str "Wrote OPENAI_API_KEY to .env"))))
 
 ;; ── Pull ─────────────────────────────────────────────────────────────────────

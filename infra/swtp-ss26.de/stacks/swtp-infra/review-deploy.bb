@@ -241,24 +241,28 @@
 
 (defn- deploy-api
   "Deploys the backend container for this PR (review_net + review.env)."
-  [org db-name]
+  [org db-name openai-api-key]
   (let [container-name (str "swtp-api-pr-" *pr-num*)
         host           (subdomain *pr-num* "api")
-        upload-dir     (provision-upload-dir!)]
+        upload-dir     (provision-upload-dir!)
+        api-extra      (if openai-api-key
+                         ["-e" (str "OPENAI_API_KEY=" openai-api-key)]
+                         [])]
     (deploy-service!
       {:container-name container-name
        :host           host
        :image          (str "ghcr.io/" org "/swtp-api:pr-" *pr-num*)
        :port           8080
-       :extra-opts     ["--network"  "review_net"
-                        "--env-file" "/opt/stacks/swtp-infra/review.env"
-                        "-v"         (str upload-dir ":/app/uploads")
-                        "-e"         "APP_UPLOADS_DIR=/app/uploads"
-                        "-e"         (str "SPRING_DATASOURCE_URL=jdbc:mysql://swtp-db:3306/" db-name)
-                        "-e"         "SPRING_MAIL_HOST=maildev"
-                        "-e"         "SPRING_MAIL_PORT=1025"
-                        "-e"         "BE_LOG_LEVEL=DEBUG"
-                        "-e"         (str "APP_FRONTEND_URL=https://" (subdomain *pr-num* nil))]})
+       :extra-opts     (into ["--network"  "review_net"
+                              "--env-file" "/opt/stacks/swtp-infra/review.env"
+                              "-v"         (str upload-dir ":/app/uploads")
+                              "-e"         "APP_UPLOADS_DIR=/app/uploads"
+                              "-e"         (str "SPRING_DATASOURCE_URL=jdbc:mysql://swtp-db:3306/" db-name)
+                              "-e"         "SPRING_MAIL_HOST=maildev"
+                              "-e"         "SPRING_MAIL_PORT=1025"
+                              "-e"         "BE_LOG_LEVEL=DEBUG"
+                              "-e"         (str "APP_FRONTEND_URL=https://" (subdomain *pr-num* nil))]
+                             api-extra)})
     (log (str "Backend live -> https://" host))))
 
 (defn- deploy-dozzle
@@ -408,6 +412,7 @@
           template-db  "swtp_template"
           kc-admin     (env-get env "KC_ADMIN")
           kc-admin-pw  (env-get env "KC_ADMIN_PASSWORD")
+          openai-key   (get env "OPENAI_API_KEY")
           pr-origin    (str "https://" (subdomain pr-num nil))]
 
       (binding [*pr-num* pr-num]
@@ -415,7 +420,7 @@
 
         (clone-db! db-name db-app-user template-db db-root-pw)
         (deploy-web org)
-        (deploy-api org db-name)
+        (deploy-api org db-name openai-key)
         (deploy-dozzle)
         (add-pr-redirect! kc-admin kc-admin-pw
                           (str pr-origin "/*") pr-origin)
