@@ -7,7 +7,6 @@ export interface ProfessorRequestResponse {
   id: string;
   requestingUserId: string;
   requestingUsername: string;
-  name: string;
   email: string;
   text: string;
   createdAt: string;
@@ -16,7 +15,6 @@ export interface ProfessorRequestResponse {
 }
 
 export interface CreateProfessorRequest {
-  name: string;
   email: string;
   text: string;
 }
