@@ -471,7 +471,10 @@ public class SecurityService {
         if (!hasAuthenticationContext(thesisId, authentication)) {
             return false;
         }
-        return isThesisSupervisor(thesisId, authentication) || hasModeratorRole(authentication);
+        if (hasModeratorRole(authentication)) {
+            return true;
+        }
+        return isProfessorUser(authentication) && isThesisSupervisor(thesisId, authentication);
     }
 
     private boolean isProfessorUser(Authentication authentication) {

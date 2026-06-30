@@ -38,9 +38,6 @@ public class ThesisEntity {
     @Column(name = "short_description", length = 300)
     private String shortDescription;
 
-    @Column(name = "delete_at")
-    private LocalDateTime deletedAt;
-
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "supervisor_keycloak_id", nullable = false)
     private UserProfile supervisor;
