@@ -20,9 +20,8 @@
                        "be"         "https://api.dev.swtp-ss26.de/swagger-ui/index.html"
                        "logs"       "https://logs.dev.swtp-ss26.de"}}})
 
-(def stack   (first *command-line-args*))
-(def api-key (second *command-line-args*))
-(def cfg     (get stacks stack))
+(def stack (first *command-line-args*))
+(def cfg   (get stacks stack))
 
 (when-not cfg
   (binding [*out* *err*]
@@ -43,12 +42,6 @@
   (System/exit code))
 
 (log (str "Deploy triggered (swtp-" stack ")"))
-
-;; ── Inject secrets ────────────────────────────────────────────────────────────
-(when api-key
-  (let [env-file (str stack-dir "/.env")]
-    (spit env-file (str "OPENAI_API_KEY=" api-key "\n"))
-    (log (str "Wrote OPENAI_API_KEY to .env"))))
 
 ;; ── Pull ─────────────────────────────────────────────────────────────────────
 (def pull (sh ["docker" "compose" "-f" compose-file "pull"] {:dir stack-dir}))
