@@ -2,7 +2,7 @@
 
 New tags are validated before being persisted. Validation only runs when creating a tag that doesn't exist locally — once a tag is in the database, it's accepted without further checks. Results are cached in Redis (`redis.ser.mlanima.org`) with a 1-hour TTL. Only invalid tags (`false`) are cached — valid tags are persisted in the DB and found there on subsequent lookups. If Redis is unreachable at startup, the `CacheManager` falls back to `NoOpCacheManager` (no caching, full functionality preserved).
 
-Three validation modes are available via `app.tags.source` in `application.yaml`. The `TagSource` interface can be further reimplemented without modifying `ProjectTagService` or `ProfileTagService`.
+Four validation modes are available via `app.tags.source` in `application.yaml`. The `TagSource` interface can be further reimplemented without modifying `ProjectTagService` or `ProfileTagService`.
 
 ---
 
@@ -11,14 +11,20 @@ Three validation modes are available via `app.tags.source` in `application.yaml`
 ```
 TagSource (interface)
     │
-    ├── ModeratedTagSource (default)         # BlocklistService + GitHubTopicsClient
+    ├── OpenAIModeratedGithubTagSource (default) # OpenAI moderation + GitHub Topics
+    │       │                                    # BlocklistService as fallback
+    │       ├── OpenAIModerationClient           # RestClient → OpenAI Moderation API
+    │       ├── BlocklistService                 # LDNOOBW wordlist (fallback)
+    │       └── GitHubTopicsClient               # RestClient → GitHub Search Topics API
+    │
+    ├── ModeratedTagSource               # BlocklistService + GitHubTopicsClient
     │       │
-    │       ├── BlocklistService             # LDNOOBW wordlist (28 languages)
-    │       └── GitHubTopicsClient           # RestClient → GitHub Search Topics API
+    │       ├── BlocklistService         # LDNOOBW wordlist (28 languages)
+    │       └── GitHubTopicsClient       # RestClient → GitHub Search Topics API
     │
-    ├── GitHubTopicsTagSource                # RestClient → GitHub Search Topics API (no blocklist)
+    ├── GitHubTopicsTagSource            # RestClient → GitHub Search Topics API (no blocklist)
     │
-    └── StackOverflowTagSource               # RestClient → StackExchange API v2.3
+    └── StackOverflowTagSource           # RestClient → StackExchange API v2.3
             │
             ▼
     TagValidationService            # @Cacheable — delegates to TagSource
@@ -35,11 +41,47 @@ Active implementation selected by `@ConditionalOnProperty(name = "app.tags.sourc
 
 | `app.tags.source` | Description |
 |---|---|
-| `github-blocklist` (default) | Checks LDNOOBW blocklist first, then queries GitHub Topics API |
+| `openai-github` (default) | OpenAI Omni Moderation first (falls back to LDNOOBW blocklist on API failure), then GitHub Topics API |
+| `github-blocklist` | Checks LDNOOBW blocklist first, then queries GitHub Topics API |
 | `github` | Queries GitHub Topics API directly — no moderation |
 | `stackoverflow` | Queries StackExchange API v2.3 — implicitly clean (community-moderated) |
 
 ---
+
+## Data Flow (openai-github mode — default)
+
+```
+User submits "typescript"
+  → ProjectTagService.addTagToProject()
+    → tagRepository.findByNameIgnoreCase("typescript")
+      → NOT FOUND → tagValidationService.isValidTag("typescript")
+        → @Cacheable(value = "tag-exists", unless = "#result")
+          → REDIS MISS → OpenAIModeratedGithubTagSource.tagExists("typescript")
+            → OpenAIModerationClient.isFlagged("typescript")?  no
+            → GitHubTopicsClient.tagExists("typescript")
+              → GET /search/topics?q=typescript
+            → valid → result is NOT cached (unless = "#result")
+        → VALID → tagRepository.save(new TagEntity("typescript")) → 200
+
+User submits "fuck"
+  → ...tagValidationService.isValidTag("fuck")
+    → OpenAIModeratedGithubTagSource.tagExists("fuck")
+      → OpenAIModerationClient.isFlagged("fuck")?  yes → return false
+    → INVALID → throw TagNotValidException → 400
+
+User submits "fuck" while OpenAI is down
+  → OpenAIModeratedGithubTagSource.tagExists("fuck")
+    → OpenAIModerationClient.isFlagged("fuck")?
+      → TagValidationException (API down)
+    → BlocklistService.contains("fuck")?  yes (fallback) → return false
+  → INVALID → throw TagNotValidException → 400
+
+User submits "4gotjwp"
+  → OpenAIModeratedGithubTagSource.tagExists("4gotjwp")
+    → OpenAIModerationClient.isFlagged("4gotjwp")?  no (gibberish passes)
+    → GitHubTopicsClient.tagExists("4gotjwp")?      no
+  → INVALID → throw TagNotValidException → 400
+```
 
 ## Data Flow (github-blocklist mode)
 
@@ -89,7 +131,15 @@ spring:
 
 app:
   tags:
-    source: github-blocklist          # "github-blocklist" (default), "github", or "stackoverflow"
+    source: openai-github             # "openai-github" (default), "github-blocklist", "github", or "stackoverflow"
+
+openai:
+  api:
+    base-url: https://api.openai.com
+    key: ${OPENAI_API_KEY:}           # required for openai-github mode; set via GitHub Secret in CI
+  moderation:
+    model: omni-moderation-latest
+    threshold: 0.1                    # category scores above this are flagged
 
 github:
   topics:
@@ -105,8 +155,9 @@ stackoverflow:
 ### Switching Modes
 
 | Mode | Config Change |
-|---|---|
-| Blocklist + GitHub (default) | `app.tags.source: github-blocklist` |
+|---|---|---|
+| OpenAI + GitHub (default) | `app.tags.source: openai-github` |
+| Blocklist + GitHub (legacy) | `app.tags.source: github-blocklist` |
 | GitHub Topics (no moderation) | `app.tags.source: github` |
 | StackOverflow | `app.tags.source: stackoverflow` |
 
@@ -131,6 +182,7 @@ Supported languages (28): ar, cs, da, de, en, eo, es, fa, fi, fil, fr, fr-CA-u-s
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
 | `SPRING_DATA_REDIS_HOST` | No | `redis.ser.mlanima.org` | Redis server hostname |
+| `OPENAI_API_KEY` | If using openai-github | empty | OpenAI API key — set as GitHub Secret, injected via deploy pipeline into `.env` |
 | `STACKOVERFLOW_API_KEY` | If using SO | empty | StackExchange API app key — inject at runtime via Compose environment, **not** as Docker build-arg |
 
 ---
@@ -157,10 +209,12 @@ api/src/main/java/de/thm/swtp/api/
 │   ├── service/ProfileTagService.java    # injects TagValidationService
 │   └── validation/
 │       ├── TagSource.java                # interface
+│       ├── OpenAIModerationClient.java   # RestClient → OpenAI Moderation API (omni-moderation-latest)
+│       ├── OpenAIModeratedGithubTagSource.java  # default — OpenAI + GitHub, blocklist fallback
 │       ├── BlocklistService.java         # loads LDNOOBW wordlist at startup
 │       ├── GitHubTopicsClient.java       # shared GitHub API client
 │       ├── GitHubTopicsTagSource.java    # GitHub-only (no blocklist)
-│       ├── ModeratedTagSource.java       # default — blocklist + GitHub
+│       ├── ModeratedTagSource.java       # legacy — blocklist + GitHub
 │       ├── StackOverflowTagSource.java   # alternative — StackExchange API
 │       ├── TagValidationService.java     # @Cacheable wrapper
 │       └── TagValidationException.java
@@ -218,10 +272,14 @@ SPRING_DATA_REDIS_HOST=localhost ./mvnw spring-boot:run
 ## CI/CD
 
 1. Push to `developer`/`main` triggers `cd-build-deploy.yml`
-2. Docker image built without secrets; `STACKOVERFLOW_API_KEY` is injected at runtime via Docker Compose environment or `.env` file
+2. Docker image built without secrets; secrets are injected at runtime:
+   - `STACKOVERFLOW_API_KEY` via Docker Compose environment or `.env` file
+   - `OPENAI_API_KEY` passed as GitHub Secret → SSH command arg → `deploy-app.bb` writes to `.env`
 3. Image pushed to GHCR, deployed via `deploy-app.bb` on `swtp-ss26.de`
 
 GitHub Topics API requires no authentication (60 req/hr unauthenticated, sufficient with 1h cache).
+
+OpenAI Moderation API is free to use with rate limits depending on usage tier (Free: 250 RPM / 5,000 RPD).
 
 ---
 

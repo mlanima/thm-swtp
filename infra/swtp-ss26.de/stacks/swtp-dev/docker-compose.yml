@@ -12,6 +12,7 @@ services:
       SPRING_MAIL_HOST: maildev
       SPRING_MAIL_PORT: "1025"
       APP_FRONTEND_URL: https://dev.swtp-ss26.de
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
     volumes:
       - ./uploads:/app/uploads
     labels:

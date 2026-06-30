@@ -71,8 +71,10 @@
   [cmd]
   (let [[head & rest] (tokenize cmd)]
     (case head
-      (nil "deploy-dev") [(str infra-dir "/deploy-app.bb") "dev"]
-      "deploy-main"      [(str infra-dir "/deploy-app.bb") "main"]
+      (nil "deploy-dev") (let [args [(str infra-dir "/deploy-app.bb") "dev"]]
+                           (if (seq rest) (conj args (first rest)) args))
+      "deploy-main"      (let [args [(str infra-dir "/deploy-app.bb") "main"]]
+                           (if (seq rest) (conj args (first rest)) args))
       "review-deploy"    (into [(str infra-dir "/review-deploy.bb")]
                                (review-args "review-deploy" rest))
       "review-teardown"  (into [(str infra-dir "/review-teardown.bb")]

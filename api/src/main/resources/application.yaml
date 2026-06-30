@@ -58,7 +58,15 @@ app:
     language: de
   frontend-url: http://localhost:4200
   tags:
-    source: github-blocklist
+    source: openai-github
+
+openai:
+  api:
+    base-url: https://api.openai.com
+    key: ${OPENAI_API_KEY:}
+  moderation:
+    model: omni-moderation-latest
+    threshold: 0.1
 
 github:
   topics:

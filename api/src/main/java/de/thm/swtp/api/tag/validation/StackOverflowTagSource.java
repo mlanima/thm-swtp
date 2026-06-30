@@ -1,7 +1,7 @@
 package de.thm.swtp.api.tag.validation;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import de.thm.swtp.api.common.LogSafe;
+import de.thm.swtp.api.common   .LogSafe;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
