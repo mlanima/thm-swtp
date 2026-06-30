@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -36,7 +37,7 @@ public class BlocklistService {
         if (filename == null) {
             return;
         }
-        try (var reader = new BufferedReader(new InputStreamReader(resource.getInputStream()))) {
+        try (var reader = new BufferedReader(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
             String line;
             var count = 0;
             while ((line = reader.readLine()) != null) {

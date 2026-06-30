@@ -67,6 +67,8 @@ export class ProfileTagListComponent implements OnInit, OnChanges {
           this.errorMessage.set(
             this.translateService.instant('PROJECTSITE.TAGS.ERROR_NOT_VALID', { name: cleanedName })
           );
+        } else if (err.status === 502) {
+          this.errorMessage.set(this.translateService.instant('PROJECTSITE.TAGS.ERROR_VALIDATION'));
         } else {
           this.errorMessage.set(this.translateService.instant('PROJECTSITE.TAGS.ERROR_TOO_LONG'));
         }

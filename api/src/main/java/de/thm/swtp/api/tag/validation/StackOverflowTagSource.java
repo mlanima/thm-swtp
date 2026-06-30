@@ -24,8 +24,8 @@ public class StackOverflowTagSource implements TagSource {
 
     public StackOverflowTagSource(
             @Value("${stackoverflow.api.base-url:https://api.stackexchange.com/2.3}") final String baseUrl,
-            @Value("${stackoverflow.api.key:}") final Optional<String> apiKey) {
-        this.apiKey = apiKey;
+            @Value("${stackoverflow.api.key:}") final String apiKeyValue) {
+        this.apiKey = apiKeyValue.isBlank() ? Optional.empty() : Optional.of(apiKeyValue);
         this.restClient = RestClient.builder()
                 .baseUrl(baseUrl)
                 .requestInterceptor((request, body, execution) -> {
@@ -45,6 +45,12 @@ public class StackOverflowTagSource implements TagSource {
                     return uri.build(tagName);
                 })
                 .retrieve()
+                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                        (request, res) -> {
+                            log.error("StackOverflow API returned {} for tag: {}",
+                                    res.getStatusCode(), LogSafe.clean(tagName));
+                            throw new TagValidationException("Tag validation service temporarily unavailable");
+                        })
                 .body(StackOverflowResponse.class);
 
         if (response == null) {

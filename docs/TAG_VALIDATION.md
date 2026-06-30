@@ -13,7 +13,7 @@ TagSource (interface)
     │
     ├── ModeratedTagSource (default)         # BlocklistService + GitHubTopicsClient
     │       │
-    │       ├── BlocklistService             # LDNOOBW wordlist (27 languages)
+    │       ├── BlocklistService             # LDNOOBW wordlist (28 languages)
     │       └── GitHubTopicsClient           # RestClient → GitHub Search Topics API
     │
     ├── GitHubTopicsTagSource                # RestClient → GitHub Search Topics API (no blocklist)

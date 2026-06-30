@@ -37,6 +37,12 @@ public class GitHubTopicsClient {
                         .queryParam("q", tagName)
                         .build())
                 .retrieve()
+                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                        (request, res) -> {
+                            log.error("GitHub Topics API returned {} for tag: {}",
+                                    res.getStatusCode(), LogSafe.clean(tagName));
+                            throw new TagValidationException("Tag validation service temporarily unavailable");
+                        })
                 .body(GitHubSearchResponse.class);
 
         if (response == null) {
