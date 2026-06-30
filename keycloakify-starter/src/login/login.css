@@ -1,0 +1,442 @@
+/* ================================================
+   Keycloak Login Theme - Custom Styles
+   Matches mockup: centered card on light background
+   ================================================ */
+
+/* === Reset & Base === */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* === Page Layout === */
+.login-pf {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #eef1f6;
+  margin: 0;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* === Login Page Wrapper === */
+.login-pf-page {
+  width: 100%;
+  max-width: 520px;
+}
+
+/* === Header === */
+.login-pf-page-header {
+  display: none;
+}
+
+.login-pf-header-wrapper {
+  display: none;
+}
+
+/* === Card === */
+.login-pf-card {
+  width: 100%;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  padding: 48px 40px 40px;
+}
+
+/* === Form Header (holds h1 title) === */
+.login-pf-header {
+  margin-bottom: 4px;
+}
+
+.login-pf-header h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0 0 4px 0;
+  line-height: 1.2;
+}
+
+.login-subtitle {
+  font-size: 15px;
+  color: #718096;
+  margin: 0 0 28px 0;
+  line-height: 1.4;
+}
+
+/* === Form Groups === */
+.form-group {
+  margin-bottom: 20px;
+}
+
+/* === Labels === */
+.kc-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a202c;
+  margin-bottom: 6px;
+}
+
+/* === Text Inputs === */
+.form-control {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 15px;
+  color: #1a202c;
+  background-color: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+
+.form-control::placeholder {
+  color: #9ca3af;
+  font-weight: 400;
+}
+
+.form-control:focus {
+  border-color: #2d3748;
+  box-shadow: 0 0 0 3px rgba(45, 55, 72, 0.1);
+}
+
+/* === Input Group (password wrapper) === */
+.kc-input-group {
+  display: flex;
+  align-items: stretch;
+  position: relative;
+}
+
+.kc-input-group .form-control {
+  flex: 1;
+  border-radius: 8px 0 0 8px;
+  padding-right: 44px;
+}
+
+.kc-password-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  min-width: 44px;
+  background: #f7fafc;
+  border: 1px solid #d1d5db;
+  border-left: none;
+  border-radius: 0 8px 8px 0;
+  cursor: pointer;
+  color: #718096;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  padding: 0;
+  outline: none;
+}
+
+.kc-password-toggle:hover {
+  background-color: #edf2f7;
+  color: #4a5568;
+}
+
+.kc-password-toggle:focus-visible {
+  box-shadow: 0 0 0 2px rgba(45, 55, 72, 0.2);
+}
+
+.kc-password-toggle .kc-icon-eye,
+.kc-password-toggle .kc-icon-eye-slash {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.kc-icon-eye {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23718096' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E");
+}
+
+.kc-icon-eye-slash {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23718096' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94'/%3E%3Cpath d='M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19'/%3E%3Cline x1='1' y1='1' x2='23' y2='23'/%3E%3Cpath d='M14.12 14.12a3 3 0 1 1-4.24-4.24'/%3E%3C/svg%3E");
+}
+
+.kc-password-toggle:hover .kc-icon-eye {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234a5568' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E");
+}
+
+.kc-password-toggle:hover .kc-icon-eye-slash {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234a5568' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94'/%3E%3Cpath d='M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19'/%3E%3Cline x1='1' y1='1' x2='23' y2='23'/%3E%3Cpath d='M14.12 14.12a3 3 0 1 1-4.24-4.24'/%3E%3C/svg%3E");
+}
+
+/* === Settings Row (Remember Me / Forgot Password) === */
+.login-pf-settings {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.login-pf-settings .form-group {
+  margin-bottom: 0;
+}
+
+.login-pf-settings .checkbox {
+  display: flex;
+  align-items: center;
+}
+
+.login-pf-settings .checkbox label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 400;
+  color: #4a5568;
+  cursor: pointer;
+  margin: 0;
+}
+
+.login-pf-settings .checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #2d3748;
+  cursor: pointer;
+  margin: 0;
+}
+
+.login-pf-options-wrapper a {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2d3748;
+  text-decoration: none;
+}
+
+.login-pf-options-wrapper a:hover {
+  text-decoration: underline;
+  color: #1a202c;
+}
+
+/* === Submit Button === */
+.kc-btn {
+  display: inline-block;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.kc-btn-primary {
+  display: block;
+  width: 100%;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  background-color: #2d3748;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.kc-btn-primary:hover {
+  background-color: #1a202c;
+}
+
+.kc-btn-primary:active {
+  background-color: #2d3748;
+  transform: scale(0.99);
+}
+
+.kc-btn-block {
+  display: block;
+  width: 100%;
+}
+
+.kc-btn-lg {
+  padding: 12px 24px;
+  font-size: 16px;
+}
+
+/* === Sign Up Section === */
+.login-pf-signup {
+  text-align: center;
+  padding-top: 24px;
+  margin-top: 8px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.login-pf-signup span {
+  font-size: 14px;
+  color: #718096;
+}
+
+.login-pf-signup a {
+  font-weight: 600;
+  color: #2d3748;
+  text-decoration: none;
+}
+
+.login-pf-signup a:hover {
+  text-decoration: underline;
+  color: #1a202c;
+}
+
+/* === Alert / Feedback Messages === */
+.kc-alert,
+[class*="alert-"] {
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  line-height: 1.4;
+}
+
+.kc-alert-title,
+[class*="alert-"] .pf-c-alert__icon + span {
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.pf-c-alert__icon {
+  display: none;
+}
+
+.alert-error {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+}
+
+.kc-alert-success,
+.alert-success {
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+}
+
+.kc-alert-info,
+.alert-info {
+  background-color: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1e40af;
+}
+
+.kc-alert-warning,
+.alert-warning {
+  background-color: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #92400e;
+}
+
+/* === Form Error State === */
+.form-group:has(.kc-input-error) .form-control,
+.form-group:has(.kc-input-error) .kc-input-group .form-control,
+.form-group:has(.kc-input-error) .kc-input-group .kc-password-toggle,
+input[aria-invalid="true"],
+input[aria-invalid="true"]:focus {
+  border-color: #ef4444;
+}
+
+input[aria-invalid="true"]:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
+.kc-input-error {
+  display: block;
+  margin-top: 6px;
+  font-size: 13px;
+  color: #dc2626;
+}
+
+/* === Social Providers === */
+.kc-social-section {
+  margin-bottom: 24px;
+}
+
+.kc-social-section hr {
+  border: none;
+  border-top: 1px solid #e2e8f0;
+  margin: 0 0 20px 0;
+}
+
+.kc-social-section h2 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #4a5568;
+  text-align: center;
+  margin: 0 0 16px 0;
+}
+
+.kc-social-links {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.kc-social-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #4a5568;
+  background-color: #f7fafc;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  text-decoration: none;
+}
+
+.kc-social-item:hover {
+  background-color: #edf2f7;
+}
+
+.kc-social-provider-name {
+  font-weight: 500;
+}
+
+/* === Locale Selector (hidden) === */
+#kc-locale,
+#kc-locale-wrapper,
+#kc-locale-dropdown,
+#language-switch1,
+div[kcclass="kcLocaleMainClass"],
+div[kcclass="kcLocaleWrapperClass"],
+div[kcclass="kcLocaleDropDownClass"],
+button#kc-current-locale-link,
+ul#language-switch1 {
+  display: none !important;
+}
+
+/* === Required Fields Indicator === */
+.required {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+/* === Responsive === */
+@media (max-width: 576px) {
+  .login-pf-card {
+    padding: 32px 24px 28px;
+    border-radius: 8px;
+  }
+
+  .login-pf-header h1 {
+    font-size: 26px;
+  }
+}

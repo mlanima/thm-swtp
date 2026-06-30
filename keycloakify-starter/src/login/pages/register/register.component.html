@@ -1,0 +1,384 @@
+@let realm = kcContext.realm;
+@let url = kcContext.url;
+@let messagesPerField = kcContext.messagesPerField;
+@let recaptchaRequired = kcContext.recaptchaRequired;
+@let recaptchaVisible = kcContext.recaptchaVisible;
+@let recaptchaSiteKey = kcContext.recaptchaSiteKey;
+@let recaptchaAction = kcContext.recaptchaAction;
+@let termsAcceptanceRequired = kcContext.termsAcceptanceRequired;
+@let profile = kcContext.profile;
+
+<ng-template #headerNode>
+  @let messageHeader = kcContext.messageHeader;
+  {{ messageHeader ?? i18n.advancedMsgStr('registerTitle') }}
+</ng-template>
+
+<div class="register-wrapper">
+  <div class="register-stepper">
+    @for (step of steps; track step.label; let idx = $index) {
+      <div
+        class="stepper-item"
+        [class.stepper-item--active]="idx === currentStep()"
+        [class.stepper-item--completed]="idx < currentStep()"
+        [class.stepper-item--clickable]="isStepAccessible(idx)"
+        (click)="isStepAccessible(idx) && goToStep(idx)"
+      >
+        <div class="stepper-circle">
+          @if (idx < currentStep()) {
+            <svg
+              width="14"
+              height="10"
+              viewBox="0 0 14 10"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M1 5L5 9L13 1"
+                stroke="white"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          } @else {
+            {{ idx + 1 }}
+          }
+        </div>
+        <span class="stepper-label">{{ step.label }}</span>
+        @if (idx < steps.length - 1) {
+          <div class="stepper-line"></div>
+        }
+      </div>
+    }
+  </div>
+
+  <div class="register-card">
+    <h2 class="register-title">{{ steps[currentStep()]?.title }}</h2>
+    <p class="register-subtitle">{{ steps[currentStep()]?.subtitle }}</p>
+
+    <form
+      id="kc-register-form"
+      method="post"
+      [action]="url.registrationAction"
+      class="register-form"
+    >
+      <!-- Hidden fields to preserve values from completed steps only -->
+      @if (getStepIndex('username') >= 0 && getStepIndex('username') < currentStep()) {
+        <input type="hidden" name="username" [value]="getUsernameValue()" />
+      }
+      @if (getStepIndex('password') >= 0 && getStepIndex('password') < currentStep()) {
+        <input type="hidden" name="password" [value]="getPasswordValue()" />
+        <input type="hidden" name="password-confirm" [value]="getPasswordConfirmValue()" />
+      }
+      @if (getStepIndex('email') >= 0 && getStepIndex('email') < currentStep()) {
+        <input type="hidden" name="email" [value]="getEmailValue()" />
+      }
+      @if (getStepIndex('firstName') >= 0 && getStepIndex('firstName') < currentStep()) {
+        <input type="hidden" name="firstName" [value]="getFirstNameValue()" />
+        <input type="hidden" name="lastName" [value]="getLastNameValue()" />
+      }
+
+      <!-- Step 0: Choose nickname -->
+      @if (currentStep() === getStepIndex('username')) {
+        <div class="form-group">
+          <label
+            for="username"
+            [kcClass]="'kcLabelClass'"
+          >
+            {{ i18n.msgStr('username') }}
+          </label>
+          <input
+            id="username"
+            name="username"
+            type="text"
+            class="form-control"
+            autocomplete="username"
+            [class.field-invalid]="touchedFields().has('username') && fieldErrors()['username']"
+            [attr.aria-invalid]="touchedFields().has('username') && !!fieldErrors()['username']"
+            (input)="onUsernameInput($event)"
+          />
+          @let usernameError = touchedFields().has('username') ? (fieldErrors()['username'] ?? null) : null;
+          @if (usernameError) {
+            <span
+              class="field-error"
+              aria-live="polite"
+              >{{ usernameError }}</span
+            >
+          } @else if (messagesPerField.existsError('username')) {
+            <span
+              class="field-error"
+              aria-live="polite"
+              [innerHTML]="messagesPerField.getFirstError('username') | kcSanitize: 'html'"
+            ></span>
+          }
+        </div>
+      }
+
+      <!-- Step 1: Set Password -->
+      @if (currentStep() === getStepIndex('password')) {
+        <div class="form-group">
+          <label
+            for="password"
+            [kcClass]="'kcLabelClass'"
+          >
+            {{ i18n.msgStr('password') }}
+          </label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            class="form-control"
+            autocomplete="new-password"
+            [class.field-invalid]="touchedFields().has('password') && fieldErrors()['password']"
+            [attr.aria-invalid]="touchedFields().has('password') && !!fieldErrors()['password']"
+            (input)="onPasswordInput($event)"
+          />
+          @let passwordError = touchedFields().has('password') ? (fieldErrors()['password'] ?? null) : null;
+          @if (passwordError) {
+            <span
+              class="field-error"
+              aria-live="polite"
+              >{{ passwordError }}</span
+            >
+          } @else if (messagesPerField.existsError('password')) {
+            <span
+              class="field-error"
+              aria-live="polite"
+              [innerHTML]="messagesPerField.getFirstError('password') | kcSanitize: 'html'"
+            ></span>
+          }
+        </div>
+        <div class="form-group">
+          <label
+            for="password-confirm"
+            [kcClass]="'kcLabelClass'"
+          >
+            {{ i18n.msgStr('passwordConfirm') }}
+          </label>
+          <input
+            id="password-confirm"
+            name="password-confirm"
+            type="password"
+            class="form-control"
+            autocomplete="new-password"
+            [class.field-invalid]="touchedFields().has('password-confirm') && fieldErrors()['password-confirm']"
+            [attr.aria-invalid]="touchedFields().has('password-confirm') && !!fieldErrors()['password-confirm']"
+            (input)="onPasswordConfirmInput($event)"
+          />
+          @let passwordConfirmError =
+            touchedFields().has('password-confirm') ? (fieldErrors()['password-confirm'] ?? null) : null;
+          @if (passwordConfirmError) {
+            <span
+              class="field-error"
+              aria-live="polite"
+              >{{ passwordConfirmError }}</span
+            >
+          } @else if (messagesPerField.existsError('password-confirm')) {
+            <span
+              class="field-error"
+              aria-live="polite"
+              [innerHTML]="messagesPerField.getFirstError('password-confirm') | kcSanitize: 'html'"
+            ></span>
+          }
+        </div>
+      }
+
+      <!-- Step 2: Set Email -->
+      @if (currentStep() === getStepIndex('email')) {
+        <div class="form-group">
+          <label
+            for="email"
+            [kcClass]="'kcLabelClass'"
+          >
+            {{ i18n.msgStr('email') }}
+          </label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            class="form-control"
+            autocomplete="email"
+            [class.field-invalid]="touchedFields().has('email') && fieldErrors()['email']"
+            [attr.aria-invalid]="touchedFields().has('email') && !!fieldErrors()['email']"
+            (input)="onEmailInput($event)"
+          />
+          @let emailError = touchedFields().has('email') ? (fieldErrors()['email'] ?? null) : null;
+          @if (emailError) {
+            <span
+              class="field-error"
+              aria-live="polite"
+              >{{ emailError }}</span
+            >
+          } @else if (messagesPerField.existsError('email')) {
+            <span
+              class="field-error"
+              aria-live="polite"
+              [innerHTML]="messagesPerField.getFirstError('email') | kcSanitize: 'html'"
+            ></span>
+          }
+        </div>
+      }
+
+      <!-- Step 3: Profile (First Name, Last Name) -->
+      @if (currentStep() === getStepIndex('firstName')) {
+        <div class="form-group">
+          <label
+            for="firstName"
+            [kcClass]="'kcLabelClass'"
+          >
+            {{ i18n.msgStr('firstName') }}
+          </label>
+          <input
+            id="firstName"
+            name="firstName"
+            type="text"
+            class="form-control"
+            autocomplete="given-name"
+            [class.field-invalid]="touchedFields().has('firstName') && fieldErrors()['firstName']"
+            [attr.aria-invalid]="touchedFields().has('firstName') && !!fieldErrors()['firstName']"
+            (input)="onFirstNameInput($event)"
+          />
+          @let firstNameError = touchedFields().has('firstName') ? (fieldErrors()['firstName'] ?? null) : null;
+          @if (firstNameError) {
+            <span
+              class="field-error"
+              aria-live="polite"
+              >{{ firstNameError }}</span
+            >
+          } @else if (messagesPerField.existsError('firstName')) {
+            <span
+              class="field-error"
+              aria-live="polite"
+              [innerHTML]="messagesPerField.getFirstError('firstName') | kcSanitize: 'html'"
+            ></span>
+          }
+        </div>
+        <div class="form-group">
+          <label
+            for="lastName"
+            [kcClass]="'kcLabelClass'"
+          >
+            {{ i18n.msgStr('lastName') }}
+          </label>
+          <input
+            id="lastName"
+            name="lastName"
+            type="text"
+            class="form-control"
+            autocomplete="family-name"
+            [class.field-invalid]="touchedFields().has('lastName') && fieldErrors()['lastName']"
+            [attr.aria-invalid]="touchedFields().has('lastName') && !!fieldErrors()['lastName']"
+            (input)="onLastNameInput($event)"
+          />
+          @let lastNameError = touchedFields().has('lastName') ? (fieldErrors()['lastName'] ?? null) : null;
+          @if (lastNameError) {
+            <span
+              class="field-error"
+              aria-live="polite"
+              >{{ lastNameError }}</span
+            >
+          } @else if (messagesPerField.existsError('lastName')) {
+            <span
+              class="field-error"
+              aria-live="polite"
+              [innerHTML]="messagesPerField.getFirstError('lastName') | kcSanitize: 'html'"
+            ></span>
+          }
+        </div>
+      }
+
+      <!-- Terms Acceptance -->
+      @if (termsAcceptanceRequired && isLastStep) {
+        <div class="form-group terms-group">
+          <div class="terms-text">
+            {{ i18n.msgStr('termsTitle') }}
+            <div id="kc-registration-terms-text">
+              {{ i18n.msgStr('termsText') }}
+            </div>
+          </div>
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              id="termsAccepted"
+              name="termsAccepted"
+              [checked]="areTermsAccepted()"
+              [attr.aria-invalid]="messagesPerField.existsError('termsAccepted')"
+              (change)="areTermsAccepted.set($any($event.target).checked)"
+            />
+            {{ i18n.msgStr('acceptTerms') }}
+          </label>
+          @if (messagesPerField.existsError('termsAccepted')) {
+            <span
+              class="field-error"
+              aria-live="polite"
+              [innerHTML]="messagesPerField.get('termsAccepted') | kcSanitize: 'html'"
+            ></span>
+          }
+        </div>
+      }
+
+      <!-- reCAPTCHA -->
+      @if (recaptchaRequired && (recaptchaVisible || recaptchaAction === undefined)) {
+        <div class="form-group">
+          <div
+            class="g-recaptcha"
+            data-size="compact"
+            [attr.data-sitekey]="recaptchaSiteKey"
+            [attr.data-action]="recaptchaAction"
+          ></div>
+        </div>
+      }
+
+      <!-- Form buttons -->
+      <div class="form-actions">
+        <a
+          [href]="url.loginUrl"
+          class="back-link"
+        >
+          {{ i18n.msgStr('backToLogin') }}
+        </a>
+
+        <div class="step-buttons">
+          @if (!isFirstStep) {
+            <button
+              type="button"
+              class="btn btn-secondary"
+              (click)="prevStep()"
+            >
+              {{ i18n.msgStr('doBack') }}
+            </button>
+          }
+
+          @if (isLastStep) {
+            @if (recaptchaRequired && !recaptchaVisible && recaptchaAction !== undefined) {
+              <button
+                type="submit"
+                class="btn btn-primary"
+                [disabled]="termsAcceptanceRequired && !areTermsAccepted()"
+              >
+                {{ i18n.msgStr('doRegister') }}
+              </button>
+            } @else {
+              <button
+                type="submit"
+                class="btn btn-primary"
+                [disabled]="termsAcceptanceRequired && !areTermsAccepted()"
+              >
+                {{ i18n.msgStr('doRegister') }}
+              </button>
+            }
+          } @else {
+            <button
+              type="button"
+              class="btn btn-primary"
+              [disabled]="!isCurrentStepValid()"
+              (click)="nextStep()"
+            >
+              {{ i18n.msgStr('doContinue') }}
+            </button>
+          }
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

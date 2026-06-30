@@ -5,6 +5,7 @@ import de.thm.swtp.api.common.LogSafe;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
@@ -16,7 +17,7 @@ import java.time.Duration;
 import java.util.List;
 
 @Slf4j
-@RequiredArgsConstructor(access = lombok.AccessLevel.PACKAGE)
+@RequiredArgsConstructor(onConstructor_ = @__(@Autowired), access = lombok.AccessLevel.PACKAGE)
 @Component
 public class GitHubTopicsClient {
 

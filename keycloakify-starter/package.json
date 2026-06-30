@@ -1,0 +1,89 @@
+{
+  "name": "keycloakify-starter-angular-vite",
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Angular + Vite Starter for Keycloakify 11",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/keycloakify/keycloakify-starter-angular-vite.git"
+  },
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "build-keycloak-theme": "ng build && keycloakify build",
+    "test": "ng test",
+    "lint": "ng lint --fix",
+    "storybook": "ng run keycloakify-starter-angular-vite:storybook",
+    "build-storybook": "ng run keycloakify-starter-angular-vite:build-storybook"
+  },
+  "author": "u/luca-peruzzo, u/kathari00, u/garronej",
+  "license": "MIT",
+  "keywords": [
+    "angular",
+    "keycloakify",
+    "keycloak",
+    "vite",
+    "analog"
+  ],
+  "dependencies": {
+    "@angular/common": "^21.2.12",
+    "@angular/compiler": "^21.2.12",
+    "@angular/core": "^21.2.12",
+    "@angular/forms": "^21.2.12",
+    "@angular/platform-browser": "^21.2.12",
+    "@angular/platform-browser-dynamic": "^21.2.12",
+    "@angular/router": "^21.2.12",
+    "@keycloakify/angular": "^21.1.5",
+    "keycloakify": "^11.15.3",
+    "primeicons": "^7.0.0",
+    "rxjs": "~7.8.2",
+    "tslib": "^2.8.1",
+    "zone.js": "~0.16.2"
+  },
+  "devDependencies": {
+    "@analogjs/platform": "2.6.0",
+    "@analogjs/storybook-angular": "^2.6.0",
+    "@analogjs/vite-plugin-angular": "2.6.0",
+    "@analogjs/vitest-angular": "^2.6.0",
+    "@angular-devkit/build-angular": "^21.2.10",
+    "@angular/build": "^21.2.10",
+    "@angular/cli": "^21.2.10",
+    "@angular/compiler-cli": "^21.2.12",
+    "@eslint/js": "^10.0.1",
+    "@nx/angular": "^22.7.5",
+    "@nx/vite": "^22.7.5",
+    "@storybook/angular": "^10.4.2",
+    "@types/node": "^24.10.1",
+    "@typescript-eslint/types": "^8.60.1",
+    "@typescript-eslint/utils": "^8.60.1",
+    "angular-eslint": "^21.4.0",
+    "eslint": "^10.4.1",
+    "eslint-plugin-prettier": "^5.5.6",
+    "eslint-plugin-storybook": "^10.4.2",
+    "jsdom": "^29.1.1",
+    "npm-check-updates": "^22.2.3",
+    "prettier": "^3.8.3",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "storybook": "^10.4.2",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.60.1",
+    "vite": "^8.0.16",
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^4.1.8"
+  },
+  "resolutions": {
+    "esbuild": "^0.28.0",
+    "vite": "^8.0.16"
+  },
+  "overrides": {
+    "esbuild": "^0.28.0",
+    "@analogjs/platform": {
+      "vite": "$vite"
+    }
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  }
+}
