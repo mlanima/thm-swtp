@@ -8,6 +8,7 @@ import de.thm.swtp.api.projectJoinRequest.repository.ProjectJoinRequestRepositor
 import de.thm.swtp.api.projectPost.domain.ProjectPostStatus;
 import de.thm.swtp.api.projectPost.entity.ProjectPostEntity;
 import de.thm.swtp.api.projectPost.repository.ProjectPostRepository;
+import de.thm.swtp.api.thesis.ThesisRepository;
 import de.thm.swtp.api.userprofile.domain.UserStatus;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,6 +45,8 @@ class SecurityServiceTest {
     private ProjectJoinRequestRepository projectJoinRequestRepository;
     @Mock
     private ProjectPostRepository projectPostRepository;
+    @Mock
+    private ThesisRepository thesisRepository;
 
     @InjectMocks
     private SecurityService securityService;
@@ -395,5 +398,112 @@ class SecurityServiceTest {
 
         assertThat(securityService.canUnbanUser(bannedUserId, authentication()))
                 .isFalse();
+    }
+
+    // --- thesis security ---
+
+    @Test
+    void canCreateThesis_allowsActiveProfessor() {
+        when(userProfileRepository.existsByKeycloakIdAndIsProfessorTrue(userId)).thenReturn(true);
+
+        assertThat(securityService.canCreateThesis(authentication())).isTrue();
+    }
+
+    @Test
+    void canCreateThesis_deniesRegularUser() {
+        when(userProfileRepository.existsByKeycloakIdAndIsProfessorTrue(userId)).thenReturn(false);
+
+        assertThat(securityService.canCreateThesis(authentication())).isFalse();
+    }
+
+    @Test
+    void canCreateThesis_deniesModerator() {
+        assertThat(securityService.canCreateThesis(authentication("ROLE_MODERATOR"))).isFalse();
+    }
+
+    @Test
+    void canCreateThesis_deniesInactiveProfessor() {
+        when(userProfileRepository.existsByKeycloakIdAndStatus(userId, UserStatus.ACTIVE))
+                .thenReturn(false);
+
+        assertThat(securityService.canCreateThesis(authentication())).isFalse();
+    }
+
+    @Test
+    void canEditThesis_allowsSupervisingProfessor() {
+        UUID thesisId = UUID.randomUUID();
+        when(userProfileRepository.existsByKeycloakIdAndIsProfessorTrue(userId)).thenReturn(true);
+        when(thesisRepository.existsByIdAndSupervisorKeycloakId(thesisId, userId)).thenReturn(true);
+
+        assertThat(securityService.canEditThesis(thesisId, authentication())).isTrue();
+    }
+
+    @Test
+    void canEditThesis_deniesNonSupervisor() {
+        UUID thesisId = UUID.randomUUID();
+        when(userProfileRepository.existsByKeycloakIdAndIsProfessorTrue(userId)).thenReturn(true);
+        when(thesisRepository.existsByIdAndSupervisorKeycloakId(thesisId, userId)).thenReturn(false);
+
+        assertThat(securityService.canEditThesis(thesisId, authentication())).isFalse();
+    }
+
+    @Test
+    void canEditThesis_deniesInactiveProfessor() {
+        UUID thesisId = UUID.randomUUID();
+        when(userProfileRepository.existsByKeycloakIdAndStatus(userId, UserStatus.ACTIVE))
+                .thenReturn(false);
+
+        assertThat(securityService.canEditThesis(thesisId, authentication())).isFalse();
+    }
+
+    @Test
+    void canDeleteThesis_allowsModerator() {
+        UUID thesisId = UUID.randomUUID();
+
+        assertThat(securityService.canDeleteThesis(thesisId, authentication("ROLE_MODERATOR"))).isTrue();
+    }
+
+    @Test
+    void canDeleteThesis_allowsActiveSupervisingProfessor() {
+        UUID thesisId = UUID.randomUUID();
+        when(userProfileRepository.existsByKeycloakIdAndIsProfessorTrue(userId)).thenReturn(true);
+        when(thesisRepository.existsByIdAndSupervisorKeycloakId(thesisId, userId)).thenReturn(true);
+
+        assertThat(securityService.canDeleteThesis(thesisId, authentication())).isTrue();
+    }
+
+    @Test
+    void canDeleteThesis_deniesInactiveSupervisingProfessor() {
+        UUID thesisId = UUID.randomUUID();
+        when(userProfileRepository.existsByKeycloakIdAndStatus(userId, UserStatus.ACTIVE))
+                .thenReturn(false);
+
+        assertThat(securityService.canDeleteThesis(thesisId, authentication())).isFalse();
+    }
+
+    @Test
+    void canDeleteThesis_deniesNonSupervisorProfessor() {
+        UUID thesisId = UUID.randomUUID();
+        when(userProfileRepository.existsByKeycloakIdAndIsProfessorTrue(userId)).thenReturn(true);
+        when(thesisRepository.existsByIdAndSupervisorKeycloakId(thesisId, userId)).thenReturn(false);
+
+        assertThat(securityService.canDeleteThesis(thesisId, authentication())).isFalse();
+    }
+
+    @Test
+    void canManageThesisStudents_allowsActiveSupervisingProfessor() {
+        UUID thesisId = UUID.randomUUID();
+        when(userProfileRepository.existsByKeycloakIdAndIsProfessorTrue(userId)).thenReturn(true);
+        when(thesisRepository.existsByIdAndSupervisorKeycloakId(thesisId, userId)).thenReturn(true);
+
+        assertThat(securityService.canManageThesisStudents(thesisId, authentication())).isTrue();
+    }
+
+    @Test
+    void canManageThesisStudents_deniesRegularUser() {
+        UUID thesisId = UUID.randomUUID();
+        when(userProfileRepository.existsByKeycloakIdAndIsProfessorTrue(userId)).thenReturn(false);
+
+        assertThat(securityService.canManageThesisStudents(thesisId, authentication())).isFalse();
     }
 }
