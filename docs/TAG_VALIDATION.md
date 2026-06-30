@@ -80,17 +80,10 @@ Only invalid tags get cached (as `false`) to avoid re-checking the blocklist or 
 
 ```yaml
 spring:
-  cache:
-    type: ${SPRING_CACHE_TYPE:redis}
-    redis:
-      time-to-live: 3600000           # 1 hour
-      cache-null-values: false
-      key-prefix: "tags:"
   data:
     redis:
       host: ${SPRING_DATA_REDIS_HOST:redis.ser.mlanima.org}
       port: 6379
-      password: ${SPRING_DATA_REDIS_PASSWORD:}
       timeout: 2000ms
       connect-timeout: 1000ms
 
@@ -137,9 +130,7 @@ Supported languages (28): ar, cs, da, de, en, eo, es, fa, fi, fil, fr, fr-CA-u-s
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `SPRING_CACHE_TYPE` | No | `redis` | Ignored when custom `CacheManager` bean is defined; Redis detection is automatic |
-| `SPRING_DATA_REDIS_HOST` | No | `redis.ser.mlanima.org` | Redis server hostname (only used when Redis is reachable) |
-| `SPRING_DATA_REDIS_PASSWORD` | No | empty | Redis password (not needed if auth is disabled) |
+| `SPRING_DATA_REDIS_HOST` | No | `redis.ser.mlanima.org` | Redis server hostname |
 | `STACKOVERFLOW_API_KEY` | If using SO | empty | StackExchange API app key — inject at runtime via Compose environment, **not** as Docker build-arg |
 
 ---
