@@ -32,7 +32,7 @@ public class OpenAIModeratedGithubTagSource implements TagSource {
                 log.warn("Blocked tag rejected (fallback): {}", LogSafe.clean(tagName));
                 return false;
             }
-            log.debug("Blocklist passed, querying GitHub for tag: {}", LogSafe.clean(tagName));
+            log.info("Blocklist passed, querying GitHub for tag: {}", LogSafe.clean(tagName));
         }
 
         return gitHubTopicsClient.tagExists(cleaned);
