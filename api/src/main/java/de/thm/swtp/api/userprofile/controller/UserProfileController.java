@@ -55,7 +55,7 @@ public class UserProfileController {
         return projectService.getAllProjectsByUsername(username);
     }
 
-    @GetMapping("/api/users/{username}/theses")
+    @GetMapping("/api/v1/users/{username}/theses")
     @PreAuthorize("@security.canViewUserTheses(#username, authentication)")
     public List<ThesisResponse> getTheses(@PathVariable String username) {
         return thesisService.getThesesByUsername(username)
