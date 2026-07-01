@@ -12,7 +12,6 @@ services:
       SPRING_MAIL_PORT: "1025"
       SPRINGDOC_SWAGGERUI_ENABLED: "false"
       APP_FRONTEND_URL: https://www.swtp-ss26.de
-      APP_BACKEND_URL: https://api.swtp-ss26.de
     volumes:
       - ./uploads:/app/uploads
     labels:
