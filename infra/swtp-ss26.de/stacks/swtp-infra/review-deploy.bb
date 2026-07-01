@@ -253,11 +253,7 @@
        :extra-opts     ["--network"  "review_net"
                         "--env-file" "/opt/stacks/swtp-infra/review.env"
                         "-v"         (str upload-dir ":/app/uploads")
-                        "-e"         "APP_UPLOADS_DIR=/app/uploads"
                         "-e"         (str "SPRING_DATASOURCE_URL=jdbc:mysql://swtp-db:3306/" db-name)
-                        "-e"         "SPRING_MAIL_HOST=maildev"
-                        "-e"         "SPRING_MAIL_PORT=1025"
-                        "-e"         "BE_LOG_LEVEL=DEBUG"
                         "-e"         (str "APP_FRONTEND_URL=https://" (subdomain *pr-num* nil))]})
     (log (str "Backend live -> https://" host))))
 
@@ -402,12 +398,15 @@
   (try
     (let [{:keys [pr-num org]} (parse-args args)
           env          (load-env!)
+          ;; Database
           db-root-pw   (env-get env "MYSQL_ROOT_PASSWORD")
           db-app-user  (or (get env "MYSQL_USER") "swtp")
           db-name      (str "swtp_pr_" pr-num)
           template-db  "swtp_template"
+          ;; Keycloak admin (needed to register the PR redirect URI)
           kc-admin     (env-get env "KC_ADMIN")
           kc-admin-pw  (env-get env "KC_ADMIN_PASSWORD")
+          ;; PR-specific URLs
           pr-origin    (str "https://" (subdomain pr-num nil))]
 
       (binding [*pr-num* pr-num]

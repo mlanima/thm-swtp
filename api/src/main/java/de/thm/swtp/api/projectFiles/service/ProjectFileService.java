@@ -44,6 +44,7 @@ public class ProjectFileService {
             "text/plain",
             "text/markdown",
             "text/x-markdown",
+            "text/x-web-markdown",
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     );
 
@@ -82,11 +83,6 @@ public class ProjectFileService {
     public ProjectFile uploadFile(UUID projectId, MultipartFile file) {
         ProjectEntity project = getProjectOrThrow(projectId);
 
-        String mimeType = file.getContentType();
-        if (mimeType == null || !ALLOWED_MIME_TYPES.contains(mimeType)) {
-            throw new ProjectFileTypeNotAllowedException(mimeType);
-        }
-
         if (projectFileRepository.countByProjectId(projectId) >= MAX_FILES_PER_PROJECT) {
             throw new ProjectFileUploadLimitExceededException(MAX_FILES_PER_PROJECT);
         }
@@ -108,6 +104,7 @@ public class ProjectFileService {
         }
 
         // verify actual MIME type via magic bytes — client-supplied Content-Type is not trusted
+        String mimeType;
         try {
             String detectedMime = TIKA.detect(filePath);
             if (!ALLOWED_MIME_TYPES.contains(detectedMime)) {
