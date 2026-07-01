@@ -1,8 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { of } from 'rxjs'
+import { Pipe, PipeTransform } from '@angular/core';
+import { of } from 'rxjs';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ProfessorRequestComponent } from './professor-request.component';
 import { ModeratorProfessorRequestService } from './service/moderator-professor-request.service';
+
+@Pipe({
+  name: 'translate',
+  standalone: true,
+})
+class TranslatePipeMock implements PipeTransform {
+  transform(value: string): string {
+    return value;
+  }
+}
 
 describe('ProfessorRequestComponent', () => {
   let component: ProfessorRequestComponent;
@@ -38,11 +49,20 @@ describe('ProfessorRequestComponent', () => {
           useValue: translateServiceMock,
         },
       ],
-    }).compileComponents();
+    })
+      .overrideComponent(ProfessorRequestComponent, {
+        remove: {
+          imports: [TranslatePipe],
+        },
+        add: {
+          imports: [TranslatePipeMock],
+        },
+      })
+      .compileComponents();
 
     fixture = TestBed.createComponent(ProfessorRequestComponent);
     component = fixture.componentInstance;
-    await fixture.whenStable();
+    fixture.detectChanges();
   });
 
   it('should create', () => {
