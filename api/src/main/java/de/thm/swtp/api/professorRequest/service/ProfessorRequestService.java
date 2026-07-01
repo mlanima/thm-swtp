@@ -37,7 +37,9 @@ public class ProfessorRequestService {
     private final ProfessorRequestProperties professorRequestProperties;
     private final ApplicationEventPublisher eventPublisher;
 
-    /** Creates a new professor-rights request with status WAITING_EMAIL_VERIFICATION for the given user. */
+    /**
+     * Creates a new professor-rights request with status WAITING_EMAIL_VERIFICATION for the given user.
+     */
     @Transactional
     public ProfessorRequest createProfessorRequest(UUID currentUserId, String email, String text) {
         String normalizedEmail = normalizeEmail(email);
@@ -48,6 +50,7 @@ public class ProfessorRequestService {
             throw new ProfessorRequestInvalidStatusException("Professor requests require a valid THM email address.");
         }
 
+        expireOutdatedVerificationRequestsForUser(currentUserId);
         validateNoOpenProfessorRequest(currentUserId);
 
         String verificationToken = createVerificationToken();
@@ -86,7 +89,7 @@ public class ProfessorRequestService {
             professorRequestEntity.setVerificationTokenHash(null);
 
             ProfessorRequestEntity saved = professorRequestRepository.save(professorRequestEntity);
-            return  ProfessorRequestMapper.toDomain(saved);
+            return ProfessorRequestMapper.toDomain(saved);
         }
 
         professorRequestEntity.setEmailVerifiedAt(LocalDateTime.now());
@@ -97,14 +100,18 @@ public class ProfessorRequestService {
         return ProfessorRequestMapper.toDomain(saved);
     }
 
-    /** Returns a paginated list of all professor-rights requests. */
+    /**
+     * Returns a paginated list of all professor-rights requests.
+     */
     @Transactional(readOnly = true)
     public Page<ProfessorRequest> getAllProfessorRequests(Pageable pageable) {
         return professorRequestRepository.findAllByOrderByCreatedAtDesc(pageable)
                 .map(ProfessorRequestMapper::toDomain);
     }
 
-    /** Returns all requests for the given user, ordered by newest first. */
+    /**
+     * Returns all requests for the given user, ordered by newest first.
+     */
     @Transactional(readOnly = true)
     public List<ProfessorRequest> getRequestsByUser(UUID userId) {
         return professorRequestRepository.findAllByRequestingUserKeycloakIdOrderByCreatedAtDesc(userId)
@@ -113,7 +120,9 @@ public class ProfessorRequestService {
                 .toList();
     }
 
-    /** Accepts a professor-rights request by setting its status to ACCEPTED and granting the professor role. */
+    /**
+     * Accepts a professor-rights request by setting its status to ACCEPTED and granting the professor role.
+     */
     @Transactional
     public ProfessorRequest acceptProfessorRequest(UUID requestId) {
         ProfessorRequestEntity entity = professorRequestRepository.findById(requestId)
@@ -131,13 +140,15 @@ public class ProfessorRequestService {
         return ProfessorRequestMapper.toDomain(saved);
     }
 
-    /** Rejects a professor-rights request by setting its status to REJECTED. */
+    /**
+     * Rejects a professor-rights request by setting its status to REJECTED.
+     */
     @Transactional
     public ProfessorRequest rejectProfessorRequest(UUID requestId) {
         ProfessorRequestEntity entity = professorRequestRepository.findById(requestId)
                 .orElseThrow(() -> new ProfessorRequestNotFoundException(requestId));
 
-        if (entity.getStatus() != ProfessorRequestStatus.PENDING &&  entity.getStatus() != ProfessorRequestStatus.WAITING_EMAIL_VERIFICATION) {
+        if (entity.getStatus() != ProfessorRequestStatus.PENDING && entity.getStatus() != ProfessorRequestStatus.WAITING_EMAIL_VERIFICATION) {
             throw new ProfessorRequestInvalidStatusException(
                     "Only a pending professor request can be rejected. Current status: " + entity.getStatus());
         }
@@ -147,6 +158,35 @@ public class ProfessorRequestService {
         ProfessorRequestEntity saved = professorRequestRepository.save(entity);
         return ProfessorRequestMapper.toDomain(saved);
     }
+
+    @Transactional
+    public int expireOutdatedVerificationRequests() {
+        List<ProfessorRequestEntity> expiredRequests = professorRequestRepository
+                .findAllByStatusAndVerificationExpiresAtBefore(ProfessorRequestStatus.WAITING_EMAIL_VERIFICATION, LocalDateTime.now());
+
+        expiredRequests.forEach(request -> {
+            request.setStatus(ProfessorRequestStatus.EXPIRED);
+            request.setVerificationTokenHash(null);
+        });
+
+        return expiredRequests.size();
+    }
+
+
+    private void expireOutdatedVerificationRequestsForUser(UUID userId) {
+        List<ProfessorRequestEntity> expiredRequests =
+                professorRequestRepository.findAllByRequestingUserKeycloakIdAndStatusAndVerificationExpiresAtBefore(
+                        userId,
+                        ProfessorRequestStatus.WAITING_EMAIL_VERIFICATION,
+                        LocalDateTime.now()
+                );
+
+        expiredRequests.forEach(request -> {
+            request.setStatus(ProfessorRequestStatus.EXPIRED);
+            request.setVerificationTokenHash(null);
+        });
+    }
+
 
     private String normalizeEmail(String email) {
         return email == null ? "" : email.trim().toLowerCase();
@@ -165,7 +205,7 @@ public class ProfessorRequestService {
                 List.of(ProfessorRequestStatus.PENDING, ProfessorRequestStatus.WAITING_EMAIL_VERIFICATION)
         );
 
-        if (openRequestExists ) {
+        if (openRequestExists) {
             throw new ProfessorRequestAlreadyExistsException(userId);
         }
     }
