@@ -35,8 +35,6 @@ public class NotificationService {
     @Value("${app.frontend-url}")
     private String frontendUrl;
 
-    @Value("${app.backend-url}")
-    private String backendUrl;
 
     @Value("${app.mail.language:de}")
     private String mailLanguage;
