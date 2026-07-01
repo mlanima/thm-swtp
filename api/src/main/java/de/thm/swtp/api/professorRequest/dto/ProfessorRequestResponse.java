@@ -15,8 +15,8 @@ public record ProfessorRequestResponse(
         String text,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
-        LocalDateTime verificationExpiresAt,
         LocalDateTime emailVerifiedAt,
+        LocalDateTime verificationExpiresAt,
         ProfessorRequestStatus status
 ) {
 
@@ -30,8 +30,8 @@ public record ProfessorRequestResponse(
                 request.getText(),
                 request.getCreatedAt(),
                 request.getUpdatedAt(),
-                request.getVerificationExpiredAt(),
                 request.getEmailVerifiedAt(),
+                request.getVerificationExpiresAt(),
                 request.getStatus()
         );
     }

@@ -16,9 +16,10 @@ public class ProfessorRequest {
     String name;
     String email;
     String text;
+    String verificationTokenHash;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
-    LocalDateTime verificationExpiredAt;
+    LocalDateTime verificationExpiresAt;
     LocalDateTime emailVerifiedAt;
     ProfessorRequestStatus status;
 }
