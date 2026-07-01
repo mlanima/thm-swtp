@@ -58,39 +58,15 @@ export class ProfessorRequestTab implements OnInit {
 
   ngOnInit(): void {
     this.authService.waitUntilAuthReady().then(() => {
-      this.loadUserAndRequest();
-    });
-  }
-  private loadUserAndRequest(retriesLeft = 10): void {
-    const user = this.authService.user();
+      const user = this.authService.user();
 
-    if (!user) {
-      if (retriesLeft <= 0) {
+      if (!user) {
         this.errorMessage.set(this.translate.instant('PROFESSOR_REQUEST.ERROR_LOAD_USER'));
         this.isLoading.set(false);
         return;
       }
-      setTimeout(() => this.loadUserAndRequest(retriesLeft - 1), 100);
-      return;
-    }
 
-    this.userName.set(user.username);
-
-    this.requestService.getMyRequest(user.id).subscribe({
-      next: (existing) => {
-        this.existingRequest.set(existing);
-
-        if (!existing) {
-          this.userEmail.set('');
-          this.userText.set('');
-        }
-
-        this.isLoading.set(false);
-      },
-      error: () => {
-        this.errorMessage.set(this.translate.instant('PROFESSOR_REQUEST.ERROR_LOAD_USER'));
-        this.isLoading.set(false);
-      },
+      this.loadUserAndRequest(user.id, user.username);
     });
   }
 
@@ -129,5 +105,26 @@ export class ProfessorRequestTab implements OnInit {
 
   closeSuccess(): void {
     this.showSuccess.set(false);
+  }
+
+  private loadUserAndRequest(userId: string, username: string): void {
+    this.userName.set(username);
+
+    this.requestService.getMyRequest(userId).subscribe({
+      next: (existing) => {
+        this.existingRequest.set(existing);
+
+        if (!existing) {
+          this.userEmail.set('');
+          this.userText.set('');
+        }
+
+        this.isLoading.set(false);
+      },
+      error: () => {
+        this.errorMessage.set(this.translate.instant('PROFESSOR_REQUEST.ERROR_LOAD'));
+        this.isLoading.set(false);
+      },
+    });
   }
 }
