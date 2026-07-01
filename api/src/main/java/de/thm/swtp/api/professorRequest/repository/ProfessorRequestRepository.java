@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /** Repository for professor-rights requests. */
@@ -20,4 +21,8 @@ public interface ProfessorRequestRepository extends JpaRepository<ProfessorReque
 
     /** Returns all requests for the given user, ordered by creation date descending. */
     List<ProfessorRequestEntity> findAllByRequestingUserKeycloakIdOrderByCreatedAtDesc(UUID keycloakId);
+
+    Optional<ProfessorRequestEntity> findByVerificationTokenHash(String verificationTokenHash);
+
+    boolean existsByRequestingUserKeycloakIdAndStatusIn(UUID keycloakId, List<ProfessorRequestStatus> statuses);
 }

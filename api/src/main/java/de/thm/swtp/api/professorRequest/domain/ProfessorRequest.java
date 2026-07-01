@@ -18,5 +18,7 @@ public class ProfessorRequest {
     String text;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
+    LocalDateTime verificationExpiredAt;
+    LocalDateTime emailVerifiedAt;
     ProfessorRequestStatus status;
 }

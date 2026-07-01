@@ -7,15 +7,19 @@ import de.thm.swtp.api.professorRequest.service.ProfessorRequestService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,6 +29,9 @@ import java.util.UUID;
 @RequestMapping("/api/v1/professor-requests")
 public class ProfessorRequestController {
     private final ProfessorRequestService professorRequestService;
+
+    @Value("${app.frontend-url}")
+    private String frontendUrl;
 
     /** Returns all professor-rights requests (paginated). */
     @GetMapping
@@ -43,6 +50,16 @@ public class ProfessorRequestController {
                 .stream()
                 .map(ProfessorRequestResponse::toResponse)
                 .toList();
+    }
+
+    @GetMapping("/verify")
+    public ResponseEntity<Void> verifyProfessorRequestEmail(@RequestParam String token) {
+        ProfessorRequest professorRequest = professorRequestService.verifyProfessorRequestEmail(token);
+
+        String redirectUrl = frontendUrl + "/settings?tab=professor-request&professorRequestStatus=" + professorRequest.getStatus();
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .location(URI.create(redirectUrl))
+                .build();
     }
 
     /** Creates a new professor-rights request for the authenticated user with status PENDING. */
