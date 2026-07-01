@@ -8,6 +8,7 @@ import {
 } from '../../../professor-request/services/professor-request.service';
 import { AuthService } from '../../../auth/auth.service';
 import { FormErrors, mapZodErrors } from '../../../project-create/schemas/zod-error.helper';
+import { ActivatedRoute, Router } from '@angular/router';
 
 const professorRequestSchema = z.object({
   email: z
@@ -35,6 +36,12 @@ export class ProfessorRequestTab implements OnInit {
   private readonly requestService = inject(ProfessorRequestService);
   private readonly translate = inject(TranslateService);
 
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+
+  readonly verificationToken = signal<string | null>(null);
+  readonly verificationSuccess = signal(false);
+
   readonly isLoading = signal(true);
   readonly isSubmitting = signal(false);
   readonly errorMessage = signal('');
@@ -57,6 +64,9 @@ export class ProfessorRequestTab implements OnInit {
   }
 
   ngOnInit(): void {
+    const token = this.route.snapshot.queryParamMap.get('verifyToken');
+    this.verificationToken.set(token);
+
     this.authService.waitUntilAuthReady().then(() => {
       const user = this.authService.user();
 
@@ -105,6 +115,37 @@ export class ProfessorRequestTab implements OnInit {
 
   closeSuccess(): void {
     this.showSuccess.set(false);
+  }
+
+  verifyEmail(): void {
+    const token = this.verificationToken();
+
+    if (!token) {
+      return;
+    }
+
+    this.isSubmitting.set(true);
+    this.errorMessage.set('');
+
+    this.requestService.verifyEmail(token).subscribe({
+      next: (verifiedRequest) => {
+        this.existingRequest.set(verifiedRequest);
+        this.verificationSuccess.set(true);
+        this.verificationToken.set(null);
+        this.isSubmitting.set(false);
+
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: { verifyToken: null },
+          queryParamsHandling: 'merge',
+          replaceUrl: true,
+        });
+      },
+      error: () => {
+        this.errorMessage.set(this.translate.instant('PROFESSOR_REQUEST.ERROR_VERIFY_EMAIL'));
+        this.isSubmitting.set(false);
+      },
+    });
   }
 
   private loadUserAndRequest(userId: string, username: string): void {
