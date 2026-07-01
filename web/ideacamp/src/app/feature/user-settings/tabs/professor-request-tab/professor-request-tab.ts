@@ -81,7 +81,7 @@ export class ProfessorRequestTab implements OnInit {
         this.existingRequest.set(existing);
 
         if (!existing) {
-          this.userEmail.set(user.email ?? '');
+          this.userEmail.set('');
           this.userText.set('');
         }
 

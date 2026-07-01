@@ -563,7 +563,7 @@
     "FORM_DESCRIPTION": "Briefly describe why you need professor rights.",
     "FORM_NAME": "Username",
     "FORM_EMAIL": "Email *",
-    "FORM_EMAIL_PLACEHOLDER": "your@university.edu",
+    "FORM_EMAIL_PLACEHOLDER": "e.g. firstname.lastname@mni.thm.de",
     "FORM_REASON": "Reason *",
     "FORM_REASON_PLACEHOLDER": "Write your application letter...",
     "SUBMITTING": "Sending",

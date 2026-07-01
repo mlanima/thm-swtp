@@ -563,7 +563,7 @@
     "FORM_DESCRIPTION": "Beschreiben Sie kurz, warum Sie Professor:innen-Rechte benötigen.",
     "FORM_NAME": "Benutzername",
     "FORM_EMAIL": "E-Mail *",
-    "FORM_EMAIL_PLACEHOLDER": "ihre@hochschule.de",
+    "FORM_EMAIL_PLACEHOLDER": "z.B. vorname.nachname@mni.thm.de",
     "FORM_REASON": "Begründung *",
     "FORM_REASON_PLACEHOLDER": "Schreiben Sie Ihr Anschreiben für die Anfrage...",
     "SUBMITTING": "Wird gesendet",
