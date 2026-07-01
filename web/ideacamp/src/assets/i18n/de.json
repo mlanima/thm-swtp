@@ -231,6 +231,8 @@
       "STATUS_PENDING": "Ausstehend",
       "STATUS_ACCEPTED": "Angenommen",
       "STATUS_REJECTED": "Abgelehnt",
+      "STATUS_WAITING_EMAIL_VERIFICATION": "Wartet auf E-Mail-Bestätigung",
+      "STATUS_EXPIRED": "Abgelaufen",
       "CONFIRM_ACCEPT_TITLE": "Anfrage annehmen",
       "CONFIRM_REJECT_TITLE": "Anfrage ablehnen",
       "CONFIRM_ACCEPT_TEXT": "Möchtest du diese Professor-Anfrage wirklich annehmen?",

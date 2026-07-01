@@ -231,6 +231,8 @@
       "STATUS_PENDING": "Pending",
       "STATUS_ACCEPTED": "Accepted",
       "STATUS_REJECTED": "Rejected",
+      "STATUS_WAITING_EMAIL_VERIFICATION": "Waiting for email verification",
+      "STATUS_EXPIRED": "Expired",
       "CONFIRM_ACCEPT_TITLE": "Accept request",
       "CONFIRM_REJECT_TITLE": "Reject request",
       "CONFIRM_ACCEPT_TEXT": "Do you really want to accept this professor request?",
