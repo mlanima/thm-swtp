@@ -28,9 +28,6 @@ import java.util.UUID;
 public class ProfessorRequestController {
     private final ProfessorRequestService professorRequestService;
 
-    @Value("${app.frontend-url}")
-    private String frontendUrl;
-
     /** Returns all professor-rights requests (paginated). */
     @GetMapping
     @PreAuthorize("@security.canViewAllProfessorRequests(authentication)")
@@ -50,8 +47,9 @@ public class ProfessorRequestController {
                 .toList();
     }
 
+    /** Verifies the THM email address for a professor-rights request.*/
     @PostMapping("/verify")
-    public ProfessorRequestResponse verifyProfessorRequestEmail(@RequestParam VerifyProfessorRequestEmailRequest request) {
+    public ProfessorRequestResponse verifyProfessorRequestEmail(@RequestBody VerifyProfessorRequestEmailRequest request) {
         ProfessorRequest professorRequest = professorRequestService.verifyProfessorRequestEmail(request.token());
         return ProfessorRequestResponse.toResponse(professorRequest);
     }

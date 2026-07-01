@@ -1,5 +1,6 @@
 package de.thm.swtp.api.professorRequest.service;
 
+import de.thm.swtp.api.exceptionhandling.exceptions.InvalidProfessorEmailDomainException;
 import de.thm.swtp.api.notification.event.ProfessorRequestVerificationCreatedEvent;
 import de.thm.swtp.api.professorRequest.config.ProfessorRequestProperties;
 import de.thm.swtp.api.professorRequest.domain.ProfessorRequest;
@@ -47,7 +48,7 @@ public class ProfessorRequestService {
                 .orElseThrow(() -> new UserProfileNotFoundException(currentUserId.toString()));
 
         if (!isAllowedProfessorEmail(normalizedEmail)) {
-            throw new ProfessorRequestInvalidStatusException("Professor requests require a valid THM email address.");
+            throw new InvalidProfessorEmailDomainException(normalizedEmail);
         }
 
         expireOutdatedVerificationRequestsForUser(currentUserId);
