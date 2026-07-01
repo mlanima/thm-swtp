@@ -1,5 +1,6 @@
 package de.thm.swtp.api.professorRequest;
 
+import de.thm.swtp.api.exceptionhandling.exceptions.InvalidProfessorEmailDomainException;
 import de.thm.swtp.api.notification.event.ProfessorRequestVerificationCreatedEvent;
 import de.thm.swtp.api.professorRequest.config.ProfessorRequestProperties;
 import de.thm.swtp.api.professorRequest.domain.ProfessorRequest;
@@ -271,7 +272,7 @@ public class ProfessorRequestServiceTest {
         when(userProfileRepository.findById(userId)).thenReturn(Optional.of(user));
 
         assertThatThrownBy(() -> professorRequestService.createProfessorRequest(userId, invalidEmail, text))
-                .isInstanceOf(ProfessorRequestInvalidStatusException.class);
+                .isInstanceOf(InvalidProfessorEmailDomainException.class);
 
         verify(professorRequestRepository, never()).save(any());
         verify(eventPublisher, never()).publishEvent(any());
