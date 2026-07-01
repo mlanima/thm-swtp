@@ -67,6 +67,11 @@ public class SecurityService {
         return isRegularUser(authentication) &&  isProjectOwner(projectId, authentication);
     }
 
+    /** Allowed to transfer project ownership to a member.*/
+    public boolean canTransferProjectOwnership(UUID projectId, Authentication authentication) {
+        return isRegularUser(authentication) && isProjectOwner(projectId, authentication);
+    }
+
     /** Allowed to delete a project.*/
     public boolean canDeleteProject(UUID projectId, Authentication authentication) {
         if (!hasAuthenticationContext(projectId, authentication)) {
