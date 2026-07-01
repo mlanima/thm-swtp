@@ -61,8 +61,17 @@ export class ProfileTagListComponent implements OnInit, OnChanges {
 
         this.isSaving.set(false);
       },
-      error: () => {
-        this.errorMessage.set(this.translateService.instant('PROJECTSITE.TAGS.ERROR_TOO_LONG'));
+      error: (err) => {
+        const apiError = err.error as { errorCode?: string };
+        if (err.status === 400 && apiError?.errorCode === 'TAG_NOT_VALID') {
+          this.errorMessage.set(
+            this.translateService.instant('PROJECTSITE.TAGS.ERROR_NOT_VALID', { name: cleanedName })
+          );
+        } else if (err.status === 502) {
+          this.errorMessage.set(this.translateService.instant('PROJECTSITE.TAGS.ERROR_VALIDATION'));
+        } else {
+          this.errorMessage.set(this.translateService.instant('PROJECTSITE.TAGS.ERROR_TOO_LONG'));
+        }
         setTimeout(() => {
           this.errorMessage.set(null);
         }, 3000);

@@ -5,9 +5,10 @@ import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
 import de.thm.swtp.api.project.exception.ProjectNotFoundException;
 import de.thm.swtp.api.tag.domain.Tag;
-import de.thm.swtp.api.tag.entity.TagEntity;
+import de.thm.swtp.api.tag.exception.TagNotValidException;
 import de.thm.swtp.api.tag.mapper.TagMapper;
 import de.thm.swtp.api.tag.repository.TagRepository;
+import de.thm.swtp.api.tag.validation.TagValidationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,8 @@ public class ProjectTagService {
 
     private final TagRepository tagRepository;
     private final ProjectRepository projectRepository;
+    private final TagValidationService tagValidationService;
+    private final TagTransactionService tagTransactionService;
 
 
     /** Returns a list of all tags assigned to the given project. */
@@ -38,16 +41,16 @@ public class ProjectTagService {
     }
 
     /** Assigns a tag to the given project. If the tag does not exist, then it will be created and then assigned. */
-    @Transactional
     public Tag addTagToProject(UUID projectId, String tagName) {
-        ProjectEntity project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new ProjectNotFoundException(projectId));
+        String cleaned = tagName.trim();
 
-        TagEntity tagEntity = getOrCreateTag(tagName);
-        project.getTags().add(tagEntity);
+        if (tagRepository.findByNameIgnoreCase(cleaned).isEmpty()) {
+            if (!tagValidationService.isValidTag(cleaned)) {
+                throw new TagNotValidException(cleaned);
+            }
+        }
 
-        TxLogger.afterCommit(log, "Tag added to project: project={}, tag={}", projectId, tagEntity.getName());
-        return TagMapper.toDomain(tagEntity);
+        return tagTransactionService.addTagToProject(projectId, cleaned);
     }
 
     /** Removes a tag from the given project. Only the project owner is allowed to remove tags. */
@@ -61,12 +64,5 @@ public class ProjectTagService {
                     project.getTags().remove(tag);
                     TxLogger.afterCommit(log, "Tag removed from project: project={}, tag={}", projectId, tag.getName());
                 });
-    }
-
-    private TagEntity getOrCreateTag(String tagName) {
-        String cleaned = tagName.trim();
-
-        return tagRepository.findByNameIgnoreCase(cleaned)
-                .orElseGet(() -> tagRepository.save(new TagEntity(cleaned)));
     }
 }

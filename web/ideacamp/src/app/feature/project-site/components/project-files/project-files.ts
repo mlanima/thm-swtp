@@ -20,6 +20,7 @@ export class ProjectFiles implements OnChanges {
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     'text/plain',
     'text/markdown',
+    'text/x-markdown',
   ];
 
   private readonly ALLOWED_EXTENSIONS = ['pdf', 'png', 'jpg', 'jpeg', 'docx', 'txt', 'md'];
