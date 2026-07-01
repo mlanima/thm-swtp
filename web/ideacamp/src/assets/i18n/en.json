@@ -578,6 +578,12 @@
     "VERIFY_EMAIL_BUTTON": "Confirm email",
     "VERIFY_EMAIL_SUCCESS": "Your email address has been confirmed. Your request is now waiting for review.",
     "ERROR_VERIFY_EMAIL": "The email address could not be confirmed. The link may be expired or invalid.",
+    "WAITING_EMAIL_VERIFICATION_TITLE": "Email confirmation pending",
+    "WAITING_EMAIL_VERIFICATION_DESCRIPTION": "We sent you an email. Please confirm your THM email address so moderators can review your request.",
+    "WAITING_EMAIL_VERIFICATION_BADGE": "Email confirmation pending",
+    "VERIFICATION_EXPIRES_AT": "Valid until:",
+    "EXPIRED_TITLE": "Verification link expired",
+    "EXPIRED_DESCRIPTION": "Your verification link has expired. You can create a new professor request.",
     "VALIDATION": {
       "EMAIL_REQUIRED": "Please enter your email address.",
       "EMAIL_INVALID": "Please enter a valid email address.",

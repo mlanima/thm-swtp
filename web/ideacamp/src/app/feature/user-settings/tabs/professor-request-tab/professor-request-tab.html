@@ -48,6 +48,43 @@
 
       <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
 
+        @if (req.status === 'WAITING_EMAIL_VERIFICATION') {
+          <div class="text-center">
+            <div class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-xl bg-primary-light">
+              <i class="pi pi-envelope text-lg text-primary"></i>
+            </div>
+
+            <h2 class="text-lg font-bold text-slate-900">
+              {{ 'PROFESSOR_REQUEST.WAITING_EMAIL_VERIFICATION_TITLE' | translate }}
+            </h2>
+
+            <p class="mx-auto mt-1 max-w-xl text-sm text-slate-600">
+              {{ 'PROFESSOR_REQUEST.WAITING_EMAIL_VERIFICATION_DESCRIPTION' | translate }}
+            </p>
+
+            <span class="mt-4 inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">
+      <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+              {{ 'PROFESSOR_REQUEST.WAITING_EMAIL_VERIFICATION_BADGE' | translate }}
+    </span>
+
+            @if (req.verificationExpiresAt) {
+              <p class="mt-3 text-xs text-slate-500">
+                {{ 'PROFESSOR_REQUEST.VERIFICATION_EXPIRES_AT' | translate }}
+                {{ req.verificationExpiresAt | date: 'dd.MM.yyyy, HH:mm' }}
+              </p>
+            }
+
+            @if (req.text) {
+              <div class="mt-4 border-t border-slate-200 pt-4 text-left">
+                <p class="text-xs font-semibold text-slate-500">
+                  {{ 'PROFESSOR_REQUEST.YOUR_MESSAGE' | translate }}
+                </p>
+                <p class="mt-1 text-sm text-slate-700">{{ req.text }}</p>
+              </div>
+            }
+          </div>
+        }
+
         @if (req.status === 'PENDING') {
           <div class="text-center">
             <div class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-xl bg-amber-100">
@@ -99,6 +136,31 @@
               type="button"
               (click)="existingRequest.set(null)"
               class="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-red-700 active:scale-[0.97]"
+            >
+              <i class="pi pi-plus text-xs"></i>
+              {{ 'PROFESSOR_REQUEST.NEW_REQUEST' | translate }}
+            </button>
+          </div>
+        }
+
+        @if (req.status === 'EXPIRED') {
+          <div class="text-center">
+            <div class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-xl bg-orange-100">
+              <i class="pi pi-clock text-lg text-orange-600"></i>
+            </div>
+
+            <h2 class="text-lg font-bold text-orange-900">
+              {{ 'PROFESSOR_REQUEST.EXPIRED_TITLE' | translate }}
+            </h2>
+
+            <p class="mt-1 text-sm text-orange-700">
+              {{ 'PROFESSOR_REQUEST.EXPIRED_DESCRIPTION' | translate }}
+            </p>
+
+            <button
+              type="button"
+              (click)="existingRequest.set(null)"
+              class="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-orange-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-orange-700 active:scale-[0.97]"
             >
               <i class="pi pi-plus text-xs"></i>
               {{ 'PROFESSOR_REQUEST.NEW_REQUEST' | translate }}

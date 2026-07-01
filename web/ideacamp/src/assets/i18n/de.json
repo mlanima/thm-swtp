@@ -578,6 +578,12 @@
     "VERIFY_EMAIL_BUTTON": "E-Mail bestätigen",
     "VERIFY_EMAIL_SUCCESS": "Deine E-Mail-Adresse wurde bestätigt. Deine Anfrage wartet nun auf Prüfung.",
     "ERROR_VERIFY_EMAIL": "Die E-Mail-Adresse konnte nicht bestätigt werden. Der Link ist möglicherweise abgelaufen oder ungültig.",
+    "WAITING_EMAIL_VERIFICATION_TITLE": "E-Mail-Bestätigung ausstehend",
+    "WAITING_EMAIL_VERIFICATION_DESCRIPTION": "Wir haben dir eine E-Mail gesendet. Bitte bestätige deine THM-E-Mail-Adresse, damit deine Anfrage von Moderatoren geprüft werden kann.",
+    "WAITING_EMAIL_VERIFICATION_BADGE": "E-Mail-Bestätigung ausstehend",
+    "VERIFICATION_EXPIRES_AT": "Gültig bis:",
+    "EXPIRED_TITLE": "Bestätigungslink abgelaufen",
+    "EXPIRED_DESCRIPTION": "Dein Bestätigungslink ist abgelaufen. Du kannst eine neue Professor:innen-Anfrage erstellen.",
     "VALIDATION": {
       "EMAIL_REQUIRED": "Bitte geben Sie Ihre E-Mail-Adresse ein.",
       "EMAIL_INVALID": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",

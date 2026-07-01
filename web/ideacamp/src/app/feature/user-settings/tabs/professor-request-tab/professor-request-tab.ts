@@ -9,6 +9,7 @@ import {
 import { AuthService } from '../../../auth/auth.service';
 import { FormErrors, mapZodErrors } from '../../../project-create/schemas/zod-error.helper';
 import { ActivatedRoute, Router } from '@angular/router';
+import { DatePipe } from '@angular/common';
 
 const professorRequestSchema = z.object({
   email: z
@@ -28,7 +29,7 @@ type FormFields = keyof z.infer<typeof professorRequestSchema>;
 @Component({
   selector: 'app-professor-request-tab',
   standalone: true,
-  imports: [FormsModule, TranslatePipe],
+  imports: [FormsModule, TranslatePipe, DatePipe],
   templateUrl: './professor-request-tab.html',
 })
 export class ProfessorRequestTab implements OnInit {
@@ -71,8 +72,6 @@ export class ProfessorRequestTab implements OnInit {
       const user = this.authService.user();
 
       if (!user) {
-        this.errorMessage.set(this.translate.instant('PROFESSOR_REQUEST.ERROR_LOAD_USER'));
-        this.isLoading.set(false);
         return;
       }
 
