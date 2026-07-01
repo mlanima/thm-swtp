@@ -1,8 +1,20 @@
 <div>
-  <h1 class="text-2xl font-semibold text-slate-800">{{ 'PROJECTSETTINGS.DANGER.TITLE' | translate }}</h1>
+  <h1 class="text-2xl font-semibold text-slate-800">{{ 'PROJECTSETTINGS.TABS.DANGER_ZONE' | translate }}</h1>
   <p class="mt-1 text-sm text-slate-500">{{ 'PROJECTSETTINGS.DANGER.SUBTITLE' | translate }}</p>
 
   <div class="mt-6 space-y-3">
+
+    <div class="rounded-xl border border-amber-200 bg-amber-50 p-5 shadow-sm">
+      <p class="text-sm font-semibold text-amber-700">{{ 'PROJECTSETTINGS.DANGER.TRANSFER_TITLE' | translate }}</p>
+      <p class="mt-0.5 text-xs text-amber-600">{{ 'PROJECTSETTINGS.DANGER.TRANSFER_DESCRIPTION' | translate }}</p>
+      <button
+        (click)="openTransferModal()"
+        class="mt-3 flex cursor-pointer items-center gap-1.5 rounded-md bg-amber-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-amber-600"
+      >
+        <i class="pi pi-arrow-right-arrow-left text-xs"></i>
+        {{ 'PROJECTSETTINGS.DANGER.TRANSFER_BUTTON' | translate }}
+      </button>
+    </div>
 
     <div class="rounded-xl border border-red-200 bg-red-50 p-5 shadow-sm">
       <p class="text-sm font-semibold text-red-700">{{ 'PROJECTSETTINGS.DANGER.TITLE' | translate }}</p>
@@ -67,24 +79,124 @@
           <p class="mt-3 text-xs text-red-600">{{ deleteError() }}</p>
         }
 
+        <div class="mt-5 flex gap-3">
+          <button
+            (click)="closeDeleteModal()"
+            class="flex-1 cursor-pointer rounded-lg border border-slate-200 bg-white py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          >
+            {{ 'COMMON.CANCEL' | translate }}
+          </button>
+          <button
+            (click)="confirmDelete()"
+            [disabled]="!deleteEnabled()"
+            class="flex-1 rounded-lg py-2 text-sm font-medium text-white transition-colors
+                   enabled:cursor-pointer enabled:bg-red-500 enabled:hover:bg-red-600
+                   disabled:cursor-not-allowed disabled:bg-red-200"
+          >
+            {{ isDeleting() ? ('PROJECTSETTINGS.DANGER.DELETING' | translate) : ('PROJECTSETTINGS.DANGER.TITLE' | translate) }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+
+@if (showTransferModal()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+    <div class="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+      <button
+        (click)="closeTransferModal()"
+        [disabled]="isTransferring()"
+        class="absolute right-4 top-4 cursor-pointer text-slate-400 hover:text-slate-700 disabled:opacity-50"
+      >
+        <i class="pi pi-times text-sm"></i>
+      </button>
+
+      <div class="flex items-center gap-3">
+        <div class="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100">
+          <i class="pi pi-arrow-right-arrow-left text-sm text-amber-600"></i>
+        </div>
+        <div>
+          <h2 class="font-semibold text-slate-800">{{ 'PROJECTSETTINGS.DANGER.TRANSFER_MODAL_TITLE' | translate }}</h2>
+          <p class="text-xs text-slate-400">{{ 'PROJECTSETTINGS.DANGER.TRANSFER_MODAL_SUBTITLE' | translate }}</p>
+        </div>
+      </div>
+
+      <p class="mt-4 text-sm text-slate-600">{{ 'PROJECTSETTINGS.DANGER.TRANSFER_CONFIRM_INFO' | translate }}</p>
+
+      <p class="mt-4 text-xs font-medium text-slate-500">{{ 'PROJECTSETTINGS.DANGER.TRANSFER_SELECT_LABEL' | translate }}</p>
+
+      <div class="mt-2 max-h-56 overflow-y-auto rounded-xl border border-slate-200">
+
+        @if (isLoadingMembers()) {
+          <p class="px-4 py-6 text-center text-sm text-slate-400">
+            {{ 'PROJECTSETTINGS.DANGER.TRANSFER_LOADING' | translate }}
+          </p>
+        }
+
+        @if (!isLoadingMembers() && loadMembersError()) {
+          <p class="px-4 py-6 text-center text-sm text-red-500">
+            {{ loadMembersError() }}
+          </p>
+        }
+
+        @if (!isLoadingMembers() && !loadMembersError() && members().length === 0) {
+          <p class="px-4 py-6 text-center text-sm text-slate-400">
+            {{ 'PROJECTSETTINGS.DANGER.TRANSFER_NO_MEMBERS' | translate }}
+          </p>
+        }
+
+        @for (member of members(); track member.keycloakId; let last = $last) {
+          <button
+            type="button"
+            (click)="selectNewOwner(member)"
+            [class.border-b]="!last"
+            [class.bg-amber-50]="selectedNewOwner()?.keycloakId === member.keycloakId"
+            class="flex w-full cursor-pointer items-center gap-3 border-slate-100 px-4 py-3 text-left hover:bg-slate-50"
+          >
+            <div
+              class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white"
+              [ngClass]="getAvatarColor(member.username)"
+            >
+              {{ getInitials(member.username) }}
+            </div>
+            <div class="flex-1 overflow-hidden">
+              <p class="truncate text-sm font-medium text-slate-800">{{ member.username }}</p>
+              <p class="truncate text-xs text-slate-400">{{ member.email }}</p>
+            </div>
+            @if (selectedNewOwner()?.keycloakId === member.keycloakId) {
+              <i class="pi pi-check text-sm text-amber-500"></i>
+            }
+          </button>
+        }
+
+      </div>
+
+      @if (transferError()) {
+        <p class="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+          {{ transferError() }}
+        </p>
+      }
+
       <div class="mt-5 flex gap-3">
         <button
-          (click)="closeDeleteModal()"
-          class="flex-1 cursor-pointer rounded-lg border border-slate-200 bg-white py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          (click)="closeTransferModal()"
+          [disabled]="isTransferring()"
+          class="flex-1 cursor-pointer rounded-lg border border-slate-200 bg-white py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
         >
           {{ 'COMMON.CANCEL' | translate }}
         </button>
         <button
-          (click)="confirmDelete()"
-          [disabled]="!deleteEnabled()"
+          (click)="confirmTransfer()"
+          [disabled]="!selectedNewOwner() || isTransferring()"
           class="flex-1 rounded-lg py-2 text-sm font-medium text-white transition-colors
-                 enabled:cursor-pointer enabled:bg-red-500 enabled:hover:bg-red-600
-                 disabled:cursor-not-allowed disabled:bg-red-200"
+                 enabled:cursor-pointer enabled:bg-amber-500 enabled:hover:bg-amber-600
+                 disabled:cursor-not-allowed disabled:bg-amber-200"
         >
-          {{ isDeleting() ? ('PROJECTSETTINGS.DANGER.DELETING' | translate) : ('PROJECTSETTINGS.DANGER.TITLE' | translate) }}
+          {{ isTransferring() ? ('PROJECTSETTINGS.DANGER.TRANSFERRING' | translate) : ('PROJECTSETTINGS.DANGER.TRANSFER_CONFIRM' | translate) }}
         </button>
-        </div>
-      </form>
+      </div>
     </div>
   </div>
 }

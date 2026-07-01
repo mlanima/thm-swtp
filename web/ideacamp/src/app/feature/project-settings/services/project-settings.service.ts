@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../enviroments/enviroment.dev';
 import { ProjectMemberResponse } from '../models/project-settings.model'
 import { CreateProjectInviteRequest, ProjectInviteResponse } from '../../../models/project-invite.model'
+import { ProjectResponse } from '../../../models/project.model';
 
 @Injectable({ providedIn: 'root' })
 export class ProjectSettingsService {
@@ -28,6 +29,10 @@ export class ProjectSettingsService {
 
   getProjectInvites(projectId: string){
     return this.http.get<ProjectInviteResponse[]>(`${this.baseUrl}/${projectId}/invitations`);
+  }
+
+  transferProjectOwnership(projectId: string, newOwnerId: string): Observable<ProjectResponse> {
+    return this.http.patch<ProjectResponse>(`${this.baseUrl}/${projectId}/owner`, { newOwnerId });
   }
 
 }

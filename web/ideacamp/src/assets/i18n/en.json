@@ -384,7 +384,20 @@
       "CONFIRM_TYPE_START": "To confirm this action, please type",
       "CONFIRM_TYPE_END": ".",
       "DELETING": "Deleting…",
-      "ERROR_DELETE_PROJECT": "Project could not be deleted."
+      "ERROR_DELETE_PROJECT": "Project could not be deleted.",
+      "TRANSFER_TITLE": "Transfer ownership",
+      "TRANSFER_DESCRIPTION": "Transfer this project to another member. You will become a regular member.",
+      "TRANSFER_BUTTON": "Transfer ownership",
+      "TRANSFER_MODAL_TITLE": "Transfer project ownership",
+      "TRANSFER_MODAL_SUBTITLE": "This action cannot be undone",
+      "TRANSFER_CONFIRM_INFO": "You will lose all owner privileges and become a regular member of this project.",
+      "TRANSFER_SELECT_LABEL": "Select new owner",
+      "TRANSFER_NO_MEMBERS": "No members available. Invite members to the project first.",
+      "TRANSFER_LOADING": "Loading members…",
+      "TRANSFER_CONFIRM": "Confirm transfer",
+      "TRANSFERRING": "Transferring…",
+      "TRANSFER_ERROR": "Ownership transfer failed. Please try again.",
+      "TRANSFER_ERROR_LOAD": "Members could not be loaded."
     }
   },
   "PROJECTSITE": {
