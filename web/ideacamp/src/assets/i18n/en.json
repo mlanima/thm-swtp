@@ -573,6 +573,11 @@
     "SUCCESS_CLOSE": "Close",
     "ERROR_LOAD_USER": "User could not be loaded.",
     "ERROR_SEND": "Your request could not be sent. Please try again later.",
+    "VERIFY_EMAIL_TITLE": "Confirm email address",
+    "VERIFY_EMAIL_DESCRIPTION": "Please confirm your THM email address so moderators can review your request.",
+    "VERIFY_EMAIL_BUTTON": "Confirm email",
+    "VERIFY_EMAIL_SUCCESS": "Your email address has been confirmed. Your request is now waiting for review.",
+    "ERROR_VERIFY_EMAIL": "The email address could not be confirmed. The link may be expired or invalid.",
     "VALIDATION": {
       "EMAIL_REQUIRED": "Please enter your email address.",
       "EMAIL_INVALID": "Please enter a valid email address.",

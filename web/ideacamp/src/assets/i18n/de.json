@@ -573,6 +573,11 @@
     "SUCCESS_CLOSE": "Schließen",
     "ERROR_LOAD_USER": "Benutzer konnte nicht geladen werden.",
     "ERROR_SEND": "Deine Anfrage konnte nicht gesendet werden. Bitte versuche es später erneut.",
+    "VERIFY_EMAIL_TITLE": "E-Mail-Adresse bestätigen",
+    "VERIFY_EMAIL_DESCRIPTION": "Bitte bestätige deine THM-E-Mail-Adresse, damit deine Anfrage von Moderatoren geprüft werden kann.",
+    "VERIFY_EMAIL_BUTTON": "E-Mail bestätigen",
+    "VERIFY_EMAIL_SUCCESS": "Deine E-Mail-Adresse wurde bestätigt. Deine Anfrage wartet nun auf Prüfung.",
+    "ERROR_VERIFY_EMAIL": "Die E-Mail-Adresse konnte nicht bestätigt werden. Der Link ist möglicherweise abgelaufen oder ungültig.",
     "VALIDATION": {
       "EMAIL_REQUIRED": "Bitte geben Sie Ihre E-Mail-Adresse ein.",
       "EMAIL_INVALID": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
