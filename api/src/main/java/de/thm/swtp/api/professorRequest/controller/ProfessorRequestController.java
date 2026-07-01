@@ -3,6 +3,7 @@ package de.thm.swtp.api.professorRequest.controller;
 import de.thm.swtp.api.professorRequest.domain.ProfessorRequest;
 import de.thm.swtp.api.professorRequest.dto.CreateProfessorRequestRequest;
 import de.thm.swtp.api.professorRequest.dto.ProfessorRequestResponse;
+import de.thm.swtp.api.professorRequest.dto.VerifyProfessorRequestEmailRequest;
 import de.thm.swtp.api.professorRequest.exception.ProfessorRequestInvalidStatusException;
 import de.thm.swtp.api.professorRequest.service.ProfessorRequestService;
 
@@ -53,20 +54,10 @@ public class ProfessorRequestController {
                 .toList();
     }
 
-    @GetMapping("/verify")
-    public ResponseEntity<Void> verifyProfessorRequestEmail(@RequestParam String token) {
-
-        String status;
-        try {
-            ProfessorRequest professorRequest = professorRequestService.verifyProfessorRequestEmail(token);
-            status = professorRequest.getStatus().name();
-        } catch (ProfessorRequestInvalidStatusException ex) {
-            status = "INVALID";
-        }
-        String redirectUrl = frontendUrl + "/settings?tab=professor-request&professorRequestStatus=" + status;
-        return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create(redirectUrl))
-                .build();
+    @PostMapping("/verify")
+    public ProfessorRequestResponse verifyProfessorRequestEmail(@RequestParam VerifyProfessorRequestEmailRequest request) {
+        ProfessorRequest professorRequest = professorRequestService.verifyProfessorRequestEmail(request.token());
+        return ProfessorRequestResponse.toResponse(professorRequest);
     }
 
     /** Creates a new professor-rights request for the authenticated user with status PENDING. */
