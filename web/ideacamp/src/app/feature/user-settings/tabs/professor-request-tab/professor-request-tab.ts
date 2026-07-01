@@ -61,11 +61,16 @@ export class ProfessorRequestTab implements OnInit {
       this.loadUserAndRequest();
     });
   }
-  private loadUserAndRequest(): void {
+  private loadUserAndRequest(retriesLeft = 10): void {
     const user = this.authService.user();
 
     if (!user) {
-      setTimeout(() => this.loadUserAndRequest(), 100);
+      if (retriesLeft <= 0) {
+        this.errorMessage.set(this.translate.instant('PROFESSOR_REQUEST.ERROR_LOAD_USER'));
+        this.isLoading.set(false);
+        return;
+      }
+      setTimeout(() => this.loadUserAndRequest(retriesLeft - 1), 100);
       return;
     }
 
@@ -76,8 +81,7 @@ export class ProfessorRequestTab implements OnInit {
         this.existingRequest.set(existing);
 
         if (!existing) {
-          this.userName.set(user.username);
-          this.userEmail.set('');
+          this.userEmail.set(user.email ?? '');
           this.userText.set('');
         }
 

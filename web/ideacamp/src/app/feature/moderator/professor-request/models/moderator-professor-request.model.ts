@@ -1,4 +1,4 @@
-export type ProfRequestStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED';
+export type ProfRequestStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'WAITING_EMAIL_VERIFICATION' | 'EXPIRED';
 
 export interface ModeratorProfRequest {
   id: string;

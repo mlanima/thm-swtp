@@ -3,6 +3,7 @@ package de.thm.swtp.api.professorRequest.controller;
 import de.thm.swtp.api.professorRequest.domain.ProfessorRequest;
 import de.thm.swtp.api.professorRequest.dto.CreateProfessorRequestRequest;
 import de.thm.swtp.api.professorRequest.dto.ProfessorRequestResponse;
+import de.thm.swtp.api.professorRequest.exception.ProfessorRequestInvalidStatusException;
 import de.thm.swtp.api.professorRequest.service.ProfessorRequestService;
 
 import jakarta.validation.Valid;
@@ -54,9 +55,15 @@ public class ProfessorRequestController {
 
     @GetMapping("/verify")
     public ResponseEntity<Void> verifyProfessorRequestEmail(@RequestParam String token) {
-        ProfessorRequest professorRequest = professorRequestService.verifyProfessorRequestEmail(token);
 
-        String redirectUrl = frontendUrl + "/settings?tab=professor-request&professorRequestStatus=" + professorRequest.getStatus();
+        String status;
+        try {
+            ProfessorRequest professorRequest = professorRequestService.verifyProfessorRequestEmail(token);
+            status = professorRequest.getStatus().name();
+        } catch (ProfessorRequestInvalidStatusException ex) {
+            status = "INVALID";
+        }
+        String redirectUrl = frontendUrl + "/settings?tab=professor-request&professorRequestStatus=" + status;
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create(redirectUrl))
                 .build();

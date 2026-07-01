@@ -35,6 +35,9 @@ public class NotificationService {
     @Value("${app.frontend-url}")
     private String frontendUrl;
 
+    @Value("${app.backend-url}")
+    private String backendUrl;
+
     @Value("${app.mail.language:de}")
     private String mailLanguage;
 
@@ -105,7 +108,7 @@ public class NotificationService {
         ProfessorRequest request = event.professorRequest();
         Locale locale = Locale.forLanguageTag(mailLanguage);
 
-        String verificationUrl = frontendUrl + "/professor-request/verify?token=" + event.verificationToken();
+        String verificationUrl = backendUrl + "/api/v1/professor-requests/verify?token=" + event.verificationToken();
 
         String safeUsername = HtmlUtils.htmlEscape(request.getRequestingUsername());
         String safeVerificationUrl = HtmlUtils.htmlEscape(verificationUrl);

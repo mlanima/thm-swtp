@@ -159,8 +159,8 @@ public class ProfessorRequestService {
                 .anyMatch(domain -> normalizedEmail.endsWith("@" + domain));
     }
 
-    private void validateNoOpenProfessorRequest(UUID userId){
-        boolean openRequestExists  = professorRequestRepository.existsByRequestingUserKeycloakIdAndStatusIn(
+    private void validateNoOpenProfessorRequest(UUID userId) {
+        boolean openRequestExists = professorRequestRepository.existsByRequestingUserKeycloakIdAndStatusIn(
                 userId,
                 List.of(ProfessorRequestStatus.PENDING, ProfessorRequestStatus.WAITING_EMAIL_VERIFICATION)
         );
