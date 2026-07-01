@@ -36,6 +36,12 @@ spring:
         jwt:
           issuer-uri: https://auth.swtp-ss26.de/realms/swtp
 
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST:redis.ser.mlanima.org}
+      port: 6379
+      timeout: 2000ms
+      connect-timeout: 1000ms
 
 server:
   forward-headers-strategy: framework
@@ -51,3 +57,23 @@ app:
     from: noreply@swtp-ss26.de
     language: de
   frontend-url: http://localhost:4200
+  tags:
+    source: openai-github
+
+openai:
+  api:
+    base-url: https://api.openai.com
+    key: ${OPENAI_API_KEY:}
+  moderation:
+    model: omni-moderation-latest
+    threshold: 0.1
+
+github:
+  topics:
+    api:
+      base-url: https://api.github.com
+
+stackoverflow:
+  api:
+    base-url: https://api.stackexchange.com/2.3
+    key: ${STACKOVERFLOW_API_KEY:}

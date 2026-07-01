@@ -160,6 +160,26 @@ services:
       - traefik-net
     restart: unless-stopped
 
+  # === Redis (Caching) ===
+  # Used for caching (e.g. tag validation results).
+  # Currently DISABLED — the app connects to an external Redis server
+  # at redis.ser.mlanima.org (configurable via SPRING_DATA_REDIS_HOST).
+  # Uncomment for a fully self-contained Docker setup.
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: swtp-redis
+  #   ports:
+  #     - "6379:6379"
+  #   healthcheck:
+  #     test: ["CMD", "redis-cli", "ping"]
+  #     interval: 10s
+  #     timeout: 3s
+  #     retries: 5
+  #   networks:
+  #     - app_internal
+  #     - review_net
+  #   restart: unless-stopped
+
 networks:
   traefik-net:
     external: true

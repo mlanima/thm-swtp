@@ -414,6 +414,8 @@
       "ERROR_INVALID_CHARS": "Tag contains invalid characters. Allowed: letters, numbers, spaces, hyphen and dot.",
       "ERROR_DUPLICATE": "Tag is already included in this project.",
       "ERROR_TOO_LONG": "Tag is too long.",
+      "ERROR_NOT_VALID": "Tag '{{name}}' is not a valid tag.",
+      "ERROR_VALIDATION": "Tag could not be validated. Please try again later.",
       "ERROR_DELETE": "Tag could not be deleted.",
       "ERROR_LOAD": "Tags could not be loaded.",
       "LOADING": "Tags are loading…",
