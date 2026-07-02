@@ -523,7 +523,10 @@
       "LOAD": "Posts could not be loaded.",
       "EMPTY_FIELDS": "Title and content must not be empty.",
       "CREATE": "Post could not be created.",
-      "DELETE": "Post could not be deleted."
+      "DELETE": "Post could not be deleted.",
+      "IMAGE_TYPE": "Please select an image in JPG, PNG or WEBP format.",
+      "IMAGE_SIZE": "The image must not be larger than 5 MB.",
+      "IMAGE_UPLOAD": "The post was created, but the image could not be uploaded."
     },
     "PLAIN_TEXT": "Plain text",
     "MARKDOWN_HINT": "You can use Markdown, e.g. headings, lists, links and emphasis.",
@@ -537,7 +540,11 @@
     },
     "DELETE_POST": "Delete post",
     "DELETING": "Deleting…",
-    "DELETE_SUCCESS": "Post deleted successfully."
+    "DELETE_SUCCESS": "Post deleted successfully.",
+    "SELECT_IMAGE": "Select image",
+    "IMAGE_LABEL": "Add image",
+    "IMAGE_HINT": "Allowed formats are JPG, PNG and WEBP up to 5 MB.",
+    "REMOVE_IMAGE": "Remove image"
   },
   "USER_SETTINGS": {
     "TITLE": "Settings",

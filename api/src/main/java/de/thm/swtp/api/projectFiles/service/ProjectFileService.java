@@ -48,6 +48,13 @@ public class ProjectFileService {
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     );
 
+    private static final Set<String> ALLOWED_IMAGE_MIME_TYPES = Set.of(
+            "image/png",
+            "image/jpeg",
+            "image/webp"
+    );
+
+
     private static final int MAX_FILES_PER_PROJECT = 20;
 
     @Value("${app.uploads.dir:./uploads}")
@@ -79,8 +86,18 @@ public class ProjectFileService {
                 .toList();
     }
 
+
     @Transactional
     public ProjectFile uploadFile(UUID projectId, MultipartFile file) {
+        return uploadFile(projectId, file, ALLOWED_MIME_TYPES);
+    }
+
+    @Transactional
+    public ProjectFile uploadImageFile(UUID projectId, MultipartFile file) {
+        return uploadFile(projectId, file, ALLOWED_IMAGE_MIME_TYPES);
+    }
+
+    private ProjectFile uploadFile(UUID projectId, MultipartFile file, Set<String> allowedMimeTypes) {
         ProjectEntity project = getProjectOrThrow(projectId);
 
         if (projectFileRepository.countByProjectId(projectId) >= MAX_FILES_PER_PROJECT) {
@@ -107,7 +124,7 @@ public class ProjectFileService {
         String mimeType;
         try {
             String detectedMime = TIKA.detect(filePath);
-            if (!ALLOWED_MIME_TYPES.contains(detectedMime)) {
+            if (!allowedMimeTypes.contains(detectedMime)) {
                 try {
                     Files.deleteIfExists(filePath);
                 } catch (IOException ignored) {

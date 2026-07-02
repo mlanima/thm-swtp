@@ -33,6 +33,7 @@ export interface ProjectPostResponse {
   authorName: string;
   title: string;
   content: string;
+  imageUrl: string | null;
   contentFormat: PostContentFormat;
   status: ProjectPostStatus;
   publishedAt: string | null;

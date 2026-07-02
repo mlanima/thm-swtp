@@ -15,6 +15,7 @@ public class ProjectPostMapper {
                 .content(projectPostEntity.getContent())
                 .status(projectPostEntity.getStatus())
                 .contentFormat(projectPostEntity.getContentFormat())
+                .imageUrl(projectPostEntity.getImageUrl())
                 .publishedAt(projectPostEntity.getPublishedAt())
                 .archivedAt(projectPostEntity.getArchivedAt())
                 .createdAt(projectPostEntity.getCreatedAt())
