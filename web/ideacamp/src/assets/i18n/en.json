@@ -477,7 +477,8 @@
       "CREATE": "Post could not be created.",
       "DELETE": "Post could not be deleted.",
       "IMAGE_TYPE": "Please select an image in JPG, PNG or WEBP format.",
-      "IMAGE_SIZE": "The image must not be larger than 5 MB."
+      "IMAGE_SIZE": "The image must not be larger than 10 MB.",
+      "IMAGE_UPLOAD": "The post was created, but the image could not be uploaded."
     },
     "PLAIN_TEXT": "Plain text",
     "MARKDOWN_HINT": "You can use Markdown, e.g. headings, lists, links and emphasis.",
