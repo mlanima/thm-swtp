@@ -447,4 +447,25 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ErrorResponse.of(500, "Internal Server Error", "An unexpected error occurred."));
     }
+
+    @ExceptionHandler(InvalidUserManagementSortFieldException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidUserManagementSortField(InvalidUserManagementSortFieldException ex) {
+        log.debug("Bad Request (400): {}", LogSafe.clean(ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidProfessorEmailDomainException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidProfessorEmailDomain(InvalidProfessorEmailDomainException ex) {
+        log.debug("Bad Request (400): {}", LogSafe.clean(ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidProjectManagementSortFieldException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidProjectManagementSortField(InvalidProjectManagementSortFieldException ex) {
+        log.debug("Bad Request (400): {}", LogSafe.clean(ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
+    }
 }

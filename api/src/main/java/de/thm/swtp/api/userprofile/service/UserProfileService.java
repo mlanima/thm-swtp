@@ -1,6 +1,7 @@
 package de.thm.swtp.api.userprofile.service;
 
 import de.thm.swtp.api.common.TxLogger;
+import de.thm.swtp.api.exceptionhandling.exceptions.InvalidUserManagementSortFieldException;
 import de.thm.swtp.api.userprofile.domain.UserStatus;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
@@ -9,10 +10,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 import java.util.Optional;
 
@@ -22,6 +25,9 @@ import java.util.Optional;
 public class UserProfileService {
 
     private final UserProfileRepository userProfileRepository;
+
+
+    private static final Set<String> MANAGED_USER_SORT_FIELDS = Set.of("username", "email", "isProfessor", "createdAt", "bannedAt", "banReason", "status");
 
     @Transactional(readOnly = true)
     public UserProfile getProfile(String username) {
@@ -81,6 +87,7 @@ public class UserProfileService {
 
     @Transactional(readOnly = true)
     public Page<UserProfile> getUsersByStatus(UserStatus status, Pageable pageable) {
+        validateManagedUserSort(pageable.getSort());
         return userProfileRepository.findByStatus(status, pageable);
     }
 
@@ -116,5 +123,14 @@ public class UserProfileService {
     @Transactional(readOnly = true)
     public Optional<UserProfile> findProfileByKeycloakId(UUID keycloakId) {
         return userProfileRepository.findByKeycloakId(keycloakId);
+    }
+
+
+    private void validateManagedUserSort(Sort sort){
+       sort.forEach((sortField) -> {
+           if (!MANAGED_USER_SORT_FIELDS.contains(sortField.getProperty())) {
+               throw new InvalidUserManagementSortFieldException("Unsupported sort field: " + sortField.getProperty());
+           }
+       });
     }
 }

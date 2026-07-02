@@ -16,8 +16,9 @@ import { LandingPage } from './feature/landing-page/pages/landing-page/landing-p
 import { UserSettings } from './feature/user-settings/user-settings';
 import { ModeratorPage } from './feature/moderator/moderator-page';
 import { ProjectsComponent } from './feature/moderator/projects/projects.component';
-import { UserManagement } from './feature/user-management/pages/user-management';
+import { UserManagement } from './feature/moderator/user-management/pages/user-management';
 import { BannedAccount } from './feature/banned-account/pages/banned-account';
+import { ProfessorRequestComponent } from './feature/moderator/professor-request/professor-request.component';
 
 export const routes: Routes = [
   {path: '', redirectTo: 'landing', pathMatch: 'full' },
@@ -37,5 +38,6 @@ export const routes: Routes = [
   {path: 'settings', component: UserSettings, canActivate: [authGuard]},
   {path: 'professor-request', redirectTo: 'settings', pathMatch: 'full'},
   {path: 'moderator/users', component: UserManagement, canActivate: [moderatorGuard]},
-  {path: 'account-banned', component: BannedAccount, canActivate: [bannedAccountGuard]}
+  {path: 'account-banned', component: BannedAccount, canActivate: [bannedAccountGuard]},
+  {path: 'moderator/professor-requests', component: ProfessorRequestComponent, canActivate: [moderatorGuard]},
 ];
