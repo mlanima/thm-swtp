@@ -17,6 +17,7 @@ public class ThesisMapper {
                 .description(entity.getDescription())
                 .shortDescription(entity.getShortDescription())
                 .supervisorKeycloakId(entity.getSupervisor().getKeycloakId())
+                .supervisorUsername(entity.getSupervisor().getUsername())
                 .tags(entity.getTags().stream()
                         .map(TagEntity::getName)
                         .collect(Collectors.toSet()))

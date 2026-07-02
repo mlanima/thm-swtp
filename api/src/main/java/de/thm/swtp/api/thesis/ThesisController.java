@@ -4,6 +4,7 @@ import de.thm.swtp.api.thesis.dto.request.CreateThesisRequest;
 import de.thm.swtp.api.thesis.dto.request.UpdateThesisRequest;
 import de.thm.swtp.api.thesis.dto.response.DeleteThesisResponse;
 import de.thm.swtp.api.thesis.dto.response.ThesisResponse;
+import de.thm.swtp.api.thesis.dto.response.ThesisStudentResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -16,6 +17,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -67,6 +69,15 @@ public class ThesisController {
     @PreAuthorize("@security.canDeleteThesis(#thesisId, authentication)")
     public ResponseEntity<DeleteThesisResponse> delete(@PathVariable UUID thesisId) {
         return ResponseEntity.ok(thesisService.delete(thesisId));
+    }
+
+    @GetMapping("/{thesisId}/students")
+    @PreAuthorize("@security.canViewThesis(#thesisId, authentication)")
+    public List<ThesisStudentResponse> getThesisStudents(@PathVariable UUID thesisId) {
+        return thesisService.getThesisStudents(thesisId)
+                .stream()
+                .map(ThesisStudentResponse::toResponse)
+                .toList();
     }
 
     @PostMapping("/{thesisId}/students/{studentKeycloakId}")

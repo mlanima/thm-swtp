@@ -153,6 +153,16 @@ public class ThesisService {
         return ThesisMapper.toDomain(updated);
     }
 
+    @Transactional(readOnly = true)
+    public List<UserProfile> getThesisStudents(UUID thesisId) {
+        ThesisEntity thesis = thesisRepository.findById(thesisId)
+                .orElseThrow(() -> new ThesisNotFoundByIdException(thesisId));
+
+        return thesis.getStudents()
+                .stream()
+                .toList();
+    }
+
     @Transactional
     public Thesis addStudent(UUID thesisId, UUID studentKeycloakId) {
         ThesisEntity thesis = thesisRepository.findById(thesisId)

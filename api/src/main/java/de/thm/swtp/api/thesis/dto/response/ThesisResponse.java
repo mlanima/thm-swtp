@@ -17,6 +17,7 @@ public class ThesisResponse {
     private String description;
     private String shortDescription;
     private UUID supervisorKeycloakId;
+    private String supervisorUsername;
     private Set<String> tags;
     private Set<UUID> studentKeycloakIds;
     private LocalDateTime createdAt;
@@ -30,6 +31,7 @@ public class ThesisResponse {
                 .description(thesis.getDescription())
                 .shortDescription(thesis.getShortDescription())
                 .supervisorKeycloakId(thesis.getSupervisorKeycloakId())
+                .supervisorUsername(thesis.getSupervisorUsername())
                 .tags(thesis.getTags())
                 .studentKeycloakIds(thesis.getStudentKeycloakIds())
                 .createdAt(thesis.getCreatedAt())
