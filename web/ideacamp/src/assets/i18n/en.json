@@ -590,6 +590,7 @@
     "VALIDATION": {
       "EMAIL_REQUIRED": "Please enter your email address.",
       "EMAIL_INVALID": "Please enter a valid email address.",
+      "EMAIL_THM_REQUIRED": "Please use a valid THM email address.",
       "TEXT_REQUIRED": "Please enter a reason.",
       "TEXT_MAX": "Text must not exceed 1000 characters."
     }

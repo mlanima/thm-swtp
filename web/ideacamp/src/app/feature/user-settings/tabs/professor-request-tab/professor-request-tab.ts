@@ -108,8 +108,15 @@ export class ProfessorRequestTab implements OnInit {
           this.isSubmitting.set(false);
           this.showSuccess.set(true);
         },
-        error: () => {
-          this.errorMessage.set(this.translate.instant('PROFESSOR_REQUEST.ERROR_SEND'));
+        error: (error) => {
+          if (error.status === 400) {
+            this.formErrors.set({
+              email: 'PROFESSOR_REQUEST.VALIDATION.EMAIL_THM_REQUIRED',
+            });
+          } else {
+            this.errorMessage.set(this.translate.instant('PROFESSOR_REQUEST.ERROR_SEND'));
+          }
+
           this.isSubmitting.set(false);
         },
       });

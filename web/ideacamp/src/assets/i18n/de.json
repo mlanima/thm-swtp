@@ -590,6 +590,7 @@
     "VALIDATION": {
       "EMAIL_REQUIRED": "Bitte geben Sie Ihre E-Mail-Adresse ein.",
       "EMAIL_INVALID": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+      "EMAIL_THM_REQUIRED": "Bitte verwende eine gültige THM-E-Mail-Adresse.",
       "TEXT_REQUIRED": "Bitte geben Sie eine Begründung ein.",
       "TEXT_MAX": "Begründung darf höchstens 1000 Zeichen lang sein."
     }
