@@ -106,7 +106,7 @@ public class NotificationService {
         ProfessorRequest request = event.professorRequest();
         Locale locale = Locale.forLanguageTag(mailLanguage);
 
-        String verificationUrl = frontendUrl + "/settings?tab=professor-request&verifyToken=" + event.verificationToken();
+        String verificationUrl = frontendUrl + "/settings?verifyToken=" + event.verificationToken();
 
         String safeUsername = HtmlUtils.htmlEscape(request.getRequestingUsername());
         String safeVerificationUrl = HtmlUtils.htmlEscape(verificationUrl);
