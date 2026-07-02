@@ -10,6 +10,7 @@ import { AuthService } from '../../../auth/auth.service';
 import { FormErrors, mapZodErrors } from '../../../project-create/schemas/zod-error.helper';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
+import { UserProfileService } from '../../../../services/user-profile.service'
 
 const professorRequestSchema = z.object({
   email: z
@@ -36,6 +37,7 @@ export class ProfessorRequestTab implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly requestService = inject(ProfessorRequestService);
   private readonly translate = inject(TranslateService);
+  private readonly userProfileService = inject(UserProfileService);
 
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -56,6 +58,8 @@ export class ProfessorRequestTab implements OnInit {
   readonly formErrors = signal<FormErrors<FormFields>>({});
 
   readonly profTextRef = viewChild<ElementRef<HTMLTextAreaElement>>('profText');
+
+  readonly isProfessor = signal(false);
 
   autoResize(): void {
     const el = this.profTextRef()?.nativeElement;
@@ -158,6 +162,12 @@ export class ProfessorRequestTab implements OnInit {
 
   private loadUserAndRequest(userId: string, username: string): void {
     this.userName.set(username);
+
+    this.userProfileService.getMyProfile().subscribe({
+      next: (profile) => {
+        this.isProfessor.set(profile.isProfessor);
+      },
+    });
 
     this.requestService.getMyRequest(userId).subscribe({
       next: (existing) => {

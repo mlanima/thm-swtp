@@ -552,6 +552,8 @@
     "ACCEPTED_BADGE": "Angenommen",
     "REJECTED_TITLE": "Anfrage abgelehnt",
     "REJECTED_DESCRIPTION": "Ihre Anfrage wurde leider abgelehnt. Sie können jederzeit eine neue Anfrage stellen.",
+    "ALREADY_PROFESSOR_TITLE": "Du bist bereits Professor:in",
+    "ALREADY_PROFESSOR_DESCRIPTION": "Dein Profil hat bereits Professor:innen-Rechte. Eine weitere Anfrage ist nicht erforderlich.",
     "NEW_REQUEST": "Neue Anfrage stellen",
     "CARD_TITLE": "Professor:in werden",
     "CARD_DESCRIPTION": "Erweiterte Funktionen für Abschlussarbeiten, Forschung und Studierendenkontakt.",

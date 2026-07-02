@@ -552,6 +552,8 @@
     "ACCEPTED_BADGE": "Approved",
     "REJECTED_TITLE": "Request rejected",
     "REJECTED_DESCRIPTION": "Your request was unfortunately rejected. You can submit a new request at any time.",
+    "ALREADY_PROFESSOR_TITLE": "You are already a professor",
+    "ALREADY_PROFESSOR_DESCRIPTION": "Your profile already has professor permissions. Another request is not required.",
     "NEW_REQUEST": "Submit new request",
     "CARD_TITLE": "Become a professor",
     "CARD_DESCRIPTION": "Advanced features for theses, research and student contact.",

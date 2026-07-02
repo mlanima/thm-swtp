@@ -41,10 +41,21 @@
     }
 
 
+    @if (isProfessor()){
+      <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-6 text-center shadow-sm">
+        <div class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-xl bg-emerald-100">
+          <i class="pi pi-check text-lg text-emerald-600"></i>
+        </div>
 
+        <h2 class="text-lg font-bold text-emerald-900">
+          {{ 'PROFESSOR_REQUEST.ALREADY_PROFESSOR_TITLE' | translate }}
+        </h2>
 
-
-    @if (existingRequest(); as req) {
+        <p class="mx-auto mt-1 max-w-xl text-sm text-emerald-700">
+          {{ 'PROFESSOR_REQUEST.ALREADY_PROFESSOR_DESCRIPTION' | translate }}
+        </p>
+      </div>
+    }@else if (existingRequest(); as req) {
 
       <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
 
