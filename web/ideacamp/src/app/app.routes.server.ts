@@ -62,6 +62,11 @@ export const serverRoutes: ServerRoute[] = [
   },
 
   {
+    path: 'moderator/professor-requests',
+    renderMode: RenderMode.Client,
+  },
+
+  {
     path: '**',
     renderMode: RenderMode.Prerender,
   },

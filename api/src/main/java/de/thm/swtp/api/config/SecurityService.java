@@ -19,7 +19,6 @@ import java.util.UUID;
  *
  * <p>Authorization checks fail when permissions are missing.</p>
  */
-
 @Component("security")
 @RequiredArgsConstructor
 public class SecurityService {
@@ -65,6 +64,11 @@ public class SecurityService {
     /** Allowed to edit project information (e.g. privacy settings, allow join-requests, description, ...).*/
     public boolean canEditProject(UUID projectId, Authentication authentication) {
         return isRegularUser(authentication) &&  isProjectOwner(projectId, authentication);
+    }
+
+    /** Allowed to transfer project ownership to a member.*/
+    public boolean canTransferProjectOwnership(UUID projectId, Authentication authentication) {
+        return isRegularUser(authentication) && isProjectOwner(projectId, authentication);
     }
 
     /** Allowed to delete a project.*/
@@ -269,7 +273,7 @@ public class SecurityService {
             return false;
         }
         UUID currentUserId = getCurrentUserId(authentication);
-        return !userProfileRepository.existsByKeycloakIdAndProfessorTrue(currentUserId);
+        return !userProfileRepository.existsByKeycloakIdAndIsProfessorTrue(currentUserId);
     }
 
     // User-profile permissions

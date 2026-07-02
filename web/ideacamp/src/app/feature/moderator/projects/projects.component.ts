@@ -9,7 +9,7 @@ import { ProjectResponse } from '../../../models/project.model';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { ProjectView, DeleteState } from './projects.types';
 import { ProjectTable } from './project-table/project-table';
-import { Pagination } from './pagination/pagination';
+import { Pagination } from '../shared/pagination/pagination';
 import { DeleteDialog } from './delete-dialog/delete-dialog';
 
 const PAGE_SIZE = 10;

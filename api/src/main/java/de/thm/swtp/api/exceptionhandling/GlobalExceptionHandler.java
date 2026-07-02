@@ -373,6 +373,20 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(500, "Internal Server Error", ex.getMessage()));
     }
 
+    @ExceptionHandler(ProjectOwnerTransferToSelfException.class)
+    public ResponseEntity<ErrorResponse> handleProjectOwnerTransferToSelf(ProjectOwnerTransferToSelfException ex) {
+        log.warn("Unprocessable Entity (422): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(ErrorResponse.of(422, "Unprocessable Entity", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ProjectOwnerTransferToNonMemberException.class)
+    public ResponseEntity<ErrorResponse> handleProjectOwnerTransferToNonMember(ProjectOwnerTransferToNonMemberException ex) {
+        log.warn("Unprocessable Entity (422): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(ErrorResponse.of(422, "Unprocessable Entity", ex.getMessage()));
+    }
+
     // ── Framework exceptions: explicit handlers so the catch-all doesn't shadow them ─
 
     @ExceptionHandler(AccessDeniedException.class)
@@ -432,5 +446,12 @@ public class GlobalExceptionHandler {
         log.error("Unhandled exception: type={}, message={}", ex.getClass().getName(), ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ErrorResponse.of(500, "Internal Server Error", "An unexpected error occurred."));
+    }
+
+    @ExceptionHandler(InvalidProfessorEmailDomainException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidProfessorEmailDomain(InvalidProfessorEmailDomainException ex) {
+        log.debug("Bad Request (400): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
     }
 }
