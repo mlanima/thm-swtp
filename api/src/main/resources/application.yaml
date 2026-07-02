@@ -57,6 +57,30 @@ app:
     from: noreply@swtp-ss26.de
     language: de
   frontend-url: http://localhost:4200
+  professor-request:
+    allowed-email-domains:
+      - thm.de
+      - verw.thm.de
+      - its.thm.de
+      - nm.thm.de
+      - ftn.thm.de
+      - bliz.thm.de
+      - zqe.thm.de
+      - zdh.thm.de
+      - bau.thm.de
+      - ei.thm.de
+      - me.thm.de
+      - lse.thm.de
+      - ges.thm.de
+      - mni.thm.de
+      - w.thm.de
+      - iem.thm.de
+      - m.thm.de
+      - mnd.thm.de
+      - wi.thm.de
+      - muk.thm.de
+    verification-token-valid-hours: 24
+    expiration-check-delay-ms: 3600000
   tags:
     source: openai-github
 

@@ -19,7 +19,6 @@ import java.util.UUID;
  *
  * <p>Authorization checks fail when permissions are missing.</p>
  */
-
 @Component("security")
 @RequiredArgsConstructor
 public class SecurityService {
@@ -260,7 +259,7 @@ public class SecurityService {
             return false;
         }
         UUID currentUserId = getCurrentUserId(authentication);
-        return !userProfileRepository.existsByKeycloakIdAndProfessorTrue(currentUserId);
+        return !userProfileRepository.existsByKeycloakIdAndIsProfessorTrue(currentUserId);
     }
 
     // User-profile permissions
