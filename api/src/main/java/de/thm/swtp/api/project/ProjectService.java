@@ -6,6 +6,7 @@ import de.thm.swtp.api.exceptionhandling.exceptions.ProjectMemberNotFoundExcepti
 import de.thm.swtp.api.project.dto.request.*;
 import de.thm.swtp.api.project.dto.response.*;
 import de.thm.swtp.api.project.exception.*;
+import de.thm.swtp.api.projectInvitation.domain.ProjectInviteStatus;
 import de.thm.swtp.api.projectInvitation.repository.ProjectInviteRepository;
 import de.thm.swtp.api.projectInvitation.service.ProjectInviteService;
 import de.thm.swtp.api.projectFavorite.repository.ProjectFavoriteRepository;
@@ -324,6 +325,37 @@ public class ProjectService {
         TxLogger.afterCommit(log, "Project member removed: project={}, member={}", projectId, memberId);
     }
 
+
+    @Transactional
+    public ProjectResponse transferProjectOwnership(UUID projectId, UUID newOwnerId) {
+        ProjectEntity project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ExceptionProjectNotFound(projectId));
+
+        if (project.getDeletedAt() != null) {
+            throw new ExceptionProjectAlreadyDeleted(projectId);
+        }
+
+        UUID currentOwnerId = project.getOwner().getKeycloakId();
+
+        if (currentOwnerId.equals(newOwnerId)) {
+            throw new ProjectOwnerTransferToSelfException(projectId);
+        }
+
+        UserProfile newOwnerProfile = project.getMembers().stream()
+                .filter(m -> m.getKeycloakId().equals(newOwnerId))
+                .findFirst()
+                .orElseThrow(() -> new ProjectOwnerTransferToNonMemberException(newOwnerId, projectId));
+
+        projectInviteRepository.deleteByProjectIdAndStatus(projectId, ProjectInviteStatus.PENDING);
+
+        project.getMembers().add(project.getOwner());
+        project.getMembers().remove(newOwnerProfile);
+        project.setOwner(newOwnerProfile);
+
+        ProjectEntity saved = projectRepository.save(project);
+        TxLogger.afterCommit(log, "Project ownership transferred: project={}, newOwner={}", projectId, newOwnerId);
+        return toResponse(saved);
+    }
 
     private void createProjectInvites(ProjectEntity project, UserProfile owner, Set <UUID> invitedUserIds) {
         if (invitedUserIds == null || invitedUserIds.isEmpty()) {

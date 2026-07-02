@@ -4,11 +4,10 @@ import { isPlatformBrowser } from '@angular/common'
 import { AuthService } from './auth.service';
 import { firstValueFrom, catchError, of } from 'rxjs';
 
-export const authGuard: CanActivateFn = async () => {
+export const authGuard: CanActivateFn = async (_route, state) => {
   const authService = inject(AuthService);
   const platformId = inject(PLATFORM_ID);
   const router = inject(Router);
-
 
   if (!isPlatformBrowser(platformId)) {
     return true;
@@ -37,6 +36,7 @@ export const authGuard: CanActivateFn = async () => {
     return true;
   }
 
-  authService.login()
+  sessionStorage.setItem('postLoginRedirectUrl', state.url);
+  authService.login();
   return false;
 };

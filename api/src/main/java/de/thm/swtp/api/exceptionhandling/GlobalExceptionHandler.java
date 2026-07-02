@@ -23,6 +23,8 @@ import de.thm.swtp.api.projectInvitation.exception.InvalidProjectInviteException
 import de.thm.swtp.api.projectInvitation.exception.ProjectInviteAccessDeniedException;
 import de.thm.swtp.api.projectInvitation.exception.ProjectInviteNotFoundException;
 import de.thm.swtp.api.tag.exception.TagAccessDeniedException;
+import de.thm.swtp.api.tag.exception.TagNotValidException;
+import de.thm.swtp.api.tag.validation.TagValidationException;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.project.exception.*;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +37,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 
@@ -140,6 +143,27 @@ public class GlobalExceptionHandler {
         log.warn("Forbidden (403): {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(ErrorResponse.of(403, "Forbidden", ex.getMessage()));
+    }
+
+    @ExceptionHandler(TagNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleTagNotValid(TagNotValidException ex) {
+        log.debug("Bad Request (400): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage(), "TAG_NOT_VALID"));
+    }
+
+    @ExceptionHandler(TagValidationException.class)
+    public ResponseEntity<ErrorResponse> handleTagValidationError(TagValidationException ex) {
+        log.error("Tag validation failed due to external API error: {}", ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                .body(ErrorResponse.of(502, "Bad Gateway", "Tag validation service temporarily unavailable."));
+    }
+
+    @ExceptionHandler(ResourceAccessException.class)
+    public ResponseEntity<ErrorResponse> handleResourceAccess(ResourceAccessException ex) {
+        log.error("External API unreachable: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                .body(ErrorResponse.of(502, "Bad Gateway", "Tag validation service temporarily unavailable."));
     }
 
     @ExceptionHandler(ProjectJoinRequestAccessDeniedException.class)
@@ -312,7 +336,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ProjectFileUploadLimitExceededException.class)
     public ResponseEntity<ErrorResponse> handleProjectFileUploadLimitExceeded(ProjectFileUploadLimitExceededException ex) {
         log.warn("Unprocessable Entity (422): {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+        return ResponseEntity.status(HttpStatus.valueOf(422))
                 .body(ErrorResponse.of(422, "Unprocessable Entity", ex.getMessage()));
     }
 
@@ -356,6 +380,20 @@ public class GlobalExceptionHandler {
         log.error("Project URL generation failed: {}", ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ErrorResponse.of(500, "Internal Server Error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ProjectOwnerTransferToSelfException.class)
+    public ResponseEntity<ErrorResponse> handleProjectOwnerTransferToSelf(ProjectOwnerTransferToSelfException ex) {
+        log.warn("Unprocessable Entity (422): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(ErrorResponse.of(422, "Unprocessable Entity", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ProjectOwnerTransferToNonMemberException.class)
+    public ResponseEntity<ErrorResponse> handleProjectOwnerTransferToNonMember(ProjectOwnerTransferToNonMemberException ex) {
+        log.warn("Unprocessable Entity (422): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(ErrorResponse.of(422, "Unprocessable Entity", ex.getMessage()));
     }
 
     // ── Framework exceptions: explicit handlers so the catch-all doesn't shadow them ─
@@ -436,7 +474,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<ErrorResponse> handleUploadTooLarge(MaxUploadSizeExceededException ex) {
         log.warn("Payload Too Large (413): {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
+        return ResponseEntity.status(HttpStatus.valueOf(413))
                 .body(ErrorResponse.of(413, "Payload Too Large", ex.getMessage()));
     }
 
@@ -480,5 +518,12 @@ public class GlobalExceptionHandler {
         log.error("Unhandled exception: type={}, message={}", ex.getClass().getName(), ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ErrorResponse.of(500, "Internal Server Error", "An unexpected error occurred."));
+    }
+
+    @ExceptionHandler(InvalidProfessorEmailDomainException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidProfessorEmailDomain(InvalidProfessorEmailDomainException ex) {
+        log.debug("Bad Request (400): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
     }
 }

@@ -20,6 +20,9 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
+import de.thm.swtp.api.tag.validation.TagValidationException;
+import org.springframework.web.client.ResourceAccessException;
+
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -77,7 +80,7 @@ class GlobalExceptionHandlerTest {
     @Test
     void fileUploadLimitReturns422() {
         assertStatus(handler.handleProjectFileUploadLimitExceeded(
-                new ProjectFileUploadLimitExceededException(20)), HttpStatus.UNPROCESSABLE_ENTITY);
+                new ProjectFileUploadLimitExceededException(20)), HttpStatus.valueOf(422));
     }
 
     @Test
@@ -143,7 +146,25 @@ class GlobalExceptionHandlerTest {
     @Test
     void uploadTooLargeReturns413() {
         assertStatus(handler.handleUploadTooLarge(
-                new MaxUploadSizeExceededException(1024L)), HttpStatus.PAYLOAD_TOO_LARGE);
+                new MaxUploadSizeExceededException(1024L)), HttpStatus.valueOf(413));
+    }
+
+    @Test
+    void tagValidationErrorReturns502() {
+        ResponseEntity<ErrorResponse> r = handler.handleTagValidationError(
+                new TagValidationException("Tag validation service temporarily unavailable"));
+        assertStatus(r, HttpStatus.BAD_GATEWAY);
+        assertThat(r.getBody().getError()).isEqualTo("Bad Gateway");
+        assertThat(r.getBody().getMessage()).isEqualTo("Tag validation service temporarily unavailable.");
+    }
+
+    @Test
+    void resourceAccessErrorReturns502() {
+        ResponseEntity<ErrorResponse> r = handler.handleResourceAccess(
+                new ResourceAccessException("I/O error: Timeout"));
+        assertStatus(r, HttpStatus.BAD_GATEWAY);
+        assertThat(r.getBody().getError()).isEqualTo("Bad Gateway");
+        assertThat(r.getBody().getMessage()).isEqualTo("Tag validation service temporarily unavailable.");
     }
 
     // ── catch-all: 500 with a generic body, never the raw exception message ──
