@@ -12,12 +12,6 @@ export interface ManagedUser {
 }
 
 
-export interface PageResponse<T> {
-  content: T[];
-  page: number;
-  size: number;
-  totalElements: number;
-  totalPages: number;
-  first: boolean;
-  last: boolean;
-}
+export type ManagedUserSortField = 'username' | 'email' | 'isProfessor' | 'createdAt' | 'bannedAt' | 'banReason' | 'status';
+
+export type SortDirection = 'asc' | 'desc';
