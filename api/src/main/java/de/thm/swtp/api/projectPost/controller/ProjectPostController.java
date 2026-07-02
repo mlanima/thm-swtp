@@ -65,7 +65,7 @@ public class ProjectPostController {
     }
 
     @PostMapping("/{postId}/image")
-    @PreAuthorize("@security.canCreateProjectPost(#projectId, authentication)")
+    @PreAuthorize("@security.canEditProjectPost(#projectId, #postId, authentication)")
     public ProjectPostResponse uploadPostImage(
             @PathVariable UUID projectId,
             @PathVariable UUID postId,
