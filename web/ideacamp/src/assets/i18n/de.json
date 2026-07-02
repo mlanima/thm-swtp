@@ -574,7 +574,6 @@
     "SUCCESS_DESCRIPTION": "Ihre Anfrage wurde erfolgreich übermittelt. Wir melden uns bei Ihnen.",
     "SUCCESS_CLOSE": "Schließen",
     "ERROR_LOAD": "Die Professor:innen-Anfrage konnte nicht geladen werden.",
-    "ERROR_LOAD_USER": "Benutzer konnte nicht geladen werden.",
     "ERROR_SEND": "Deine Anfrage konnte nicht gesendet werden. Bitte versuche es später erneut.",
     "VERIFY_EMAIL_TITLE": "E-Mail-Adresse bestätigen",
     "VERIFY_EMAIL_DESCRIPTION": "Bitte bestätige deine THM-E-Mail-Adresse, damit deine Anfrage von Moderatoren geprüft werden kann.",

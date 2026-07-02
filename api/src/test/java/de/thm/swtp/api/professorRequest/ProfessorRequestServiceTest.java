@@ -77,7 +77,7 @@ public class ProfessorRequestServiceTest {
     @Test
     void createProfessorRequest_shouldCreateRequest_whenUserExists() {
         when(userProfileRepository.findById(userId)).thenReturn(Optional.of(user));
-        
+
         when(professorRequestRepository.existsByRequestingUserKeycloakIdAndStatusIn(eq(userId), any()))
                 .thenReturn(false);
 

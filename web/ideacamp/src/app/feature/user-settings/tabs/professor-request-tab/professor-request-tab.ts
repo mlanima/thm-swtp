@@ -73,7 +73,6 @@ export class ProfessorRequestTab implements OnInit {
       const user = this.authService.user();
 
       if (!user) {
-        this.errorMessage.set(this.translate.instant('PROFESSOR_REQUEST.ERROR_LOAD_USER'));
         this.isLoading.set(false);
         return;
       }
