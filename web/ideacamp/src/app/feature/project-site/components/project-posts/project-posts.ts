@@ -331,7 +331,8 @@ export class ProjectPosts implements OnChanges, OnDestroy {
       },
       error: () => {
         this.postImageUrls.update((urls) => {
-          const { [post.id]: removed, ...remainingUrls } = urls;
+          const remainingUrls = { ...urls };
+          delete remainingUrls[post.id];
           return remainingUrls;
         });
       },
