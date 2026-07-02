@@ -2,6 +2,8 @@ package de.thm.swtp.api.userprofile.controller;
 
 import de.thm.swtp.api.project.ProjectService;
 import de.thm.swtp.api.project.dto.response.ProjectResponse;
+import de.thm.swtp.api.thesis.ThesisService;
+import de.thm.swtp.api.thesis.dto.response.ThesisResponse;
 import de.thm.swtp.api.userprofile.dto.UserProfileRequest;
 import de.thm.swtp.api.userprofile.dto.UserProfileResponse;
 import de.thm.swtp.api.userprofile.dto.UserStatusResponse;
@@ -26,6 +28,7 @@ public class UserProfileController {
     private final UserProfileMapper userProfileMapper;
     private final UserStatusMapper userStatusMapper;
     private final ProjectService projectService;
+    private final ThesisService thesisService;
 
     @PostMapping("/api/v1/users/me")
     public UserProfileResponse syncProfile(@AuthenticationPrincipal Jwt jwt) {
@@ -50,6 +53,15 @@ public class UserProfileController {
     @PreAuthorize("@security.canViewUserProjects(#username, authentication)")
     public List<ProjectResponse> getAllProjects(@PathVariable String username) {
         return projectService.getAllProjectsByUsername(username);
+    }
+
+    @GetMapping("/api/v1/users/{username}/theses")
+    @PreAuthorize("@security.canViewUserTheses(#username, authentication)")
+    public List<ThesisResponse> getTheses(@PathVariable String username) {
+        return thesisService.getThesesByUsername(username)
+                .stream()
+                .map(ThesisResponse::toResponse)
+                .toList();
     }
 
     @PutMapping("/api/v1/users/{username}/profile")

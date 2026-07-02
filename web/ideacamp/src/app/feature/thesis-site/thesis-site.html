@@ -1,0 +1,124 @@
+<div class="min-h-screen bg-slate-100 text-slate-700">
+
+  @if (isLoading()) {
+    <div class="flex items-center justify-center py-20">
+      <p class="text-slate-500">{{ 'THESISSITE.LOADING' | translate }}</p>
+    </div>
+  }
+
+  @if (!isLoading() && errorMessage()) {
+    <div class="mx-auto max-w-6xl px-6 py-10">
+      <div class="rounded-xl bg-red-50 border border-red-200 p-6 text-red-700">
+        <p class="font-semibold">{{ 'COMMON.ERROR' | translate }}</p>
+        <p class="mt-1 text-sm">{{ errorMessage()! | translate }}</p>
+      </div>
+    </div>
+  }
+
+  @if (!isLoading() && thesis()) {
+    <app-thesis-header [thesis]="thesis()!" />
+
+    <main class="mx-auto grid max-w-6xl grid-cols-1 gap-6 px-6 py-10 lg:grid-cols-[1fr_320px] lg:items-start">
+      <section class="space-y-6">
+
+        <div class="rounded-2xl bg-white p-6 shadow-sm">
+          <div class="mb-4 flex items-center justify-between">
+            <h2 class="text-lg font-semibold text-slate-700">
+              {{ 'THESISSITE.INFORMATION' | translate }}
+            </h2>
+
+            @if (isSupervisor && !isEditing()) {
+              <div class="flex items-center gap-3">
+                <button (click)="startEdit()" class="cursor-pointer text-slate-400 hover:text-lime-500">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10.0002 4H7.2002C6.08009 4 5.51962 4 5.0918 4.21799C4.71547 4.40973 4.40973 4.71547 4.21799 5.0918C4 5.51962 4 6.08009 4 7.2002V16.8002C4 17.9203 4 18.4801 4.21799 18.9079C4.40973 19.2842 4.71547 19.5905 5.0918 19.7822C5.5192 20 6.07899 20 7.19691 20H16.8031C17.921 20 18.48 20 18.9074 19.7822C19.2837 19.5905 19.5905 19.2839 19.7822 18.9076C20 18.4802 20 17.921 20 16.8031V14M16 5L10 11V14H13L19 8M16 5L19 2L22 5L19 8M16 5L19 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+              </div>
+            }
+          </div>
+
+          @if (isEditing()) {
+            <form class="space-y-4" (ngSubmit)="saveEdit()">
+              <div>
+                <label for="editTitle" class="text-xs font-medium text-slate-500">{{ 'THESISSITE.FORM.TITLE' | translate }}</label>
+                <input
+                  id="editTitle"
+                  name="editTitle"
+                  [ngModel]="editTitle()"
+                  (ngModelChange)="editTitle.set($event)"
+                  class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:border-lime-400 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label for="editShortDescription" class="text-xs font-medium text-slate-500">{{ 'PROJECTCREATE.SHORT_DESCRIPTION' | translate }}</label>
+                <input
+                  id="editShortDescription"
+                  name="editShortDescription"
+                  [ngModel]="editShortDescription()"
+                  (ngModelChange)="editShortDescription.set($event)"
+                  class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:border-lime-400 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label for="editDescription" class="text-xs font-medium text-slate-500">{{ 'PROJECTCREATE.DESCRIPTION' | translate }}</label>
+                <textarea
+                  id="editDescription"
+                  name="editDescription"
+                  [ngModel]="editDescription()"
+                  (ngModelChange)="editDescription.set($event)"
+                  rows="4"
+                  class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:border-lime-400 focus:outline-none"
+                ></textarea>
+              </div>
+
+              <div class="flex gap-2">
+                <button
+                  type="submit"
+                  [disabled]="isSaving()"
+                  class="rounded-md bg-lime-500 px-4 py-2 text-sm font-medium text-white hover:bg-lime-600 disabled:opacity-50"
+                >
+                  {{ isSaving() ? ('COMMON.SAVE' | translate) + '…' : ('COMMON.SAVE' | translate) }}
+                </button>
+
+                <button
+                  type="button"
+                  (click)="cancelEdit()"
+                  class="rounded-md bg-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-300"
+                >
+                  {{ 'COMMON.CANCEL' | translate }}
+                </button>
+              </div>
+            </form>
+          } @else {
+            <app-info-card [thesis]="thesis()!" />
+          }
+        </div>
+      </section>
+
+      <app-thesis-sidebar
+        class="lg:col-start-2 lg:row-start-1"
+        [thesisId]="thesis()!.id"
+        [isSupervisor]="isSupervisor"
+        [supervisorKeycloakId]="thesis()!.supervisorKeycloakId"
+        [supervisorUsername]="thesis()!.supervisorUsername"
+        [tags]="thesis()!.tags"
+        [isSavingTags]="isSavingTags()"
+        [tagsErrorMessage]="tagsErrorMessage()"
+        (addTag)="addTag($event)"
+        (deleteTag)="deleteTag($event)"
+      />
+
+    </main>
+  }
+
+  @if (showSuccessModal()) {
+    <app-success-modal
+      [message]="'THESISSITE.THESIS_UPDATED' | translate"
+      [buttonText]="'COMMON.CONTINUE' | translate"
+      (closeModal)="closeSuccessModal()">
+    </app-success-modal>
+  }
+</div>

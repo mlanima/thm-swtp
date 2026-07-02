@@ -1,0 +1,64 @@
+<div class="min-h-screen bg-slate-100 text-slate-700">
+
+  @if (store.isLoading()) {
+    <div class="flex items-center justify-center py-20">
+      <p class="text-slate-500">{{ 'COMMON.LOADING' | translate }}</p>
+    </div>
+  }
+
+  @if (!store.isLoading() && store.errorMessage()) {
+    <div class="mx-auto max-w-5xl px-6 py-10">
+      <div class="rounded-xl border border-red-200 bg-red-50 p-6 text-red-700">
+        <p class="font-semibold">{{ 'THESISSETTINGS.UNEXPECTED_ERROR' | translate }}</p>
+        <p class="mt-1 text-sm">{{ store.errorMessage()! | translate }}</p>
+      </div>
+    </div>
+  }
+
+  @if (!store.isLoading() && store.thesis()) {
+    <div class="mx-auto max-w-5xl px-6 py-10">
+
+      <a
+        [routerLink]="['/thesis', store.thesis()!.thesisUrl]"
+        class="mb-6 inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-slate-500 transition hover:bg-slate-100 hover:text-lime-500"
+      >
+        <i class="pi pi-arrow-left text-sm text-zinc-400"></i>
+        <span>{{ 'THESISSETTINGS.BACK_TO_THESIS' | translate }}</span>
+      </a>
+
+      <div class="flex flex-col gap-6 md:flex-row md:gap-8">
+
+        <aside class="w-full md:w-48 md:shrink-0">
+          <p class="mb-3 px-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+            {{ 'THESISSETTINGS.TITLE' | translate }}
+          </p>
+          <nav class="space-y-0.5">
+            @for (tab of tabs; track tab.id) {
+              <button
+                (click)="setTab(tab.id)"
+                class="flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors"
+                [ngClass]="activeTab() === tab.id
+                  ? 'bg-slate-800 text-white'
+                  : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'"
+              >
+                <i class="pi text-sm" [ngClass]="tab.icon"></i>
+                {{ tab.label | translate }}
+              </button>
+            }
+          </nav>
+        </aside>
+
+        <main class="flex-1 min-w-0">
+          @if (activeTab() === 'students') {
+            <app-students-tab />
+          }
+          @if (activeTab() === 'danger-zone') {
+            <app-danger-zone-tab />
+          }
+        </main>
+
+      </div>
+    </div>
+  }
+
+</div>

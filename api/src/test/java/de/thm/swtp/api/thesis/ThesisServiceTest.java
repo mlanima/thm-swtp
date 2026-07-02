@@ -1,0 +1,380 @@
+package de.thm.swtp.api.thesis;
+
+import de.thm.swtp.api.tag.entity.TagEntity;
+import de.thm.swtp.api.tag.repository.TagRepository;
+import de.thm.swtp.api.thesis.domain.Thesis;
+import de.thm.swtp.api.thesis.dto.request.CreateThesisRequest;
+import de.thm.swtp.api.thesis.dto.request.UpdateThesisRequest;
+import de.thm.swtp.api.thesis.dto.response.DeleteThesisResponse;
+import de.thm.swtp.api.thesis.exception.ThesisInvalidStudentAssignmentException;
+import de.thm.swtp.api.thesis.exception.ThesisInvalidUrlException;
+import de.thm.swtp.api.thesis.exception.ThesisNotFoundByIdException;
+import de.thm.swtp.api.thesis.exception.ThesisNotFoundException;
+import de.thm.swtp.api.thesis.exception.ThesisStudentAlreadyAssignedException;
+import de.thm.swtp.api.thesis.exception.ThesisStudentNotFoundException;
+import de.thm.swtp.api.thesis.exception.ThesisTitleAlreadyExistsException;
+import de.thm.swtp.api.thesis.exception.ThesisUrlAlreadyExistsException;
+import de.thm.swtp.api.userprofile.entity.UserProfile;
+import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
+import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+class ThesisServiceTest {
+
+    @Mock
+    private ThesisRepository thesisRepository;
+    @Mock
+    private UserProfileRepository userProfileRepository;
+    @Mock
+    private TagRepository tagRepository;
+
+    @InjectMocks
+    private ThesisService thesisService;
+
+    private UUID thesisId;
+    private UUID supervisorId;
+    private UUID studentId;
+    private UserProfile supervisor;
+    private UserProfile student;
+    private ThesisEntity thesisEntity;
+
+    @BeforeEach
+    void setUp() {
+        thesisId = UUID.randomUUID();
+        supervisorId = UUID.randomUUID();
+        studentId = UUID.randomUUID();
+
+        supervisor = UserProfile.builder()
+                .keycloakId(supervisorId)
+                .username("prof")
+                .email("prof@thm.de")
+                .isProfessor(true)
+                .build();
+
+        student = UserProfile.builder()
+                .keycloakId(studentId)
+                .username("student")
+                .email("student@thm.de")
+                .isProfessor(false)
+                .build();
+
+        thesisEntity = ThesisEntity.builder()
+                .id(thesisId)
+                .title("Meine Abschlussarbeit")
+                .thesisUrl("meine-abschlussarbeit")
+                .description("Beschreibung")
+                .shortDescription("Kurz")
+                .supervisor(supervisor)
+                .tags(new HashSet<>())
+                .students(new HashSet<>())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+    }
+
+    // --- getById ---
+
+    @Test
+    void getById_returnsThesis_whenFound() {
+        when(thesisRepository.findById(thesisId)).thenReturn(Optional.of(thesisEntity));
+
+        Thesis result = thesisService.getById(thesisId);
+
+        assertThat(result.getId()).isEqualTo(thesisId);
+        assertThat(result.getTitle()).isEqualTo("Meine Abschlussarbeit");
+        assertThat(result.getSupervisorKeycloakId()).isEqualTo(supervisorId);
+    }
+
+    @Test
+    void getById_throwsNotFoundById_whenMissing() {
+        when(thesisRepository.findById(thesisId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> thesisService.getById(thesisId))
+                .isInstanceOf(ThesisNotFoundByIdException.class)
+                .hasMessageContaining(thesisId.toString());
+    }
+
+    // --- getByUrl ---
+
+    @Test
+    void getByUrl_returnsThesis_whenFound() {
+        when(thesisRepository.findByThesisUrl("meine-abschlussarbeit"))
+                .thenReturn(Optional.of(thesisEntity));
+
+        Thesis result = thesisService.getByUrl("meine-abschlussarbeit");
+
+        assertThat(result.getThesisUrl()).isEqualTo("meine-abschlussarbeit");
+    }
+
+    @Test
+    void getByUrl_throwsNotFoundException_whenMissing() {
+        when(thesisRepository.findByThesisUrl("unknown")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> thesisService.getByUrl("unknown"))
+                .isInstanceOf(ThesisNotFoundException.class)
+                .hasMessageContaining("unknown");
+    }
+
+    // --- create ---
+
+    @Test
+    void create_savesThesis_withAutoGeneratedUrl() {
+        CreateThesisRequest request = new CreateThesisRequest(
+                "Neue Arbeit", "Desc", "Short", null, Set.of());
+
+        when(thesisRepository.existsByTitle("Neue Arbeit")).thenReturn(false);
+        when(thesisRepository.existsByThesisUrl("neue-arbeit")).thenReturn(false);
+        when(userProfileRepository.findById(supervisorId)).thenReturn(Optional.of(supervisor));
+        when(thesisRepository.save(any())).thenReturn(thesisEntity);
+
+        Thesis result = thesisService.create(request, supervisorId);
+
+        assertThat(result).isNotNull();
+        verify(thesisRepository).save(any(ThesisEntity.class));
+    }
+
+    @Test
+    void create_savesThesis_withExplicitUrl() {
+        CreateThesisRequest request = new CreateThesisRequest(
+                "Neue Arbeit", "Desc", "Short", "neue-arbeit", Set.of());
+
+        when(thesisRepository.existsByTitle("Neue Arbeit")).thenReturn(false);
+        when(thesisRepository.existsByThesisUrl("neue-arbeit")).thenReturn(false);
+        when(userProfileRepository.findById(supervisorId)).thenReturn(Optional.of(supervisor));
+        when(thesisRepository.save(any())).thenReturn(thesisEntity);
+
+        Thesis result = thesisService.create(request, supervisorId);
+
+        assertThat(result).isNotNull();
+    }
+
+    @Test
+    void create_throwsTitleConflict_whenTitleExists() {
+        CreateThesisRequest request = new CreateThesisRequest(
+                "Duplikat", null, null, null, null);
+
+        when(thesisRepository.existsByTitle("Duplikat")).thenReturn(true);
+
+        assertThatThrownBy(() -> thesisService.create(request, supervisorId))
+                .isInstanceOf(ThesisTitleAlreadyExistsException.class);
+    }
+
+    @Test
+    void create_throwsUrlConflict_whenExplicitUrlTaken() {
+        CreateThesisRequest request = new CreateThesisRequest(
+                "Neue Arbeit", null, null, "belegt-url", null);
+
+        when(thesisRepository.existsByTitle("Neue Arbeit")).thenReturn(false);
+        when(thesisRepository.existsByThesisUrl("belegt-url")).thenReturn(true);
+
+        assertThatThrownBy(() -> thesisService.create(request, supervisorId))
+                .isInstanceOf(ThesisUrlAlreadyExistsException.class);
+    }
+
+    @Test
+    void create_throwsInvalidUrl_whenUrlFormatInvalid() {
+        CreateThesisRequest request = new CreateThesisRequest(
+                "Neue Arbeit", null, null, "INVALID URL!", null);
+
+        when(thesisRepository.existsByTitle("Neue Arbeit")).thenReturn(false);
+
+        assertThatThrownBy(() -> thesisService.create(request, supervisorId))
+                .isInstanceOf(ThesisInvalidUrlException.class);
+    }
+
+    @Test
+    void create_throwsUserNotFound_whenSupervisorMissing() {
+        CreateThesisRequest request = new CreateThesisRequest(
+                "Neue Arbeit", null, null, "neue-arbeit", null);
+
+        when(thesisRepository.existsByTitle("Neue Arbeit")).thenReturn(false);
+        when(thesisRepository.existsByThesisUrl("neue-arbeit")).thenReturn(false);
+        when(userProfileRepository.findById(supervisorId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> thesisService.create(request, supervisorId))
+                .isInstanceOf(UserProfileNotFoundException.class);
+    }
+
+    // --- update ---
+
+    @Test
+    void update_throwsNotFoundById_whenMissing() {
+        UpdateThesisRequest request = new UpdateThesisRequest();
+        when(thesisRepository.findById(thesisId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> thesisService.update(thesisId, request))
+                .isInstanceOf(ThesisNotFoundByIdException.class);
+    }
+
+    @Test
+    void update_throwsTitleConflict_whenNewTitleTakenByOther() {
+        UpdateThesisRequest request = new UpdateThesisRequest();
+        request.setTitle("Anderer Titel");
+
+        when(thesisRepository.findById(thesisId)).thenReturn(Optional.of(thesisEntity));
+        when(thesisRepository.existsByTitleAndIdNot("Anderer Titel", thesisId)).thenReturn(true);
+
+        assertThatThrownBy(() -> thesisService.update(thesisId, request))
+                .isInstanceOf(ThesisTitleAlreadyExistsException.class);
+    }
+
+    @Test
+    void update_savesChanges_whenValid() {
+        UpdateThesisRequest request = new UpdateThesisRequest();
+        request.setTitle("Neuer Titel");
+
+        when(thesisRepository.findById(thesisId)).thenReturn(Optional.of(thesisEntity));
+        when(thesisRepository.existsByTitleAndIdNot("Neuer Titel", thesisId)).thenReturn(false);
+        when(thesisRepository.save(any())).thenReturn(thesisEntity);
+
+        thesisService.update(thesisId, request);
+
+        verify(thesisRepository).save(thesisEntity);
+    }
+
+    // --- addStudent ---
+
+    @Test
+    void addStudent_addsStudent_whenValid() {
+        when(thesisRepository.findById(thesisId)).thenReturn(Optional.of(thesisEntity));
+        when(userProfileRepository.findById(studentId)).thenReturn(Optional.of(student));
+        when(thesisRepository.save(any())).thenReturn(thesisEntity);
+
+        thesisService.addStudent(thesisId, studentId);
+
+        assertThat(thesisEntity.getStudents()).contains(student);
+    }
+
+    @Test
+    void addStudent_throwsInvalidAssignment_whenStudentIsProfessor() {
+        UserProfile professor = UserProfile.builder()
+                .keycloakId(studentId)
+                .username("another-prof")
+                .email("prof2@thm.de")
+                .isProfessor(true)
+                .build();
+
+        when(thesisRepository.findById(thesisId)).thenReturn(Optional.of(thesisEntity));
+        when(userProfileRepository.findById(studentId)).thenReturn(Optional.of(professor));
+
+        assertThatThrownBy(() -> thesisService.addStudent(thesisId, studentId))
+                .isInstanceOf(ThesisInvalidStudentAssignmentException.class);
+    }
+
+    @Test
+    void addStudent_throwsInvalidAssignment_whenStudentIsSupervisor() {
+        when(thesisRepository.findById(thesisId)).thenReturn(Optional.of(thesisEntity));
+        when(userProfileRepository.findById(supervisorId)).thenReturn(Optional.of(supervisor));
+
+        assertThatThrownBy(() -> thesisService.addStudent(thesisId, supervisorId))
+                .isInstanceOf(ThesisInvalidStudentAssignmentException.class);
+    }
+
+    @Test
+    void addStudent_throwsAlreadyAssigned_whenStudentAlreadyPresent() {
+        thesisEntity.getStudents().add(student);
+
+        when(thesisRepository.findById(thesisId)).thenReturn(Optional.of(thesisEntity));
+        when(userProfileRepository.findById(studentId)).thenReturn(Optional.of(student));
+
+        assertThatThrownBy(() -> thesisService.addStudent(thesisId, studentId))
+                .isInstanceOf(ThesisStudentAlreadyAssignedException.class);
+    }
+
+    @Test
+    void addStudent_throwsNotFoundById_whenThesisMissing() {
+        when(thesisRepository.findById(thesisId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> thesisService.addStudent(thesisId, studentId))
+                .isInstanceOf(ThesisNotFoundByIdException.class);
+    }
+
+    // --- removeStudent ---
+
+    @Test
+    void removeStudent_removesStudent_whenAssigned() {
+        thesisEntity.getStudents().add(student);
+
+        when(thesisRepository.findById(thesisId)).thenReturn(Optional.of(thesisEntity));
+        when(userProfileRepository.findById(studentId)).thenReturn(Optional.of(student));
+        when(thesisRepository.save(any())).thenReturn(thesisEntity);
+
+        thesisService.removeStudent(thesisId, studentId);
+
+        assertThat(thesisEntity.getStudents()).doesNotContain(student);
+    }
+
+    @Test
+    void removeStudent_throwsStudentNotFound_whenNotAssigned() {
+        when(thesisRepository.findById(thesisId)).thenReturn(Optional.of(thesisEntity));
+        when(userProfileRepository.findById(studentId)).thenReturn(Optional.of(student));
+
+        assertThatThrownBy(() -> thesisService.removeStudent(thesisId, studentId))
+                .isInstanceOf(ThesisStudentNotFoundException.class);
+    }
+
+    @Test
+    void removeStudent_throwsNotFoundById_whenThesisMissing() {
+        when(thesisRepository.findById(thesisId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> thesisService.removeStudent(thesisId, studentId))
+                .isInstanceOf(ThesisNotFoundByIdException.class);
+    }
+
+    // --- delete ---
+
+    @Test
+    void delete_deletesThesis_whenFound() {
+        when(thesisRepository.findById(thesisId)).thenReturn(Optional.of(thesisEntity));
+
+        DeleteThesisResponse response = thesisService.delete(thesisId);
+
+        verify(thesisRepository).delete(thesisEntity);
+        assertThat(response.getThesisId()).isEqualTo(thesisId);
+    }
+
+    @Test
+    void delete_throwsNotFoundById_whenMissing() {
+        when(thesisRepository.findById(thesisId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> thesisService.delete(thesisId))
+                .isInstanceOf(ThesisNotFoundByIdException.class);
+    }
+
+    // --- resolveTags ---
+
+    @Test
+    void create_resolvesTagsCaseInsensitive() {
+        TagEntity existingTag = new TagEntity("java");
+        CreateThesisRequest request = new CreateThesisRequest(
+                "Arbeit mit Tags", null, null, "arbeit-mit-tags", Set.of("Java"));
+
+        when(thesisRepository.existsByTitle("Arbeit mit Tags")).thenReturn(false);
+        when(thesisRepository.existsByThesisUrl("arbeit-mit-tags")).thenReturn(false);
+        when(userProfileRepository.findById(supervisorId)).thenReturn(Optional.of(supervisor));
+        when(tagRepository.findByNameIgnoreCase("Java")).thenReturn(Optional.of(existingTag));
+        when(thesisRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        thesisService.create(request, supervisorId);
+
+        verify(tagRepository).findByNameIgnoreCase("Java");
+    }
+}

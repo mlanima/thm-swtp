@@ -166,7 +166,7 @@
       "ERROR_DELETE": "Projekt konnte nicht gelöscht werden.",
       "CONFIRM_DELETE_TITLE": "Projekt löschen",
       "CONFIRM_DELETE_SUBTITLE": "Diese Aktion kann nicht rückgängig gemacht werden.",
-      "CONFIRM_DELETE_TEXT": "Das Projekt \"{{ projectName }}\" wird dauerhaft gel\u00F6scht. Alle zugeh\u00F6rigen Daten gehen dabei verloren.",
+      "CONFIRM_DELETE_TEXT": "Das Projekt \"{{ projectName }}\" wird dauerhaft gelöscht. Alle zugehörigen Daten gehen dabei verloren.",
       "CONFIRM_DELETE_LABEL": "Gib zur Bestätigung den Projektnamen ein",
       "CONFIRM_DELETE_PLACEHOLDER": "Gib zur Bestätigung den Projektnamen ein",
       "CONFIRM_DELETE_HINT_FILLED": "Der Projektname muss eingegeben werden"
@@ -623,5 +623,77 @@
     "NO_REASON": "Kein Grund angegeben",
     "BANNED_AT": "Gesperrt am:",
     "CONTACT_HINT": "Wenn du Fragen hast, wende dich bitte an das Projektteam."
+  },
+  "THESISSITE": {
+    "LOADING": "Abschlussarbeit wird geladen…",
+    "INFORMATION": "Informationen zur Abschlussarbeit",
+    "THESIS_UPDATED": "Abschlussarbeit erfolgreich geändert.",
+    "ERRORS": {
+      "NO_THESIS_URL": "Keine URL für die Abschlussarbeit angegeben.",
+      "LOAD_THESIS": "Daten der Abschlussarbeit konnten nicht abgerufen werden.",
+      "SAVE_THESIS": "Abschlussarbeit konnte nicht gespeichert werden."
+    },
+    "HEADER": {
+      "BADGE": "Abschlussarbeit",
+      "SETTINGS": "Einstellungen"
+    },
+    "FORM": {
+      "TITLE": "Titel der Abschlussarbeit"
+    },
+    "TAGS": {
+      "TITLE": "Tags",
+      "EMPTY": "Keine Tags vorhanden.",
+      "ERROR_DUPLICATE": "Tag ist bereits in dieser Abschlussarbeit enthalten.",
+      "ERROR_SAVE": "Tag konnte nicht gespeichert werden. Bitte versuche es erneut."
+    },
+    "PEOPLE": {
+      "TITLE": "Betreuer & Studierende",
+      "EMPTY": "Noch kein Betreuer oder Studierende.",
+      "SUPERVISOR": "Betreuer"
+    }
+  },
+  "THESISSETTINGS": {
+    "TITLE": "Einstellungen der Abschlussarbeit",
+    "BACK_TO_THESIS": "Zurück zur Abschlussarbeit",
+    "UNEXPECTED_ERROR": "Ein unerwarteter Fehler ist aufgetreten",
+    "TABS": {
+      "STUDENTS": "Studierende",
+      "DANGER_ZONE": "Gefahrenzone"
+    },
+    "ERRORS": {
+      "NO_THESIS_URL": "Keine URL für die Abschlussarbeit angegeben.",
+      "LOAD_THESIS": "Abschlussarbeit konnte nicht geladen werden."
+    },
+    "STUDENTS": {
+      "SUBTITLE": "Verwalte, welche Studierende an dieser Abschlussarbeit beteiligt sind.",
+      "ADD_STUDENT": "Studierende hinzufügen",
+      "ADD_SUBTITLE": "Suche nach einem Nutzer",
+      "EMPTY": "Diese Abschlussarbeit hat noch keine Studierenden.",
+      "TABLE_STUDENT": "Studierende:r",
+      "REMOVE_STUDENT": "Studierende:n entfernen",
+      "REMOVE_SUBTITLE": "Zugriff auf die Abschlussarbeit wird entfernt",
+      "REMOVE_CONFIRM_START": "Bist du sicher, dass du",
+      "REMOVE_CONFIRM_END": "von dieser Abschlussarbeit entfernen möchtest?",
+      "USER_SEARCH_PLACEHOLDER": "Nutzer suchen",
+      "ERROR_ADD_STUDENT": "Studierende:r konnte nicht hinzugefügt werden. Bitte versuche es erneut.",
+      "ERROR_REMOVE_STUDENT": "Studierende:r konnte nicht entfernt werden. Bitte versuche es gleich nochmal.",
+      "LOADING": "Lade Studierende...",
+      "ERROR_LOAD_STUDENTS": "Studierende konnten nicht geladen werden. Bitte versuche es später nochmal.",
+      "ERROR_ADD_INVALID": "Dieser Nutzer kann nicht als Studierende:r hinzugefügt werden: er/sie ist Professor:in oder bereits Betreuer:in dieser Abschlussarbeit.",
+      "ERROR_ADD_DUPLICATE": "Dieser Nutzer ist bereits Studierende:r dieser Abschlussarbeit.",
+      "ERROR_REMOVE_NOT_FOUND": "Dieser Nutzer ist kein:e Studierende:r dieser Abschlussarbeit (evtl. bereits entfernt)."
+    },
+    "DANGER": {
+      "TITLE": "Abschlussarbeit löschen",
+      "SUBTITLE": "Diese Aktion kann nicht rückgängig gemacht werden.",
+      "DESCRIPTION": "Diese Abschlussarbeit und alle zugehörigen Daten werden unwiderruflich gelöscht!",
+      "MODAL_SUBTITLE": "Das ist eine unwiderrufliche Aktion",
+      "DELETE_TEXT_START": "Wenn du",
+      "DELETE_TEXT_END": "endgültig löschst, werden alle Studierenden, Tags und Einstellungen gelöscht. Die Daten können nicht wiederhergestellt werden.",
+      "CONFIRM_TYPE_START": "Um diese Aktion zu bestätigen, tippe bitte",
+      "CONFIRM_TYPE_END": "ein.",
+      "DELETING": "Wird gelöscht…",
+      "ERROR_DELETE_THESIS": "Abschlussarbeit konnte nicht gelöscht werden."
+    }
   }
 }

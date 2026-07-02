@@ -623,5 +623,77 @@
     "NO_REASON": "No reason provided",
     "BANNED_AT": "Banned on:",
     "CONTACT_HINT": "If you have any questions, please contact the project team."
+  },
+  "THESISSITE": {
+    "LOADING": "Thesis is loading…",
+    "INFORMATION": "Thesis information",
+    "THESIS_UPDATED": "Thesis updated successfully.",
+    "ERRORS": {
+      "NO_THESIS_URL": "No thesis URL provided.",
+      "LOAD_THESIS": "Thesis data could not be loaded.",
+      "SAVE_THESIS": "Thesis could not be saved."
+    },
+    "HEADER": {
+      "BADGE": "Thesis",
+      "SETTINGS": "Settings"
+    },
+    "FORM": {
+      "TITLE": "Thesis title"
+    },
+    "TAGS": {
+      "TITLE": "Tags",
+      "EMPTY": "No tags yet.",
+      "ERROR_DUPLICATE": "Tag is already included in this thesis.",
+      "ERROR_SAVE": "Tag could not be saved. Please try again."
+    },
+    "PEOPLE": {
+      "TITLE": "Supervisor & students",
+      "EMPTY": "No supervisor or students yet.",
+      "SUPERVISOR": "Supervisor"
+    }
+  },
+  "THESISSETTINGS": {
+    "TITLE": "Thesis settings",
+    "BACK_TO_THESIS": "Back to thesis",
+    "UNEXPECTED_ERROR": "An unexpected error occurred",
+    "TABS": {
+      "STUDENTS": "Students",
+      "DANGER_ZONE": "Danger zone"
+    },
+    "ERRORS": {
+      "NO_THESIS_URL": "No thesis URL provided.",
+      "LOAD_THESIS": "Thesis could not be loaded."
+    },
+    "STUDENTS": {
+      "SUBTITLE": "Manage which students are part of this thesis.",
+      "ADD_STUDENT": "Add student",
+      "ADD_SUBTITLE": "Search for a user",
+      "EMPTY": "This thesis does not have any students yet.",
+      "TABLE_STUDENT": "Student",
+      "REMOVE_STUDENT": "Remove student",
+      "REMOVE_SUBTITLE": "Access to the thesis will be removed",
+      "REMOVE_CONFIRM_START": "Are you sure you want to remove",
+      "REMOVE_CONFIRM_END": "from this thesis?",
+      "USER_SEARCH_PLACEHOLDER": "Search user",
+      "ERROR_ADD_STUDENT": "Student could not be added. Please try again.",
+      "ERROR_REMOVE_STUDENT": "Student could not be removed. Please try again shortly.",
+      "LOADING": "Loading students...",
+      "ERROR_LOAD_STUDENTS": "Students could not be loaded. Please try again later.",
+      "ERROR_ADD_INVALID": "This user cannot be added as a student: they are a professor, or already the supervisor of this thesis.",
+      "ERROR_ADD_DUPLICATE": "This user is already a student on this thesis.",
+      "ERROR_REMOVE_NOT_FOUND": "This user is not a student on this thesis (they may have already been removed)."
+    },
+    "DANGER": {
+      "TITLE": "Delete thesis",
+      "SUBTITLE": "This action cannot be undone.",
+      "DESCRIPTION": "This thesis and all related data will be permanently deleted!",
+      "MODAL_SUBTITLE": "This is an irreversible action",
+      "DELETE_TEXT_START": "If you permanently delete",
+      "DELETE_TEXT_END": "all students, tags and settings will be deleted. The data cannot be restored.",
+      "CONFIRM_TYPE_START": "To confirm this action, please type",
+      "CONFIRM_TYPE_END": ".",
+      "DELETING": "Deleting…",
+      "ERROR_DELETE_THESIS": "Thesis could not be deleted."
+    }
   }
 }

@@ -3,6 +3,15 @@ package de.thm.swtp.api.exceptionhandling;
 import de.thm.swtp.api.common.LogSafe;
 import de.thm.swtp.api.exceptionhandling.exceptions.*;
 import de.thm.swtp.api.professorRequest.exception.ProfessorRequestAlreadyExistsException;
+import de.thm.swtp.api.thesis.exception.ThesisInvalidUrlException;
+import de.thm.swtp.api.thesis.exception.ThesisUrlGenerationFailedException;
+import de.thm.swtp.api.thesis.exception.ThesisNotFoundException;
+import de.thm.swtp.api.thesis.exception.ThesisStudentAlreadyAssignedException;
+import de.thm.swtp.api.thesis.exception.ThesisStudentNotFoundException;
+import de.thm.swtp.api.thesis.exception.ThesisTitleAlreadyExistsException;
+import de.thm.swtp.api.thesis.exception.ThesisUrlAlreadyExistsException;
+import de.thm.swtp.api.thesis.exception.ThesisInvalidStudentAssignmentException;
+import de.thm.swtp.api.thesis.exception.ThesisNotFoundByIdException;
 import de.thm.swtp.api.professorRequest.exception.ProfessorRequestInvalidStatusException;
 import de.thm.swtp.api.professorRequest.exception.ProfessorRequestNotFoundException;
 import de.thm.swtp.api.projectFavorite.exception.ProjectAlreadyFavoritedException;
@@ -427,6 +436,34 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(405, "Method Not Allowed", ex.getMessage()));
     }
 
+    @ExceptionHandler(ThesisNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleThesisNotFound(ThesisNotFoundException ex) {
+        log.debug("Not Found (404): {}", LogSafe.clean(ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ThesisTitleAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleThesisTitleAlreadyExists(ThesisTitleAlreadyExistsException ex) {
+        log.debug("Conflict (409): {}", LogSafe.clean(ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ThesisUrlAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleThesisUrlAlreadyExists(ThesisUrlAlreadyExistsException ex) {
+        log.debug("Conflict (409): {}", LogSafe.clean(ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ThesisInvalidUrlException.class)
+    public ResponseEntity<ErrorResponse> handleThesisInvalidUrl(ThesisInvalidUrlException ex) {
+        log.debug("Bad Request (400): {}", LogSafe.clean(ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
+    }
+
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     public ResponseEntity<ErrorResponse> handleMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex) {
         log.warn("Unsupported Media Type (415): {}", LogSafe.clean(ex.getMessage()));
@@ -439,6 +476,41 @@ public class GlobalExceptionHandler {
         log.warn("Payload Too Large (413): {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.valueOf(413))
                 .body(ErrorResponse.of(413, "Payload Too Large", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ThesisUrlGenerationFailedException.class)
+    public ResponseEntity<ErrorResponse> handleThesisUrlGenerationFailed(ThesisUrlGenerationFailedException ex) {
+        log.error("Thesis URL generation failed: {}", ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ErrorResponse.of(500, "Internal Server Error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ThesisStudentAlreadyAssignedException.class)
+    public ResponseEntity<ErrorResponse> handleThesisStudentAlreadyAssigned(ThesisStudentAlreadyAssignedException ex) {
+        log.debug("Conflict (409): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ThesisStudentNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleThesisStudentNotFound(ThesisStudentNotFoundException ex) {
+        log.debug("Not Found (404): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ThesisNotFoundByIdException.class)
+    public ResponseEntity<ErrorResponse> handleThesisNotFoundById(ThesisNotFoundByIdException ex) {
+        log.debug("Not Found (404): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ThesisInvalidStudentAssignmentException.class)
+    public ResponseEntity<ErrorResponse> handleThesisInvalidStudentAssignment(ThesisInvalidStudentAssignmentException ex) {
+        log.warn("Unprocessable Entity (422): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(ErrorResponse.of(422, "Unprocessable Entity", ex.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)
