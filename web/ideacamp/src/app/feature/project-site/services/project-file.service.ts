@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../enviroments/enviroment.dev';
 import { ProjectFileModel, ProjectFileSchema } from '../../../models/project-file.model';
+import { FileVisibility } from '../../../models/file-visibility.model';
 import { Observable, map } from 'rxjs';
 import { z } from 'zod';
 
@@ -16,11 +17,18 @@ export class ProjectFileService {
       .pipe(map((data) => z.array(ProjectFileSchema).parse(data)));
   }
 
-  uploadFile(projectId: string, file: File): Observable<ProjectFileModel> {
+  uploadFile(projectId: string, file: File, visibility: FileVisibility = 'PUBLIC'): Observable<ProjectFileModel> {
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('visibility', visibility);
     return this.http
       .post<unknown>(`${this.baseUrl}/${projectId}/files`, formData)
+      .pipe(map((data) => ProjectFileSchema.parse(data)));
+  }
+
+  updateFileVisibility(projectId: string, fileId: string, visibility: FileVisibility): Observable<ProjectFileModel> {
+    return this.http
+      .patch<unknown>(`${this.baseUrl}/${projectId}/files/${fileId}`, { visibility })
       .pipe(map((data) => ProjectFileSchema.parse(data)));
   }
 

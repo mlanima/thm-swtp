@@ -6,6 +6,7 @@ import de.thm.swtp.api.exceptionhandling.exceptions.*;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
 import de.thm.swtp.api.project.exception.ProjectNotFoundException;
+import de.thm.swtp.api.projectFiles.domain.FileVisibility;
 import de.thm.swtp.api.projectFiles.domain.ProjectFile;
 import de.thm.swtp.api.projectFiles.domain.ProjectFileDownload;
 import de.thm.swtp.api.projectFiles.entity.ProjectFileEntity;
@@ -71,17 +72,28 @@ public class ProjectFileService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProjectFile> getProjectFiles(UUID projectId) {
-        getProjectOrThrow(projectId);
-        return projectFileRepository.findByProjectIdOrderByCreatedAtAsc(projectId)
+    public List<ProjectFile> getProjectFiles(UUID projectId, UUID currentUserId) {
+        ProjectEntity project = getProjectOrThrow(projectId);
+
+        boolean allowedToSeePrivateFiles = isProjectOwner(project, currentUserId) || isProjectMember(project, currentUserId);
+
+        if (allowedToSeePrivateFiles) {
+            return projectFileRepository.findByProjectIdOrderByCreatedAtAsc(projectId)
+                    .stream()
+                    .map(ProjectFileMapper::toDomain)
+                    .toList();
+        }
+
+        return projectFileRepository.findByProjectIdAndVisibilityOrderByCreatedAtAsc(projectId, FileVisibility.PUBLIC)
                 .stream()
                 .map(ProjectFileMapper::toDomain)
                 .toList();
     }
 
     @Transactional
-    public ProjectFile uploadFile(UUID projectId, MultipartFile file) {
+    public ProjectFile uploadFile(UUID projectId, MultipartFile file, FileVisibility visibility) {
         ProjectEntity project = getProjectOrThrow(projectId);
+        FileVisibility cleanedVisibility = visibility != null ? visibility : FileVisibility.PUBLIC;
 
         if (projectFileRepository.countByProjectId(projectId) >= MAX_FILES_PER_PROJECT) {
             throw new ProjectFileUploadLimitExceededException(MAX_FILES_PER_PROJECT);
@@ -131,6 +143,7 @@ public class ProjectFileService {
                 .storageName(storageName)
                 .mimeType(mimeType)
                 .sizeBytes(file.getSize())
+                .visibility(cleanedVisibility)
                 .build();
 
         try {
@@ -159,6 +172,19 @@ public class ProjectFileService {
             throw new ProjectFileNotFoundException(fileId);
         }
         return new ProjectFileDownload(ProjectFileMapper.toDomain(fileEntity), resource);
+    }
+
+    @Transactional
+    public ProjectFile updateFileVisibility(UUID projectId, UUID fileId, FileVisibility visibility) {
+        getProjectOrThrow(projectId);
+
+        ProjectFileEntity fileEntity = getFileOrThrow(fileId);
+        checkFileBelongsToProject(fileEntity, projectId);
+
+        fileEntity.setVisibility(visibility);
+
+        ProjectFileEntity saved = projectFileRepository.save(fileEntity);
+        return ProjectFileMapper.toDomain(saved);
     }
 
     @Transactional
@@ -203,6 +229,16 @@ public class ProjectFileService {
         if (!file.getProject().getId().equals(projectId)) {
             throw new ProjectFileDoesNotBelongToProjectException();
         }
+    }
+
+    private boolean isProjectOwner(ProjectEntity projectEntity, UUID currentUserId) {
+        return projectEntity.getOwner().getKeycloakId().equals(currentUserId);
+    }
+
+    private boolean isProjectMember(ProjectEntity projectEntity, UUID currentUserId) {
+        return projectEntity.getMembers()
+                .stream()
+                .anyMatch(member -> member.getKeycloakId().equals(currentUserId));
     }
 
     private String getExtension(String filename) {

@@ -13,6 +13,7 @@ public class ProjectFileMapper {
                 .mimeType(entity.getMimeType())
                 .sizeBytes(entity.getSizeBytes())
                 .createdAt(entity.getCreatedAt())
+                .visibility(entity.getVisibility())
                 .build();
     }
 }

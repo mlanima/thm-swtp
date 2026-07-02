@@ -1,12 +1,14 @@
 import { Component, Input, OnChanges, SimpleChanges, inject, signal } from '@angular/core';
+import { NgClass } from '@angular/common';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ProjectFileModel } from '../../../../models/project-file.model';
+import { FileVisibility } from '../../../../models/file-visibility.model';
 import { ProjectFileService } from '../../services/project-file.service';
 
 @Component({
   selector: 'app-project-files',
   standalone: true,
-  imports: [TranslatePipe],
+  imports: [TranslatePipe, NgClass],
   templateUrl: './project-files.html',
 })
 export class ProjectFiles implements OnChanges {
@@ -32,6 +34,7 @@ export class ProjectFiles implements OnChanges {
   isLoading = signal(false);
   isUploading = signal(false);
   errorMessage = signal<string | null>(null);
+  uploadVisibility = signal<FileVisibility>('PUBLIC');
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['projectId'] && this.projectId) {
@@ -72,6 +75,23 @@ export class ProjectFiles implements OnChanges {
 
   onDragOver(event: DragEvent): void {
     event.preventDefault();
+  }
+
+  toggleUploadVisibility(): void {
+    this.uploadVisibility.set(this.uploadVisibility() === 'PUBLIC' ? 'PRIVATE' : 'PUBLIC');
+  }
+
+  toggleFileVisibility(file: ProjectFileModel): void {
+    const nextVisibility: FileVisibility = file.visibility === 'PUBLIC' ? 'PRIVATE' : 'PUBLIC';
+
+    this.projectFileService.updateFileVisibility(this.projectId, file.id, nextVisibility).subscribe({
+      next: (updated) => {
+        this.files.set(this.files().map((f) => (f.id === updated.id ? updated : f)));
+      },
+      error: () => {
+        this.errorMessage.set(this.translateService.instant('PROJECTSITE.FILES.ERROR_UPDATE_VISIBILITY'));
+      },
+    });
   }
 
   deleteFile(fileId: string): void {
@@ -137,7 +157,7 @@ export class ProjectFiles implements OnChanges {
     this.isUploading.set(true);
     this.errorMessage.set(null);
 
-    this.projectFileService.uploadFile(this.projectId, file).subscribe({
+    this.projectFileService.uploadFile(this.projectId, file, this.uploadVisibility()).subscribe({
       next: (uploaded) => {
         this.files.set([...this.files(), uploaded]);
         this.isUploading.set(false);
