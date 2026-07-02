@@ -41,7 +41,7 @@ public class ProjectFileEntity {
     private LocalDateTime createdAt;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 7)
+    @Column(nullable = false, length = 7, columnDefinition = "varchar(7) default 'PUBLIC'")
     @Builder.Default
     private FileVisibility visibility = FileVisibility.PUBLIC;
 

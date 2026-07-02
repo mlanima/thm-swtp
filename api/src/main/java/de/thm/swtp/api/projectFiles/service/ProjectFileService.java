@@ -184,6 +184,8 @@ public class ProjectFileService {
         fileEntity.setVisibility(visibility);
 
         ProjectFileEntity saved = projectFileRepository.save(fileEntity);
+        TxLogger.afterCommit(log, "Visibility update: project={}, file={}, visibility={}",
+                projectId, fileId, visibility);
         return ProjectFileMapper.toDomain(saved);
     }
 
