@@ -48,7 +48,7 @@ public class ProfessorRequestController {
 
     /** Verifies the THM email address for a professor-rights request.*/
     @PostMapping("/verify")
-    public ProfessorRequestResponse verifyProfessorRequestEmail(@RequestBody VerifyProfessorRequestEmailRequest request) {
+    public ProfessorRequestResponse verifyProfessorRequestEmail(@Valid @RequestBody VerifyProfessorRequestEmailRequest request) {
         ProfessorRequest professorRequest = professorRequestService.verifyProfessorRequestEmail(request.token());
         return ProfessorRequestResponse.toResponse(professorRequest);
     }

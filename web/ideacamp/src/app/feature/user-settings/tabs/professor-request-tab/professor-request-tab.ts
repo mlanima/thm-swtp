@@ -65,13 +65,16 @@ export class ProfessorRequestTab implements OnInit {
   }
 
   ngOnInit(): void {
-    const token = this.route.snapshot.queryParamMap.get('verifyToken');
-    this.verificationToken.set(token);
+    this.route.queryParamMap.subscribe((params) => {
+      this.verificationToken.set(params.get('verifyToken'));
+    });
 
     this.authService.waitUntilAuthReady().then(() => {
       const user = this.authService.user();
 
       if (!user) {
+        this.errorMessage.set(this.translate.instant('PROFESSOR_REQUEST.ERROR_LOAD_USER'));
+        this.isLoading.set(false);
         return;
       }
 

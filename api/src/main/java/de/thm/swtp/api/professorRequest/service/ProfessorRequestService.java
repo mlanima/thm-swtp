@@ -48,7 +48,7 @@ public class ProfessorRequestService {
                 .orElseThrow(() -> new UserProfileNotFoundException(currentUserId.toString()));
 
         if (!isAllowedProfessorEmail(normalizedEmail)) {
-            throw new InvalidProfessorEmailDomainException(normalizedEmail);
+            throw new InvalidProfessorEmailDomainException();
         }
 
         expireOutdatedVerificationRequestsForUser(currentUserId);

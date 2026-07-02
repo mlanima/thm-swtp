@@ -1,4 +1,6 @@
 package de.thm.swtp.api.professorRequest.dto;
 
-public record VerifyProfessorRequestEmailRequest(String token) {
+import jakarta.validation.constraints.NotBlank;
+
+public record VerifyProfessorRequestEmailRequest(@NotBlank String token) {
 }
