@@ -1,13 +1,91 @@
 <div class="rounded-xl border border-slate-200 bg-white shadow-sm">
   <table class="w-full text-left text-sm">
     <thead>
-      <tr class="border-b border-slate-200 text-xs font-semibold uppercase tracking-wider text-slate-500">
-        <th class="px-1.5 py-1.5 md:px-6">{{ 'MODERATOR.PROJECTS.COLUMN_PROJECT' | translate }}</th>
-        <th class="hidden px-1.5 py-1.5 md:table-cell md:px-6">{{ 'MODERATOR.PROJECTS.COLUMN_OWNER' | translate }}</th>
-        <th class="px-1.5 py-1.5 text-center md:table-cell md:px-6">{{ 'MODERATOR.PROJECTS.COLUMN_CREATED' | translate }}</th>
-        <th class="px-1.5 py-1.5 text-center md:px-6">{{ 'MODERATOR.PROJECTS.COLUMN_STATUS' | translate }}</th>
-        <th class="px-1.5 py-1.5 text-center md:px-6">{{ 'MODERATOR.PROJECTS.COLUMN_ACTION' | translate }}</th>
-      </tr>
+    <tr class="border-b border-slate-200 text-xs font-semibold uppercase tracking-wider text-slate-500">
+      <th class="px-1.5 py-1.5 md:px-6">
+        <button
+          type="button"
+          class="inline-flex items-center gap-1 uppercase tracking-wider transition hover:text-slate-700"
+          [title]="getSortTitle('name') | translate"
+          (click)="sortChange.emit('name')">
+          {{ 'MODERATOR.PROJECTS.COLUMN_PROJECT' | translate }}
+          <span
+            class="text-slate-400"
+            [class.text-slate-700]="sortField() === 'name'"
+            aria-hidden="true">
+          {{ getSortIndicator('name') }}
+        </span>
+        </button>
+      </th>
+
+      <th class="hidden px-1.5 py-1.5 md:table-cell md:px-6">
+        <button
+          type="button"
+          class="inline-flex items-center gap-1 uppercase tracking-wider transition hover:text-slate-700"
+          [title]="getSortTitle('owner.username') | translate"
+          (click)="sortChange.emit('owner.username')">
+          {{ 'MODERATOR.PROJECTS.COLUMN_OWNER' | translate }}
+          <span
+            class="text-slate-400"
+            [class.text-slate-700]="sortField() === 'owner.username'"
+            aria-hidden="true">
+          {{ getSortIndicator('owner.username') }}
+        </span>
+        </button>
+      </th>
+
+      <th class="px-1.5 py-1.5 text-center md:table-cell md:px-6">
+        <button
+          type="button"
+          class="inline-flex items-center justify-center gap-1 uppercase tracking-wider transition hover:text-slate-700"
+          [title]="getSortTitle('createdAt') | translate"
+          (click)="sortChange.emit('createdAt')">
+          {{ 'MODERATOR.PROJECTS.COLUMN_CREATED' | translate }}
+          <span
+            class="text-slate-400"
+            [class.text-slate-700]="sortField() === 'createdAt'"
+            aria-hidden="true">
+          {{ getSortIndicator('createdAt') }}
+        </span>
+        </button>
+      </th>
+
+      <th class="hidden px-1.5 py-1.5 text-center md:table-cell md:px-6">
+        <button
+          type="button"
+          class="inline-flex items-center justify-center gap-1 uppercase tracking-wider transition hover:text-slate-700"
+          [title]="getSortTitle('updatedAt') | translate"
+          (click)="sortChange.emit('updatedAt')">
+          {{ 'MODERATOR.PROJECTS.COLUMN_UPDATED' | translate }}
+          <span
+            class="text-slate-400"
+            [class.text-slate-700]="sortField() === 'updatedAt'"
+            aria-hidden="true">
+          {{ getSortIndicator('updatedAt') }}
+        </span>
+        </button>
+      </th>
+
+      <th class="px-1.5 py-1.5 text-center md:px-6">
+        <button
+          type="button"
+          class="inline-flex items-center justify-center gap-1 uppercase tracking-wider transition hover:text-slate-700"
+          [title]="getSortTitle('isPrivateProject') | translate"
+          (click)="sortChange.emit('isPrivateProject')">
+          {{ 'MODERATOR.PROJECTS.COLUMN_STATUS' | translate }}
+          <span
+            class="text-slate-400"
+            [class.text-slate-700]="sortField() === 'isPrivateProject'"
+            aria-hidden="true">
+          {{ getSortIndicator('isPrivateProject') }}
+        </span>
+        </button>
+      </th>
+
+      <th class="px-1.5 py-1.5 text-center md:px-6">
+        {{ 'MODERATOR.PROJECTS.COLUMN_ACTION' | translate }}
+      </th>
+    </tr>
     </thead>
     <tbody>
       @for (project of projects(); track project.id) {
@@ -15,7 +93,10 @@
           <td class="px-1.5 py-1.5 md:px-6 md:py-4">
             <div class="font-medium text-slate-700">{{ project.name }}</div>
             <div class="flex flex-wrap items-center gap-x-1 gap-y-0.5 text-[10px] text-slate-400 md:text-xs">
-              <span>{{ project.memberCount }} {{ 'MODERATOR.PROJECTS.MEMBERS' | translate }}</span>
+              <span>{{ project.memberCount }}
+                {{ project.memberCount === 1
+                ? ('MODERATOR.PROJECTS.MEMBER' | translate)
+                : ('MODERATOR.PROJECTS.MEMBERS' | translate) }}</span>
               <span class="md:hidden">{{ project.ownerUsername }}</span>
             </div>
           </td>
@@ -35,6 +116,12 @@
             <span class="md:hidden">{{ project.createdAtShort }}</span>
             <span class="hidden md:inline">{{ project.createdAt }}</span>
           </td>
+
+          <td class="hidden px-1.5 py-1.5 text-center text-[10px] text-slate-400 md:table-cell md:px-6 md:py-4 md:text-sm md:text-slate-500">
+            <span class="md:hidden">{{ project.updatedAtShort }}</span>
+            <span class="hidden md:inline">{{ project.updatedAt }}</span>
+          </td>
+
           <td class="px-1.5 py-1.5 text-center md:px-6 md:py-4">
             <span
               class="inline-flex items-center rounded-full px-1 py-0.5 text-[10px] font-medium whitespace-nowrap md:px-2.5 md:text-xs"
@@ -58,7 +145,7 @@
         </tr>
       } @empty {
         <tr>
-          <td colspan="5" class="px-1.5 py-12 text-center text-sm text-slate-400 md:px-6">
+          <td colspan="6" class="px-1.5 py-12 text-center text-sm text-slate-400 md:px-6">
             {{ 'MODERATOR.PROJECTS.NO_RESULTS' | translate }}
           </td>
         </tr>
