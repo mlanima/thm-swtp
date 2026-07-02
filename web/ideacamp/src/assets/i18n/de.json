@@ -477,7 +477,7 @@
       "CREATE": "Post konnte nicht erstellt werden.",
       "DELETE": "Post konnte nicht gelöscht werden.",
       "IMAGE_TYPE": "Bitte wähle ein Bild im Format JPG, PNG oder WEBP aus.",
-      "IMAGE_SIZE": "Das Bild darf maximal 10 MB groß sein.",
+      "IMAGE_SIZE": "Das Bild darf maximal 5 MB groß sein.",
       "IMAGE_UPLOAD": "Der Post wurde erstellt, aber das Bild konnte nicht hochgeladen werden."
     },
     "PLAIN_TEXT": "Klartext",
