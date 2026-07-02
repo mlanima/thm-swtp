@@ -84,7 +84,7 @@ public class ProjectPostEntity {
     @Column(name = "image_url")
     private String imageUrl;
 
-    /** Image that will be loaded from the upload-folder of the backend*/
-    @Column(name = "image_file_name")
-    private String imageFileName;
+    /** Project file id of the uploaded post image. */
+    @Column(name = "image_file_id")
+    private UUID imageFileId;
 }
