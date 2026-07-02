@@ -4,11 +4,14 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../enviroments/enviroment.dev';
 import { ProjectResponse } from '../../../models/project.model';
 import { PageResponse } from '../../../models/page-response.model';
+import { ManagedProjectSortField, SortDirection } from '../projects/projects.types';
 
 export interface ProjectSearchParams {
   page: number;
   size: number;
   name?: string;
+  sortField?: ManagedProjectSortField;
+  sortDirection?: SortDirection;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -19,7 +22,8 @@ export class ModeratorProjectsService {
   getAllProjects(params: ProjectSearchParams): Observable<PageResponse<ProjectResponse>> {
     let httpParams = new HttpParams()
       .set('page', params.page.toString())
-      .set('size', params.size.toString());
+      .set('size', params.size.toString())
+      .set('sort', `${params.sortField ?? 'name'},${params.sortDirection ?? 'asc'}`);
 
     if (params.name) {
       httpParams = httpParams.set('name', params.name);
