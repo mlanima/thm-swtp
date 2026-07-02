@@ -47,6 +47,9 @@ export class ProjectPosts implements OnChanges, OnDestroy {
   @ViewChild('postContentInput')
   postContentInput?: ElementRef<HTMLTextAreaElement>;
 
+  @ViewChild('postImageInput')
+  postImageInput?: ElementRef<HTMLInputElement>;
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['project'] && this.project?.id) {
       this.loadPosts();
@@ -227,7 +230,7 @@ export class ProjectPosts implements OnChanges, OnDestroy {
   closeDeleteSuccessModal(): void {
     this.showDeleteSuccessModal.set(false);
   }
-  
+
   onImageSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
@@ -258,6 +261,10 @@ export class ProjectPosts implements OnChanges, OnDestroy {
   removeSelectedImage(): void {
     this.selectedImage.set(null);
     this.revokeImagePreviewUrl();
+
+    if (this.postImageInput) {
+      this.postImageInput.nativeElement.value = '';
+    }
   }
 
   private resetCreateForm(): void {
@@ -266,6 +273,10 @@ export class ProjectPosts implements OnChanges, OnDestroy {
     this.contentFormat.set('MARKDOWN');
     this.selectedImage.set(null);
     this.revokeImagePreviewUrl();
+
+    if (this.postImageInput) {
+      this.postImageInput.nativeElement.value = '';
+    }
   }
 
   private revokeImagePreviewUrl(): void {

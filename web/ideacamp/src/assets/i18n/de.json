@@ -492,8 +492,9 @@
     "DELETE_POST": "Post löschen",
     "DELETING": "Wird gelöscht…",
     "DELETE_SUCCESS": "Post erfolgreich gelöscht.",
+    "SELECT_IMAGE": "Bild auswählen",
     "IMAGE_LABEL": "Bild hinzufügen",
-    "IMAGE_HINT": "Erlaubt sind JPG, PNG und WEBP bis maximal 5 MB.",
+    "IMAGE_HINT": "Erlaubte Formate sind JPG, PNG und WEBP bis maximal 5 MB.",
     "REMOVE_IMAGE": "Bild entfernen"
   },
   "USER_SETTINGS": {

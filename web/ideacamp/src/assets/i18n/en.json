@@ -492,6 +492,7 @@
     "DELETE_POST": "Delete post",
     "DELETING": "Deleting…",
     "DELETE_SUCCESS": "Post deleted successfully.",
+    "SELECT_IMAGE": "Select image",
     "IMAGE_LABEL": "Add image",
     "IMAGE_HINT": "Allowed formats are JPG, PNG and WEBP up to 5 MB.",
     "REMOVE_IMAGE": "Remove image"

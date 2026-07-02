@@ -136,18 +136,34 @@
         ></textarea>
 
         <div>
-          <label for="postImage" class="text-xs font-medium text-slate-500">
+          <label class="text-xs font-medium text-slate-500">
             {{ 'PROJECTPOSTS.IMAGE_LABEL' | translate }}
           </label>
 
-          <input
-            id="postImage"
-            name="postImage"
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            class="mt-1 block w-full text-sm text-slate-500 file:mr-4 file:rounded-md file:border-0 file:bg-lime-500 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-lime-600"
-            (change)="onImageSelected($event)"
-          />
+          <div class="mt-1 flex items-center gap-3">
+            <input
+              #postImageInput
+              id="postImage"
+              name="postImage"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              class="hidden"
+              (change)="onImageSelected($event)"
+            />
+
+            <label
+              for="postImage"
+              class="cursor-pointer rounded-md bg-lime-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-lime-600"
+            >
+              {{ 'PROJECTPOSTS.SELECT_IMAGE' | translate }}
+            </label>
+
+            @if (selectedImage()) {
+              <span class="text-sm text-slate-500">
+        {{ selectedImage()?.name }}
+      </span>
+            }
+          </div>
 
           <p class="mt-1 text-xs text-slate-400">
             {{ 'PROJECTPOSTS.IMAGE_HINT' | translate }}
@@ -164,7 +180,8 @@
               <button
                 type="button"
                 class="mt-3 rounded-md border border-slate-200 px-3 py-1 text-xs font-medium text-slate-500 transition hover:bg-slate-100"
-                (click)="removeSelectedImage()">
+                (click)="removeSelectedImage()"
+              >
                 {{ 'PROJECTPOSTS.REMOVE_IMAGE' | translate }}
               </button>
             </div>
