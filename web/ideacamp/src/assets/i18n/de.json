@@ -151,8 +151,10 @@
       "COLUMN_PROJECT": "Projekt",
       "COLUMN_OWNER": "Ersteller",
       "COLUMN_CREATED": "Erstellt am",
+      "COLUMN_UPDATED": "Zuletzt aktualisiert",
       "COLUMN_STATUS": "Status",
       "COLUMN_ACTION": "Aktion",
+      "MEMBER": "Mitglied",
       "MEMBERS": "Mitglieder",
       "STATUS_PRIVATE": "Privat",
       "STATUS_PUBLIC": "Öffentlich",
@@ -169,7 +171,12 @@
       "CONFIRM_DELETE_TEXT": "Das Projekt \"{{ projectName }}\" wird dauerhaft gel\u00F6scht. Alle zugeh\u00F6rigen Daten gehen dabei verloren.",
       "CONFIRM_DELETE_LABEL": "Gib zur Bestätigung den Projektnamen ein",
       "CONFIRM_DELETE_PLACEHOLDER": "Gib zur Bestätigung den Projektnamen ein",
-      "CONFIRM_DELETE_HINT_FILLED": "Der Projektname muss eingegeben werden"
+      "CONFIRM_DELETE_HINT_FILLED": "Der Projektname muss eingegeben werden",
+      "SORT": {
+        "SORT_BY": "Nach dieser Spalte sortieren",
+        "ASC": "Aufsteigend sortiert",
+        "DESC": "Absteigend sortiert"
+      }
     },
     "USER_MANAGEMENT": {
       "TITLE": "Nutzerverwaltung",
