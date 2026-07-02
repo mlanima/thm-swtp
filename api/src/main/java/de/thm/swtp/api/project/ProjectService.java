@@ -2,6 +2,7 @@ package de.thm.swtp.api.project;
 
 
 import de.thm.swtp.api.common.TxLogger;
+import de.thm.swtp.api.exceptionhandling.exceptions.InvalidProjectManagementSortFieldException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectMemberNotFoundException;
 import de.thm.swtp.api.project.dto.request.*;
 import de.thm.swtp.api.project.dto.response.*;
@@ -23,6 +24,7 @@ import java.time.*;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +41,7 @@ public class ProjectService {
     private static final String PROJECT_CREATION_INVITE_MESSAGE = "You have been invited to join this project.";
     private final ProjectFavoriteRepository projectFavoriteRepository;
     private final ProjectViewRepository projectViewRepository;
+    private static final Set<String> MANAGED_PROJECT_SORT_FIELDS = Set.of("name", "owner.username", "createdAt", "updatedAt", "isPrivateProject");
 
     private ProjectResponse toResponse(ProjectEntity project) {
         Set<UUID> memberIds = project.getMembers().stream()
@@ -255,6 +258,7 @@ public class ProjectService {
 
     @Transactional
     public Page<ProjectResponse> getAllProjects(String name, Pageable pageable) {
+        validateManagedProjectSort(pageable.getSort());
         if (name != null && !name.isBlank()) {
             return projectRepository.findByNameContainingIgnoreCase(name, pageable).map(this::toResponse);
         }
@@ -338,5 +342,13 @@ public class ProjectService {
                         userId,
                         PROJECT_CREATION_INVITE_MESSAGE
                 ));
+    }
+
+    private void validateManagedProjectSort(Sort sort) {
+        sort.forEach(sortField -> {
+            if (!MANAGED_PROJECT_SORT_FIELDS.contains(sortField.getProperty())) {
+                throw new InvalidProjectManagementSortFieldException("Unsupported sort field: " + sortField.getProperty());
+            }
+        });
     }
 }

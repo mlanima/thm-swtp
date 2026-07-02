@@ -4,6 +4,7 @@ package de.thm.swtp.api.project;
 import de.thm.swtp.api.project.dto.request.*;
 import de.thm.swtp.api.project.dto.response.*;
 import lombok.*;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -25,7 +26,7 @@ public class ProjectController {
     @PreAuthorize("@security.hasModeratorRole(authentication)")
     public ResponseEntity<Page<ProjectResponse>> getAllProjects(
             @RequestParam(required = false) String name,
-            @PageableDefault(size = 20) Pageable pageable) {
+            @PageableDefault(size = 20, sort = "name", direction = Sort.Direction.ASC) Pageable pageable) {
         return ResponseEntity.ok(projectService.getAllProjects(name, pageable));
     }
 
