@@ -79,4 +79,8 @@ public class ProjectPostEntity {
     @UpdateTimestamp
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+
+    /** Image the post contains */
+    @Column(name = "image_url")
+    private String imageUrl;
 }

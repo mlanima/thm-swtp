@@ -10,6 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -59,6 +60,18 @@ public class ProjectPostController {
     public ProjectPostResponse archivePost(@PathVariable UUID projectId, @PathVariable UUID postId) {
         return ProjectPostResponse.toResponse(projectPostService.archiveProjectPost(projectId, postId));
 
+    }
+
+    @PostMapping("/{postId}/image")
+    @PreAuthorize("@security.canCreateProjectPost(#projectId, authentication)")
+    public ProjectPostResponse uploadPostImage(
+            @PathVariable UUID projectId,
+            @PathVariable UUID postId,
+            @RequestParam("image") MultipartFile image
+    ) {
+        return ProjectPostResponse.toResponse(
+                projectPostService.uploadPostImage(projectId, postId, image)
+        );
     }
 
     private UUID getCurrentUserId(Jwt jwt){

@@ -17,6 +17,7 @@ public class ProjectPost {
     String title;
     String content;
     ProjectPostStatus status;
+    String imageUrl;
     PostContentFormat contentFormat;
     LocalDateTime publishedAt;
     LocalDateTime archivedAt;

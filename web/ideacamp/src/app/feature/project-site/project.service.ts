@@ -60,6 +60,13 @@ export class ProjectService {
     return this.http.post<ProjectPostResponse>(`${this.baseUrl}/${projectId}/posts`, request);
   }
 
+  uploadProjectPostImage(projectId: string, postId: string, image: File): Observable<ProjectPostResponse> {
+    const formData = new FormData();
+    formData.append('image', image);
+
+    return this.http.post<ProjectPostResponse>(`${this.baseUrl}/${projectId}/posts/${postId}/image`, formData);
+  }
+
   deleteProjectPost(projectId: string, postId: string) {
     return this.http.delete<void>(`${this.baseUrl}/${projectId}/posts/${postId}`);
   }
