@@ -447,4 +447,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ErrorResponse.of(500, "Internal Server Error", "An unexpected error occurred."));
     }
+
+    @ExceptionHandler(InvalidProfessorEmailDomainException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidProfessorEmailDomain(InvalidProfessorEmailDomainException ex) {
+        log.debug("Bad Request (400): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
+    }
 }

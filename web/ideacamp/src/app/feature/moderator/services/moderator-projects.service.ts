@@ -3,14 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../enviroments/enviroment.dev';
 import { ProjectResponse } from '../../../models/project.model';
-
-export interface PageResponse<T> {
-  content: T[];
-  totalElements: number;
-  totalPages: number;
-  size: number;
-  number: number;
-}
+import { PageResponse } from '../../../models/page-response.model';
 
 export interface ProjectSearchParams {
   page: number;

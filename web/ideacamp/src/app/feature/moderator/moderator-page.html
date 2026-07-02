@@ -1,4 +1,4 @@
-<section class="min-h-screen grid place-items-center bg-gradient-to-b from-gray-50 to-white p-8">
+<section class="min-h-screen grid place-items-center bg-linear-to-b from-gray-50 to-white p-8">
   <div class="w-full max-w-xl rounded-3xl border border-gray-200 bg-white p-10 text-center shadow-xl">
     <div class="mx-auto mb-5 grid h-16 w-16 place-items-center rounded-full bg-indigo-100 text-3xl text-indigo-600">
       <i class="pi pi-shield"></i>
@@ -26,6 +26,41 @@
           </h2>
           <p class="text-sm text-gray-500">
             {{ 'MODERATOR.PROJECTS_LINK_DESCRIPTION' | translate }}
+          </p>
+        </div>
+        <i class="pi pi-chevron-right ml-auto text-gray-400"></i>
+      </a>
+      <a
+        routerLink="/moderator/users"
+        class="flex items-center gap-4 rounded-xl border border-gray-200 bg-gray-50 p-4 text-left transition hover:border-gray-300 hover:bg-gray-100"
+      >
+        <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100 text-lg text-blue-600">
+          <i class="pi pi-users"></i>
+        </div>
+        <div>
+          <h2 class="text-base font-semibold text-gray-900">
+            {{ 'MODERATOR.USERS_LINK_TITLE' | translate }}
+          </h2>
+          <p class="text-sm text-gray-500">
+            {{ 'MODERATOR.USERS_LINK_DESCRIPTION' | translate }}
+          </p>
+        </div>
+        <i class="pi pi-chevron-right ml-auto text-gray-400"></i>
+      </a>
+
+      <a
+        routerLink="/moderator/professor-requests"
+        class="flex items-center gap-4 rounded-xl border border-gray-200 bg-gray-50 p-4 text-left transition hover:border-gray-300 hover:bg-gray-100"
+      >
+        <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-emerald-100 text-lg text-emerald-600">
+          <i class="pi pi-graduation-cap"></i>
+        </div>
+        <div>
+          <h2 class="text-base font-semibold text-gray-900">
+            {{ 'MODERATOR.PROFESSOR_REQUESTS_LINK_TITLE' | translate }}
+          </h2>
+          <p class="text-sm text-gray-500">
+            {{ 'MODERATOR.PROFESSOR_REQUESTS_LINK_DESCRIPTION' | translate }}
           </p>
         </div>
         <i class="pi pi-chevron-right ml-auto text-gray-400"></i>

@@ -42,6 +42,13 @@
                 <span>{{ 'SIDEBAR.USER_MANAGEMENT' | translate }}</span>
               </app-menu-link>
             </a>
+
+            <a routerLink="/moderator/professor-requests" (click)="requestClose()">
+              <app-menu-link>
+                <i class="pi pi-graduation-cap text-sm text-zinc-400"></i>
+                <span>{{ 'SIDEBAR.PROFESSOR_REQUESTS' | translate }}</span>
+              </app-menu-link>
+            </a>
           } @else {
             <a routerLink="/search" (click)="requestClose()">
             <app-menu-link>
