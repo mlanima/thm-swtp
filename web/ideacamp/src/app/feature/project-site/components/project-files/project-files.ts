@@ -38,6 +38,7 @@ export class ProjectFiles implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['projectId'] && this.projectId) {
+      this.uploadVisibility.set('PUBLIC');
       this.loadFiles();
     }
   }
