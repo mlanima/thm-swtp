@@ -77,6 +77,9 @@ public class ProfessorRequestServiceTest {
     @Test
     void createProfessorRequest_shouldCreateRequest_whenUserExists() {
         when(userProfileRepository.findById(userId)).thenReturn(Optional.of(user));
+        
+        when(professorRequestRepository.existsByRequestingUserKeycloakIdAndStatusIn(eq(userId), any()))
+                .thenReturn(false);
 
         when(professorRequestRepository.save(any(ProfessorRequestEntity.class)))
                 .thenAnswer(invocation -> {
@@ -98,9 +101,6 @@ public class ProfessorRequestServiceTest {
         assertThat(result.getStatus()).isEqualTo(ProfessorRequestStatus.WAITING_EMAIL_VERIFICATION);
         assertThat(result.getVerificationTokenHash()).isNotBlank();
         assertThat(result.getVerificationExpiresAt()).isNotNull();
-
-        when(professorRequestRepository.existsByRequestingUserKeycloakIdAndStatusIn(eq(userId), any()))
-                .thenReturn(false);
 
         verify(professorRequestRepository).save(any(ProfessorRequestEntity.class));
         verify(eventPublisher).publishEvent(any(ProfessorRequestVerificationCreatedEvent.class));
