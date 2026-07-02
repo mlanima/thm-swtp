@@ -449,12 +449,16 @@
       "DROP_HINT": "Drop file here",
       "DOWNLOAD_FILE": "Download file",
       "DELETE_FILE": "Delete file",
+      "TOGGLE_VISIBILITY": "Change visibility",
+      "PUBLIC": "Public",
+      "PRIVATE": "Private",
       "ERROR_TYPE_NOT_ALLOWED": "File type not allowed. Allowed: PDF, PNG, JPG, DOCX, TXT, MD",
       "ERROR_FILE_TOO_LARGE": "File is too large. Maximum file size: 10 MB.",
       "ERROR_LOAD": "Files could not be loaded.",
       "ERROR_UPLOAD": "File could not be uploaded.",
       "ERROR_DELETE": "File could not be deleted.",
-      "ERROR_DOWNLOAD": "File could not be downloaded."
+      "ERROR_DOWNLOAD": "File could not be downloaded.",
+      "ERROR_UPDATE_VISIBILITY": "Visibility could not be updated."
     }
   },
   "JOIN_REQUEST": {

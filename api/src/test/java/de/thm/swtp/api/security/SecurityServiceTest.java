@@ -3,6 +3,8 @@ package de.thm.swtp.api.security;
 import de.thm.swtp.api.config.SecurityService;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
+import de.thm.swtp.api.projectFiles.domain.FileVisibility;
+import de.thm.swtp.api.projectFiles.repository.ProjectFileRepository;
 import de.thm.swtp.api.projectInvitation.repository.ProjectInviteRepository;
 import de.thm.swtp.api.projectJoinRequest.repository.ProjectJoinRequestRepository;
 import de.thm.swtp.api.projectPost.domain.ProjectPostStatus;
@@ -44,6 +46,8 @@ class SecurityServiceTest {
     private ProjectJoinRequestRepository projectJoinRequestRepository;
     @Mock
     private ProjectPostRepository projectPostRepository;
+    @Mock
+    private ProjectFileRepository projectFileRepository;
 
     @InjectMocks
     private SecurityService securityService;
@@ -178,6 +182,89 @@ class SecurityServiceTest {
                 projectId, authentication())).isTrue();
     }
 
+
+    @Test
+    void canViewProjectFiles_delegatesToCanViewProject() {
+        when(projectRepository.existsByIdAndIsPrivateProjectFalse(projectId)).thenReturn(true);
+
+        assertThat(securityService.canViewProjectFiles(projectId, authentication()))
+                .isTrue();
+    }
+
+    @Test
+    void canDownloadProjectFile_deniesWithoutProjectAccess() {
+        assertThat(securityService.canDownloadProjectFile(projectId, resourceId, authentication()))
+                .isFalse();
+        verifyNoInteractions(projectFileRepository);
+    }
+
+    @Test
+    void canDownloadProjectFile_deniesNullFileId() {
+        assertThat(securityService.canDownloadProjectFile(projectId, null, authentication()))
+                .isFalse();
+        verifyNoInteractions(projectFileRepository);
+    }
+
+    @Test
+    void canDownloadProjectFile_allowsAnyoneWithProjectAccess_forPublicFile() {
+        when(projectRepository.existsByIdAndIsPrivateProjectFalse(projectId)).thenReturn(true);
+        when(projectFileRepository.existsByIdAndProjectIdAndVisibility(resourceId, projectId, FileVisibility.PUBLIC))
+                .thenReturn(true);
+
+        assertThat(securityService.canDownloadProjectFile(projectId, resourceId, authentication()))
+                .isTrue();
+    }
+
+    @Test
+    void canDownloadProjectFile_deniesStranger_forPrivateFile() {
+        when(projectRepository.existsByIdAndIsPrivateProjectFalse(projectId)).thenReturn(true);
+        when(projectFileRepository.existsByIdAndProjectIdAndVisibility(resourceId, projectId, FileVisibility.PUBLIC))
+                .thenReturn(false);
+
+        assertThat(securityService.canDownloadProjectFile(projectId, resourceId, authentication()))
+                .isFalse();
+    }
+
+    @Test
+    void canDownloadProjectFile_allowsContributor_forPrivateFile() {
+        when(projectRepository.existsByIdAndMembersKeycloakId(projectId, userId)).thenReturn(true);
+        when(projectFileRepository.existsByIdAndProjectIdAndVisibility(resourceId, projectId, FileVisibility.PUBLIC))
+                .thenReturn(false);
+
+        assertThat(securityService.canDownloadProjectFile(projectId, resourceId, authentication()))
+                .isTrue();
+    }
+
+    @Test
+    void canDownloadProjectFile_deniesModerator_forPrivateFileWithoutMembership() {
+        when(projectFileRepository.existsByIdAndProjectIdAndVisibility(resourceId, projectId, FileVisibility.PUBLIC))
+                .thenReturn(false);
+
+        assertThat(securityService.canDownloadProjectFile(projectId, resourceId, authentication("ROLE_MODERATOR")))
+                .isFalse();
+    }
+
+    @Test
+    void canCreateProjectFile_allowsOwner() {
+        when(projectRepository.existsByIdAndOwnerKeycloakId(projectId, userId)).thenReturn(true);
+
+        assertThat(securityService.canCreateProjectFile(projectId, authentication()))
+                .isTrue();
+    }
+
+    @Test
+    void canEditProjectFile_allowsOwner() {
+        when(projectRepository.existsByIdAndOwnerKeycloakId(projectId, userId)).thenReturn(true);
+
+        assertThat(securityService.canEditProjectFile(projectId, authentication()))
+                .isTrue();
+    }
+
+    @Test
+    void canDeleteProjectFile_deniesNonOwner() {
+        assertThat(securityService.canDeleteProjectFile(projectId, authentication()))
+                .isFalse();
+    }
 
     @Test
     void canRespondToProjectInvite_checksInvitedUser() {

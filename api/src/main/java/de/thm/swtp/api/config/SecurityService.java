@@ -1,6 +1,8 @@
 package de.thm.swtp.api.config;
 
 import de.thm.swtp.api.project.ProjectRepository;
+import de.thm.swtp.api.projectFiles.domain.FileVisibility;
+import de.thm.swtp.api.projectFiles.repository.ProjectFileRepository;
 import de.thm.swtp.api.projectInvitation.repository.ProjectInviteRepository;
 import de.thm.swtp.api.projectJoinRequest.repository.ProjectJoinRequestRepository;
 import de.thm.swtp.api.projectPost.repository.ProjectPostRepository;
@@ -29,6 +31,7 @@ public class SecurityService {
     private final ProjectInviteRepository projectInviteRepository;
     private final ProjectJoinRequestRepository projectJoinRequestRepository;
     private final ProjectPostRepository projectPostRepository;
+    private final ProjectFileRepository projectFileRepository;
 
     // Project permissions
 
@@ -148,6 +151,39 @@ public class SecurityService {
 
     /** Allowed to delete project-links.*/
     public boolean canDeleteProjectLink(UUID projectId, Authentication authentication) {
+        return canEditProject(projectId, authentication);
+    }
+
+    // Project file permissions
+
+    /** Allowed to view project-files.*/
+    public boolean canViewProjectFiles(UUID projectId, Authentication authentication) {
+        return canViewProject(projectId, authentication);
+    }
+
+    /** Allowed to download a project-file. Private files are restricted to the project owner/members.*/
+    public boolean canDownloadProjectFile(UUID projectId, UUID fileId, Authentication authentication) {
+        if (!hasAuthenticationContext(projectId, authentication) || fileId == null || !canViewProject(projectId, authentication)) {
+            return false;
+        }
+        if (projectFileRepository.existsByIdAndProjectIdAndVisibility(fileId, projectId, FileVisibility.PUBLIC)) {
+            return true;
+        }
+        return isProjectContributor(projectId, authentication);
+    }
+
+    /** Allowed to upload project-files.*/
+    public boolean canCreateProjectFile(UUID projectId, Authentication authentication) {
+        return canEditProject(projectId, authentication);
+    }
+
+    /** Allowed to edit a project-file (e.g. its visibility).*/
+    public boolean canEditProjectFile(UUID projectId, Authentication authentication) {
+        return canEditProject(projectId, authentication);
+    }
+
+    /** Allowed to delete project-files.*/
+    public boolean canDeleteProjectFile(UUID projectId, Authentication authentication) {
         return canEditProject(projectId, authentication);
     }
 
