@@ -384,7 +384,20 @@
       "CONFIRM_TYPE_START": "Um diese Aktion zu bestätigen, tippe bitte",
       "CONFIRM_TYPE_END": "ein.",
       "DELETING": "Wird gelöscht…",
-      "ERROR_DELETE_PROJECT": "Projekt konnte nicht gelöscht werden."
+      "ERROR_DELETE_PROJECT": "Projekt konnte nicht gelöscht werden.",
+      "TRANSFER_TITLE": "Eigentümerschaft übertragen",
+      "TRANSFER_DESCRIPTION": "Übertrage dieses Projekt an ein anderes Mitglied. Du wirst danach ein normales Mitglied.",
+      "TRANSFER_BUTTON": "Eigentümerschaft übertragen",
+      "TRANSFER_MODAL_TITLE": "Projekteigentümerschaft übertragen",
+      "TRANSFER_MODAL_SUBTITLE": "Diese Aktion kann nicht rückgängig gemacht werden",
+      "TRANSFER_CONFIRM_INFO": "Du verlierst alle Eigentümerrechte und wirst ein normales Mitglied dieses Projekts.",
+      "TRANSFER_SELECT_LABEL": "Neuen Eigentümer auswählen",
+      "TRANSFER_NO_MEMBERS": "Keine Mitglieder vorhanden. Lade zuerst Mitglieder in das Projekt ein.",
+      "TRANSFER_LOADING": "Mitglieder werden geladen…",
+      "TRANSFER_CONFIRM": "Übertragung bestätigen",
+      "TRANSFERRING": "Wird übertragen…",
+      "TRANSFER_ERROR": "Eigentumsübertragung fehlgeschlagen. Bitte versuche es erneut.",
+      "TRANSFER_ERROR_LOAD": "Mitglieder konnten nicht geladen werden."
     }
   },
   "PROJECTSITE": {

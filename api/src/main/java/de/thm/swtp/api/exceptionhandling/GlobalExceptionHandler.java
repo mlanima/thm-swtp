@@ -373,6 +373,20 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(500, "Internal Server Error", ex.getMessage()));
     }
 
+    @ExceptionHandler(ProjectOwnerTransferToSelfException.class)
+    public ResponseEntity<ErrorResponse> handleProjectOwnerTransferToSelf(ProjectOwnerTransferToSelfException ex) {
+        log.warn("Unprocessable Entity (422): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(ErrorResponse.of(422, "Unprocessable Entity", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ProjectOwnerTransferToNonMemberException.class)
+    public ResponseEntity<ErrorResponse> handleProjectOwnerTransferToNonMember(ProjectOwnerTransferToNonMemberException ex) {
+        log.warn("Unprocessable Entity (422): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(ErrorResponse.of(422, "Unprocessable Entity", ex.getMessage()));
+    }
+
     // ── Framework exceptions: explicit handlers so the catch-all doesn't shadow them ─
 
     @ExceptionHandler(AccessDeniedException.class)
