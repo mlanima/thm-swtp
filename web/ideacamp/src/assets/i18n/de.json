@@ -187,6 +187,11 @@
         "BANNED_AT": "Gebannt am",
         "REASON": "Grund"
       },
+      "SORT": {
+        "ASC": "Aufsteigend sortiert",
+        "DESC": "Absteigend sortiert",
+        "NOT_SORTED": "Nicht sortiert"
+      },
       "ROLES": {
         "PROFESSOR": "Professor",
         "MEMBER": "Mitglied"
