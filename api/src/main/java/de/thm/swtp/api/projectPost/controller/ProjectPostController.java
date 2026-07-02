@@ -11,6 +11,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 import java.util.UUID;
@@ -72,6 +74,15 @@ public class ProjectPostController {
         return ProjectPostResponse.toResponse(
                 projectPostService.uploadPostImage(projectId, postId, image)
         );
+    }
+
+    @GetMapping("/{postId}/image")
+    @PreAuthorize("@security.canViewProject(#projectId, authentication)")
+    public ResponseEntity<Resource> getPostImage(
+            @PathVariable UUID projectId,
+            @PathVariable UUID postId
+    ) {
+        return projectPostService.getPostImage(projectId, postId);
     }
 
     private UUID getCurrentUserId(Jwt jwt){

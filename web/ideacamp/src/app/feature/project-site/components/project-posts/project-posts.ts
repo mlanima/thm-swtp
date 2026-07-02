@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnChanges, OnDestroy, SimpleChanges, inject, signal, ElementRef, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { finalize, of, switchMap } from 'rxjs';
+import { catchError, finalize, of, switchMap } from 'rxjs';
 import { ProjectPostResponse, ProjectResponse } from '../../../../models/project.model';
 import { ProjectService } from '../../project.service';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -43,6 +43,7 @@ export class ProjectPosts implements OnChanges, OnDestroy {
 
   selectedImage = signal<File | null>(null);
   imagePreviewUrl = signal<string | null>(null);
+  postImageUrls = signal<Record<string, string>>({});
 
   @ViewChild('postContentInput')
   postContentInput?: ElementRef<HTMLTextAreaElement>;
@@ -58,6 +59,7 @@ export class ProjectPosts implements OnChanges, OnDestroy {
 
   ngOnDestroy(): void {
     this.revokeImagePreviewUrl();
+    this.clearPostImageUrls();
   }
 
   get visiblePosts(): ProjectPostResponse[] {
@@ -74,8 +76,10 @@ export class ProjectPosts implements OnChanges, OnDestroy {
 
     this.projectService.getProjectPosts(this.project.id).subscribe({
       next: (posts) => {
+        this.clearPostImageUrls();
         this.posts.set(posts);
         this.visibleCount.set(3);
+        this.loadPostImages(posts);
         this.isLoading.set(false);
       },
       error: () => {
@@ -127,6 +131,14 @@ export class ProjectPosts implements OnChanges, OnDestroy {
           this.project.id,
           createdPost.id,
           image
+        ).pipe(
+          catchError(() => {
+            this.errorMessage.set(
+              this.translateService.instant('PROJECTPOSTS.ERRORS.IMAGE_UPLOAD')
+            );
+
+            return of(createdPost);
+          })
         );
       }),
       finalize(() => {
@@ -135,6 +147,11 @@ export class ProjectPosts implements OnChanges, OnDestroy {
     ).subscribe({
       next: (createdOrUpdatedPost) => {
         this.posts.update((posts) => [createdOrUpdatedPost, ...posts]);
+
+        if (createdOrUpdatedPost.imageUrl) {
+          this.loadPostImage(createdOrUpdatedPost);
+        }
+
         this.resetCreateForm();
         this.showCreateForm.set(false);
       },
@@ -286,5 +303,46 @@ export class ProjectPosts implements OnChanges, OnDestroy {
       URL.revokeObjectURL(previewUrl);
       this.imagePreviewUrl.set(null);
     }
+  }
+
+  private loadPostImages(posts: ProjectPostResponse[]): void {
+    posts
+      .filter((post) => !!post.imageUrl)
+      .forEach((post) => this.loadPostImage(post));
+  }
+
+  private loadPostImage(post: ProjectPostResponse): void {
+    this.projectService.getProjectPostImage(this.project.id, post.id).subscribe({
+      next: (blob) => {
+        const objectUrl = URL.createObjectURL(blob);
+
+        this.postImageUrls.update((urls) => {
+          const oldUrl = urls[post.id];
+
+          if (oldUrl) {
+            URL.revokeObjectURL(oldUrl);
+          }
+
+          return {
+            ...urls,
+            [post.id]: objectUrl,
+          };
+        });
+      },
+      error: () => {
+        this.postImageUrls.update((urls) => {
+          const { [post.id]: removed, ...remainingUrls } = urls;
+          return remainingUrls;
+        });
+      },
+    });
+  }
+
+  private clearPostImageUrls(): void {
+    Object.values(this.postImageUrls()).forEach((url) => {
+      URL.revokeObjectURL(url);
+    });
+
+    this.postImageUrls.set({});
   }
 }

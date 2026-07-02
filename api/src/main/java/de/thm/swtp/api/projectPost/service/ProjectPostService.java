@@ -20,6 +20,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+
+import org.apache.tika.Tika;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -39,6 +46,8 @@ public class ProjectPostService {
     private final ProjectRepository projectRepository;
     private final UserProfileRepository userProfileRepository;
 
+    private final Tika tika = new Tika();
+
     private static final long MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5 MB
 
     private static final Set<String> ALLOWED_IMAGE_TYPES = Set.of(
@@ -47,7 +56,8 @@ public class ProjectPostService {
             "image/webp"
     );
 
-    private static final Path POST_IMAGE_UPLOAD_DIR = Path.of("uploads/project-post-images");
+    @Value("${app.uploads.dir:uploads}")
+    private String uploadsDir;
 
     @Transactional(readOnly = true)
     public List<ProjectPost> getPublishedPostsForProject(UUID projectId) {
@@ -88,33 +98,78 @@ public class ProjectPostService {
         ProjectPostEntity postEntity = getPostOrThrowError(postId);
         assertPostBelongsToProject(postEntity, projectId);
 
-        validateImage(image);
+        validateImageSize(image);
 
-        String contentType = image.getContentType();
-        String fileExtension = getFileExtension(contentType);
+        String detectedContentType = detectImageContentType(image);
+        String fileExtension = getFileExtension(detectedContentType);
         String fileName = postId + "-" + UUID.randomUUID() + fileExtension;
 
+        Path uploadDir = getPostImageUploadDir();
+        Path targetPath = uploadDir.resolve(fileName).normalize();
+
+        String oldFileName = postEntity.getImageFileName();
+
         try {
-            Files.createDirectories(POST_IMAGE_UPLOAD_DIR);
+            Files.createDirectories(uploadDir);
 
-            Path targetPath = POST_IMAGE_UPLOAD_DIR.resolve(fileName).normalize();
-
-            if (!targetPath.startsWith(POST_IMAGE_UPLOAD_DIR)) {
+            if (!targetPath.startsWith(uploadDir.normalize())) {
                 throw new InvalidProjectPostException("Invalid image path.");
             }
 
             Files.copy(image.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
 
-            String imageUrl = "/uploads/project-post-images/" + fileName;
-            postEntity.setImageUrl(imageUrl);
+            postEntity.setImageFileName(fileName);
+            postEntity.setImageUrl("/api/v1/projects/" + projectId + "/posts/" + postId + "/image");
 
             ProjectPost post = ProjectPostMapper.toDomain(projectPostRepository.save(postEntity));
+
+            deletePostImageFileIfExists(oldFileName);
 
             TxLogger.afterCommit(log, "Image uploaded for post: project={}, post={}", projectId, postId);
 
             return post;
-        } catch (IOException e) {
+        } catch (Exception e) {
+            try {
+                Files.deleteIfExists(targetPath);
+            } catch (IOException deleteException) {
+                log.warn("Could not delete orphan post image after failed upload: {}", targetPath, deleteException);
+            }
+
             throw new InvalidProjectPostException("Could not store image.");
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public ResponseEntity<Resource> getPostImage(UUID projectId, UUID postId) {
+        ProjectPostEntity postEntity = getPostOrThrowError(postId);
+        assertPostBelongsToProject(postEntity, projectId);
+
+        String fileName = postEntity.getImageFileName();
+
+        if (fileName == null || fileName.isBlank()) {
+            throw new ProjectPostNotFoundException(postId);
+        }
+
+        Path uploadDir = getPostImageUploadDir();
+        Path imagePath = uploadDir.resolve(fileName).normalize();
+
+        if (!imagePath.startsWith(uploadDir.normalize()) || !Files.exists(imagePath)) {
+            throw new ProjectPostNotFoundException(postId);
+        }
+
+        try {
+            Resource resource = new UrlResource(imagePath.toUri());
+            String contentType = Files.probeContentType(imagePath);
+
+            if (contentType == null) {
+                contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
+            }
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .body(resource);
+        } catch (IOException e) {
+            throw new InvalidProjectPostException("Could not load image.");
         }
     }
 
@@ -163,7 +218,12 @@ public class ProjectPostService {
         ProjectPostEntity postEntity = getPostOrThrowError(postId);
         assertPostBelongsToProject(postEntity, projectId);
 
+        String imageFileName = postEntity.getImageFileName();
+
         projectPostRepository.delete(postEntity);
+
+        deletePostImageFileIfExists(imageFileName);
+
         TxLogger.afterCommit(log, "Post deleted: project={}, post={}", projectId, postId);
     }
 
@@ -201,7 +261,7 @@ public class ProjectPostService {
         }
     }
 
-    private void validateImage(MultipartFile image) {
+    private void validateImageSize(MultipartFile image) {
         if (image == null || image.isEmpty()) {
             throw new InvalidProjectPostException("Image must not be empty.");
         }
@@ -209,11 +269,19 @@ public class ProjectPostService {
         if (image.getSize() > MAX_IMAGE_SIZE) {
             throw new InvalidProjectPostException("Image must not be larger than 5 MB.");
         }
+    }
 
-        String contentType = image.getContentType();
+    private String detectImageContentType(MultipartFile image) {
+        try {
+            String detectedContentType = tika.detect(image.getInputStream());
 
-        if (contentType == null || !ALLOWED_IMAGE_TYPES.contains(contentType)) {
-            throw new InvalidProjectPostException("Only JPEG, PNG and WEBP images are allowed.");
+            if (!ALLOWED_IMAGE_TYPES.contains(detectedContentType)) {
+                throw new InvalidProjectPostException("Only JPEG, PNG and WEBP images are allowed.");
+            }
+
+            return detectedContentType;
+        } catch (IOException e) {
+            throw new InvalidProjectPostException("Could not validate image.");
         }
     }
 
@@ -232,5 +300,28 @@ public class ProjectPostService {
         }
     }
 
+    private Path getPostImageUploadDir() {
+        return Path.of(uploadsDir, "project-post-images");
+    }
+
+    private void deletePostImageFileIfExists(String fileName) {
+        if (fileName == null || fileName.isBlank()) {
+            return;
+        }
+
+        Path uploadDir = getPostImageUploadDir();
+        Path imagePath = uploadDir.resolve(fileName).normalize();
+
+        if (!imagePath.startsWith(uploadDir.normalize())) {
+            log.warn("Skipped deleting post image outside upload directory: {}", imagePath);
+            return;
+        }
+
+        try {
+            Files.deleteIfExists(imagePath);
+        } catch (IOException e) {
+            log.warn("Could not delete post image file: {}", fileName, e);
+        }
+    }
 
 }
