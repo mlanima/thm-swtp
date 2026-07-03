@@ -15,8 +15,6 @@ import { UserProfileService } from '../../../services/user-profile.service';
 })
 
 /** Third step of the thesis creation wizard.
- * Reuses the {@link ProjectInviteMember} shape for the selected students,
- * since students are added to a thesis after creation via a separate endpoint.
  */
 export class ThesisStudentsForm implements OnChanges {
   private readonly userProfileService = inject(UserProfileService);
