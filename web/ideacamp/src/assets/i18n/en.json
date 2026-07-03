@@ -350,6 +350,8 @@
     "THESIS_URL_CHECK_ERROR": "Thesis URL could not be checked.",
     "SUCCESS_CREATED": "Thesis created successfully!",
     "SUCCESS_CREATED_WITH_STUDENTS": "Thesis created successfully and students added!",
+    "SUCCESS_CREATED_STUDENTS_PARTIAL": "Thesis created successfully. Some students could not be added.",
+    "SUCCESS_CREATED_STUDENTS_FAILED": "Thesis created successfully. The students could not be added.",
     "ERROR_CREATE_THESIS": "Thesis could not be created. Please try again.",
     "VALIDATION": {
       "TITLE_MIN": "Title must be at least 3 characters long.",

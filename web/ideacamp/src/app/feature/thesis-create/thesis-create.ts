@@ -1,8 +1,8 @@
 import { Component, HostListener, ViewChild, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import {z} from 'zod';
-import {forkJoin, of} from 'rxjs';
-import {catchError} from 'rxjs/operators';
+import {forkJoin, Observable, of} from 'rxjs';
+import {catchError, map} from 'rxjs/operators';
 import {WizardLayout} from '../project-create/wizard-layout/wizard-layout';
 import {Stepper} from '../project-create/stepper/stepper';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -153,14 +153,13 @@ export class ThesisCreate {
       tags: [],
     }).subscribe({
       next: (thesis) => {
-        this.addInvitedStudents(thesis.id);
-        this.isLoading = false;
-        this.successMessage = this.translateService.instant(
-          this.invitedStudents.length > 0 ? 'THESISCREATE.SUCCESS_CREATED_WITH_STUDENTS' : 'THESISCREATE.SUCCESS_CREATED',
-        );
-        setTimeout(() => {
-          this.router.navigate(['/thesis', thesis.thesisUrl]);
-        }, 1500);
+        this.addInvitedStudents(thesis.id).subscribe((failedCount) => {
+          this.isLoading = false;
+          this.successMessage = this.translateService.instant(this.resolveSuccessMessageKey(failedCount));
+          setTimeout(() => {
+            this.router.navigate(['/thesis', thesis.thesisUrl]);
+          }, 1500);
+        });
       },
       error: () => {
         this.isLoading = false;
@@ -168,16 +167,32 @@ export class ThesisCreate {
       },
     });
   }
-
-  private addInvitedStudents(thesisId: string) {
+  
+  private addInvitedStudents(thesisId: string): Observable<number> {
     if (this.invitedStudents.length === 0) {
-      return;
+      return of(0);
     }
 
-    forkJoin(
+    return forkJoin(
       this.invitedStudents.map((student) =>
-        this.thesisSettingsService.addStudent(thesisId, student.keycloakId).pipe(catchError(() => of(null))),
+        this.thesisSettingsService.addStudent(thesisId, student.keycloakId).pipe(
+          map(() => true),
+          catchError(() => of(false)),
+        ),
       ),
-    ).subscribe();
+    ).pipe(map((results) => results.filter((succeeded) => !succeeded).length));
+  }
+
+  private resolveSuccessMessageKey(failedStudentCount: number): string {
+    if (this.invitedStudents.length === 0) {
+      return 'THESISCREATE.SUCCESS_CREATED';
+    }
+    if (failedStudentCount === 0) {
+      return 'THESISCREATE.SUCCESS_CREATED_WITH_STUDENTS';
+    }
+    if (failedStudentCount === this.invitedStudents.length) {
+      return 'THESISCREATE.SUCCESS_CREATED_STUDENTS_FAILED';
+    }
+    return 'THESISCREATE.SUCCESS_CREATED_STUDENTS_PARTIAL';
   }
 }

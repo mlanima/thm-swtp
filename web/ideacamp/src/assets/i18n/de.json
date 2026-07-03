@@ -350,6 +350,8 @@
     "THESIS_URL_CHECK_ERROR": "Abschlussarbeit-URL konnte nicht geprüft werden.",
     "SUCCESS_CREATED": "Abschlussarbeit erfolgreich erstellt!",
     "SUCCESS_CREATED_WITH_STUDENTS": "Abschlussarbeit erfolgreich erstellt und Studierende hinzugefügt!",
+    "SUCCESS_CREATED_STUDENTS_PARTIAL": "Abschlussarbeit erfolgreich erstellt. Einige Studierende konnten nicht hinzugefügt werden.",
+    "SUCCESS_CREATED_STUDENTS_FAILED": "Abschlussarbeit erfolgreich erstellt. Die Studierenden konnten nicht hinzugefügt werden.",
     "ERROR_CREATE_THESIS": "Abschlussarbeit konnte nicht erstellt werden. Bitte versuche es erneut.",
     "VALIDATION": {
       "TITLE_MIN": "Titel muss mindestens 3 Zeichen lang sein.",
