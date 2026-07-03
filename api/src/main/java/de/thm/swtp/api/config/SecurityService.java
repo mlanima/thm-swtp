@@ -344,6 +344,26 @@ public class SecurityService {
         return userProfileRepository.existsByKeycloakIdAndStatus(userId, UserStatus.BANNED);
     }
 
+    // Reporting permissions
+
+    /** Allowed to create reports.*/
+    public boolean canCreateReport(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return false;
+        }
+        return isRegularUser(authentication);
+    }
+
+    /** Allowed to see submitted reports.*/
+    public boolean canViewReports(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return false;
+        }
+        return hasModeratorRole(authentication);
+    }
+
+
+
 
 
     // Authorization checks
