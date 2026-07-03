@@ -114,7 +114,8 @@
     "FOLLOW": "Follow",
     "FOLLOWING": "Following",
     "UNFOLLOW": "Unfollow",
-    "INVITE": "Invite"
+    "INVITE": "Invite",
+    "PROFESSOR_BADGE": "Professor"
   },
   "CONTACT-REQUESTS": {
     "CONTACT": "Contact Requests",
