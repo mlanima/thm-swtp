@@ -15,6 +15,7 @@ import de.thm.swtp.api.projectPost.repository.ProjectPostRepository;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
+import de.thm.swtp.api.auditlog.AuditLogService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,7 @@ public class ProjectPostService {
     private final ProjectPostRepository projectPostRepository;
     private final ProjectRepository projectRepository;
     private final UserProfileRepository userProfileRepository;
-
+    private final AuditLogService auditLogService;
 
 
     @Transactional(readOnly = true)
@@ -109,9 +110,20 @@ public class ProjectPostService {
     }
 
     @Transactional
-    public void deleteProjectPost(UUID projectId, UUID postId) {
+    public void deleteProjectPost(UUID projectId, UUID postId, UUID actorUserId) {
         ProjectPostEntity postEntity = getPostOrThrowError(postId);
         assertPostBelongsToProject(postEntity, projectId);
+
+        String postTitle = postEntity.getTitle();
+        String projectName = postEntity.getProject().getName();
+
+        auditLogService.logProjectPostDeleted(
+                actorUserId,
+                postId,
+                postTitle,
+                projectId,
+                projectName
+        );
 
         projectPostRepository.delete(postEntity);
         TxLogger.afterCommit(log, "Post deleted: project={}, post={}", projectId, postId);

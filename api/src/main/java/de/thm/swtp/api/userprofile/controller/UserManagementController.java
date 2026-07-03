@@ -13,6 +13,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -37,15 +39,17 @@ public class UserManagementController {
 
     @PatchMapping("/{userId}/ban")
     @PreAuthorize("@security.canBanUser(#userId, authentication)")
-    public ManagedUserResponse banUser(@PathVariable UUID userId, @Valid @RequestBody(required = false) BanUserRequest banUserRequest) {
+    public ManagedUserResponse banUser(@PathVariable UUID userId, @AuthenticationPrincipal Jwt jwt, @Valid @RequestBody(required = false) BanUserRequest banUserRequest) {
+        UUID actorUserId = UUID.fromString(jwt.getSubject());
         String banReason = banUserRequest == null ? null : banUserRequest.reason();
-        return managedUserMapper.toResponse(userProfileService.banUser(userId, banReason));
+        return managedUserMapper.toResponse(userProfileService.banUser(userId, banReason, actorUserId));
     }
 
     @PatchMapping("/{userId}/unban")
     @PreAuthorize("@security.canUnbanUser(#userId, authentication)")
-    public ManagedUserResponse unbanUser(@PathVariable UUID userId){
-        return managedUserMapper.toResponse(userProfileService.unbanUser(userId));
+    public ManagedUserResponse unbanUser(@PathVariable UUID userId, @AuthenticationPrincipal Jwt jwt){
+        UUID actorUserId = UUID.fromString(jwt.getSubject());
+        return managedUserMapper.toResponse(userProfileService.unbanUser(userId, actorUserId));
     }
 
 }

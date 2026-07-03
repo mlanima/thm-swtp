@@ -241,6 +241,44 @@
       "CONFIRM": "Confirm",
       "SHOWING_OF": "From",
       "TOTAL_REQUESTS": "Requests shown"
+    },
+    "AUDIT_LOGS_LINK_TITLE": "Audit logs",
+    "AUDIT_LOGS_LINK_DESCRIPTION": "Track who performed critical actions.",
+    "AUDIT_LOGS": {
+      "TITLE": "Audit logs",
+      "SUBTITLE": "Track who managed projects, posts, users, and professor requests.",
+      "LOADING": "Loading audit logs …",
+      "ERROR_LOAD": "Audit logs could not be loaded.",
+      "NO_RESULTS": "No audit logs available.",
+      "COLUMN_TIME": "Time",
+      "COLUMN_ACTION": "Action",
+      "COLUMN_ACTOR": "Performed by",
+      "COLUMN_TARGET": "Target",
+      "COLUMN_DETAILS": "Details",
+      "SHOWING_OF": "of",
+      "TOTAL_LOGS": "logs displayed",
+      "ACTIONS": {
+        "PROJECT_DELETED": "Project deleted",
+        "PROJECT_POST_DELETED": "Project post deleted",
+        "USER_BANNED": "User banned",
+        "USER_UNBANNED": "User unbanned",
+        "PROFESSOR_REQUEST_ACCEPTED": "Professor request accepted",
+        "PROFESSOR_REQUEST_REJECTED": "Professor request rejected"
+      },
+      "TARGET_TYPES": {
+        "PROJECT": "Project",
+        "PROJECT_POST": "Project post",
+        "USER": "User",
+        "PROFESSOR_REQUEST": "Professor request"
+      },
+      "DETAILS": {
+        "PROJECT_DELETED": "Project was deleted.",
+        "PROJECT_POST_DELETED": "Project post was deleted.",
+        "USER_BANNED": "User was banned.",
+        "USER_UNBANNED": "User was unbanned.",
+        "PROFESSOR_REQUEST_ACCEPTED": "Professor request was accepted.",
+        "PROFESSOR_REQUEST_REJECTED": "Professor request was rejected."
+      }
     }
   },
   "SIDEBAR": {

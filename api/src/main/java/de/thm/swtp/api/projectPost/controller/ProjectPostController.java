@@ -44,8 +44,9 @@ public class ProjectPostController {
     @DeleteMapping("/{postId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("@security.canDeleteProjectPost(#projectId, #postId, authentication)")
-    public void deletePost(@PathVariable UUID projectId, @PathVariable UUID postId) {
-        projectPostService.deleteProjectPost(projectId, postId);
+    public void deletePost(@PathVariable UUID projectId, @PathVariable UUID postId, @AuthenticationPrincipal Jwt jwt) {
+        UUID actorUserId = getCurrentUserId(jwt);
+        projectPostService.deleteProjectPost(projectId, postId, actorUserId);
     }
 
     @PatchMapping("/{postId}/publish")

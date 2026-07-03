@@ -42,8 +42,9 @@ public class ProjectController {
 
     @DeleteMapping("/{projectId}")
     @PreAuthorize("@security.canDeleteProject(#projectId, authentication)")
-    public ResponseEntity<DeleteProjectResponse> deleteProject(@PathVariable UUID projectId) {
-        DeleteProjectResponse response = projectService.deleteProject(projectId);
+    public ResponseEntity<DeleteProjectResponse> deleteProject(@PathVariable UUID projectId, @AuthenticationPrincipal Jwt jwt) {
+        UUID actorUserId = UUID.fromString(jwt.getSubject());
+        DeleteProjectResponse response = projectService.deleteProject(projectId, actorUserId);
         return ResponseEntity.ok(response);
     }
 

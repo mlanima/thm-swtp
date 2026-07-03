@@ -16,6 +16,8 @@ import de.thm.swtp.api.projectView.entity.ProjectViewEntity;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import de.thm.swtp.api.projectView.repository.ProjectViewRepository;
+import de.thm.swtp.api.auditlog.AuditLogService;
+import de.thm.swtp.api.auditlog.AuditActor;
 
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +42,7 @@ public class ProjectService {
     private static final String PROJECT_CREATION_INVITE_MESSAGE = "You have been invited to join this project.";
     private final ProjectFavoriteRepository projectFavoriteRepository;
     private final ProjectViewRepository projectViewRepository;
+    private final AuditLogService auditLogService;
 
     private ProjectResponse toResponse(ProjectEntity project) {
         Set<UUID> memberIds = project.getMembers().stream()
@@ -147,7 +150,7 @@ public class ProjectService {
     }
 
     @Transactional
-    public DeleteProjectResponse deleteProject(UUID projectId) {
+    public DeleteProjectResponse deleteProject(UUID projectId, AuditActor actor) {
 
         ProjectEntity project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ExceptionProjectNotFound(projectId));
@@ -156,13 +159,17 @@ public class ProjectService {
             throw new ExceptionProjectAlreadyDeleted(projectId);
         }
 
+        String projectName = project.getName();
+
+        auditLogService.logProjectDeleted(actor, projectId, projectName);
+
         projectFavoriteRepository.deleteByProjectId(projectId);
         projectViewRepository.deleteByProjectId(projectId);
         projectInviteRepository.deleteByProjectId(projectId);
         projectJoinRequestRepository.deleteByProjectId(projectId);
         projectRepository.delete(project);
 
-        TxLogger.afterCommit(log, "Project deleted: project={}", projectId);
+        TxLogger.afterCommit(log, "Project deleted: project={}", projectId, actor.userId());
         return DeleteProjectResponse.builder()
                 .projectId(projectId)
                 .message("Projekt erfolgreich gelöscht.")

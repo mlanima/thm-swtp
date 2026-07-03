@@ -14,6 +14,7 @@ import de.thm.swtp.api.professorRequest.repository.ProfessorRequestRepository;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
+import de.thm.swtp.api.auditlog.AuditLogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -37,6 +38,7 @@ public class ProfessorRequestService {
     private final UserProfileRepository userProfileRepository;
     private final ProfessorRequestProperties professorRequestProperties;
     private final ApplicationEventPublisher eventPublisher;
+    private final AuditLogService auditLogService;
 
     /**
      * Creates a new professor-rights request with status WAITING_EMAIL_VERIFICATION for the given user.
@@ -125,7 +127,7 @@ public class ProfessorRequestService {
      * Accepts a professor-rights request by setting its status to ACCEPTED and granting the professor role.
      */
     @Transactional
-    public ProfessorRequest acceptProfessorRequest(UUID requestId) {
+    public ProfessorRequest acceptProfessorRequest(UUID requestId, UUID actorUserId) {
         ProfessorRequestEntity entity = professorRequestRepository.findById(requestId)
                 .orElseThrow(() -> new ProfessorRequestNotFoundException(requestId));
 
@@ -138,6 +140,14 @@ public class ProfessorRequestService {
         entity.setVerificationTokenHash(null);
         entity.getRequestingUser().setProfessor(true); // Grant professor role to the user
         ProfessorRequestEntity saved = professorRequestRepository.save(entity);
+
+        auditLogService.logProfessorRequestAccepted(
+                actorUserId,
+                requestId,
+                saved.getRequestingUser().getUsername(),
+                saved.getEmail()
+        );
+
         return ProfessorRequestMapper.toDomain(saved);
     }
 
@@ -145,7 +155,7 @@ public class ProfessorRequestService {
      * Rejects a professor-rights request by setting its status to REJECTED.
      */
     @Transactional
-    public ProfessorRequest rejectProfessorRequest(UUID requestId) {
+    public ProfessorRequest rejectProfessorRequest(UUID requestId, UUID actorUserId) {
         ProfessorRequestEntity entity = professorRequestRepository.findById(requestId)
                 .orElseThrow(() -> new ProfessorRequestNotFoundException(requestId));
 
@@ -157,6 +167,14 @@ public class ProfessorRequestService {
         entity.setStatus(ProfessorRequestStatus.REJECTED);
         entity.setVerificationTokenHash(null);
         ProfessorRequestEntity saved = professorRequestRepository.save(entity);
+
+        auditLogService.logProfessorRequestRejected(
+                actorUserId,
+                requestId,
+                saved.getRequestingUser().getUsername(),
+                saved.getEmail()
+        );
+
         return ProfessorRequestMapper.toDomain(saved);
     }
 

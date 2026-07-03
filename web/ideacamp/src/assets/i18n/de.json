@@ -241,6 +241,44 @@
       "CONFIRM": "Bestätigen",
       "SHOWING_OF": "von",
       "TOTAL_REQUESTS": "Anfragen angezeigt"
+    },
+    "AUDIT_LOGS_LINK_TITLE": "Audit Logs",
+    "AUDIT_LOGS_LINK_DESCRIPTION": "Nachvollziehen, wer kritische Aktionen durchgeführt hat.",
+    "AUDIT_LOGS": {
+      "TITLE": "Audit Logs",
+      "SUBTITLE": "Nachvollziehen, wer Projekte, Posts, Nutzer und Professor-Anfragen verwaltet hat.",
+      "LOADING": "Audit Logs werden geladen …",
+      "ERROR_LOAD": "Audit Logs konnten nicht geladen werden.",
+      "NO_RESULTS": "Keine Audit Logs vorhanden.",
+      "COLUMN_TIME": "Zeitpunkt",
+      "COLUMN_ACTION": "Aktion",
+      "COLUMN_ACTOR": "Ausgeführt von",
+      "COLUMN_TARGET": "Ziel",
+      "COLUMN_DETAILS": "Details",
+      "SHOWING_OF": "von",
+      "TOTAL_LOGS": "Logs angezeigt",
+      "ACTIONS": {
+        "PROJECT_DELETED": "Projekt gelöscht",
+        "PROJECT_POST_DELETED": "Projektpost gelöscht",
+        "USER_BANNED": "Nutzer gebannt",
+        "USER_UNBANNED": "Nutzer entbannt",
+        "PROFESSOR_REQUEST_ACCEPTED": "Professor-Anfrage angenommen",
+        "PROFESSOR_REQUEST_REJECTED": "Professor-Anfrage abgelehnt"
+      },
+      "TARGET_TYPES": {
+        "PROJECT": "Projekt",
+        "PROJECT_POST": "Projektpost",
+        "USER": "Nutzer",
+        "PROFESSOR_REQUEST": "Professor-Anfrage"
+      },
+      "DETAILS": {
+        "PROJECT_DELETED": "Projekt wurde gelöscht.",
+        "PROJECT_POST_DELETED": "Projektpost wurde gelöscht.",
+        "USER_BANNED": "Nutzer wurde gebannt.",
+        "USER_UNBANNED": "Nutzer wurde entbannt.",
+        "PROFESSOR_REQUEST_ACCEPTED": "Professor-Anfrage wurde angenommen.",
+        "PROFESSOR_REQUEST_REJECTED": "Professor-Anfrage wurde abgelehnt."
+      }
     }
   },
   "SIDEBAR": {
