@@ -13,6 +13,7 @@ import { MyProjectsPage } from './feature/my-projects/pages/my-projects-page/my-
 import { ProjectSettings } from './feature/project-settings/project-settings';
 import { ThesisSite } from './feature/thesis-site/thesis-site';
 import { ThesisSettings } from './feature/thesis-settings/thesis-settings';
+import { ThesisCreate } from './feature/thesis-create/thesis-create';
 import { FavoritesPage } from './feature/favorites/pages/favorites-page/favorites-page';
 import { LandingPage } from './feature/landing-page/pages/landing-page/landing-page';
 import { UserSettings } from './feature/user-settings/user-settings';
@@ -37,6 +38,7 @@ export const routes: Routes = [
   {path: 'thesis/:thesisUrl/settings', component: ThesisSettings, canActivate: [authGuard]},
   {path: 'search', component: SearchPage, canActivate: [authGuard]},
   {path: 'createProject', component: ProjectCreate, canActivate: [authGuard]},
+  {path: 'createThesis', component: ThesisCreate, canActivate: [authGuard]},
   {path: 'my-projects', component: MyProjectsPage, canActivate: [authGuard]},
   {path: 'favorites', component: FavoritesPage, canActivate: [authGuard]},
   {path: 'settings', component: UserSettings, canActivate: [authGuard]},

@@ -22,6 +22,11 @@ export const serverRoutes: ServerRoute[] = [
   },
 
   {
+    path: 'createThesis',
+    renderMode: RenderMode.Client,
+  },
+
+  {
     path: 'project/:id',
     renderMode: RenderMode.Client,
   },
