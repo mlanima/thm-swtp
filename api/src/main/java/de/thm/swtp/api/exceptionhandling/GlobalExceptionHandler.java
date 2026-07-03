@@ -387,6 +387,28 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(422, "Unprocessable Entity", ex.getMessage()));
     }
 
+    @ExceptionHandler(InvalidProfessorEmailDomainException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidProfessorEmailDomain(InvalidProfessorEmailDomainException ex) {
+        log.debug("Bad Request (400): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ReportTargetNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleReportTargetNotFound(ReportTargetNotFoundException ex) {
+        log.debug("Not Found (404): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidReportSortFieldException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidReportSortField(InvalidReportSortFieldException ex) {
+        log.debug("Bad Request (400): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
+    }
+
+
     // ── Framework exceptions: explicit handlers so the catch-all doesn't shadow them ─
 
     @ExceptionHandler(AccessDeniedException.class)
@@ -448,10 +470,4 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(500, "Internal Server Error", "An unexpected error occurred."));
     }
 
-    @ExceptionHandler(InvalidProfessorEmailDomainException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidProfessorEmailDomain(InvalidProfessorEmailDomainException ex) {
-        log.debug("Bad Request (400): {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
-    }
 }
