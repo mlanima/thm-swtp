@@ -1,13 +1,13 @@
 package de.thm.swtp.api.moderation;
 
 import de.thm.swtp.api.common.LogSafe;
-import de.thm.swtp.api.moderation.exception.ContentModerationException;
 import de.thm.swtp.api.moderation.exception.ContentNotValidException;
 import de.thm.swtp.api.moderation.exception.ModerationApiException;
 import de.thm.swtp.api.tag.validation.BlocklistService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
@@ -21,20 +21,34 @@ public class ContentModerationService {
 
     private final ModerationClient moderationClient;
     private final BlocklistService blocklistService;
-    private final boolean blocklistFallback;
+    private final Cache cache;
 
     public ContentModerationService(
             final ModerationClient moderationClient,
             final BlocklistService blocklistService,
+            final CacheManager cacheManager,
             @Value("${app.content-moderation.blocklist-fallback:true}") final boolean blocklistFallback) {
         this.moderationClient = moderationClient;
         this.blocklistService = blocklistService;
-        this.blocklistFallback = blocklistFallback;
+        this.cache = cacheManager.getCache("content-moderation");
     }
 
-    @Cacheable(value = "content-moderation", key = "#hash(content)")
     public boolean isContentAppropriate(final String content) {
-        log.debug("Cache miss for content moderation — querying OpenAI");
+        var key = hash(content);
+        var cached = cache != null ? cache.get(key, Boolean.class) : null;
+        if (cached != null) {
+            log.info("Cache hit for content moderation");
+            return cached;
+        }
+        log.info("Cache miss for content moderation — querying OpenAI");
+        var result = checkContent(content);
+        if (cache != null) {
+            cache.put(key, result);
+        }
+        return result;
+    }
+
+    private boolean checkContent(final String content) {
         try {
             return !moderationClient.isFlagged(content);
         } catch (ModerationApiException e) {
