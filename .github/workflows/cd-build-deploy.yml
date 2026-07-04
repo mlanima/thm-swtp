@@ -83,6 +83,8 @@ jobs:
           push: true
           build-args: |
             API_URL=${{ github.ref_name == 'main' && 'https://api.swtp-ss26.de/api' || 'https://api.dev.swtp-ss26.de/api' }}
+          secrets: |
+            google-api-key=${{ secrets.GOOGLE_API_KEY }}
           tags: |
             ghcr.io/${{ needs.namespace.outputs.namespace }}/swtp-web:${{ github.ref_name == 'main' && 'latest' || 'dev' }}
             ghcr.io/${{ needs.namespace.outputs.namespace }}/swtp-web:${{ github.run_number }}

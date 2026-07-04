@@ -2,11 +2,12 @@
 FROM node:24-alpine AS builder
 WORKDIR /app
 ARG API_URL=https://api.swtp-ss26.de/api
-ARG GOOGLE_API_KEY
 COPY package.json package-lock.json ./
 RUN npm ci --ignore-scripts
 COPY . .
-RUN sed -i "s|__API_URL__|${API_URL}|g" src/app/enviroments/enviroment.prod.ts && \
+RUN --mount=type=secret,id=google-api-key \
+    GOOGLE_API_KEY=$(cat /run/secrets/google-api-key); \
+    sed -i "s|__API_URL__|${API_URL}|g" src/app/enviroments/enviroment.prod.ts; \
     sed -i "s|__GOOGLE_API_KEY__|${GOOGLE_API_KEY}|g" src/app/enviroments/enviroment.prod.ts
 RUN npm run build -- --configuration=production
 
