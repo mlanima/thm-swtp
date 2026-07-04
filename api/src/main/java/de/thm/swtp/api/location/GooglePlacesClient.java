@@ -55,9 +55,9 @@ public class GooglePlacesClient {
             throw new GooglePlacesApiException("Failed to parse Google Places response");
         }
 
-        var status = node.path("status").asText();
+        var status = node.path("status").asString();
         if (!"OK".equals(status)) {
-            var errorMsg = node.path("error_message").asText("");
+            var errorMsg = node.path("error_message").asString("");
             log.warn("Google Places API returned status '{}' for placeId={}: {}", status, placeId, errorMsg);
             throw new InvalidPlaceException("Invalid place: " + placeId);
         }
@@ -68,7 +68,7 @@ public class GooglePlacesClient {
         var city = findComponent(addressComponents, "locality", "postal_town");
         var country = findComponent(addressComponents, "country");
 
-        var locationName = city != null ? city : result.path("formatted_address").asText();
+        var locationName = city != null ? city : result.path("formatted_address").asString();
         if (country != null) {
             locationName = locationName + ", " + country;
         }
@@ -80,9 +80,9 @@ public class GooglePlacesClient {
     private static String findComponent(final JsonNode components, final String... targetTypes) {
         return StreamSupport.stream(components.spliterator(), false)
                 .filter(c -> StreamSupport.stream(c.path("types").spliterator(), false)
-                        .map(t -> t.asText())
+                        .map(t -> t.asString())
                         .anyMatch(t -> Stream.of(targetTypes).anyMatch(t::equals)))
-                .map(c -> c.path("long_name").asText())
+                .map(c -> c.path("long_name").asString())
                 .findFirst()
                 .orElse(null);
     }
