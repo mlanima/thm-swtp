@@ -19,6 +19,7 @@ import { ProjectsComponent } from './feature/moderator/projects/projects.compone
 import { UserManagement } from './feature/moderator/user-management/pages/user-management';
 import { BannedAccount } from './feature/banned-account/pages/banned-account';
 import { ProfessorRequestComponent } from './feature/moderator/professor-request/professor-request.component';
+import { ReportManagement } from './feature/moderator/reports/pages/report-management';
 
 export const routes: Routes = [
   {path: '', redirectTo: 'landing', pathMatch: 'full' },
@@ -40,4 +41,5 @@ export const routes: Routes = [
   {path: 'moderator/users', component: UserManagement, canActivate: [moderatorGuard]},
   {path: 'account-banned', component: BannedAccount, canActivate: [bannedAccountGuard]},
   {path: 'moderator/professor-requests', component: ProfessorRequestComponent, canActivate: [moderatorGuard]},
+  {path: 'moderator/reports', component: ReportManagement, canActivate: [moderatorGuard]},
 ];
