@@ -1,17 +1,19 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges, inject, signal } from '@angular/core';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslateService } from '@ngx-translate/core';
 import { EditableTagListComponent } from '../../../../shared/tags/tag-list/editable-tag-list.component';
+import { ToastService } from '../../../../shared/toast/toast.service';
 import { UserProfileTagService, TagResponse } from '../../services/user-profile-tag.service'
 
 @Component({
   selector: 'app-profile-tag-list',
   standalone: true,
-  imports: [EditableTagListComponent, TranslatePipe],
+  imports: [EditableTagListComponent],
   templateUrl: './profile-tag-list.component.html',
 })
 export class ProfileTagListComponent implements OnInit, OnChanges {
   private readonly userProfileTagService = inject(UserProfileTagService);
   private readonly translateService = inject(TranslateService);
+  private readonly toastService = inject(ToastService);
 
   @Input({ required: true }) username?: string;
   @Input() isOwner = false;
@@ -20,7 +22,6 @@ export class ProfileTagListComponent implements OnInit, OnChanges {
   isLoading = signal(false);
   isSaving = signal(false);
   isDeleting = signal(false);
-  errorMessage = signal<string | null>(null);
 
   ngOnInit(): void {
     this.loadTags();
@@ -41,7 +42,6 @@ export class ProfileTagListComponent implements OnInit, OnChanges {
     }
 
     this.isSaving.set(true);
-    this.errorMessage.set(null);
 
     this.userProfileTagService.addTag(username, { name: cleanedName }).subscribe({
       next: (tag) => {
@@ -49,10 +49,7 @@ export class ProfileTagListComponent implements OnInit, OnChanges {
         const existing = this.tags().some((item) => item.name.toLowerCase() === lower);
 
         if (existing) {
-          this.errorMessage.set(this.translateService.instant('PROJECTSITE.TAGS.ERROR_DUPLICATE'));
-          setTimeout(() => {
-            this.errorMessage.set(null);
-          }, 3000);
+          this.toastService.warning(this.translateService.instant('PROJECTSITE.TAGS.ERROR_DUPLICATE'));
         }
 
         if (!existing) {
@@ -64,17 +61,14 @@ export class ProfileTagListComponent implements OnInit, OnChanges {
       error: (err) => {
         const apiError = err.error as { errorCode?: string };
         if (err.status === 400 && apiError?.errorCode === 'TAG_NOT_VALID') {
-          this.errorMessage.set(
+          this.toastService.error(
             this.translateService.instant('PROJECTSITE.TAGS.ERROR_NOT_VALID', { name: cleanedName })
           );
         } else if (err.status === 502) {
-          this.errorMessage.set(this.translateService.instant('PROJECTSITE.TAGS.ERROR_VALIDATION'));
+          this.toastService.error(this.translateService.instant('PROJECTSITE.TAGS.ERROR_VALIDATION'));
         } else {
-          this.errorMessage.set(this.translateService.instant('PROJECTSITE.TAGS.ERROR_TOO_LONG'));
+          this.toastService.error(this.translateService.instant('PROJECTSITE.TAGS.ERROR_TOO_LONG'));
         }
-        setTimeout(() => {
-          this.errorMessage.set(null);
-        }, 3000);
         this.isSaving.set(false);
       },
     });
@@ -88,7 +82,6 @@ export class ProfileTagListComponent implements OnInit, OnChanges {
     }
 
     this.isDeleting.set(true);
-    this.errorMessage.set(null);
 
     this.userProfileTagService.deleteTag(tagName).subscribe({
       next: () => {
@@ -97,10 +90,7 @@ export class ProfileTagListComponent implements OnInit, OnChanges {
         this.isDeleting.set(false);
       },
       error: () => {
-        this.errorMessage.set(this.translateService.instant('PROJECTSITE.TAGS.ERROR_DELETE'));
-        setTimeout(() => {
-          this.errorMessage.set(null);
-        }, 3000);
+        this.toastService.error(this.translateService.instant('PROJECTSITE.TAGS.ERROR_DELETE'));
         this.isDeleting.set(false);
       },
     });
@@ -112,7 +102,6 @@ export class ProfileTagListComponent implements OnInit, OnChanges {
     }
 
     this.isLoading.set(true);
-    this.errorMessage.set(null);
 
     this.userProfileTagService.getProfileTags(this.username).subscribe({
       next: (tags) => {
@@ -120,7 +109,7 @@ export class ProfileTagListComponent implements OnInit, OnChanges {
         this.isLoading.set(false);
       },
       error: () => {
-        this.errorMessage.set(this.translateService.instant('PROJECTSITE.TAGS.ERROR_LOAD'));
+        this.toastService.error(this.translateService.instant('PROJECTSITE.TAGS.ERROR_LOAD'));
         this.isLoading.set(false);
       },
     });

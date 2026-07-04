@@ -7,7 +7,6 @@ import { UserProfileModel } from '../../../../models/user-profile.model';
 import { EditButton } from '../../../../shared/edit-button/edit-button';
 import { FollowButton } from '../../../../shared/follow-button/follow-button';
 import { TranslatePipe } from '@ngx-translate/core';
-import { ProfileSaveErrorService } from '../../services/profile-save-error.service';
 
 /** Displays the profile banner of the user
  *
@@ -21,8 +20,6 @@ import { ProfileSaveErrorService } from '../../services/profile-save-error.servi
   templateUrl: './profile-banner.html',
 })
 export class ProfileBanner implements OnChanges {
-  readonly saveErrorService = inject(ProfileSaveErrorService);
-
   /**
    * Profile data displayed inside the banner
    *

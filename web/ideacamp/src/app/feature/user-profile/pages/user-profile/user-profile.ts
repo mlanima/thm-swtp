@@ -10,7 +10,7 @@ import { ProfileBanner } from '../../components/profile-banner/profile-banner';
 import { UserProfileService, UpdateUserProfileRequest } from '../../../../services/user-profile.service';
 import { AuthService } from '../../../auth/auth.service';
 import { UserProfileModel } from '../../../../models/user-profile.model';
-import { ProfileSaveErrorService } from '../../services/profile-save-error.service';
+import { ToastService } from '../../../../shared/toast/toast.service';
 import { ProfileTagListComponent } from '../../components/profile-tag-list/profile-tag-list.component'
 import { SuccessModal } from '../../../../shared/success-modal/success-modal';
 
@@ -48,7 +48,7 @@ export class UserProfile implements OnInit, OnDestroy {
 
   private readonly userProfileLinkService = inject(UserProfileLinkService);
 
-  readonly saveErrorService = inject(ProfileSaveErrorService);
+  private readonly toastService = inject(ToastService);
 
   profileLinkDataSource: LinkManagerDataSource<UserProfileLinkModel> | null = null;
 
@@ -169,12 +169,10 @@ export class UserProfile implements OnInit, OnDestroy {
 
     this.initialEditValues = { ...this.editForm };
     this.editingSection = section;
-    this.saveErrorService.clear();
   }
 
   cancelEditing(): void {
     this.editingSection = null;
-    this.saveErrorService.clear();
   }
 
   saveProfile(profile: UserProfileModel): void {
@@ -224,7 +222,7 @@ export class UserProfile implements OnInit, OnDestroy {
                   ? this.translateService.instant('USERPROFILE.ERROR_CONTENT_NOT_VALID')
                   : this.translateService.instant('USERPROFILE.ERROR_UPDATE_PROFILE');
 
-          this.saveErrorService.set(errorMessage, errorCode);
+          this.toastService.error(errorMessage);
           this.isSaving = false;
         },
       });

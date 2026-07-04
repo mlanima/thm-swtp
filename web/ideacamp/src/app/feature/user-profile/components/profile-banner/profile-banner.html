@@ -13,10 +13,6 @@
           </h1>
 
           @if (isEditing) {
-            @if (saveErrorService.message() && saveErrorService.errorCode() !== 'INVALID_PLACE') {
-              <p class="text-xs text-red-600">{{ saveErrorService.message() }}</p>
-            }
-
             <input
               type="text"
               class="mt-2 w-full max-w-sm rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700 outline-none focus:border-slate-500"
@@ -26,10 +22,6 @@
 
             <div class="mt-3 flex flex-wrap items-center justify-center gap-5 text-sm text-slate-500 sm:justify-start">
               <div class="w-full max-w-sm">
-                @if (saveErrorService.message() && saveErrorService.errorCode() === 'INVALID_PLACE') {
-                  <p class="text-xs text-red-600">{{ saveErrorService.message() }}</p>
-                }
-
                 <div class="flex items-center gap-1.5">
                   <app-location-icon></app-location-icon>
 
