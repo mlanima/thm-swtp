@@ -34,6 +34,7 @@ public class ContentModerationService {
 
     @Cacheable(value = "content-moderation", key = "#hash(content)", unless = "#result")
     public boolean isContentAppropriate(final String content) {
+        log.debug("Cache miss for content moderation — querying OpenAI");
         try {
             return !moderationClient.isFlagged(content);
         } catch (ModerationApiException e) {
