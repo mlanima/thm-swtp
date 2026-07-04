@@ -94,7 +94,7 @@
               (click)="downloadFile(file.id, file.originalName)"
               class="rounded-md px-2 py-1 text-sm text-slate-400 hover:bg-slate-100 hover:text-lime-500"
               [attr.aria-label]="'PROJECTSITE.FILES.DOWNLOAD_FILE' | translate">
-              ↓
+              <i class="pi pi-download text-xs"></i>
             </button>
 
             @if (isOwner) {
