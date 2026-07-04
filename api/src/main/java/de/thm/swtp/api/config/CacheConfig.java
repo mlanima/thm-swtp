@@ -35,6 +35,7 @@ public class CacheConfig implements CachingConfigurer {
                 return RedisCacheManager.builder(factory)
                         .cacheDefaults(defaultCacheConfig())
                         .withCacheConfiguration("tag-exists", tagExistsCacheConfig())
+                        .withCacheConfiguration("content-moderation", contentModerationCacheConfig())
                         .build();
             } catch (Exception e) {
                 log.warn("Redis unreachable \u2014 caching disabled: {}", e.getMessage());
@@ -60,6 +61,12 @@ public class CacheConfig implements CachingConfigurer {
         return defaultCacheConfig()
                 .entryTtl(Duration.ofHours(1))
                 .prefixCacheNameWith("tags:");
+    }
+
+    private RedisCacheConfiguration contentModerationCacheConfig() {
+        return defaultCacheConfig()
+                .entryTtl(Duration.ofMinutes(10))
+                .prefixCacheNameWith("content:");
     }
 
     @Override

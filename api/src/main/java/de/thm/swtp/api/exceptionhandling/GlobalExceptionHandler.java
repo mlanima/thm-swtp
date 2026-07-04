@@ -14,6 +14,8 @@ import de.thm.swtp.api.projectInvitation.exception.InvalidProjectInviteException
 import de.thm.swtp.api.projectInvitation.exception.ProjectInviteAccessDeniedException;
 import de.thm.swtp.api.projectInvitation.exception.ProjectInviteNotFoundException;
 import de.thm.swtp.api.tag.exception.TagAccessDeniedException;
+import de.thm.swtp.api.moderation.exception.ContentModerationException;
+import de.thm.swtp.api.moderation.exception.ContentNotValidException;
 import de.thm.swtp.api.moderation.exception.ModerationApiException;
 import de.thm.swtp.api.tag.exception.TagNotValidException;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
@@ -141,6 +143,20 @@ public class GlobalExceptionHandler {
         log.debug("Bad Request (400): {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ErrorResponse.of(400, "Bad Request", ex.getMessage(), "TAG_NOT_VALID"));
+    }
+
+    @ExceptionHandler(ContentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleContentNotValid(ContentNotValidException ex) {
+        log.debug("Bad Request (400): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage(), "CONTENT_NOT_VALID"));
+    }
+
+    @ExceptionHandler(ContentModerationException.class)
+    public ResponseEntity<ErrorResponse> handleContentModerationError(ContentModerationException ex) {
+        log.error("Content moderation failed: {}", ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                .body(ErrorResponse.of(502, "Bad Gateway", "Content moderation service temporarily unavailable."));
     }
 
     @ExceptionHandler(ModerationApiException.class)

@@ -62,4 +62,12 @@ public class BlocklistService {
     public boolean contains(final String word) {
         return blockedWords.contains(word.toLowerCase().trim());
     }
+
+    public boolean containsAny(final String text) {
+        if (text == null || text.isBlank()) {
+            return false;
+        }
+        var lower = text.toLowerCase();
+        return blockedWords.stream().anyMatch(lower::contains);
+    }
 }
