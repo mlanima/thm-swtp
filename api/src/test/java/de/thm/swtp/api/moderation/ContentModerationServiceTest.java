@@ -60,11 +60,12 @@ class ContentModerationServiceTest {
     }
 
     @Test
-    void shouldRejectWhenBothOpenAiAndBlocklistFail() {
+    void shouldAcceptWhenOpenAiFailsAndBlocklistPasses() {
         when(moderationClient.isFlagged(anyString())).thenThrow(new ModerationApiException("down"));
-        when(blocklistService.containsAny("offensive stuff")).thenReturn(true);
+        when(blocklistService.containsAny("clean content")).thenReturn(false);
 
-        assertThat(service.isContentAppropriate("offensive stuff")).isFalse();
+        assertThat(service.isContentAppropriate("clean content")).isTrue();
+        verify(blocklistService).containsAny("clean content");
     }
 
     @Test
