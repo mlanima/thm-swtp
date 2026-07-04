@@ -4,7 +4,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import {z} from 'zod';
 import {WizardLayout} from './wizard-layout/wizard-layout';
 import {Stepper} from './stepper/stepper';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslateService } from '@ngx-translate/core';
 import {ProjectGeneralForm} from './project-general-form/project-general-form';
 import {ProjectSettingsForm} from './project-settings-form/project-settings-form';
 import {ProjectMembersForm} from './project-members-form/project-members-form';
@@ -25,8 +25,7 @@ import {ProjectInviteMember } from '../../models/project-invite-member.model';
     ProjectGeneralForm,
     ProjectSettingsForm,
     ProjectMembersForm,
-    ProjectFinishForm,
-    TranslatePipe
+    ProjectFinishForm
   ],
   templateUrl: './project-create.html',
 })
