@@ -82,6 +82,7 @@ public class ProjectService {
 
     @Transactional
     public ProjectResponse createProject(CreateProjectRequest request, UUID currentUserId) {
+        contentModerationService.assertAppropriate(request.name(), "name");
         contentModerationService.assertAppropriate(request.description(), "description");
         contentModerationService.assertAppropriate(request.shortDescription(), "shortDescription");
 
@@ -232,6 +233,7 @@ public class ProjectService {
         }
 
         if (request.getName() != null) {
+            contentModerationService.assertAppropriate(request.getName(), "name");
             project.setName(request.getName());
         }
         if (request.getDescription() != null) {

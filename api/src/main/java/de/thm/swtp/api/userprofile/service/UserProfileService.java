@@ -58,6 +58,7 @@ public class UserProfileService {
 
     @Transactional
     public UserProfile updateProfile(String username, String title, String location, String about, String experience) {
+        contentModerationService.assertAppropriate(title, "title");
         contentModerationService.assertAppropriate(about, "about");
         contentModerationService.assertAppropriate(experience, "experience");
         UserProfile profile = findOrThrow(username);
