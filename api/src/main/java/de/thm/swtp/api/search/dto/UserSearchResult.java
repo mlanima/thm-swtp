@@ -23,5 +23,6 @@ public record UserSearchResult(
         String username,
         String title,
         String location,
+        String placeId,
         List<String> tags
 ) {}

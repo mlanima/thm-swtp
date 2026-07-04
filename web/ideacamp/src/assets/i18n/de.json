@@ -111,6 +111,8 @@
     "ERROR_EDIT_FORBIDDEN": "Du bist nicht berechtigt, dieses Profil zu bearbeiten.",
     "FOLLOWERS": "Follower",
     "ERROR_UPDATE_PROFILE": "Das Profil konnte nicht aktualisiert werden. Bitte versuche es später erneut.",
+    "ERROR_INVALID_PLACE": "Dies ist keine reale Stadt. Bitte wähle einen Ort aus den Vorschlägen aus.",
+    "ERROR_CONTENT_NOT_VALID": "Diese Eingabe enthält nicht erlaubten Inhalt.",
     "FOLLOW": "Folgen",
     "FOLLOWING": "Folge ich",
     "UNFOLLOW": "Entfolgen",

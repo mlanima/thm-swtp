@@ -14,6 +14,8 @@ import de.thm.swtp.api.projectInvitation.exception.InvalidProjectInviteException
 import de.thm.swtp.api.projectInvitation.exception.ProjectInviteAccessDeniedException;
 import de.thm.swtp.api.projectInvitation.exception.ProjectInviteNotFoundException;
 import de.thm.swtp.api.tag.exception.TagAccessDeniedException;
+import de.thm.swtp.api.location.exception.GooglePlacesApiException;
+import de.thm.swtp.api.location.exception.InvalidPlaceException;
 import de.thm.swtp.api.moderation.exception.ContentModerationException;
 import de.thm.swtp.api.moderation.exception.ContentNotValidException;
 import de.thm.swtp.api.moderation.exception.ModerationApiException;
@@ -463,6 +465,20 @@ public class GlobalExceptionHandler {
         log.error("Unhandled exception: type={}, message={}", ex.getClass().getName(), ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ErrorResponse.of(500, "Internal Server Error", "An unexpected error occurred."));
+    }
+
+    @ExceptionHandler(InvalidPlaceException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidPlace(InvalidPlaceException ex) {
+        log.warn("Bad Request (400): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage(), "INVALID_PLACE"));
+    }
+
+    @ExceptionHandler(GooglePlacesApiException.class)
+    public ResponseEntity<ErrorResponse> handleGooglePlacesApiError(GooglePlacesApiException ex) {
+        log.error("Google Places API error: {}", ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                .body(ErrorResponse.of(502, "Bad Gateway", "Places service temporarily unavailable."));
     }
 
     @ExceptionHandler(InvalidProfessorEmailDomainException.class)

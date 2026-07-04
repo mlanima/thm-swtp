@@ -1,4 +1,5 @@
 package de.thm.swtp.api.UserProfile;
+import de.thm.swtp.api.location.GooglePlacesClient;
 import de.thm.swtp.api.moderation.ContentModerationService;
 import de.thm.swtp.api.userprofile.domain.UserStatus;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
@@ -33,6 +34,9 @@ class UserProfileServiceTest {
     @Mock
     private ContentModerationService contentModerationService;
 
+    @Mock
+    private GooglePlacesClient googlePlacesClient;
+
     private UserProfileService userProfileService;
 
     private UUID userId;
@@ -40,7 +44,7 @@ class UserProfileServiceTest {
 
     @BeforeEach
     void setUp() {
-        userProfileService = new UserProfileService(userProfileRepository, contentModerationService);
+        userProfileService = new UserProfileService(userProfileRepository, contentModerationService, googlePlacesClient);
 
         userId = UUID.randomUUID();
 

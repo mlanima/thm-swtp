@@ -111,6 +111,8 @@
     "ERROR_EDIT_FORBIDDEN": "You are not authorized to edit this profile.",
     "FOLLOWERS": "Followers",
     "ERROR_UPDATE_PROFILE": "The profile could not be updated. Please try again later.",
+    "ERROR_INVALID_PLACE": "This is not a real city. Please select a place from the suggestions.",
+    "ERROR_CONTENT_NOT_VALID": "This input contains content that is not allowed.",
     "FOLLOW": "Follow",
     "FOLLOWING": "Following",
     "UNFOLLOW": "Unfollow",

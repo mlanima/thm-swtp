@@ -1,11 +1,13 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, signal } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, signal, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { LocationIcon } from '../../../../shared/icons/location-icon/location-icon';
 import { FollowersIcon } from '../../../../shared/icons/followers-icon/followers-icon';
+import { PlaceAutocomplete } from '../../../../shared/place-autocomplete/place-autocomplete';
 import { UserProfileModel } from '../../../../models/user-profile.model';
 import { EditButton } from '../../../../shared/edit-button/edit-button';
 import { FollowButton } from '../../../../shared/follow-button/follow-button';
 import { TranslatePipe } from '@ngx-translate/core';
+import { ProfileSaveErrorService } from '../../services/profile-save-error.service';
 
 /** Displays the profile banner of the user
  *
@@ -15,10 +17,12 @@ import { TranslatePipe } from '@ngx-translate/core';
 @Component({
   selector: 'app-profile-banner',
   standalone: true,
-  imports: [LocationIcon, FollowersIcon, EditButton, FollowButton, FormsModule, TranslatePipe],
+  imports: [LocationIcon, FollowersIcon, PlaceAutocomplete, EditButton, FollowButton, FormsModule, TranslatePipe],
   templateUrl: './profile-banner.html',
 })
 export class ProfileBanner implements OnChanges {
+  readonly saveErrorService = inject(ProfileSaveErrorService);
+
   /**
    * Profile data displayed inside the banner
    *
@@ -38,7 +42,13 @@ export class ProfileBanner implements OnChanges {
     location: string;
     about: string;
     experience: string;
+    placeId: string;
   };
+
+  onPlaceChange(result: { placeId: string; location: string }): void {
+    this.editForm.location = result.location;
+    this.editForm.placeId = result.placeId;
+  }
 
   /** Emits when the edit button inside the banner is clicked */
   @Output() edit = new EventEmitter<void>();
