@@ -66,7 +66,7 @@ public class ReportController {
 
         return ModeratorReportResponse.toResponse(reportService.updateReportStatus(
                 reportId,
-                request.reportStatus(),
+                request.status(),
                 moderatorKeycloakId,
                 moderatorUsername,
                 request.moderatorMessage()

@@ -2,11 +2,9 @@ package de.thm.swtp.api.reports.service;
 
 import de.thm.swtp.api.exceptionhandling.exceptions.*;
 import de.thm.swtp.api.project.ProjectRepository;
+import de.thm.swtp.api.projectPost.entity.ProjectPostEntity;
 import de.thm.swtp.api.projectPost.repository.ProjectPostRepository;
-import de.thm.swtp.api.reports.domain.Report;
-import de.thm.swtp.api.reports.domain.ReportReason;
-import de.thm.swtp.api.reports.domain.ReportStatus;
-import de.thm.swtp.api.reports.domain.ReportTarget;
+import de.thm.swtp.api.reports.domain.*;
 import de.thm.swtp.api.reports.entity.ReportEntity;
 import de.thm.swtp.api.reports.mapper.ReportMapper;
 import de.thm.swtp.api.reports.repository.ReportRepository;
@@ -67,7 +65,7 @@ public class ReportService {
         validateReportSort(pageable);
        String normalizedQuery = normalizeQuery(query);
        return reportRepository.searchReports(status, target, reason, normalizedQuery, pageable)
-               .map(ReportMapper::toDomain);
+               .map(this::toDomainWithTargetSummary);
     }
 
     /** Updates the moderation status of a report.*/
@@ -83,7 +81,7 @@ public class ReportService {
         }
 
         ReportEntity saved =  reportRepository.save(reportEntity);
-        return ReportMapper.toDomain(saved);
+        return toDomainWithTargetSummary(saved);
     }
 
 
@@ -109,14 +107,88 @@ public class ReportService {
         });
     }
 
+    /** Converts a report entity into a domain model with the target display information.*/
+    private Report toDomainWithTargetSummary(ReportEntity reportEntity) {
+        ReportTargetSummary targetSummary = buildTargetSummary(reportEntity.getTarget(), reportEntity.getTargetId());
+        return ReportMapper.toDomain(reportEntity, targetSummary);
+    }
+
+    private ReportTargetSummary buildTargetSummary(ReportTarget target, UUID targetId){
+        return switch (target) {
+            case USER -> buildUserTargetSummary(targetId);
+            case PROJECT -> buildProjectTargetSummary(targetId);
+            case PROJECT_POST -> buildProjectPostTargetSummary(targetId);
+        };
+    }
+
+    /** Builds display information for a reported user profile. */
+    private ReportTargetSummary buildUserTargetSummary(UUID userId) {
+        return userProfileRepository.findById(userId)
+                .map(user -> new ReportTargetSummary(
+                        user.getUsername(),
+                        "USER",
+                        "/profiles/" + user.getUsername()
+                ))
+                .orElse(new ReportTargetSummary(
+                        "Deleted user",
+                        "USER",
+                        null
+                ));
+    }
+
+    /** Builds display information for a reported project. */
+    private ReportTargetSummary buildProjectTargetSummary(UUID projectId) {
+        return projectRepository.findById(projectId)
+                .map(project -> new ReportTargetSummary(
+                        project.getName(),
+                        "PROJECT",
+                        "/project/" + project.getProjectUrl()
+                ))
+                .orElse(new ReportTargetSummary(
+                        "Deleted project",
+                        "PROJECT",
+                        null
+                ));
+    }
+
+    /** Builds display information for a reported project post. */
+    private ReportTargetSummary buildProjectPostTargetSummary(UUID postId) {
+        return projectPostRepository.findById(postId)
+                .map(post -> new ReportTargetSummary(
+                        getProjectPostTitle(post),
+                        post.getProject().getName(),
+                        "/project/" + post.getProject().getProjectUrl()
+                ))
+                .orElse(new ReportTargetSummary(
+                        "Deleted project post",
+                        "PROJECT_POST",
+                        null
+                ));
+    }
+
+    /** Returns a short display title for a project post. */
+    private String getProjectPostTitle(ProjectPostEntity post) {
+        if (post.getTitle() != null && !post.getTitle().isBlank()) {
+            return post.getTitle();
+        }
+
+        if (post.getContent() == null || post.getContent().isBlank()) {
+            return "Project post";
+        }
+
+        return post.getContent().length() <= 80
+                ? post.getContent()
+                : post.getContent().substring(0, 80) + "...";
+    }
+
     private ReportEntity getReport(UUID reportId) {
         return reportRepository.findById(reportId)
                 .orElseThrow(() -> new ReportNotFoundException("Report not found: " + reportId));
     }
 
     /** Ensures that only open or in-review reports can be updated.*/
-    private void canUpdateReportStatus(ReportEntity reportentity){
-        if (reportentity.getStatus() == ReportStatus.RESOLVED || reportentity.getStatus() == ReportStatus.DISMISSED) {
+    private void canUpdateReportStatus(ReportEntity reportEntity){
+        if (reportEntity.getStatus() == ReportStatus.RESOLVED || reportEntity.getStatus() == ReportStatus.DISMISSED) {
             throw new InvalidReportStatusException("Only open or in-review reports can be updated.");
         }
     }

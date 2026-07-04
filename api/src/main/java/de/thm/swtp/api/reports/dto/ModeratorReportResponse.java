@@ -4,6 +4,7 @@ import de.thm.swtp.api.reports.domain.Report;
 import de.thm.swtp.api.reports.domain.ReportReason;
 import de.thm.swtp.api.reports.domain.ReportStatus;
 import de.thm.swtp.api.reports.domain.ReportTarget;
+import de.thm.swtp.api.reports.domain.ReportTargetSummary;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -17,6 +18,7 @@ public record ModeratorReportResponse(UUID id,
                                       ReportReason reason,
                                       String message,
                                       ReportStatus status,
+                                      ReportTargetSummary targetSummary,
                                       UUID reviewerKeycloakId,
                                       String reviewerUsername,
                                       LocalDateTime reviewedAt,
@@ -35,6 +37,7 @@ public record ModeratorReportResponse(UUID id,
                 report.getReason(),
                 report.getMessage(),
                 report.getStatus(),
+                report.getTargetSummary(),
                 report.getReviewerKeycloakId(),
                 report.getReviewerUsername(),
                 report.getReviewedAt(),

@@ -21,6 +21,7 @@ public class Report {
     ReportReason reason;
     String message;
     ReportStatus status;
+    ReportTargetSummary targetSummary;
     UUID reviewerKeycloakId;
     String reviewerUsername;
     LocalDateTime reviewedAt;

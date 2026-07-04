@@ -5,5 +5,5 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 /** Request DTO for updating the moderation status of a report.*/
-public record UpdateReportStatusRequest(@NotNull ReportStatus reportStatus, @Size(max = 1000) String moderatorMessage) {
+public record UpdateReportStatusRequest(@NotNull ReportStatus status, @Size(max = 1000) String moderatorMessage) {
 }

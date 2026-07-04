@@ -1,27 +1,33 @@
 package de.thm.swtp.api.reports.mapper;
 
 import de.thm.swtp.api.reports.domain.Report;
+import de.thm.swtp.api.reports.domain.ReportTargetSummary;
 import de.thm.swtp.api.reports.entity.ReportEntity;
 
 /** Mapper to convert a report-entity into a report domain object.*/
 public class ReportMapper {
 
-    public static Report toDomain(ReportEntity reportEntity) {
+    public static Report toDomain(ReportEntity entity) {
+        return toDomain(entity, null);
+    }
+
+    public static Report toDomain(ReportEntity entity, ReportTargetSummary targetSummary) {
         return Report.builder()
-                .id(reportEntity.getId())
-                .reporterId(reportEntity.getReporter().getKeycloakId())
-                .reporterUsername(reportEntity.getReporter().getUsername())
-                .target(reportEntity.getTarget())
-                .targetId(reportEntity.getTargetId())
-                .reason(reportEntity.getReason())
-                .message(reportEntity.getMessage())
-                .status(reportEntity.getStatus())
-                .reviewerKeycloakId(reportEntity.getReviewerKeycloakId())
-                .reviewerUsername(reportEntity.getReviewerUsername())
-                .reviewedAt(reportEntity.getReviewedAt())
-                .moderatorMessage(reportEntity.getModeratorMessage())
-                .createdAt(reportEntity.getCreatedAt())
-                .updatedAt(reportEntity.getUpdatedAt())
+                .id(entity.getId())
+                .reporterId(entity.getReporter().getKeycloakId())
+                .reporterUsername(entity.getReporter().getUsername())
+                .target(entity.getTarget())
+                .targetId(entity.getTargetId())
+                .reason(entity.getReason())
+                .message(entity.getMessage())
+                .status(entity.getStatus())
+                .targetSummary(targetSummary)
+                .reviewerKeycloakId(entity.getReviewerKeycloakId())
+                .reviewerUsername(entity.getReviewerUsername())
+                .reviewedAt(entity.getReviewedAt())
+                .moderatorMessage(entity.getModeratorMessage())
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
                 .build();
     }
 }
