@@ -20,7 +20,7 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
-import de.thm.swtp.api.tag.validation.TagValidationException;
+import de.thm.swtp.api.moderation.exception.ModerationApiException;
 import org.springframework.web.client.ResourceAccessException;
 
 import java.util.UUID;
@@ -150,12 +150,12 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void tagValidationErrorReturns502() {
-        ResponseEntity<ErrorResponse> r = handler.handleTagValidationError(
-                new TagValidationException("Tag validation service temporarily unavailable"));
+    void moderationApiErrorReturns502() {
+        ResponseEntity<ErrorResponse> r = handler.handleModerationApiError(
+                new ModerationApiException("Moderation service temporarily unavailable"));
         assertStatus(r, HttpStatus.BAD_GATEWAY);
         assertThat(r.getBody().getError()).isEqualTo("Bad Gateway");
-        assertThat(r.getBody().getMessage()).isEqualTo("Tag validation service temporarily unavailable.");
+        assertThat(r.getBody().getMessage()).isEqualTo("Moderation service temporarily unavailable.");
     }
 
     @Test
@@ -164,7 +164,7 @@ class GlobalExceptionHandlerTest {
                 new ResourceAccessException("I/O error: Timeout"));
         assertStatus(r, HttpStatus.BAD_GATEWAY);
         assertThat(r.getBody().getError()).isEqualTo("Bad Gateway");
-        assertThat(r.getBody().getMessage()).isEqualTo("Tag validation service temporarily unavailable.");
+        assertThat(r.getBody().getMessage()).isEqualTo("Moderation service temporarily unavailable.");
     }
 
     // ── catch-all: 500 with a generic body, never the raw exception message ──

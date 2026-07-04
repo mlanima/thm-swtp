@@ -1,7 +1,8 @@
-package de.thm.swtp.api.tag.validation;
+package de.thm.swtp.api.moderation;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import de.thm.swtp.api.common.LogSafe;
+import de.thm.swtp.api.moderation.exception.ModerationApiException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,7 +17,7 @@ import java.util.Optional;
 
 @Slf4j
 @Component
-public class OpenAIModerationClient {
+public class ModerationClient {
 
     private static final String MODERATION_URL = "/v1/moderations";
 
@@ -26,7 +27,7 @@ public class OpenAIModerationClient {
     private final boolean enabled;
 
     @Autowired
-    public OpenAIModerationClient(
+    public ModerationClient(
             @Value("${openai.api.base-url:https://api.openai.com}") final String baseUrl,
             @Value("${openai.moderation.model:omni-moderation-latest}") final String model,
             @Value("${openai.moderation.threshold:0.1}") final double threshold,
@@ -34,7 +35,7 @@ public class OpenAIModerationClient {
         this(buildClient(baseUrl, apiKey), model, threshold, !apiKey.isBlank());
     }
 
-    OpenAIModerationClient(
+    ModerationClient(
             final RestClient restClient,
             final String model,
             final double threshold,
@@ -60,7 +61,7 @@ public class OpenAIModerationClient {
     public boolean isFlagged(final String text) {
         if (!enabled) {
             log.warn("OpenAI moderation disabled \u2014 no API key configured");
-            throw new TagValidationException("Tag validation service temporarily unavailable");
+            throw new ModerationApiException("Moderation service temporarily unavailable");
         }
 
         var response = restClient.post()
@@ -71,13 +72,13 @@ public class OpenAIModerationClient {
                         (request, res) -> {
                             log.debug("OpenAI Moderation API returned {} for input: {}",
                                     res.getStatusCode(), LogSafe.clean(text));
-                            throw new TagValidationException("Tag validation service temporarily unavailable");
+                            throw new ModerationApiException("Moderation service temporarily unavailable");
                         })
                 .body(ModerationResponse.class);
 
         if (response == null || response.results() == null || response.results().isEmpty()) {
             log.debug("OpenAI Moderation API returned empty response for input: {}", LogSafe.clean(text));
-            throw new TagValidationException("Tag validation service temporarily unavailable");
+            throw new ModerationApiException("Moderation service temporarily unavailable");
         }
 
         var result = response.results().getFirst();

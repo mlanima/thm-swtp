@@ -14,8 +14,8 @@ import de.thm.swtp.api.projectInvitation.exception.InvalidProjectInviteException
 import de.thm.swtp.api.projectInvitation.exception.ProjectInviteAccessDeniedException;
 import de.thm.swtp.api.projectInvitation.exception.ProjectInviteNotFoundException;
 import de.thm.swtp.api.tag.exception.TagAccessDeniedException;
+import de.thm.swtp.api.moderation.exception.ModerationApiException;
 import de.thm.swtp.api.tag.exception.TagNotValidException;
-import de.thm.swtp.api.tag.validation.TagValidationException;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.project.exception.*;
 import lombok.extern.slf4j.Slf4j;
@@ -143,18 +143,18 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(400, "Bad Request", ex.getMessage(), "TAG_NOT_VALID"));
     }
 
-    @ExceptionHandler(TagValidationException.class)
-    public ResponseEntity<ErrorResponse> handleTagValidationError(TagValidationException ex) {
-        log.error("Tag validation failed due to external API error: {}", ex.getMessage(), ex);
+    @ExceptionHandler(ModerationApiException.class)
+    public ResponseEntity<ErrorResponse> handleModerationApiError(ModerationApiException ex) {
+        log.error("Moderation API error: {}", ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
-                .body(ErrorResponse.of(502, "Bad Gateway", "Tag validation service temporarily unavailable."));
+                .body(ErrorResponse.of(502, "Bad Gateway", "Moderation service temporarily unavailable."));
     }
 
     @ExceptionHandler(ResourceAccessException.class)
     public ResponseEntity<ErrorResponse> handleResourceAccess(ResourceAccessException ex) {
         log.error("External API unreachable: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
-                .body(ErrorResponse.of(502, "Bad Gateway", "Tag validation service temporarily unavailable."));
+                .body(ErrorResponse.of(502, "Bad Gateway", "Moderation service temporarily unavailable."));
     }
 
     @ExceptionHandler(ProjectJoinRequestAccessDeniedException.class)
