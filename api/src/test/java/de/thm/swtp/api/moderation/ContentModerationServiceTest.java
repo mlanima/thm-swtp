@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.cache.CacheManager;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -24,11 +25,15 @@ class ContentModerationServiceTest {
     @Mock
     private BlocklistService blocklistService;
 
+    @Mock
+    private CacheManager cacheManager;
+
     private ContentModerationService service;
 
     @BeforeEach
     void setUp() {
-        service = new ContentModerationService(moderationClient, blocklistService, true);
+        when(cacheManager.getCache("content-moderation")).thenReturn(null);
+        service = new ContentModerationService(moderationClient, blocklistService, cacheManager, true);
     }
 
     @Test
@@ -70,7 +75,7 @@ class ContentModerationServiceTest {
 
     @Test
     void shouldThrowContentModerationExceptionWhenOpenAiFailsAndNoFallback() {
-        service = new ContentModerationService(moderationClient, blocklistService, false);
+        service = new ContentModerationService(moderationClient, blocklistService, cacheManager, false);
         when(moderationClient.isFlagged(anyString())).thenThrow(new ModerationApiException("down"));
 
         assertThatThrownBy(() -> service.isContentAppropriate("any text"))
