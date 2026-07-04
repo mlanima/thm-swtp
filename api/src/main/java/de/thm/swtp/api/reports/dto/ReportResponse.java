@@ -16,10 +16,6 @@ public record ReportResponse(UUID id,
                              ReportReason reason,
                              String message,
                              ReportStatus status,
-                             UUID reviewedByKeycloakId,
-                             String reviewedByUsername,
-                             LocalDateTime reviewedAt,
-                             String moderatorNote,
                              LocalDateTime createdAt,
                              LocalDateTime updatedAt
 ) {
@@ -37,10 +33,6 @@ public record ReportResponse(UUID id,
                 report.getReason(),
                 report.getMessage(),
                 report.getStatus(),
-                report.getReviewerKeycloakId(),
-                report.getReviewerUsername(),
-                report.getReviewedAt(),
-                report.getModeratorMessage(),
                 report.getCreatedAt(),
                 report.getUpdatedAt()
         );
