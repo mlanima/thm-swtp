@@ -11,6 +11,7 @@ public class ReportMapper {
                 .reporterId(reportEntity.getReporter().getKeycloakId())
                 .reporterUsername(reportEntity.getReporter().getUsername())
                 .target(reportEntity.getTarget())
+                .targetId(reportEntity.getTargetId())
                 .reason(reportEntity.getReason())
                 .message(reportEntity.getMessage())
                 .status(reportEntity.getStatus())
