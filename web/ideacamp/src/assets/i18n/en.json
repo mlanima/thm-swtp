@@ -300,6 +300,7 @@
     "SUCCESS_CREATED": "Project created successfully!",
     "SUCCESS_CREATED_WITH_INVITES": "Project created successfully and invitations sent!",
     "ERROR_CREATE_PROJECT": "Project could not be created. Please try again.",
+    "ERROR_MODERATION": "Project could not be created because some content was flagged as inappropriate. Please review your entries.",
     "VALIDATION": {
       "NAME_MIN": "Project name must be at least 3 characters long.",
       "NAME_MAX": "Project name must not be longer than 20 characters.",

@@ -22,28 +22,28 @@
 
       <div>
         <p class="font-medium text-slate-600">{{ 'PROJECTCREATE.PROJECT_NAME' | translate }}:</p>
-        <p class="max-w-full overflow-hidden truncate whitespace-nowrap">{{ projectData.name || ('PROJECTCREATE.NO_PROJECT_NAME' | translate) }}</p>
+        <p class="max-w-full overflow-hidden truncate whitespace-nowrap">{{ projectData().name || ('PROJECTCREATE.NO_PROJECT_NAME' | translate) }}</p>
       </div>
 
       <div>
         <p class="font-medium text-slate-600">{{ 'PROJECTCREATE.SHORT_DESCRIPTION' | translate }}:</p>
-        <p class="max-w-full overflow-hidden truncate whitespace-nowrap">{{ projectData.shortDescription || ('PROJECTCREATE.NO_SHORT_DESCRIPTION' | translate) }}</p>
+        <p class="max-w-full overflow-hidden truncate whitespace-nowrap">{{ projectData().shortDescription || ('PROJECTCREATE.NO_SHORT_DESCRIPTION' | translate) }}</p>
       </div>
 
       <div>
         <p class="font-medium text-slate-600">{{ 'PROJECTCREATE.DESCRIPTION' | translate }}:</p>
-        <p class="max-w-full overflow-hidden truncate whitespace-nowrap">{{ projectData.description || ('PROJECTCREATE.NO_DESCRIPTION' | translate) }}</p>
+        <p class="max-w-full overflow-hidden truncate whitespace-nowrap">{{ projectData().description || ('PROJECTCREATE.NO_DESCRIPTION' | translate) }}</p>
       </div>
 
       <div>
         <p class="font-medium text-slate-600">{{ 'PROJECTCREATE.PROJECT_URL' | translate }}:</p>
-        <p class="max-w-full overflow-hidden truncate whitespace-nowrap">{{ projectData.projectUrl || ('PROJECTCREATE.NO_PROJECT_URL' | translate) }}</p>
+        <p class="max-w-full overflow-hidden truncate whitespace-nowrap">{{ projectData().projectUrl || ('PROJECTCREATE.NO_PROJECT_URL' | translate) }}</p>
       </div>
 
       <div>
         <p class="font-medium text-slate-600">{{ 'PROJECTCREATE.STATUS' | translate }}:</p>
 
-        @if (projectData.isPrivateProject) {
+        @if (projectData().isPrivateProject) {
           <p>{{ 'COMMON.PRIVATE' | translate }}</p>
         } @else {
           <p>{{ 'COMMON.PUBLIC' | translate }}</p>
@@ -52,7 +52,7 @@
       <div>
         <p class="font-medium text-slate-600">{{ 'PROJECTCREATE.INVITED_MEMBERS' | translate }}:</p>
 
-        @if (members.length > 0) {
+        @if (members().length > 0) {
           <div class="mt-2 space-y-2">
             @for (member of members; track member.keycloakId) {
               <div class="rounded-lg border border-slate-200 bg-white px-3 py-2">
@@ -87,8 +87,14 @@
 
     <button
       type="submit"
-      class="rounded-lg bg-slate-700 px-5 py-2 text-sm font-semibold text-white hover:bg-slate-800">
-      {{ 'COMMON.FINISH' | translate }}
+      [disabled]="isLoading()"
+      class="inline-flex items-center gap-2 rounded-lg bg-slate-700 px-5 py-2 text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed">
+      @if (isLoading()) {
+        <i class="pi pi-spin pi-spinner"></i>
+        <span>{{ 'PROJECTCREATE.CREATING' | translate }}</span>
+      } @else {
+        <span>{{ 'COMMON.FINISH' | translate }}</span>
+      }
     </button>
 
   </div>
