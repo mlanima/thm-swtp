@@ -58,7 +58,6 @@ export class ProjectPosts implements OnChanges {
 
   loadPosts(): void {
     this.isLoading.set(true);
-    this.errorMessage.set(null);
 
     this.projectService.getProjectPosts(this.project.id).subscribe({
       next: (posts) => {

@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges, inject, signal } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ProjectTagService, TagResponse } from '../../services/project-tag.service';
 import { EditableTagListComponent } from '../../../../shared/tags/tag-list/editable-tag-list.component';
 import { ToastService } from '../../../../shared/toast/toast.service';
@@ -7,7 +7,7 @@ import { ToastService } from '../../../../shared/toast/toast.service';
 @Component({
   selector: 'app-tag-list',
   standalone: true,
-  imports: [EditableTagListComponent],
+  imports: [EditableTagListComponent, TranslatePipe],
   templateUrl: './tag-list.html',
 })
 export class TagList implements OnInit, OnChanges {
