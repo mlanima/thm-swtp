@@ -1,6 +1,7 @@
 package de.thm.swtp.api.moderation;
 
 import de.thm.swtp.api.common.LogSafe;
+import de.thm.swtp.api.moderation.exception.ContentModerationException;
 import de.thm.swtp.api.moderation.exception.ContentNotValidException;
 import de.thm.swtp.api.moderation.exception.ModerationApiException;
 import de.thm.swtp.api.tag.validation.BlocklistService;
@@ -22,6 +23,7 @@ public class ContentModerationService {
     private final ModerationClient moderationClient;
     private final BlocklistService blocklistService;
     private final Cache cache;
+    private final boolean blocklistFallback;
 
     public ContentModerationService(
             final ModerationClient moderationClient,
@@ -31,6 +33,7 @@ public class ContentModerationService {
         this.moderationClient = moderationClient;
         this.blocklistService = blocklistService;
         this.cache = cacheManager.getCache("content-moderation");
+        this.blocklistFallback = blocklistFallback;
     }
 
     public boolean isContentAppropriate(final String content) {
