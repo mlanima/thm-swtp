@@ -10,6 +10,7 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import java.util.Arrays;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -80,8 +81,8 @@ public class GooglePlacesClient {
     private static String findComponent(final JsonNode components, final String... targetTypes) {
         return StreamSupport.stream(components.spliterator(), false)
                 .filter(c -> StreamSupport.stream(c.path("types").spliterator(), false)
-                        .map(t -> t.asString())
-                        .anyMatch(t -> Stream.of(targetTypes).anyMatch(t::equals)))
+                        .map(JsonNode::asString)
+                        .anyMatch(t -> Arrays.asList(targetTypes).contains(t)))
                 .map(c -> c.path("long_name").asString())
                 .findFirst()
                 .orElse(null);
