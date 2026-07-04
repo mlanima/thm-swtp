@@ -362,6 +362,14 @@ public class SecurityService {
         return hasModeratorRole(authentication);
     }
 
+    /** Allowed to update report status.*/
+    public boolean canManageReports(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return false;
+        }
+        return hasModeratorRole(authentication);
+    }
+
 
 
 
