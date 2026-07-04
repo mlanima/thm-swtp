@@ -1,5 +1,6 @@
 package de.thm.swtp.api.moderation;
 
+import de.thm.swtp.api.common.LogSafe;
 import de.thm.swtp.api.moderation.exception.ContentModerationException;
 import de.thm.swtp.api.moderation.exception.ContentNotValidException;
 import de.thm.swtp.api.moderation.exception.ModerationApiException;
@@ -34,13 +35,22 @@ public class ContentModerationService {
     @Cacheable(value = "content-moderation", key = "#hash(content)", unless = "#result")
     public boolean isContentAppropriate(final String content) {
         try {
-            return !moderationClient.isFlagged(content);
-        } catch (ModerationApiException e) {
-            if (blocklistFallback) {
-                log.warn("OpenAI moderation unavailable, falling back to blocklist");
-                return !blocklistService.containsAny(content);
+            var flagged = moderationClient.isFlagged(content);
+            if (flagged) {
+                log.warn("Content flagged by OpenAI moderation: {}", LogSafe.clean(content));
+            } else {
+                log.info("Content passed OpenAI moderation");
             }
-            throw new ContentModerationException("Content moderation temporarily unavailable");
+            return !flagged;
+        } catch (ModerationApiException e) {
+            log.warn("OpenAI moderation unavailable, falling back to blocklist");
+            var blocked = blocklistService.containsAny(content);
+            if (blocked) {
+                log.warn("Content rejected by blocklist (fallback): {}", LogSafe.clean(content));
+            } else {
+                log.info("Content passed blocklist check (fallback)");
+            }
+            return !blocked;
         }
     }
 
@@ -49,6 +59,7 @@ public class ContentModerationService {
             return;
         }
         if (!isContentAppropriate(content)) {
+            log.warn("Content in field '{}' is not appropriate", fieldName);
             throw new ContentNotValidException(fieldName);
         }
     }
