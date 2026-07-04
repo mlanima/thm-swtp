@@ -1,6 +1,7 @@
 package de.thm.swtp.api.userprofile.service;
 
 import de.thm.swtp.api.common.TxLogger;
+import de.thm.swtp.api.moderation.ContentModerationService;
 import de.thm.swtp.api.userprofile.domain.UserStatus;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
@@ -22,6 +23,7 @@ import java.util.Optional;
 public class UserProfileService {
 
     private final UserProfileRepository userProfileRepository;
+    private final ContentModerationService contentModerationService;
 
     @Transactional(readOnly = true)
     public UserProfile getProfile(String username) {
@@ -56,6 +58,8 @@ public class UserProfileService {
 
     @Transactional
     public UserProfile updateProfile(String username, String title, String location, String about, String experience) {
+        contentModerationService.assertAppropriate(about, "about");
+        contentModerationService.assertAppropriate(experience, "experience");
         UserProfile profile = findOrThrow(username);
         profile.setTitle(title);
         profile.setLocation(location);
