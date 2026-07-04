@@ -1,11 +1,11 @@
 package de.thm.swtp.api.reports.service;
 
-import de.thm.swtp.api.exceptionhandling.exceptions.InvalidReportSortFieldException;
-import de.thm.swtp.api.exceptionhandling.exceptions.ReportTargetNotFoundException;
+import de.thm.swtp.api.exceptionhandling.exceptions.*;
 import de.thm.swtp.api.project.ProjectRepository;
 import de.thm.swtp.api.projectPost.repository.ProjectPostRepository;
 import de.thm.swtp.api.reports.domain.Report;
 import de.thm.swtp.api.reports.domain.ReportReason;
+import de.thm.swtp.api.reports.domain.ReportStatus;
 import de.thm.swtp.api.reports.domain.ReportTarget;
 import de.thm.swtp.api.reports.entity.ReportEntity;
 import de.thm.swtp.api.reports.mapper.ReportMapper;
@@ -19,9 +19,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
+/** Service for creating, searching and moderation reports.*/
 @Service
 @RequiredArgsConstructor
 public class ReportService {
@@ -30,14 +32,19 @@ public class ReportService {
     private final ProjectRepository projectRepository;
     private final ProjectPostRepository projectPostRepository;
 
-    private static final Set<String> ALLOWED_REPORT_SORT_FIELDS = Set.of("createdAt", "updatedAt", "reportStatus", "reason", "target");
+    private static final Set<String> ALLOWED_REPORT_SORT_FIELDS = Set.of("target", "targetId", "reason", "status", "reporter.username",
+                                                                         "reviewerUsername", "createdAt", "updatedAt", "reviewedAt");
 
 
+    /** Creates a new report for a user, project or project post.*/
     @Transactional
     public Report createReport(UUID currentUserId, ReportTarget target, UUID targetId, ReportReason reason, String message) {
         UserProfile reporter = userProfileRepository.findById(currentUserId)
                 .orElseThrow(() -> new UserProfileNotFoundException(currentUserId.toString()));
 
+        if (target == ReportTarget.USER && targetId.equals(currentUserId)) {
+            throw new InvalidReportTargetException("Users cannot report themselves.");
+        }
 
         validateReportTarget(target,targetId);
 
@@ -54,14 +61,33 @@ public class ReportService {
 
     }
 
+    /** Returns reports for moderator review. Reports can be filtered, sorted or searched through a query. */
     @Transactional
-    public Page<Report> getReports(Pageable pageable){
+    public Page<Report> getReports(ReportStatus status, ReportTarget target, ReportReason reason, String query, Pageable pageable) {
         validateReportSort(pageable);
-        return reportRepository.findAll(pageable)
-                .map(ReportMapper::toDomain);
+       String normalizedQuery = normalizeQuery(query);
+       return reportRepository.searchReports(status, target, reason, normalizedQuery, pageable)
+               .map(ReportMapper::toDomain);
+    }
+
+    /** Updates the moderation status of a report.*/
+    @Transactional
+    public Report updateReportStatus(UUID reportId, ReportStatus status, UUID moderatorKeycloakId, String moderatorUsername, String moderatorMessage) {
+        ReportEntity reportEntity = getReport(reportId);
+        canUpdateReportStatus(reportEntity);
+
+        switch(status) {
+            case IN_REVIEW -> markReportAsInReview(reportEntity, moderatorKeycloakId, moderatorUsername);
+            case RESOLVED, DISMISSED -> closeReport(reportEntity, status, moderatorKeycloakId, moderatorUsername, moderatorMessage);
+            case OPEN -> throw new  InvalidReportStatusException("Reports cannot be set back to open.");
+        }
+
+        ReportEntity saved =  reportRepository.save(reportEntity);
+        return ReportMapper.toDomain(saved);
     }
 
 
+    /** Checks if the report target exists.*/
     private void validateReportTarget(ReportTarget target, UUID targetId){
         boolean exists = switch (target){
             case USER -> userProfileRepository.existsById(targetId);
@@ -74,12 +100,47 @@ public class ReportService {
         }
     }
 
+    /** Checks if the requested sort parameter is supported.*/
     private void validateReportSort(Pageable pageable){
         pageable.getSort().forEach(sortField -> {
             if (!ALLOWED_REPORT_SORT_FIELDS.contains(sortField.getProperty())) {
                 throw new InvalidReportSortFieldException("Unsupported sort field: " + sortField.getProperty());
             }
         });
+    }
+
+    private ReportEntity getReport(UUID reportId) {
+        return reportRepository.findById(reportId)
+                .orElseThrow(() -> new ReportNotFoundException("Report not found: " + reportId));
+    }
+
+    /** Ensures that only open or in-review reports can be updated.*/
+    private void canUpdateReportStatus(ReportEntity reportentity){
+        if (reportentity.getStatus() == ReportStatus.RESOLVED || reportentity.getStatus() == ReportStatus.DISMISSED) {
+            throw new InvalidReportStatusException("Only open or in-review reports can be updated.");
+        }
+    }
+
+    private void markReportAsInReview(ReportEntity reportEntity, UUID moderatorKeycloakId, String moderatorUsername) {
+        reportEntity.setStatus(ReportStatus.IN_REVIEW);
+        reportEntity.setReviewerKeycloakId(moderatorKeycloakId);
+        reportEntity.setReviewerUsername(moderatorUsername);
+        reportEntity.setReviewedAt(LocalDateTime.now());
+    }
+
+    private void closeReport(ReportEntity reportEntity, ReportStatus status, UUID moderatorKeycloakId, String moderatorUsername, String moderatorMessage) {
+        reportEntity.setStatus(status);
+        reportEntity.setReviewerKeycloakId(moderatorKeycloakId);
+        reportEntity.setReviewerUsername(moderatorUsername);
+        reportEntity.setReviewedAt(LocalDateTime.now());
+        reportEntity.setModeratorMessage(moderatorMessage);
+    }
+
+    private String normalizeQuery(String query) {
+        if (query == null || query.isEmpty()) {
+            return null;
+        }
+        return "%" +  query.trim().toLowerCase() + "%";
     }
 
 }

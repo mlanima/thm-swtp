@@ -3,6 +3,7 @@ package de.thm.swtp.api.reports.mapper;
 import de.thm.swtp.api.reports.domain.Report;
 import de.thm.swtp.api.reports.entity.ReportEntity;
 
+/** Mapper to convert a report-entity into a report domain object.*/
 public class ReportMapper {
 
     public static Report toDomain(ReportEntity reportEntity) {
