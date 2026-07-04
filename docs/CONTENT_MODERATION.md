@@ -1,316 +1,319 @@
-# Content Moderation
+# Content Moderation & Location
 
-Extending the existing OpenAI Moderation infrastructure (from tag validation) to moderate free-text user content — bios, descriptions, posts, and messages.
+Two features built on top of the same OpenAI Moderation API infrastructure:
 
----
+1. **Content Moderation** — free-text moderation for user profiles, projects, and posts via OpenAI Omni Moderation, with an LDNOOBW blocklist as fallback
+2. **Google Places Location** — placeId-based city validation for user profile locations via the Google Place Details API
 
-## Rationale
-
-Tag validation already uses `OpenAIModerationClient` to flag single words via the OpenAI Moderation API. The same client can be reused to moderate longer, multi-sentence content. Unlike tags (which are cached permanently in the DB once valid), content is more dynamic and longer — caching is per-content hash with shorter TTL.
-
----
-
-## Fields That Can Be Moderated
-
-Grouped by priority and implementation effort:
-
-### Tier 1 — Bio / Description (Low Effort, High Impact)
-
-| Field | Entity | Backend Entry Point | Max Length | Existing Validation |
-|---|---|---|---|---|
-| `UserProfile.about` | `UserProfile` | `UserProfileController.updateProfile()` → `UserProfileService.updateProfile()` | `TEXT` (unbounded) | None (no `@Valid`, no DB constraint beyond `TEXT`) |
-| `UserProfile.experience` | `UserProfile` | Same as above | `TEXT` (unbounded) | None |
-| `Project.description` | `ProjectEntity` | `ProjectController.createProject()` / `editProject()` → `ProjectService` | `@Column(length = 500)` | DB length only; no `@Valid` on controller |
-| `Project.shortDescription` | `ProjectEntity` | Same as above | `@Column(length = 200)` | DB length only; no `@Valid` on controller |
-
-### Tier 2 — Posts (Medium Effort, High Impact)
-
-| Field | Entity | Backend Entry Point | Max Length | Existing Validation |
-|---|---|---|---|---|
-| `ProjectPost.title` | `ProjectPostEntity` | `ProjectPostController.createPost()` | 200 | `@NotBlank @Size` + `@Valid` on controller |
-| `ProjectPost.content` | `ProjectPostEntity` | Same as above | 10,000 | `@NotBlank @Size` + `@Valid` on controller |
-
-### Tier 3 — Messages (Medium Effort, Medium Impact)
-
-| Field | Entity | Backend Entry Point | Max Length | Existing Validation |
-|---|---|---|---|---|
-| `ProjectJoinRequest.message` | `ProjectJoinRequestEntity` | `ProjectJoinRequestController.createRequest()` | 500 | `@Size` + `@Valid` |
-| `ProjectInvite.message` | `ProjectInviteEntity` | `ProjectInviteController.createInvite()` | 500 | `@Size` + `@Valid` |
-| `ProfessorRequest.text` | `ProfessorRequestEntity` | `ProfessorRequestController.createRequest()` | 1000 | `@NotBlank @Size` + `@Valid` |
-
-### Tier 4 — Misc (Low Effort, Low Impact)
-
-| Field | Entity | Backend Entry Point | Max Length | Existing Validation |
-|---|---|---|---|---|
-| `UserProfile.title` | `UserProfile` | `UserProfileController.updateProfile()` | None | None |
-| `UserProfile.location` | `UserProfile` | Same as above | None | None |
+Both return clear error codes — `CONTENT_NOT_VALID` (400) and `INVALID_PLACE` (400) — that the frontend displays as toast notifications.
 
 ---
 
 ## Architecture
 
 ```
-ModerationClient (moved from tag.validation)
+ModerationClient (OpenAI /v1/moderations)
         │
-        ├── TagValidationService          # existing use — cached tag checking
-        ├── ContentModerationService      # new — moderated free-text content
-        │       │
-        │       ├── UserProfileService        # moderate about/experience
-        │       ├── ProjectService            # moderate description/shortDescription
-        │       ├── ProjectPostService        # moderate title/content
-        │       ├── ProjectJoinRequestService # moderate message
-        │       ├── ProjectInviteService      # moderate message
-        │       └── ProfessorRequestService   # moderate text
+        ├── TagValidationService              # tag validation (existing)
+        │       └── TagSource implementations
         │
-        └── BlocklistService (fallback)  # LDNOOBW wordlist — shared with tag validation
-```
+        ├── ContentModerationService           # free-text content moderation
+        │       ├── UserProfileService         #   title / about / experience
+        │       ├── ProjectService              #   name / description / shortDescription
+        │       └── ProjectPostService          #   title / content
+        │
+        └── BlocklistService (fallback)        # used when OpenAI is unreachable
 
-### Component Overview
-
-**`ModerationClient`** — the existing `OpenAIModerationClient` moved from `tag.validation` to `moderation`, renamed to `ModerationClient`. Already fully generic (accepts any `String input`). Supports:
-- Configurable model (`omni-moderation-latest`)
-- Configurable threshold (default `0.1`)
-- Throws `ModerationApiException` (renamed from `TagValidationException`) when unavailable
-- Automatic disable when no API key is configured
-
-The move removes the awkward cross-package dependency and eliminates the misleading `TagValidationException` name for non-tag use.
-
-**`ContentModerationService`** — `@Cacheable` wrapper similar to `TagValidationService`, but:
-- Cache key = SHA-256 hash of the content (to handle long strings)
-- Cache TTL = shorter (e.g., 10 minutes instead of 1 hour), since content is more varied than tags
-- Cache only flagged results (`unless = "#result == false"`)
-- Catches `ModerationApiException` from the client and re-throws as `ContentModerationException`
-
-**Exception handling** — Reuse the same pattern:
-- `ContentNotValidException` → `400 Bad Request` with code `CONTENT_NOT_VALID`
-- `ContentModerationException` (OpenAI down) → `502 Bad Gateway`
-- (Optional) Fallback to `BlocklistService.contains()` on API failure, mirroring the tag source pattern
-
----
-
-## Data Flow
-
-```
-User submits "I am a great developer"
-  → UserProfileService.updateProfile()
-    → contentModerationService.isContentAppropriate("I am a great developer")
-      → @Cacheable(value = "content-moderation", key = "#hash")
-        → REDIS MISS → ModerationClient.isFlagged("I am a great developer")
-          → OpenAI returns flagged=false, all scores < 0.1
-        → NOT FLAGGED → return true (not cached)
-    → OK → save profile
-
-User submits offensive text
-  → ...contentModerationService.isContentAppropriate(offensive)
-    → ModerationClient.isFlagged(offensive)
-      → OpenAI returns flagged=true, score > 0.1
-    → FLAGGED → return false (cached in Redis with TTL)
-    → throw ContentNotValidException → 400 Bad Request
-
-OpenAI is down
-  → ...contentModerationService.isContentAppropriate(text)
-    → ModerationClient.isFlagged(text)
-      → ResourceAccessException / ModerationApiException
-    → (optional) BlocklistService.contains(text)? fallback
-    → throw ContentModerationException → 502 Bad Gateway
+GooglePlacesClient (Google Place Details API)
+        │
+        └── UserProfileService                 # validate placeId → canonical location name
 ```
 
 ---
 
-## Where to Integrate
+## Content Moderation
 
-### 1. User Profile — `about`, `experience`, `title`, `location`
+### Which Fields Are Moderated
 
-**Service:** `UserProfileService.updateProfile()` (`api/src/main/java/.../userprofile/service/UserProfileService.java:58`)
+| Entity | Fields | Entry Point |
+|--------|--------|-------------|
+| `UserProfile` | `title`, `about`, `experience` | `UserProfileService.updateProfile()` |
+| `ProjectEntity` | `name`, `description`, `shortDescription` | `ProjectService.createProject()` / `.editProject()` |
+| `ProjectPostEntity` | `title`, `content` | `ProjectPostService.createProjectPost()` |
 
-Before setting fields on the entity:
+Each field is moderated independently — one flagged field rejects the whole request with a 400 `CONTENT_NOT_VALID` error.
+
+### ContentModerationService
+
+`api/src/main/java/.../moderation/ContentModerationService.java`
+
+Uses **manual `CacheManager` access** (not `@Cacheable`) to log cache hits and misses at `info` level:
+
 ```java
-@Transactional
-public UserProfile updateProfile(String username, String title, String location,
-                                  String about, String experience) {
-    // Moderate free-text fields
-    contentModerationService.assertAppropriate(about, "about");
-    contentModerationService.assertAppropriate(experience, "experience");
-
-    UserProfile profile = findOrThrow(username);
-    profile.setAbout(about);
-    profile.setExperience(experience);
-    ...
+public boolean isContentAppropriate(final String content) {
+    var key = hash(content);
+    var cached = cache != null ? cache.get(key, Boolean.class) : null;
+    if (cached != null) {
+        log.info("Cache hit for content moderation");
+        return cached;
+    }
+    log.info("Cache miss for content moderation — querying OpenAI");
+    var result = checkContent(content);
+    if (cache != null) {
+        cache.put(key, result);
+    }
+    return result;
 }
 ```
 
-### 2. Project — `description`, `shortDescription`
+- **Cache key:** SHA-256 hex of the content (same content from any source = same key)
+- **Cache TTL:** 10 minutes
+- **Both clean and flagged results are cached** (unlike tag validation which only caches rejected tags)
+- **`assertAppropriate(content, fieldName)`** — public API. Skips null/blank silently, logs pass at `info` / reject at `warn`, throws `ContentNotValidException` on rejection
 
-**Service:** `ProjectService.createProject()` (line 82) and `ProjectService.editProject()` (line 215)
+### Blocklist Fallback
 
-For creation:
-```java
-contentModerationService.assertAppropriate(request.description(), "description");
-contentModerationService.assertAppropriate(request.shortDescription(), "shortDescription");
+Controlled by `app.content-moderation.blocklist-fallback: true`:
+
+```
+OpenAI available
+  └─ is content flagged? ──yes──→ 400 CONTENT_NOT_VALID
+  └─ no ─→ save succeeds
+
+OpenAI down + blocklist-fallback = true
+  └─ BlocklistService.containsAny(content)? ──yes──→ 400 CONTENT_NOT_VALID
+  └─ no ─→ save succeeds
+
+OpenAI down + blocklist-fallback = false
+  └─ throw ContentModerationException ──→ 502 Bad Gateway
 ```
 
-For editing, moderate only if the value changed.
+`BlocklistService` does **substring matching** — any match anywhere in the content triggers rejection. Lives in `tag/validation/` and is shared with tag validation.
 
-### 3. Project Posts — `title`, `content`
+### ModerationClient
 
-**Service:** `ProjectPostService` (in `projectPost/`)
+`api/src/main/java/.../moderation/ModerationClient.java`
 
-### 4. Join Requests, Invites, Professor Requests — `message` / `text`
+HTTP client for `POST /v1/moderations` (OpenAI). RestClient-based, configurable model (`omni-moderation-latest`) and threshold (default `0.1`). Auto-disabled when `OPENAI_API_KEY` is blank — throws `ModerationApiException`.
 
-**Services:** Respective service classes under `projectJoinRequest/`, `projectInvitation/`, `professorRequest/`
+### Exceptions
+
+| Exception | HTTP | `errorCode` | When |
+|-----------|------|-------------|------|
+| `ContentNotValidException` | 400 | `CONTENT_NOT_VALID` | Content flagged by OpenAI or blocklist |
+| `ContentModerationException` | 502 | — | OpenAI down and blocklist-fallback off |
+| `ModerationApiException` | 502 | — | OpenAI returns 4xx/5xx or unreachable |
 
 ---
 
-## Configuration
+## Google Places Location
 
-Add to `application.yaml`:
+### How It Works
 
-```yaml
-app:
-  content-moderation:
-    enabled: true                    # master switch; can disable per-Tier in the future
-    cache-ttl: 10m                   # Redis TTL for flagged content
-    blocklist-fallback: true         # fall back to BlocklistService when OpenAI is down
+1. User types in the `PlaceAutocomplete` component (frontend)
+2. Google Maps Places Autocomplete suggests cities
+3. User selects a suggestion → component emits `placeId` + `formatted_address`
+4. Both are sent to `PUT /api/v1/user-profiles`
+5. Backend calls `GooglePlacesClient.validatePlaceId(placeId)`
+6. Google Place Details API returns address components
+7. Backend extracts city + country → stores as canonical `location` string
+8. Invalid placeId → 400 `INVALID_PLACE`
+
+### GooglePlacesClient
+
+`api/src/main/java/.../location/GooglePlacesClient.java`
+
+```
+GET /maps/api/place/details/json
+  ?place_id={placeId}
+  &key={apiKey}
+  &fields=address_components,formatted_address
 ```
 
-The existing `openai.moderation.*` settings are reused:
+Parses response JSON manually (Jackson 3 — reads as `String` then `readTree()` because `RestClient` can't deserialize abstract `JsonNode`), extracts `locality` or `postal_town` from `address_components`, appends `country`, returns `"Munich, Germany"`. 3s connect / 5s read timeout.
 
-```yaml
-openai:
-  moderation:
-    model: omni-moderation-latest
-    threshold: 0.1
-```
+### Location + placeId Pairing
 
-No new API keys required — the existing `OPENAI_API_KEY` env var is shared.
+| `location` | `placeId` | Result |
+|-----------|-----------|--------|
+| non-null | non-null | Validate placeId, set both |
+| blank | anything | Clear both (remove location) |
+| non-null | blank/null | Skip silently (no change) |
+| null | anything | Skip silently (no change) |
+
+### Exceptions
+
+| Exception | HTTP | `errorCode` | When |
+|-----------|------|-------------|------|
+| `InvalidPlaceException` | 400 | `INVALID_PLACE` | placeId doesn't resolve or returns non-OK |
+| `GooglePlacesApiException` | 502 | — | Network error or unparseable response |
 
 ---
 
 ## Caching
 
-Flagged (inappropriate) content → cached in Redis to avoid repeated API calls. Keyed by SHA-256 hash of the content.
+| Cache | TTL | Key | Prefix | Values |
+|-------|-----|-----|--------|--------|
+| `content-moderation` | 10 min | SHA-256 of content | `content:` | Both clean (`true`) and flagged (`false`) |
+| `tag-rejected` | 1 h | Tag name | `tags:` | Only rejected (`false`) via `unless = "#result"` |
 
-```java
-@Cacheable(value = "content-moderation", key = "#root.target.toHash(#content)", unless = "#result")
-public boolean isContentAppropriate(String content) { ... }
-```
-
-Cache config addition in `CacheConfig.java`:
-
-```java
-private RedisCacheConfiguration contentModerationCacheConfig() {
-    return defaultCacheConfig()
-            .entryTtl(Duration.ofMinutes(10))
-            .prefixCacheNameWith("content:");
-}
-```
+At startup, pings Redis. If unreachable → `NoOpCacheManager` (no caching, API called on every request). `CacheErrorHandler` logs warnings without crashing.
 
 ---
 
-## File Layout (proposed)
+## Frontend
+
+### Toast System
+
+**`ToastService`** — singleton (`providedIn: 'root'`), `toasts` signal, `error()`/`success()`/`warning()`/`info()` methods. Auto-dismiss: errors 6s, warnings 4s, others 3s.
+
+**`ToastComponent`** — fixed top-right, `z-[9999]`, slide-in animation, PrimeIcons per type. Rendered in `app.html` above footer.
+
+### Error Handling by Feature
+
+| Feature | File | Check |
+|---------|------|-------|
+| Project create | `project-create.ts:146` | `CONTENT_NOT_VALID` → moderation toast |
+| Project edit | `project-site.ts:119` | Generic save error toast |
+| Profile edit | `user-profile.ts:214-223` | `CONTENT_NOT_VALID` / `INVALID_PLACE` / 401-403 → specific toasts |
+| Tag add (project) | `tag-list.ts:68` | `TAG_NOT_VALID` → moderation toast |
+| Tag add (profile) | `profile-tag-list.component.ts:63` | `TAG_NOT_VALID` → moderation toast |
+
+### PlaceAutocomplete Component
+
+- Dynamically loads Google Maps JS API (not in `index.html`)
+- Restricted to cities (`types: ['(cities)']`)
+- Signal-based `input()` / `output()`
+- `placeChange` emits `{ placeId, location }` on selection
+- Falls back to plain text input if script fails to load
+
+### Project Creation Loading
+
+Finish button shows `pi pi-spin pi-spinner` during request, disabled to prevent double-submit. No top-of-page "Creating..." text.
+
+---
+
+## Configuration
+
+```yaml
+app:
+  content-moderation:
+    blocklist-fallback: true
+
+openai:
+  api:
+    base-url: https://api.openai.com
+    key: ${OPENAI_API_KEY:}
+  moderation:
+    model: omni-moderation-latest
+    threshold: 0.1
+
+google:
+  api:
+    base-url: https://maps.googleapis.com/maps/api/place
+    key: ${GOOGLE_API_KEY:}
+```
+
+| Variable | Required For | Default |
+|----------|-------------|---------|
+| `OPENAI_API_KEY` | Content moderation | empty (disabled) |
+| `GOOGLE_API_KEY` | Location validation, frontend Maps | empty |
+
+### Frontend Environment
+
+```
+enviroment.dev.ts   → googleMapsApiKey: ''
+enviroment.prod.ts  → googleMapsApiKey: '__GOOGLE_API_KEY__' (replaced at Docker build)
+```
+
+`angular.json` uses `fileReplacements` to swap `.dev` → `.prod` in production builds.
+
+---
+
+## Deployment
+
+### Frontend — Google API Key (Docker BuildKit Secret)
+
+```dockerfile
+RUN --mount=type=secret,id=google-api-key \
+    GOOGLE_API_KEY=$(cat /run/secrets/google-api-key); \
+    sed -i "s|__GOOGLE_API_KEY__|${GOOGLE_API_KEY}|g" src/app/enviroments/enviroment.prod.ts
+```
+
+GitHub Actions pass the secret:
+```yaml
+secrets: |
+  google-api-key=${{ secrets.GOOGLE_API_KEY }}
+```
+
+The `GOOGLE_API_KEY` GitHub Secret must exist in the repository.
+
+### Backend — API Keys
+
+Both `OPENAI_API_KEY` and `GOOGLE_API_KEY` are injected at **runtime** via Docker Compose `.env` — never as build-args.
+
+### Redis
+
+Production at `redis.ser.mlanima.org`. Locally the host is firewalled → `NoOpCacheManager` fallback.
+
+---
+
+## File Layout
 
 ```
 api/src/main/java/de/thm/swtp/api/
 ├── moderation/
-│   ├── ModerationClient.java              # ← moved from tag.validation, renamed
-│   ├── exception/ModerationApiException.java  # ← renamed from TagValidationException
-│   ├── ContentModerationService.java       # @Cacheable wrapper
-│   ├── exception/ContentNotValidException.java
-│   └── exception/ContentModerationException.java
-├── tag/validation/
-│   ├── TagSource.java                     # unchanged
-│   ├── ...TagSource implementations       # ← update import to moderation.ModerationClient
-│   ├── TagValidationService.java          # unchanged
-│   └── BlocklistService.java              # unchanged (shared, stays in tag.validation)
-└── exceptionhandling/GlobalExceptionHandler.java  # add handlers + update TagValidationException → ModerationApiException reference
-```
+│   ├── ContentModerationService.java
+│   ├── ModerationClient.java
+│   └── exception/
+│       ├── ContentModerationException.java
+│       ├── ContentNotValidException.java
+│       └── ModerationApiException.java
+├── location/
+│   ├── GooglePlacesClient.java
+│   └── exception/
+│       ├── GooglePlacesApiException.java
+│       └── InvalidPlaceException.java
+├── config/CacheConfig.java
+├── tag/validation/BlocklistService.java
+├── userprofile/service/UserProfileService.java
+├── project/ProjectService.java
+├── projectPost/service/ProjectPostService.java
+└── exceptionhandling/GlobalExceptionHandler.java
 
-After the move, `ContentModerationService` injects `ModerationClient` from the same package:
-
-```java
-@Service
-public class ContentModerationService {
-
-    private final ModerationClient moderationClient;
-    private final BlocklistService blocklistService;
-    private final boolean blocklistFallback;
-
-    @Cacheable(value = "content-moderation", key = "#hash(content)", unless = "#result")
-    public boolean isContentAppropriate(String content) {
-        try {
-            return !moderationClient.isFlagged(content);
-        } catch (ModerationApiException e) {
-            if (blocklistFallback) {
-                return !blocklistService.containsAny(content);
-            }
-            throw new ContentModerationException("Content moderation temporarily unavailable");
-        }
-    }
-
-    public void assertAppropriate(String content, String fieldName) {
-        if (content == null || content.isBlank()) return;
-        if (!isContentAppropriate(content)) {
-            throw new ContentNotValidException(fieldName);
-        }
-    }
-
-    String hash(String content) {
-        return DigestUtils.sha256Hex(content != null ? content : "");
-    }
-}
-```
-
-Existing tag source implementations (`OpenAIModeratedGithubTagSource` etc.) update their import from `tag.validation.OpenAIModerationClient` to `moderation.ModerationClient` and from `TagValidationException` to `ModerationApiException`. No behavioral changes.
-
----
-
-## Error Handling
-
-| Exception | HTTP | Log Level | Message |
-|-----------|------|-----------|---------|
-| `ContentNotValidException` | 400 | debug | `"Content in field 'about' is not appropriate"` |
-| `ContentModerationException` | 502 | error | `"Content moderation service temporarily unavailable"` |
-
-Add to `GlobalExceptionHandler`:
-
-```java
-@ExceptionHandler(ContentNotValidException.class)
-public ResponseEntity<ErrorResponse> handleContentNotValid(ContentNotValidException ex) {
-    log.debug("Bad Request (400): {}", ex.getMessage());
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-            .body(ErrorResponse.of(400, "Bad Request", ex.getMessage(), "CONTENT_NOT_VALID"));
-}
-
-@ExceptionHandler(ContentModerationException.class)
-public ResponseEntity<ErrorResponse> handleContentModerationError(ContentModerationException ex) {
-    log.error("Content moderation failed: {}", ex.getMessage(), ex);
-    return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
-            .body(ErrorResponse.of(502, "Bad Gateway", "Content moderation service temporarily unavailable."));
-}
+web/ideacamp/src/app/
+├── shared/
+│   ├── toast/
+│   │   ├── toast.service.ts
+│   │   └── toast.ts
+│   └── place-autocomplete/
+│       ├── place-autocomplete.ts
+│       └── place-autocomplete.html
+├── feature/
+│   ├── project-create/project-create.ts
+│   ├── project-site/project-site.ts
+│   └── user-profile/user-profile.ts
+└── enviroments/
+    ├── enviroment.dev.ts
+    └── enviroment.prod.ts
 ```
 
 ---
 
-## Frontend Considerations
+## Adding Moderation to a New Field
 
-The existing tag validation frontend error handling checks `err.status === 400` and the `"not a valid"` substring. For content moderation, a similar pattern can be used — check `err.status === 400` and the `errorCode === "CONTENT_NOT_VALID"` on the error response body.
+1. Inject `ContentModerationService` into the service
+2. Call `assertAppropriate(content, fieldName)` before persisting
+3. Frontend: check `error.error?.errorCode === 'CONTENT_NOT_VALID'` → show moderation toast
 
-| Feature | File | Current Error Handling | Changes Needed |
-|---------|------|------------------------|----------------|
-| User profile save | `user-profile.ts:229` | Generic error message | Check `errorCode === "CONTENT_NOT_VALID"` and show field-specific translation key |
-| Project create | `project-create` component | Zod validation errors | Add server-side moderation error handling |
-| Project edit (site) | `project-site.ts:116` | Generic error message | Check for CONTENT_NOT_VALID |
+No changes needed to exception handlers, cache config, or the moderation client.
 
 ---
 
-## Implementation Order (Recommended)
+## Local Development
 
-1. **Refactor** — Move `OpenAIModerationClient` → `moderation.ModerationClient`, rename `TagValidationException` → `ModerationApiException`, update imports in tag sources. This is a mechanical change with no behavior difference, but it keeps the package boundary clean before adding new code.
+- **No Redis** — `NoOpCacheManager` fallback
+- **No OpenAI key** — blocklist fallback handles it (returns `false` for clean content)
+- **No Google key** — `GooglePlacesClient` fails with 502 if called; autocomplete works as plain text
 
-2. **Tier 1** — Add `ContentModerationService`, integrate in `UserProfileService.updateProfile()` and `ProjectService` (create + edit). This covers the originally requested fields with moderate effort.
-
-3. **Tier 2** — Integrate in `ProjectPostService` for post title/content (highest abuse risk among remaining fields).
-
-4. **Tier 3** — Integrate in join request, invite, and professor request services (lower frequency, lower risk).
-
-5. **Tier 4** — Optionally moderate profile title and location (low risk, quick win).
+Both API keys are server-side env vars only — not GitHub Secrets, not in CI/CD.
