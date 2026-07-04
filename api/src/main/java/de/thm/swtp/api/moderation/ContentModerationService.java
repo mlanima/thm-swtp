@@ -35,22 +35,10 @@ public class ContentModerationService {
     @Cacheable(value = "content-moderation", key = "#hash(content)", unless = "#result")
     public boolean isContentAppropriate(final String content) {
         try {
-            var flagged = moderationClient.isFlagged(content);
-            if (flagged) {
-                log.warn("Content flagged by OpenAI moderation: {}", LogSafe.clean(content));
-            } else {
-                log.info("Content passed OpenAI moderation");
-            }
-            return !flagged;
+            return !moderationClient.isFlagged(content);
         } catch (ModerationApiException e) {
             log.warn("OpenAI moderation unavailable, falling back to blocklist");
-            var blocked = blocklistService.containsAny(content);
-            if (blocked) {
-                log.warn("Content rejected by blocklist (fallback): {}", LogSafe.clean(content));
-            } else {
-                log.info("Content passed blocklist check (fallback)");
-            }
-            return !blocked;
+            return !blocklistService.containsAny(content);
         }
     }
 
@@ -58,8 +46,11 @@ public class ContentModerationService {
         if (content == null || content.isBlank()) {
             return;
         }
-        if (!isContentAppropriate(content)) {
-            log.warn("Content in field '{}' is not appropriate", fieldName);
+        var appropriate = isContentAppropriate(content);
+        if (appropriate) {
+            log.info("Moderation '{}' passed: {}", fieldName, LogSafe.clean(content));
+        } else {
+            log.warn("Moderation '{}' rejected: {}", fieldName, LogSafe.clean(content));
             throw new ContentNotValidException(fieldName);
         }
     }
