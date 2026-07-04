@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { UserProfileService } from '../../../services/user-profile.service';
 import { TranslatePipe } from '@ngx-translate/core';
+import { isModeratorReadableRoute } from '../moderator-readable-routes';
 
 @Component({
   selector: 'app-success',
@@ -23,19 +24,27 @@ export class SuccessComponent implements OnInit {
       return;
     }
 
+    const redirectUrl = sessionStorage.getItem('postLoginRedirectUrl');
+
     if (this.authService.isModerator()) {
+      if (redirectUrl && isModeratorReadableRoute(redirectUrl)) {
+        sessionStorage.removeItem('postLoginRedirectUrl');
+        await this.router.navigateByUrl(redirectUrl);
+        return;
+      }
+
+      sessionStorage.removeItem('postLoginRedirectUrl');
       await this.router.navigateByUrl('/moderator');
       return;
     }
 
-    const redirectUrl = sessionStorage.getItem('postLoginRedirectUrl');
-    sessionStorage.removeItem('postLoginRedirectUrl');
-
     if (redirectUrl) {
+      sessionStorage.removeItem('postLoginRedirectUrl');
       await this.router.navigateByUrl(redirectUrl);
       return;
     }
 
+    sessionStorage.removeItem('postLoginRedirectUrl');
     this.userProfileService.getMyProfile().subscribe();
   }
 }

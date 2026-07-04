@@ -3,6 +3,7 @@ import { inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common'
 import { AuthService } from './auth.service';
 import { firstValueFrom, catchError, of } from 'rxjs';
+import { isModeratorReadableRoute } from './moderator-readable-routes';
 
 export const authGuard: CanActivateFn = async (_route, state) => {
   const authService = inject(AuthService);
@@ -30,7 +31,14 @@ export const authGuard: CanActivateFn = async (_route, state) => {
       return router.createUrlTree(['/account-banned']);
     }
 
+    if (isAuthCallbackRoute(state.url)) {
+      return true;
+    }
+
     if (authService.isModerator()) {
+      if (isModeratorReadableRoute(state.url)){
+        return true;
+      }
       return router.createUrlTree(['/moderator']);
     }
     return true;
@@ -40,3 +48,7 @@ export const authGuard: CanActivateFn = async (_route, state) => {
   authService.login();
   return false;
 };
+
+function isAuthCallbackRoute(url: string): boolean {
+  return url.split('?')[0].split('#')[0] === '/success';
+}
