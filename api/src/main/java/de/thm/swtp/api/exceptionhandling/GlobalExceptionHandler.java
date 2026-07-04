@@ -22,6 +22,7 @@ import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.project.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -392,14 +393,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ProjectOwnerTransferToSelfException.class)
     public ResponseEntity<ErrorResponse> handleProjectOwnerTransferToSelf(ProjectOwnerTransferToSelfException ex) {
         log.warn("Unprocessable Entity (422): {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+        return ResponseEntity.status(HttpStatusCode.valueOf(422))
                 .body(ErrorResponse.of(422, "Unprocessable Entity", ex.getMessage()));
     }
 
     @ExceptionHandler(ProjectOwnerTransferToNonMemberException.class)
     public ResponseEntity<ErrorResponse> handleProjectOwnerTransferToNonMember(ProjectOwnerTransferToNonMemberException ex) {
         log.warn("Unprocessable Entity (422): {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+        return ResponseEntity.status(HttpStatusCode.valueOf(422))
                 .body(ErrorResponse.of(422, "Unprocessable Entity", ex.getMessage()));
     }
 
