@@ -7,7 +7,7 @@ COPY package.json package-lock.json ./
 RUN npm ci --ignore-scripts
 COPY . .
 RUN sed -i "s|__API_URL__|${API_URL}|g" src/app/enviroments/enviroment.prod.ts && \
-    sed -i "s|__GOOGLE_MAPS_API_KEY__|${GOOGLE_API_KEY}|g" src/app/enviroments/enviroment.prod.ts
+    sed -i "s|__GOOGLE_API_KEY__|${GOOGLE_API_KEY}|g" src/app/enviroments/enviroment.prod.ts
 RUN npm run build -- --configuration=production
 
 # Stage 2: Runtime
