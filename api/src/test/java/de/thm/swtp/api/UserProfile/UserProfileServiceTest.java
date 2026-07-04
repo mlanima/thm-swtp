@@ -1,4 +1,5 @@
 package de.thm.swtp.api.UserProfile;
+import de.thm.swtp.api.moderation.ContentModerationService;
 import de.thm.swtp.api.userprofile.domain.UserStatus;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
@@ -29,6 +30,9 @@ class UserProfileServiceTest {
     @Mock
     private UserProfileRepository userProfileRepository;
 
+    @Mock
+    private ContentModerationService contentModerationService;
+
     private UserProfileService userProfileService;
 
     private UUID userId;
@@ -36,7 +40,7 @@ class UserProfileServiceTest {
 
     @BeforeEach
     void setUp() {
-        userProfileService = new UserProfileService(userProfileRepository);
+        userProfileService = new UserProfileService(userProfileRepository, contentModerationService);
 
         userId = UUID.randomUUID();
 
