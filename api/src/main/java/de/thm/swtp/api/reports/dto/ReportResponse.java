@@ -8,6 +8,7 @@ import de.thm.swtp.api.reports.domain.ReportTarget;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/** Response DTO returned after a user creates a report.*/
 public record ReportResponse(UUID id,
                              UUID reporterId,
                              String reporterUsername,
@@ -20,9 +21,7 @@ public record ReportResponse(UUID id,
                              LocalDateTime updatedAt
 ) {
 
-    /**
-     * Converts a report domain object into a response DTO.
-     */
+    /**Converts a report domain object into a response DTO for users.*/
     public static ReportResponse toResponse(Report report) {
         return new ReportResponse(
                 report.getId(),

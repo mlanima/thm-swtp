@@ -7,5 +7,6 @@ import jakarta.validation.constraints.Size;
 
 import java.util.UUID;
 
+/** Request DTO for creating a report.*/
 public record CreateReportRequest(@NotNull ReportTarget reportTarget, @NotNull UUID targetId, @NotNull ReportReason reportReason, @Size(max = 1000) String message) {
 }

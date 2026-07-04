@@ -8,6 +8,7 @@ import de.thm.swtp.api.reports.domain.ReportTarget;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/** Response DTO for reports shown in the moderation reports page.*/
 public record ModeratorReportResponse(UUID id,
                                       UUID reporterId,
                                       String reporterUsername,
@@ -23,6 +24,7 @@ public record ModeratorReportResponse(UUID id,
                                       LocalDateTime createdAt,
                                       LocalDateTime updatedAt) {
 
+    /** Converts a report domain object into a response DTO for moderators.*/
     public static ModeratorReportResponse toResponse(Report report) {
         return new ModeratorReportResponse(
                 report.getId(),
