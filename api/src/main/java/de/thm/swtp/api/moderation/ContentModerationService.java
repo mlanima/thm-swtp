@@ -32,7 +32,7 @@ public class ContentModerationService {
         this.blocklistFallback = blocklistFallback;
     }
 
-    @Cacheable(value = "content-moderation", key = "#hash(content)", unless = "#result")
+    @Cacheable(value = "content-moderation", key = "#hash(content)")
     public boolean isContentAppropriate(final String content) {
         log.debug("Cache miss for content moderation — querying OpenAI");
         try {
