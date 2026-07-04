@@ -144,7 +144,7 @@
     "USERS_LINK_DESCRIPTION": "View and manage active and banned users.",
     "PROFESSOR_REQUESTS_LINK_TITLE": "Professor Management",
     "PROFESSOR_REQUESTS_LINK_DESCRIPTION": "Review, accept, or reject professor requests.",
-    "REPORTS_LINK_TITLE": "Manage reports",
+    "REPORTS_LINK_TITLE": "Report Management",
     "REPORTS_LINK_DESCRIPTION": "Review and process reported content.",
     "PROJECTS": {
       "TITLE": "Project Management",
@@ -360,6 +360,7 @@
     "MODERATOR": "Moderator",
     "MODERATOR_PROJECTS": "Project Management",
     "USER_MANAGEMENT": "User management",
+    "REPORTS": "Report management",
     "PROFESSOR_REQUESTS": "Professor management",
     "IMPRESSUM": "Legal notice",
     "MENU": "Menu"

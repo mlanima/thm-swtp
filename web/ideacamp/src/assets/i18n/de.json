@@ -144,7 +144,7 @@
     "USERS_LINK_DESCRIPTION": "Aktive und gebannte Nutzer einsehen und verwalten.",
     "PROFESSOR_REQUESTS_LINK_TITLE": "Professorverwaltung",
     "PROFESSOR_REQUESTS_LINK_DESCRIPTION": "Professor-Anfragen prüfen, annehmen oder ablehnen.",
-    "REPORTS_LINK_TITLE": "Reports verwalten",
+    "REPORTS_LINK_TITLE": "Reportverwaltung",
     "REPORTS_LINK_DESCRIPTION": "Gemeldete Inhalte prüfen und bearbeiten.",
     "PROJECTS": {
       "TITLE": "Projektverwaltung",
@@ -245,7 +245,7 @@
       "TOTAL_REQUESTS": "Anfragen angezeigt"
     },
     "REPORTS": {
-      "TITLE": "Reportsverwaltung",
+      "TITLE": "Reportverwaltung",
       "SUBTITLE": "Gemeldete Inhalte prüfen, priorisieren und bearbeiten.",
       "BADGE": "Moderator",
 
@@ -360,6 +360,7 @@
     "MODERATOR": "Moderator",
     "MODERATOR_PROJECTS": "Projektverwaltung",
     "USER_MANAGEMENT": "Nutzerverwaltung",
+    "REPORTS": "Reportverwaltung",
     "PROFESSOR_REQUESTS": "Professorverwaltung",
     "IMPRESSUM": "Impressum",
     "MENU": "Menü"

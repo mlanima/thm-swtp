@@ -43,6 +43,13 @@
               </app-menu-link>
             </a>
 
+            <a routerLink="/moderator/reports" (click)="requestClose()">
+              <app-menu-link>
+                <i class="pi pi-flag text-sm text-zinc-400"></i>
+                <span>{{ 'SIDEBAR.REPORTS' | translate }}</span>
+              </app-menu-link>
+            </a>
+
             <a routerLink="/moderator/professor-requests" (click)="requestClose()">
               <app-menu-link>
                 <i class="pi pi-graduation-cap text-sm text-zinc-400"></i>
