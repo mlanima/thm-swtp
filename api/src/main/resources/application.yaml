@@ -87,7 +87,7 @@ app:
 openai:
   api:
     base-url: https://api.openai.com
-    key: ${OPENAI_API_KEY}
+    key: ${OPENAI_API_KEY:}
   moderation:
     model: omni-moderation-latest
     threshold: 0.1
@@ -100,7 +100,7 @@ github:
 google:
   api:
     base-url: https://maps.googleapis.com/maps/api/place
-    key: ${GOOGLE_API_KEY}
+    key: ${GOOGLE_API_KEY:}
 
 stackoverflow:
   api:

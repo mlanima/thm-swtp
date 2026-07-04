@@ -52,8 +52,11 @@ public class ContentModerationService {
         try {
             return !moderationClient.isFlagged(content);
         } catch (ModerationApiException e) {
-            log.warn("OpenAI moderation unavailable, falling back to blocklist");
-            return !blocklistService.containsAny(content);
+            if (blocklistFallback) {
+                log.warn("OpenAI moderation unavailable, falling back to blocklist");
+                return !blocklistService.containsAny(content);
+            }
+            throw new ContentModerationException("Content moderation temporarily unavailable");
         }
     }
 
