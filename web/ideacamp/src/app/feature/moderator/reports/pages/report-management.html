@@ -1,0 +1,157 @@
+<section class="min-h-screen bg-slate-100 px-6 py-8 text-slate-700">
+  <div class="mx-auto max-w-6xl">
+    <header class="mb-6">
+      <div class="flex items-center gap-3">
+        <h1 class="text-3xl font-bold text-slate-700">
+          {{ 'MODERATOR.REPORTS.TITLE' | translate }}
+        </h1>
+
+        <span class="inline-flex items-center rounded-md bg-slate-700 px-2.5 py-0.5 text-xs font-medium text-white">
+          {{ 'MODERATOR.REPORTS.BADGE' | translate }}
+        </span>
+      </div>
+
+      <p class="mt-1 text-sm text-slate-500">
+        {{ 'MODERATOR.REPORTS.SUBTITLE' | translate }}
+      </p>
+    </header>
+
+    <div class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div class="space-y-4 border-b border-slate-200 p-5">
+        <div class="relative">
+          <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400"></i>
+          <input
+            type="text"
+            [ngModel]="query()"
+            (ngModelChange)="onQueryChange($event)"
+            [placeholder]="'MODERATOR.REPORTS.SEARCH_PLACEHOLDER' | translate"
+            class="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-9 pr-4 text-sm text-slate-700 placeholder:text-slate-400 focus:border-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400"
+          />
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <span class="text-xs font-bold uppercase tracking-wide text-slate-500">
+            {{ 'MODERATOR.REPORTS.FILTER.STATUS' | translate }}:
+          </span>
+
+          <div class="flex rounded-xl bg-slate-100 p-1">
+            @for (status of statusOptions; track status ?? 'ALL') {
+              <button
+                type="button"
+                (click)="setStatusFilter(status)"
+                class="rounded-lg px-4 py-1.5 text-sm font-medium transition"
+                [class.bg-white]="statusFilter() === status"
+                [class.text-slate-800]="statusFilter() === status"
+                [class.shadow-sm]="statusFilter() === status"
+                [class.text-slate-500]="statusFilter() !== status"
+              >
+                @if (status === null) {
+                  {{ 'MODERATOR.REPORTS.FILTER.ALL' | translate }}
+                } @else {
+                  {{ ('MODERATOR.REPORTS.STATUS.' + status) | translate }}
+                }
+              </button>
+            }
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-4">
+          <div class="flex flex-wrap items-center gap-3">
+            <span class="text-xs font-bold uppercase tracking-wide text-slate-500">
+              {{ 'MODERATOR.REPORTS.FILTER.CONTENT_TYPE' | translate }}:
+            </span>
+
+            <div class="flex rounded-xl bg-slate-100 p-1">
+              @for (target of targetOptions; track target ?? 'ALL') {
+                <button
+                  type="button"
+                  (click)="setTargetFilter(target)"
+                  class="rounded-lg px-4 py-1.5 text-sm font-medium transition"
+                  [class.bg-white]="targetFilter() === target"
+                  [class.text-slate-800]="targetFilter() === target"
+                  [class.shadow-sm]="targetFilter() === target"
+                  [class.text-slate-500]="targetFilter() !== target"
+                >
+                  @if (target === null) {
+                    {{ 'MODERATOR.REPORTS.FILTER.ALL' | translate }}
+                  } @else {
+                    {{ ('MODERATOR.REPORTS.TARGET.' + target) | translate }}
+                  }
+                </button>
+              }
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <span class="text-xs font-bold uppercase tracking-wide text-slate-500">
+              {{ 'MODERATOR.REPORTS.FILTER.REASON' | translate }}:
+            </span>
+
+            <select
+              [ngModel]="reasonFilter()"
+              (ngModelChange)="setReasonFilter($event || null)"
+              class="rounded-xl border border-slate-200 bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 focus:border-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400"
+            >
+              <option [ngValue]="null">
+                {{ 'MODERATOR.REPORTS.FILTER.ALL_REASONS' | translate }}
+              </option>
+
+              @for (reason of reasonOptions; track reason) {
+                <option [ngValue]="reason">
+                  {{ ('MODERATOR.REPORTS.REASON.' + reason) | translate }}
+                </option>
+              }
+            </select>
+          </div>
+        </div>
+      </div>
+
+      @if (errorMessage()) {
+        <div class="border-b border-red-100 bg-red-50 px-5 py-3 text-sm font-medium text-red-700">
+          {{ errorMessage()! | translate }}
+        </div>
+      }
+
+      @if (isLoading()) {
+        <div class="flex items-center justify-center px-6 py-16">
+          <p class="text-sm text-slate-500">
+            {{ 'MODERATOR.REPORTS.LOADING' | translate }}
+          </p>
+        </div>
+      } @else {
+        <app-report-table
+          [reports]="reports()"
+          [sortField]="sortField()"
+          [sortDirection]="sortDirection()"
+          (openReport)="openReport($event)"
+          (sortChange)="changeSort($event)"
+          (updateStatus)="updateReportStatusFromTable($event)"
+        />
+
+        <div class="flex items-center justify-between border-t border-slate-200 px-5 py-4">
+          <p class="text-sm text-slate-400">
+            {{
+              'MODERATOR.REPORTS.PAGINATION.SHOWING'
+                | translate: { shown: reports().length, total: totalElements() }
+            }}
+          </p>
+
+          <app-pagination
+            [currentPage]="currentPage()"
+            [totalPages]="totalPages()"
+            (pageChange)="onPageChange($event)"
+          />
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+@if (selectedReport(); as report) {
+  <app-report-detail-dialog
+    [report]="report"
+    [isUpdating]="isUpdating()"
+    (closeDialog)="closeReportDialog()"
+    (updateStatus)="updateReportStatus($event.status, $event.moderatorMessage)"
+  />
+}

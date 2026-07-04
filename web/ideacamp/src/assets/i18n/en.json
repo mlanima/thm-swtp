@@ -144,6 +144,8 @@
     "USERS_LINK_DESCRIPTION": "View and manage active and banned users.",
     "PROFESSOR_REQUESTS_LINK_TITLE": "Professor Management",
     "PROFESSOR_REQUESTS_LINK_DESCRIPTION": "Review, accept, or reject professor requests.",
+    "REPORTS_LINK_TITLE": "Manage reports",
+    "REPORTS_LINK_DESCRIPTION": "Review and process reported content.",
     "PROJECTS": {
       "TITLE": "Project Management",
       "SUBTITLE": "View, search, and delete projects as needed.",
@@ -241,6 +243,114 @@
       "CONFIRM": "Confirm",
       "SHOWING_OF": "From",
       "TOTAL_REQUESTS": "Requests shown"
+    },
+    "REPORTS": {
+      "TITLE": "Report Management",
+      "SUBTITLE": "Review, prioritize, and process reported content.",
+      "BADGE": "Moderator",
+
+      "SEARCH_PLACEHOLDER": "Search by user, report, note, or ID...",
+
+      "FILTER": {
+        "STATUS": "Status",
+        "CONTENT_TYPE": "Content type",
+        "REASON": "Reason",
+        "PRIORITY": "Priority",
+        "ALL": "All",
+        "ALL_REASONS": "All reasons"
+      },
+
+      "COLUMN": {
+        "MESSAGE": "Report",
+        "REASON": "Reason",
+        "REPORTED_CONTENT": "Reported content",
+        "REPORTED_BY": "Reported by",
+        "STATUS": "Status",
+        "CREATED_AT": "Created at",
+        "ACTIONS": "Actions"
+      },
+
+      "STATUS": {
+        "OPEN": "Open",
+        "IN_REVIEW": "In review",
+        "RESOLVED": "Resolved",
+        "DISMISSED": "Dismissed"
+      },
+
+      "TARGET": {
+        "USER": "User",
+        "PROJECT": "Project",
+        "PROJECT_POST": "Project post"
+      },
+
+      "REASON": {
+        "SPAM": "Spam",
+        "HARASSMENT": "Harassment",
+        "HATE_SPEECH": "Hate speech",
+        "INAPPROPRIATE_CONTENT": "Inappropriate content",
+        "VIOLENCE_OR_THREATS": "Violence / threats",
+        "SELF_HARM_OR_SUICIDE": "Self-harm",
+        "PERSONAL_DATA": "Personal data",
+        "COPYRIGHT": "Copyright",
+        "MISINFORMATION": "Misinformation",
+        "FRAUD_OR_IMPERSONATION": "Fraud / impersonation",
+        "OTHER": "Other"
+      },
+
+      "PRIORITY": {
+        "CRITICAL": "Critical",
+        "MEDIUM": "Medium",
+        "LOW": "Low"
+      },
+
+      "ACTIONS": {
+        "VIEW": "View",
+        "OPEN_MENU": "More actions",
+        "SET_IN_REVIEW": "Set in review",
+        "RESOLVE": "Mark as resolved",
+        "DISMISS": "Dismiss",
+        "CLOSE": "Close",
+        "SAVE": "Save"
+      },
+
+      "DETAIL": {
+        "TITLE": "Report",
+        "REPORT_ID": "Report ID",
+        "REASON": "Reason",
+        "PRIORITY": "Priority",
+        "CONTENT_TYPE": "Content type",
+        "REPORTED_CONTENT": "Reported content",
+        "REPORTED_BY": "Reported by",
+        "COMMENT": "Comment",
+        "MODERATOR_NOTE": "Moderator note",
+        "MODERATOR_NOTE_PLACEHOLDER": "e.g. “Post was reviewed.” or “No violation found.”",
+        "NO_MODERATOR_NOTE": "No moderator note available.",
+        "CREATED_AT": "Created at",
+        "UPDATED_AT": "Updated at",
+        "REVIEWED_BY": "Reviewed by",
+        "REVIEWED_AT": "Reviewed at"
+      },
+
+      "EMPTY": {
+        "TITLE": "No reports found.",
+        "DESCRIPTION": "Adjust the filters or search query to find other reports."
+      },
+
+      "PAGINATION": {
+        "SHOWING": "{{ shown }} of {{ total }} reports",
+        "PAGE": "Page {{ current }} of {{ total }}"
+      },
+
+      "SORT": {
+        "SORT_BY": "Sort by this column",
+        "ASC": "Sorted ascending",
+        "DESC": "Sorted descending"
+      },
+
+      "ERROR_LOAD": "Reports could not be loaded.",
+      "ERROR_UPDATE": "Report could not be updated.",
+      "LOADING": "Loading reports...",
+      "EMPTY_MESSAGE": "No message provided."
     }
   },
   "SIDEBAR": {
