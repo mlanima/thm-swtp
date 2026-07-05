@@ -14,6 +14,7 @@ import de.thm.swtp.api.projectInvitation.exception.InvalidProjectInviteException
 import de.thm.swtp.api.projectInvitation.exception.ProjectInviteAccessDeniedException;
 import de.thm.swtp.api.projectInvitation.exception.ProjectInviteNotFoundException;
 import de.thm.swtp.api.tag.exception.TagAccessDeniedException;
+import de.thm.swtp.api.tag.exception.TagSourceApiException;
 import de.thm.swtp.api.location.exception.GooglePlacesApiException;
 import de.thm.swtp.api.location.exception.InvalidPlaceException;
 import de.thm.swtp.api.moderation.exception.ContentModerationException;
@@ -146,6 +147,13 @@ public class GlobalExceptionHandler {
         log.debug("Bad Request (400): {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ErrorResponse.of(400, "Bad Request", ex.getMessage(), "TAG_NOT_VALID"));
+    }
+
+    @ExceptionHandler(TagSourceApiException.class)
+    public ResponseEntity<ErrorResponse> handleTagSourceApiError(TagSourceApiException ex) {
+        log.error("Tag source API error: {}", ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                .body(ErrorResponse.of(502, "Bad Gateway", "Tag validation service temporarily unavailable."));
     }
 
     @ExceptionHandler(ContentNotValidException.class)
