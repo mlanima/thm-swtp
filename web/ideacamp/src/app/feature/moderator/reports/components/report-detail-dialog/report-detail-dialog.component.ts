@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, input, output, effect } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { FormsModule } from '@angular/forms';
-import { ManagedReport, ReportReason, ReportStatus, ReportTarget } from '../../models/report.model';
+import { ManagedReport, ReportReason, ReportStatus, ReportTarget, TargetAction } from '../../models/report.model';
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -19,6 +19,11 @@ export class ReportDetailDialogComponent {
   readonly updateStatus = output<{ status: ReportStatus; moderatorMessage?: string }>();
 
   moderatorMessage = '';
+
+  readonly targetActionConfirmed = output<{
+    report: ManagedReport;
+    action: TargetAction;
+  }>();
 
   constructor() {
     effect(() => {

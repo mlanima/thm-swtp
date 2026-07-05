@@ -98,11 +98,12 @@
 
           <td class="px-5 py-4">
             <span
-              class="inline-flex min-w-28 rounded-full border px-3 py-1 text-xs font-semibold"
-              [class]="getTargetBadgeClasses(report.target)"
+              class="inline-flex min-w-28 items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold shadow-sm"
+              [ngClass]="getTargetBadgeClasses(report.target)"
             >
-            {{ getTargetTranslationKey(report.target) | translate }}
-          </span>
+            <i class="pi text-[10px]" [ngClass]="getTargetIcon(report.target)"></i>
+                        {{ getTargetTranslationKey(report.target) | translate }}
+            </span>
 
             @if (report.targetSummary) {
               @if (report.targetSummary.link) {
@@ -254,10 +255,11 @@
         </span>
 
         <span
-          class="inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold"
+          class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold shadow-sm"
           [class]="getTargetBadgeClasses(report.target)"
         >
-          {{ getTargetTranslationKey(report.target) | translate }}
+        <i class="text-[10px]" [ngClass]="getTargetIcon(report.target)"></i>
+                {{ getTargetTranslationKey(report.target) | translate }}
         </span>
       </div>
 

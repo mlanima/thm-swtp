@@ -48,6 +48,10 @@ export interface ReportTargetSummary{
   title: string;
   subtitle: string;
   link: string | null;
+  parentId: string | null;
 }
 
 export type ReportPriority = 'CRITICAL' | 'MEDIUM' | 'LOW';
+
+
+export type TargetAction = 'BAN_USER' | 'DELETE_PROJECT' | 'DELETE_PROJECT_POST';

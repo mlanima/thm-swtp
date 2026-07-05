@@ -23,7 +23,7 @@
         (click)="closeDialog.emit()"
         class="rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
       >
-        ×
+        <i class="pi pi-times text-sm"></i>
       </button>
     </div>
 
@@ -117,7 +117,7 @@
         </p>
 
         @if (isClosed(report())) {
-          <div class="mt-2 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600 whitespace-pre-wrap break-words">
+          <div class="mt-2 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600 whitespace-pre-wrap wrap-break-word">
             @if (report().moderatorMessage) {
               {{ report().moderatorMessage }}
             } @else {
@@ -137,6 +137,46 @@
         }
       </div>
     </div>
+
+    @if (!isClosed(report())) {
+      <div class="border-t border-slate-200 px-6 py-4">
+        <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+          {{ 'MODERATOR.REPORTS.DETAIL.TARGET_ACTIONS' | translate }}
+        </p>
+
+        <div class="flex flex-wrap gap-2">
+          @if (report().target === 'USER') {
+            <button
+              type="button"
+              class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-100"
+              (click)="targetActionConfirmed.emit({ report: report(), action: 'BAN_USER' })"
+            >
+              {{ 'MODERATOR.REPORTS.ACTIONS.BAN_USER' | translate }}
+            </button>
+          }
+
+          @if (report().target === 'PROJECT') {
+            <button
+              type="button"
+              class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-100"
+              (click)="targetActionConfirmed.emit({ report: report(), action: 'DELETE_PROJECT' })"
+            >
+              {{ 'MODERATOR.REPORTS.ACTIONS.DELETE_PROJECT' | translate }}
+            </button>
+          }
+
+          @if (report().target === 'PROJECT_POST') {
+            <button
+              type="button"
+              class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-100"
+              (click)="targetActionConfirmed.emit({ report: report(), action: 'DELETE_PROJECT_POST' })"
+            >
+              {{ 'MODERATOR.REPORTS.ACTIONS.DELETE_PROJECT_POST' | translate }}
+            </button>
+          }
+        </div>
+      </div>
+    }
 
     <div class="flex justify-end gap-2 border-t border-slate-200 px-6 py-4">
       @if (canSetInReview(report())) {

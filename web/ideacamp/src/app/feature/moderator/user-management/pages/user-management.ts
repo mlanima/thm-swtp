@@ -67,7 +67,7 @@ export class UserManagement implements OnInit {
         next: (response) => {
           this.activeUsers.set(response.content);
           this.activeUserCount.set(response.totalElements);
-          this.activeCurrentPage.set(response.number);
+          this.activeCurrentPage.set(response.page);
           this.activeTotalPages.set(response.totalPages);
           this.isLoading.set(false);
         },
@@ -88,7 +88,7 @@ export class UserManagement implements OnInit {
         next: (response) => {
           this.bannedUsers.set(response.content);
           this.bannedUserCount.set(response.totalElements);
-          this.bannedCurrentPage.set(response.number);
+          this.bannedCurrentPage.set(response.page);
           this.bannedTotalPages.set(response.totalPages);
           this.isLoading.set(false);
         },

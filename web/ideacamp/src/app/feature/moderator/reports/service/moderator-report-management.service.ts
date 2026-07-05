@@ -4,6 +4,7 @@ import { environment } from '../../../../enviroments/enviroment.dev';
 import {
   ManagedReport,
   ReportSearchParams,
+  ReportTarget,
   UpdateReportStatus,
 } from '../models/report.model';
 import { Observable } from 'rxjs';
@@ -21,7 +22,11 @@ export class ModeratorReportManagementService {
   }
 
   updateReportStatus(reportId: string, request: UpdateReportStatus): Observable<ManagedReport> {
-    return this.http.patch <ManagedReport>(`${this.baseUrl}/${reportId}/status`, request);
+    return this.http.patch<ManagedReport>(`${this.baseUrl}/${reportId}/status`, request);
+  }
+
+  resolveActiveReportsForTarget(target: ReportTarget, targetId: string, moderatorMessage: string,): Observable<void> {
+    return this.http.patch<void>(`${this.baseUrl}/targets/${target}/${targetId}/resolve-active`, { moderatorMessage, });
   }
 
   private buildReportParams(params: ReportSearchParams): HttpParams {

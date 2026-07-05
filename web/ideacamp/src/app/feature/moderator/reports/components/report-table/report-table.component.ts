@@ -88,13 +88,25 @@ export class ReportTableComponent {
   getTargetBadgeClasses(target: ReportTarget): string {
     switch (target) {
       case 'USER':
-        return 'border-blue-200 bg-blue-50 text-blue-700';
+        return 'border-blue-300 bg-blue-50 text-blue-800';
 
       case 'PROJECT':
-        return 'border-green-200 bg-green-50 text-green-700';
+        return 'border-green-300 bg-green-50 text-green-800';
 
       case 'PROJECT_POST':
-        return 'border-purple-200 bg-purple-50 text-purple-700';
+        return 'border-purple-300 bg-purple-50 text-purple-800';
+    }
+  }
+  getTargetIcon(target: ReportTarget): string {
+    switch (target) {
+      case 'USER':
+        return 'pi pi-user';
+
+      case 'PROJECT':
+        return 'pi pi-folder';
+
+      case 'PROJECT_POST':
+        return 'pi pi-comment';
     }
   }
 

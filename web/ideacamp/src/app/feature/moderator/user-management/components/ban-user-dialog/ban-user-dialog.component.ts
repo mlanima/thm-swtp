@@ -1,6 +1,11 @@
 import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
-import { ManagedUser } from '../../models/managed-user.model';
+
+export interface BanUserDialogUser {
+  keycloakId: string;
+  username: string;
+  email?: string | null;
+}
 
 @Component({
   selector: 'app-ban-user-dialog',
@@ -10,7 +15,7 @@ import { ManagedUser } from '../../models/managed-user.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BanUserDialogComponent {
-  readonly user = input.required<ManagedUser>();
+  readonly user = input.required<BanUserDialogUser>();
   readonly isSubmitting = input(false);
 
   readonly closeDialog = output<void>();

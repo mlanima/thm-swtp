@@ -157,5 +157,82 @@
     [isUpdating]="isUpdating()"
     (closeDialog)="closeReportDialog()"
     (updateStatus)="updateReportStatus($event.status, $event.moderatorMessage)"
+    (targetActionConfirmed)="handleTargetAction($event)"
   />
+}
+
+@if (userToBan(); as user) {
+  <app-ban-user-dialog
+    [user]="user"
+    [isSubmitting]="isTargetActionRunning()"
+    (closeDialog)="closeBanUserDialog()"
+    (confirmBan)="confirmBanUserFromReport($event)"
+  />
+}
+
+@if (projectToDelete(); as state) {
+  <app-delete-dialog
+    [state]="state"
+    [confirmInput]="deleteConfirmInput()"
+    [isDeleting]="isTargetActionRunning()"
+    [isDeleteEnabled]="isProjectDeleteEnabled()"
+    [deleteError]="targetActionError() ?? ''"
+    (closeDialog)="closeProjectDeleteDialog()"
+    (confirm)="confirmDeleteProjectFromReport()"
+    (confirmInputChange)="deleteConfirmInput.set($event)"
+  />
+}
+
+@if (postToDelete(); as report) {
+  <div class="fixed inset-0 z-60 flex items-center justify-center bg-slate-900/50 px-4">
+    <section class="w-full max-w-md rounded-xl bg-white p-6 shadow-2xl">
+      <h2 class="text-lg font-bold text-slate-800">
+        {{ 'MODERATOR.REPORTS.CONFIRM.DELETE_PROJECT_POST_TITLE' | translate }}
+      </h2>
+
+      <p class="mt-2 text-sm text-slate-500">
+        {{ 'MODERATOR.REPORTS.CONFIRM.DELETE_PROJECT_POST_DESCRIPTION' | translate }}
+      </p>
+
+      @if (report.targetSummary) {
+        <div class="mt-5 rounded-lg border border-red-100 bg-red-50 p-4">
+          <p class="text-sm font-semibold text-slate-800">
+            {{ report.targetSummary.title }}
+          </p>
+
+          @if (report.targetSummary.subtitle) {
+            <p class="mt-1 text-xs text-slate-500">
+              {{ report.targetSummary.subtitle }}
+            </p>
+          }
+        </div>
+      }
+
+      @if (targetActionError()) {
+        <p class="mt-4 rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-sm text-red-700">
+          {{ targetActionError()! | translate }}
+        </p>
+      }
+
+      <div class="mt-6 flex justify-end gap-3">
+        <button
+          type="button"
+          class="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50 disabled:opacity-60"
+          (click)="closeProjectPostDeleteDialog()"
+          [disabled]="isTargetActionRunning()"
+        >
+          {{ 'COMMON.CANCEL' | translate }}
+        </button>
+
+        <button
+          type="button"
+          class="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700 disabled:opacity-60"
+          (click)="confirmDeleteProjectPostFromReport()"
+          [disabled]="isTargetActionRunning()"
+        >
+          {{ 'COMMON.CONFIRM' | translate }}
+        </button>
+      </div>
+    </section>
+  </div>
 }
