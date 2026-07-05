@@ -27,6 +27,7 @@
 
                   <app-place-autocomplete
                     [value]="editForm.location"
+                    [placeIdInput]="editForm.placeId"
                     [placeholder]="'USERPROFILE.NO_LOCATION' | translate"
                     (placeChange)="onPlaceChange($event)"
                     (enterKey)="save.emit()">

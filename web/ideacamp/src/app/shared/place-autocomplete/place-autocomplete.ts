@@ -39,6 +39,8 @@ export class PlaceAutocomplete implements AfterViewInit, OnDestroy {
 
   readonly value = input('');
 
+  readonly placeIdInput = input('');
+
   readonly placeChange = output<{ placeId: string; location: string }>();
 
   readonly enterKey = output<void>();
@@ -49,21 +51,23 @@ export class PlaceAutocomplete implements AfterViewInit, OnDestroy {
 
   private currentPlaceId = '';
 
+  private selectedLocation = '';
+
   private readonly listener: google.maps.MapsEventListener[] = [];
 
   ngAfterViewInit(): void {
     if (isPlatformBrowser(this.platformId)) {
+      this.currentPlaceId = this.placeIdInput();
+      this.selectedLocation = this.value();
       this.inputElement.nativeElement.value = this.value();
       this.initAutocomplete();
     }
   }
 
   onInput(): void {
-    this.currentPlaceId = '';
-    this.placeChange.emit({
-      placeId: '',
-      location: this.inputElement.nativeElement.value,
-    });
+    var value = this.inputElement.nativeElement.value;
+    var placeId = value === this.selectedLocation ? this.currentPlaceId : '';
+    this.placeChange.emit({ placeId, location: value });
   }
 
   private async initAutocomplete(): Promise<void> {
@@ -76,6 +80,7 @@ export class PlaceAutocomplete implements AfterViewInit, OnDestroy {
         const place = this.autocomplete!.getPlace();
         if (place.place_id && place.formatted_address) {
           this.currentPlaceId = place.place_id;
+          this.selectedLocation = place.formatted_address;
           this.inputElement.nativeElement.value = place.formatted_address;
           this.placeChange.emit({
             placeId: place.place_id,
