@@ -87,6 +87,21 @@
         </div>
       </div>
 
+      @if (report().similarReportsCount > 1) {
+        <div class="rounded-xl border border-amber-100 bg-amber-50 px-4 py-3">
+          <p class="text-xs font-semibold uppercase tracking-wide text-amber-700">
+            {{ 'MODERATOR.REPORTS.DETAIL.SIMILAR_REPORTS' | translate }}
+          </p>
+
+          <p class="mt-1 text-sm font-medium text-amber-800">
+            {{
+              'MODERATOR.REPORTS.DETAIL.SIMILAR_REPORTS_TEXT'
+                | translate: { count: report().similarReportsCount }
+            }}
+          </p>
+        </div>
+      }
+
       <div>
         <p class="text-xs font-bold uppercase tracking-wide text-slate-400">
           {{ 'MODERATOR.REPORTS.DETAIL.COMMENT' | translate }}

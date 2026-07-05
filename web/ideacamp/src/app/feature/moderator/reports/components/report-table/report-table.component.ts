@@ -111,4 +111,10 @@ export class ReportTableComponent {
   getTargetSubtitleTranslationKey(value: string): string {
     return `MODERATOR.REPORTS.TARGET.${value.trim().toUpperCase()}`;
   }
+
+  shouldShowSimilarReports(report: ManagedReport): boolean {
+    return (
+      report.similarReportsCount > 1 && (report.status === 'OPEN' || report.status === 'IN_REVIEW')
+    );
+  }
 }

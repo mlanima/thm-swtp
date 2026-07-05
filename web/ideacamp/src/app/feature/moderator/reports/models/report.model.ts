@@ -21,6 +21,7 @@ export interface ManagedReport {
   targetSummary: ReportTargetSummary | null;
   createdAt: string;
   updatedAt: string;
+  similarReportsCount: number;
 }
 
 export type ReportSortField = 'reason' | 'target' | 'status' | 'reporter.username' | 'reviewerUsername' | 'reviewedAt' | 'createdAt' | 'updatedAt';

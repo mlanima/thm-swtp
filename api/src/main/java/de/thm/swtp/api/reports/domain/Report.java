@@ -28,4 +28,5 @@ public class Report {
     String moderatorMessage;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
+    long similarReportsCount;
 }

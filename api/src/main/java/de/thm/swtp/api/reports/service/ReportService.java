@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -32,7 +33,7 @@ public class ReportService {
 
     private static final Set<String> ALLOWED_REPORT_SORT_FIELDS = Set.of("target", "targetId", "reason", "status", "reporter.username",
                                                                          "reviewerUsername", "createdAt", "updatedAt", "reviewedAt");
-
+    private static final List<ReportStatus> ACTIVE_REPORT_STATUSES = List.of(ReportStatus.OPEN, ReportStatus.IN_REVIEW);
 
     /** Creates a new report for a user, project or project post.*/
     @Transactional
@@ -110,7 +111,8 @@ public class ReportService {
     /** Converts a report entity into a domain model with the target display information.*/
     private Report toDomainWithTargetSummary(ReportEntity reportEntity) {
         ReportTargetSummary targetSummary = buildTargetSummary(reportEntity.getTarget(), reportEntity.getTargetId());
-        return ReportMapper.toDomain(reportEntity, targetSummary);
+        long similarReportsCount = countSimilarActiveReports(reportEntity);
+        return ReportMapper.toDomain(reportEntity, targetSummary, similarReportsCount);
     }
 
     private ReportTargetSummary buildTargetSummary(ReportTarget target, UUID targetId){
@@ -209,10 +211,15 @@ public class ReportService {
     }
 
     private String normalizeQuery(String query) {
-        if (query == null || query.isEmpty()) {
+        if (query == null || query.isBlank()) {
             return null;
         }
         return "%" +  query.trim().toLowerCase() + "%";
+    }
+
+    private long countSimilarActiveReports(ReportEntity reportEntity) {
+        return reportRepository.countByTargetAndTargetIdAndStatusIn(reportEntity.getTarget(),
+                reportEntity.getTargetId(), ACTIVE_REPORT_STATUSES);
     }
 
 }

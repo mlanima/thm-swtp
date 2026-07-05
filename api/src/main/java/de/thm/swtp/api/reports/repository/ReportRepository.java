@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Collection;
 import java.util.UUID;
 
 /** Repository for report entities.*/
@@ -39,4 +40,6 @@ public interface ReportRepository extends JpaRepository<ReportEntity, UUID> {
             @Param("query") String query,
             Pageable pageable
     );
+
+    long countByTargetAndTargetIdAndStatusIn(ReportTarget target, UUID reportId, Collection<ReportStatus> statuses);
 }

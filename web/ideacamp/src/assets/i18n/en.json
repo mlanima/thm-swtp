@@ -328,7 +328,9 @@
         "CREATED_AT": "Created at",
         "UPDATED_AT": "Updated at",
         "REVIEWED_BY": "Reviewed by",
-        "REVIEWED_AT": "Reviewed at"
+        "REVIEWED_AT": "Reviewed at",
+        "SIMILAR_REPORTS": "Similar reports",
+        "SIMILAR_REPORTS_TEXT": "{{count}} active report(s) exist for this content."
       },
 
       "EMPTY": {
@@ -350,7 +352,9 @@
       "ERROR_LOAD": "Reports could not be loaded.",
       "ERROR_UPDATE": "Report could not be updated.",
       "LOADING": "Loading reports...",
-      "EMPTY_MESSAGE": "No message provided."
+      "EMPTY_MESSAGE": "No message provided.",
+
+      "SIMILAR_REPORTS": "{{count}} reports"
     }
   },
   "SIDEBAR": {

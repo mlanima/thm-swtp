@@ -24,7 +24,8 @@ public record ModeratorReportResponse(UUID id,
                                       LocalDateTime reviewedAt,
                                       String moderatorMessage,
                                       LocalDateTime createdAt,
-                                      LocalDateTime updatedAt) {
+                                      LocalDateTime updatedAt,
+                                      long similarReportsCount) {
 
     /** Converts a report domain object into a response DTO for moderators.*/
     public static ModeratorReportResponse toResponse(Report report) {
@@ -43,7 +44,8 @@ public record ModeratorReportResponse(UUID id,
                 report.getReviewedAt(),
                 report.getModeratorMessage(),
                 report.getCreatedAt(),
-                report.getUpdatedAt()
+                report.getUpdatedAt(),
+                report.getSimilarReportsCount()
         );
     }
 }

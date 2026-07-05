@@ -8,10 +8,14 @@ import de.thm.swtp.api.reports.entity.ReportEntity;
 public class ReportMapper {
 
     public static Report toDomain(ReportEntity entity) {
-        return toDomain(entity, null);
+        return toDomain(entity, null, 0);
     }
 
     public static Report toDomain(ReportEntity entity, ReportTargetSummary targetSummary) {
+        return toDomain(entity, targetSummary, 0);
+    }
+
+    public static Report toDomain(ReportEntity entity, ReportTargetSummary targetSummary, long similarReportsCount) {
         return Report.builder()
                 .id(entity.getId())
                 .reporterId(entity.getReporter().getKeycloakId())
@@ -28,6 +32,7 @@ public class ReportMapper {
                 .moderatorMessage(entity.getModeratorMessage())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
+                .similarReportsCount(similarReportsCount)
                 .build();
     }
 }

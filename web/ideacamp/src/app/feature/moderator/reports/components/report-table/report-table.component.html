@@ -127,6 +127,13 @@
                   }
                 </div>
               }
+
+              @if (shouldShowSimilarReports(report)) {
+                <div class="mt-1 max-w-44 truncate text-xs font-medium text-amber-600">
+                  {{ 'MODERATOR.REPORTS.SIMILAR_REPORTS' | translate: { count: report.similarReportsCount } }}
+                </div>
+              }
+
             } @else {
               <div class="mt-1 max-w-40 truncate text-xs text-slate-400">
                 ID: {{ getShortId(report.targetId) }}
@@ -278,6 +285,13 @@
               }
             </p>
           }
+
+          @if (shouldShowSimilarReports(report)) {
+            <p class="mt-1 text-xs font-medium text-amber-600">
+              {{ 'MODERATOR.REPORTS.SIMILAR_REPORTS' | translate: { count: report.similarReportsCount } }}
+            </p>
+          }
+
         </div>
       }
 

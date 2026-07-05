@@ -272,7 +272,7 @@
 
       "STATUS": {
         "OPEN": "Offen",
-        "IN_REVIEW": "In Prüfung",
+        "IN_REVIEW": "In Bearbeitung",
         "RESOLVED": "Gelöst",
         "DISMISSED": "Verworfen"
       },
@@ -306,7 +306,7 @@
       "ACTIONS": {
         "VIEW": "Ansehen",
         "OPEN_MENU": "Weitere Aktionen",
-        "SET_IN_REVIEW": "In Prüfung setzen",
+        "SET_IN_REVIEW": "In Bearbeitung setzen",
         "RESOLVE": "Als gelöst markieren",
         "DISMISS": "Verwerfen",
         "CLOSE": "Schließen",
@@ -328,7 +328,9 @@
         "CREATED_AT": "Erstellt am",
         "UPDATED_AT": "Aktualisiert am",
         "REVIEWED_BY": "Bearbeitet von",
-        "REVIEWED_AT": "Bearbeitet am"
+        "REVIEWED_AT": "Bearbeitet am",
+        "SIMILAR_REPORTS": "Ähnliche Meldungen",
+        "SIMILAR_REPORTS_TEXT": "Zu diesem Inhalt liegen {{count}} aktive Meldungen vor."
       },
 
       "EMPTY": {
@@ -350,7 +352,9 @@
       "ERROR_LOAD": "Reports konnten nicht geladen werden.",
       "ERROR_UPDATE": "Report konnte nicht aktualisiert werden.",
       "LOADING": "Reports werden geladen...",
-      "EMPTY_MESSAGE": "Keine Nachricht angegeben."
+      "EMPTY_MESSAGE": "Keine Nachricht angegeben.",
+
+      "SIMILAR_REPORTS": "{{count}} Meldungen"
     }
   },
   "SIDEBAR": {
