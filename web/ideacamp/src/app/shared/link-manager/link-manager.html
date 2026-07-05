@@ -194,19 +194,12 @@
                   }
 
                   @if (allowVisibility && link.visibility) {
-                    <span
-                      class="inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium"
-                      [ngClass]="link.visibility === 'PRIVATE'
-                        ? 'bg-slate-100 text-slate-600'
-                        : 'bg-lime-50 text-lime-700'">
-
-                      <i
-                        class="pi text-[9px]"
-                        [ngClass]="link.visibility === 'PRIVATE' ? 'pi-lock' : 'pi-globe'">
-                      </i>
-
-                      {{ (link.visibility === 'PRIVATE' ? 'COMMON.QUICKLINKS.PRIVATE' : 'COMMON.QUICKLINKS.PUBLIC') | translate }}
-                    </span>
+                    <i
+                      class="pi shrink-0 text-xs"
+                      [ngClass]="link.visibility === 'PRIVATE' ? 'pi-lock text-slate-500' : 'pi-globe text-lime-600'"
+                      [attr.aria-label]="(link.visibility === 'PRIVATE' ? 'COMMON.QUICKLINKS.PRIVATE' : 'COMMON.QUICKLINKS.PUBLIC') | translate"
+                      [title]="(link.visibility === 'PRIVATE' ? 'COMMON.QUICKLINKS.PRIVATE' : 'COMMON.QUICKLINKS.PUBLIC') | translate">
+                    </i>
                   }
                 </div>
 
