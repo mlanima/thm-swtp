@@ -8,6 +8,7 @@ import {ProjectResponse } from '../../models/project.model';
 import { ProjectHeader } from './components/project-header/project-header';
 import { InfoCard } from './components/info-card/info-card';
 import { ProjectSidebar } from './components/project-sidebar/project-sidebar';
+import { ProjectReadme } from './components/project-readme/project-readme';
 import {AuthService} from '../auth/auth.service';
 import { SuccessModal } from '../../shared/success-modal/success-modal';
 import { ProjectPosts } from './components/project-posts/project-posts';
@@ -15,7 +16,7 @@ import { ProjectPosts } from './components/project-posts/project-posts';
 @Component({
   selector: 'app-project-site',
   standalone: true,
-  imports: [ProjectHeader, InfoCard, ProjectSidebar, FormsModule, CommonModule, SuccessModal, TranslatePipe, ProjectPosts],
+  imports: [ProjectHeader, InfoCard, ProjectSidebar, ProjectReadme, FormsModule, CommonModule, SuccessModal, TranslatePipe, ProjectPosts],
   templateUrl: './project-site.html',
 })
 export class ProjectSite  implements OnInit {
@@ -26,6 +27,7 @@ export class ProjectSite  implements OnInit {
   project = signal<ProjectResponse | null>(null);
   errorMessage = signal<string | null>(null);
   isLoading = signal(true);
+  readmeRefreshToken = signal(0);
 
   isEditing = signal(false);
   isSaving = signal(false);
@@ -122,5 +124,9 @@ export class ProjectSite  implements OnInit {
 
   closeSuccessModal(): void {
     this.showSuccessModal.set(false);
+  }
+
+  onReadmeChanged(): void {
+    this.readmeRefreshToken.update((token) => token + 1);
   }
 }

@@ -179,9 +179,19 @@
                 (click)="openLink(link.url)"
                 class="min-w-0 flex-1 cursor-pointer text-left hover:text-lime-500">
                 <div class="flex min-w-0 items-center gap-2">
+                  @if (allowGithubReadme && isGitHubRepo(link.url)) {
+                    <i class="pi pi-github shrink-0 text-slate-500" [attr.aria-label]="'COMMON.QUICKLINKS.GITHUB_REPO' | translate"></i>
+                  }
+
                   <p class="truncate font-medium">
                     {{ link.label }}
                   </p>
+
+                  @if (allowGithubReadme && link.showReadme) {
+                    <span class="inline-flex shrink-0 items-center gap-1 rounded-full bg-lime-50 px-2 py-0.5 text-[10px] font-medium text-lime-700">
+                      {{ 'COMMON.QUICKLINKS.README_SHOWN' | translate }}
+                    </span>
+                  }
 
                   @if (allowVisibility && link.visibility) {
                     <span
@@ -206,7 +216,28 @@
               </button>
 
               @if (isOwner) {
-                <div class="flex shrink-0 gap-1 opacity-100 transition md:opacity-0 md:group-hover:opacity-100">
+                <div class="relative flex shrink-0 gap-1 opacity-100 transition md:opacity-0 md:group-hover:opacity-100">
+                  @if (allowGithubReadme && isGitHubRepo(link.url)) {
+                    <button
+                      type="button"
+                      (click)="toggleMenu(link.id)"
+                      class="rounded-md px-2 py-1 text-sm text-slate-400 hover:bg-slate-100 hover:text-lime-500"
+                      [attr.aria-label]="'COMMON.QUICKLINKS.GITHUB_ACTIONS' | translate">
+                      <i class="pi pi-ellipsis-v"></i>
+                    </button>
+
+                    @if (openMenuLinkId === link.id) {
+                      <div class="absolute right-0 top-full z-10 mt-1 w-56 rounded-lg border border-slate-200 bg-white py-1 shadow-lg">
+                        <button
+                          type="button"
+                          (click)="toggleReadme(link)"
+                          class="block w-full px-3 py-2 text-left text-sm text-slate-600 hover:bg-slate-50">
+                          {{ (link.showReadme ? 'COMMON.QUICKLINKS.HIDE_README' : 'COMMON.QUICKLINKS.SHOW_README') | translate }}
+                        </button>
+                      </div>
+                    }
+                  }
+
                   <button
                     type="button"
                     (click)="startEdit(link)"

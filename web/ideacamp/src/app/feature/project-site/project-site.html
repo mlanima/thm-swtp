@@ -103,11 +103,13 @@
             <app-info-card [project]="project()!" />
           }
         </div>
+
+        <app-project-readme [projectId]="project()!.id" [refreshToken]="readmeRefreshToken()" />
 <!--        TODO: not implemented yet-->
 <!--        <app-open-position-card />-->
       </section>
 
-      <app-sidebar class="lg:col-start-2 lg:row-start-1 lg:row-span-2" [projectId]="project()!.id" [isOwner]="isOwner" [ownerId]="project()!.ownerId" [ownerUsername]="project()!.ownerUsername" />
+      <app-sidebar class="lg:col-start-2 lg:row-start-1 lg:row-span-2" [projectId]="project()!.id" [isOwner]="isOwner" [ownerId]="project()!.ownerId" [ownerUsername]="project()!.ownerUsername" (readmeChanged)="onReadmeChanged()" />
 
       <app-project-posts
         class="lg:col-start-1 lg:row-start-2"

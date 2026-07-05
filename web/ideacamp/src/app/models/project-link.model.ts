@@ -9,6 +9,7 @@ export const ProjectLinkSchema = z.object({
   visibility : LinkVisibilitySchema,
   createdAt : z.string(),
   updatedAt : z.string(),
+  showReadme : z.boolean(),
 });
 
 export type ProjectLinkModel = z.infer<typeof ProjectLinkSchema>;

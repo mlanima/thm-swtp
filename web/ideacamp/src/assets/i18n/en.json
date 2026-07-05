@@ -44,7 +44,12 @@
       "VALIDATION_LABEL_NO_QUOTES": "The label must not contain quotation marks.",
       "VALIDATION_URL_REQUIRED": "URL is required.",
       "VALIDATION_URL_TOO_LONG": "The URL must not be longer than 300 characters.",
-      "VALIDATION_URL_INVALID": "The URL must be valid."
+      "VALIDATION_URL_INVALID": "The URL must be valid.",
+      "GITHUB_REPO": "GitHub repository",
+      "GITHUB_ACTIONS": "GitHub actions",
+      "README_SHOWN": "README shown",
+      "SHOW_README": "Show README on project page",
+      "HIDE_README": "Hide README from project page"
     }
   },
   "LANGUAGE": {
@@ -452,6 +457,7 @@
     "LOADING": "Project is loading…",
     "INFORMATION": "Project information",
     "PROJECT_UPDATED": "Project updated successfully.",
+    "VIEW_ON_GITHUB": "View on GitHub",
     "ERRORS": {
       "NO_PROJECT_URL": "No project URL provided.",
       "LOAD_PROJECT": "Project data could not be loaded.",

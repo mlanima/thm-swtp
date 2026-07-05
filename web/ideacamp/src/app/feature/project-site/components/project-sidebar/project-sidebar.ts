@@ -1,4 +1,4 @@
-import { Component, inject, input, computed } from '@angular/core';
+import { Component, inject, input, computed, output } from '@angular/core';
 import { TagList } from '../tag-list/tag-list';
 import { MemberList } from '../member-list/member-list';
 import { LinkManagerComponent } from '../../../../shared/link-manager/link-manager';
@@ -21,6 +21,8 @@ export class ProjectSidebar {
   ownerId = input('');
   ownerUsername = input('');
 
+  readmeChanged = output<void>();
+
   projectLinkDataSource = computed<LinkManagerDataSource<ProjectLinkModel>>(() => {
     const projectId = this.projectId();
 
@@ -38,6 +40,7 @@ export class ProjectSidebar {
           label: request.label,
           url: request.url,
           visibility: request.visibility,
+          showReadme: request.showReadme,
         }),
       deleteLink: (linkId) => this.projectLinkService.deleteProjectLink(projectId, linkId),
     };

@@ -14,6 +14,7 @@ public class ProjectLinkMapper{
                 .createdAt(projectLinkEntity.getCreatedAt())
                 .updatedAt(projectLinkEntity.getUpdatedAt())
                 .visibility(projectLinkEntity.getVisibility())
+                .showReadme(projectLinkEntity.isShowReadme())
                 .build();
     }
 }

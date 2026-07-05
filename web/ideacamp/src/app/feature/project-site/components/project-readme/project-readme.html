@@ -1,0 +1,19 @@
+@if (renderedHtml()) {
+  <div class="rounded-2xl bg-white p-6 shadow-sm">
+    <div class="mb-4 flex items-center justify-between">
+      <h2 class="text-lg font-semibold text-slate-700">README</h2>
+
+      @if (repoUrl()) {
+        <a
+          [href]="repoUrl()"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-sm font-medium text-lime-600 hover:underline">
+          {{ 'PROJECTSITE.VIEW_ON_GITHUB' | translate }}
+        </a>
+      }
+    </div>
+
+    <div class="markdown-readme" [innerHTML]="renderedHtml()"></div>
+  </div>
+}

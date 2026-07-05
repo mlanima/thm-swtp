@@ -44,7 +44,12 @@
       "VALIDATION_LABEL_NO_QUOTES": "Die Bezeichnung darf keine Anführungszeichen enthalten.",
       "VALIDATION_URL_REQUIRED": "URL erforderlich.",
       "VALIDATION_URL_TOO_LONG": "Die URL darf nicht länger als 300 Zeichen sein.",
-      "VALIDATION_URL_INVALID": "Die URL muss gültig sein."
+      "VALIDATION_URL_INVALID": "Die URL muss gültig sein.",
+      "GITHUB_REPO": "GitHub-Repository",
+      "GITHUB_ACTIONS": "GitHub-Aktionen",
+      "README_SHOWN": "README wird angezeigt",
+      "SHOW_README": "README auf Projektseite anzeigen",
+      "HIDE_README": "README von Projektseite entfernen"
     }
   },
   "LANGUAGE": {
@@ -452,6 +457,7 @@
     "LOADING": "Projekt wird geladen…",
     "INFORMATION": "Projektinformationen",
     "PROJECT_UPDATED": "Projekt erfolgreich geändert.",
+    "VIEW_ON_GITHUB": "Auf GitHub ansehen",
     "ERRORS": {
       "NO_PROJECT_URL": "Keine Projekt-URL angegeben.",
       "LOAD_PROJECT": "Projektdaten konnten nicht abgerufen werden.",

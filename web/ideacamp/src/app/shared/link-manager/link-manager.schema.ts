@@ -37,6 +37,7 @@ export const updateLinkSchema = z.object({
     .optional(),
 
   visibility: LinkVisibilitySchema.optional(),
+  showReadme: z.boolean().optional(),
 });
 
 export type CreateLinkRequest = z.infer<typeof createLinkSchema>;

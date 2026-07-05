@@ -468,4 +468,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
     }
+
+    @ExceptionHandler(LinkIsNotGitHubRepositoryException.class)
+    public ResponseEntity<ErrorResponse> handleLinkIsNotGitHubRepository(LinkIsNotGitHubRepositoryException ex) {
+        log.warn("Unprocessable Entity (422): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(ErrorResponse.of(422, "Unprocessable Entity", ex.getMessage()));
+    }
 }

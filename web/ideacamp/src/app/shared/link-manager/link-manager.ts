@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Input, OnChanges, SimpleChanges, inject, } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject, } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -19,6 +19,11 @@ export class LinkManagerComponent implements OnChanges {
   @Input({ required: true }) dataSource!: LinkManagerDataSource;
   @Input() isOwner = false;
   @Input() allowVisibility = false;
+  @Input() allowGithubReadme = false;
+
+  @Output() readmeChanged = new EventEmitter<void>();
+
+  private static readonly GITHUB_REPO_URL = /^https?:\/\/(?:www\.)?github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+(?:\.git)?\/?(?:[/?#].*)?$/i;
 
   links: LinkManager[] = [];
 
@@ -26,6 +31,7 @@ export class LinkManagerComponent implements OnChanges {
   errorMessage: string | null = null;
   isAdding = false;
   editingLinkId: string | null = null;
+  openMenuLinkId: string | null = null;
 
   newLabel = '';
   newUrl = '';
@@ -162,6 +168,33 @@ export class LinkManagerComponent implements OnChanges {
 
   removeHttpFromLink(url: string): string {
     return url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+  }
+
+  isGitHubRepo(url: string): boolean {
+    return LinkManagerComponent.GITHUB_REPO_URL.test(url);
+  }
+
+  toggleMenu(linkId: string): void {
+    this.openMenuLinkId = this.openMenuLinkId === linkId ? null : linkId;
+  }
+
+  closeMenu(): void {
+    this.openMenuLinkId = null;
+  }
+
+  toggleReadme(link: LinkManager): void {
+    this.openMenuLinkId = null;
+
+    this.dataSource.updateLink(link.id, { showReadme: !link.showReadme }).subscribe({
+      next: () => {
+        this.loadLinks();
+        this.readmeChanged.emit();
+      },
+      error: () => {
+        this.errorMessage = this.translateService.instant('COMMON.QUICKLINKS.ERROR_UPDATE');
+        this.changeDetectorRef.markForCheck();
+      },
+    });
   }
 
   private validateCreateLinkRequest(): CreateLinkRequest | null {

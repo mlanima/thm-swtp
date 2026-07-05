@@ -1,6 +1,8 @@
 package de.thm.swtp.api.project;
 
 
+import de.thm.swtp.api.links.dto.ProjectReadmeResponse;
+import de.thm.swtp.api.links.service.ProjectLinkService;
 import de.thm.swtp.api.project.dto.request.*;
 import de.thm.swtp.api.project.dto.response.*;
 import jakarta.validation.Valid;
@@ -22,6 +24,7 @@ import java.util.*;
 public class ProjectController {
 
     private final ProjectService projectService;
+    private final ProjectLinkService projectLinkService;
 
     @GetMapping
     @PreAuthorize("@security.hasModeratorRole(authentication)")
@@ -104,6 +107,18 @@ public class ProjectController {
             @Valid @RequestBody TransferProjectOwnershipRequest request) {
         ProjectResponse response = projectService.transferProjectOwnership(projectId, request.newOwnerId());
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{projectId}/readme")
+    @PreAuthorize("@security.canViewProjectLinks(#projectId, authentication)")
+    public ResponseEntity<ProjectReadmeResponse> getProjectReadme(
+            @PathVariable UUID projectId, @AuthenticationPrincipal Jwt jwt) {
+        UUID currentUserId = UUID.fromString(jwt.getSubject());
+
+        return projectLinkService.getProjectReadme(projectId, currentUserId)
+                .map(ProjectReadmeResponse::toResponse)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.noContent().build());
     }
 
     @GetMapping("/url-exists/{projectUrl}")

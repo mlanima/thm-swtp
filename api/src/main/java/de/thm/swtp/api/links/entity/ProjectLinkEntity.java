@@ -44,6 +44,10 @@ public class ProjectLinkEntity {
     @Builder.Default
     private LinkVisibility visibility = LinkVisibility.PUBLIC;
 
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    @Builder.Default
+    private boolean showReadme = false;
+
     @PrePersist
     protected void onCreate(){
         LocalDateTime now = LocalDateTime.now();

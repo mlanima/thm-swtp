@@ -1,11 +1,14 @@
 package de.thm.swtp.api.projectLink;
 
+import de.thm.swtp.api.exceptionhandling.exceptions.LinkIsNotGitHubRepositoryException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectLinkAlreadyExistsException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectLinkDoesNotBelongToProjectException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectLinkNotFoundException;
 import de.thm.swtp.api.links.domain.LinkVisibility;
 import de.thm.swtp.api.links.domain.ProjectLink;
+import de.thm.swtp.api.links.domain.ProjectReadme;
 import de.thm.swtp.api.links.entity.ProjectLinkEntity;
+import de.thm.swtp.api.links.github.GitHubReadmeService;
 import de.thm.swtp.api.links.repository.ProjectLinkRepository;
 import de.thm.swtp.api.links.service.ProjectLinkService;
 import de.thm.swtp.api.project.ProjectEntity;
@@ -30,6 +33,7 @@ public class ProjectLinkServiceTest {
 
     private ProjectLinkRepository projectLinkRepository;
     private ProjectRepository projectRepository;
+    private GitHubReadmeService gitHubReadmeService;
     private ProjectLinkService projectLinkService;
 
     private UUID projectId;
@@ -51,10 +55,12 @@ public class ProjectLinkServiceTest {
     void setUp() {
         projectLinkRepository = mock(ProjectLinkRepository.class);
         projectRepository = mock(ProjectRepository.class);
+        gitHubReadmeService = mock(GitHubReadmeService.class);
 
         projectLinkService = new ProjectLinkService(
                 projectLinkRepository,
-                projectRepository
+                projectRepository,
+                gitHubReadmeService
         );
 
         projectId = UUID.randomUUID();
@@ -284,6 +290,7 @@ public class ProjectLinkServiceTest {
                 linkId,
                 "New Label",
                 null,
+                null,
                 null
         );
 
@@ -311,6 +318,7 @@ public class ProjectLinkServiceTest {
                 linkId,
                 null,
                 "https://github.com/new-project",
+                null,
                 null
         );
 
@@ -341,6 +349,7 @@ public class ProjectLinkServiceTest {
                 linkId,
                 "New Label",
                 "https://github.com/new-project",
+                null,
                 null
         );
 
@@ -359,6 +368,7 @@ public class ProjectLinkServiceTest {
                 projectId,
                 linkId,
                 "New Label",
+                null,
                 null,
                 null
         )).isInstanceOf(ProjectLinkNotFoundException.class);
@@ -379,11 +389,122 @@ public class ProjectLinkServiceTest {
                 linkId,
                 null,
                 null,
-                LinkVisibility.PRIVATE
+                LinkVisibility.PRIVATE,
+                null
         );
 
         assertThat(result.getVisibility()).isEqualTo(LinkVisibility.PRIVATE);
         verify(projectLinkRepository).save(link);
+    }
+
+    @Test
+    void updateProjectLink_shouldThrowLinkIsNotGitHubRepository_whenShowReadmeTrueAndUrlIsNotGitHub() {
+        ProjectLinkEntity link = createProjectLinkEntity("https://example.com/not-a-repo", label, LinkVisibility.PUBLIC);
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(projectLinkRepository.findById(linkId)).thenReturn(Optional.of(link));
+
+        assertThatThrownBy(() -> projectLinkService.updateProjectLink(
+                projectId,
+                linkId,
+                null,
+                null,
+                null,
+                true
+        )).isInstanceOf(LinkIsNotGitHubRepositoryException.class);
+
+        verify(projectLinkRepository, never()).save(any());
+    }
+
+    @Test
+    void updateProjectLink_shouldEnableReadmeAndClearSiblings_whenUrlIsGitHubRepo() {
+        ProjectLinkEntity link = createProjectLinkEntity(url, label, LinkVisibility.PUBLIC);
+        ProjectLinkEntity siblingLink = ProjectLinkEntity.builder()
+                .id(UUID.randomUUID())
+                .project(project)
+                .label("Other repo")
+                .url("https://github.com/mlanima/other-repo")
+                .visibility(LinkVisibility.PUBLIC)
+                .showReadme(true)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(projectLinkRepository.findById(linkId)).thenReturn(Optional.of(link));
+        when(projectLinkRepository.findByProjectIdAndShowReadmeTrueAndIdNot(projectId, linkId))
+                .thenReturn(List.of(siblingLink));
+        when(projectLinkRepository.save(link)).thenReturn(link);
+
+        ProjectLink result = projectLinkService.updateProjectLink(
+                projectId,
+                linkId,
+                null,
+                null,
+                null,
+                true
+        );
+
+        assertThat(result.isShowReadme()).isTrue();
+        assertThat(siblingLink.isShowReadme()).isFalse();
+
+        verify(projectLinkRepository).saveAll(List.of(siblingLink));
+        verify(projectLinkRepository).save(link);
+    }
+
+    @Test
+    void updateProjectLink_shouldDisableReadme_whenShowReadmeFalse() {
+        ProjectLinkEntity link = createProjectLinkEntity(url, label, LinkVisibility.PUBLIC);
+        link.setShowReadme(true);
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(projectLinkRepository.findById(linkId)).thenReturn(Optional.of(link));
+        when(projectLinkRepository.save(link)).thenReturn(link);
+
+        ProjectLink result = projectLinkService.updateProjectLink(
+                projectId,
+                linkId,
+                null,
+                null,
+                null,
+                false
+        );
+
+        assertThat(result.isShowReadme()).isFalse();
+        verify(projectLinkRepository, never()).findByProjectIdAndShowReadmeTrueAndIdNot(any(), any());
+        verify(projectLinkRepository).save(link);
+    }
+
+    @Test
+    void getProjectReadme_shouldReturnContent_whenALinkHasReadmeEnabled() {
+        ProjectLinkEntity link = createProjectLinkEntity(url, label, LinkVisibility.PUBLIC);
+        link.setShowReadme(true);
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(projectLinkRepository.findByProjectIdOrderByCreatedAtAsc(projectId))
+                .thenReturn(List.of(link));
+        when(gitHubReadmeService.getReadme("mlanima", "thm-swtp"))
+                .thenReturn(Optional.of("# Hello"));
+
+        Optional<ProjectReadme> result = projectLinkService.getProjectReadme(projectId, ownerId);
+
+        assertThat(result).isPresent();
+        assertThat(result.get().getRepoUrl()).isEqualTo(url);
+        assertThat(result.get().getContent()).isEqualTo("# Hello");
+    }
+
+    @Test
+    void getProjectReadme_shouldReturnEmpty_whenNoLinkHasReadmeEnabled() {
+        ProjectLinkEntity link = createProjectLinkEntity(url, label, LinkVisibility.PUBLIC);
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(projectLinkRepository.findByProjectIdOrderByCreatedAtAsc(projectId))
+                .thenReturn(List.of(link));
+
+        Optional<ProjectReadme> result = projectLinkService.getProjectReadme(projectId, ownerId);
+
+        assertThat(result).isEmpty();
+        verify(gitHubReadmeService, never()).getReadme(any(), any());
     }
 
     @Test

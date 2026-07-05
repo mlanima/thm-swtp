@@ -17,4 +17,5 @@ public class ProjectLink {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LinkVisibility visibility;
+    private boolean showReadme;
 }

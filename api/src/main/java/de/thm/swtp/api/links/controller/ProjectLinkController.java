@@ -48,7 +48,8 @@ public class ProjectLinkController {
                                                  @Valid @RequestBody UpdateProjectLinkRequest updateProjectLinkRequest) {
 
         return ProjectLinkResponse.toResponse(projectLinkService.updateProjectLink(projectId,
-                linkId, updateProjectLinkRequest.label(), updateProjectLinkRequest.url(), updateProjectLinkRequest.visibility()));
+                linkId, updateProjectLinkRequest.label(), updateProjectLinkRequest.url(),
+                updateProjectLinkRequest.visibility(), updateProjectLinkRequest.showReadme()));
     }
 
 

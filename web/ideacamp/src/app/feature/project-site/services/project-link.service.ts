@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../enviroments/enviroment.dev';
 import { ProjectLinkModel, ProjectLinkSchema} from '../../../models/project-link.model'
+import { ProjectReadmeModel, ProjectReadmeSchema } from '../../../models/project-readme.model';
 import { Observable, map } from 'rxjs';
 import { CreateLinkRequest, UpdateLinkRequest } from '../../../shared/link-manager/link-manager.types';
 import { z } from 'zod';
@@ -32,5 +33,13 @@ export class ProjectLinkService {
 
   deleteProjectLink(projectId: string, linkId: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${projectId}/links/${linkId}`);
+  }
+
+  getProjectReadme(projectId: string): Observable<ProjectReadmeModel | null> {
+    return this.http
+      .get<unknown>(`${this.baseUrl}/${projectId}/readme`, { observe: 'response' })
+      .pipe(
+        map((response) => (response.body ? ProjectReadmeSchema.parse(response.body) : null)),
+      );
   }
 }

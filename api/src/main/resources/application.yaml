@@ -96,6 +96,9 @@ github:
   topics:
     api:
       base-url: https://api.github.com
+  readme:
+    api:
+      base-url: https://api.github.com
 
 stackoverflow:
   api:

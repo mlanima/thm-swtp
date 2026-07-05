@@ -6,6 +6,7 @@ export interface LinkManager {
   label : string,
   url : string
   visibility?: LinkVisibility
+  showReadme?: boolean
 }
 
 export interface CreateLinkRequest {
@@ -18,6 +19,7 @@ export interface UpdateLinkRequest {
   label?: string,
   url?: string,
   visibility?: LinkVisibility
+  showReadme?: boolean
 }
 
 export interface LinkManagerDataSource<TLink extends LinkManager = LinkManager>{

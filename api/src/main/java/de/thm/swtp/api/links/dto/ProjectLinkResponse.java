@@ -6,7 +6,7 @@ import de.thm.swtp.api.links.domain.ProjectLink;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public record ProjectLinkResponse(UUID id, UUID projectId, String label, String url, LocalDateTime createdAt, LocalDateTime updatedAt, LinkVisibility visibility) {
+public record ProjectLinkResponse(UUID id, UUID projectId, String label, String url, LocalDateTime createdAt, LocalDateTime updatedAt, LinkVisibility visibility, boolean showReadme) {
 
     public static ProjectLinkResponse toResponse(ProjectLink projectLink) {
         return new ProjectLinkResponse(
@@ -16,7 +16,8 @@ public record ProjectLinkResponse(UUID id, UUID projectId, String label, String 
                 projectLink.getUrl(),
                 projectLink.getCreatedAt(),
                 projectLink.getUpdatedAt(),
-                projectLink.getVisibility()
+                projectLink.getVisibility(),
+                projectLink.isShowReadme()
         );
     }
 }

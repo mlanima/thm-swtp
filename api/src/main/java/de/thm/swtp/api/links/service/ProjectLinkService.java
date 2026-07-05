@@ -1,9 +1,13 @@
 package de.thm.swtp.api.links.service;
 
+import de.thm.swtp.api.exceptionhandling.exceptions.LinkIsNotGitHubRepositoryException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectLinkAlreadyExistsException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectLinkDoesNotBelongToProjectException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectLinkNotFoundException;
 import de.thm.swtp.api.links.domain.LinkVisibility;
+import de.thm.swtp.api.links.domain.ProjectReadme;
+import de.thm.swtp.api.links.github.GitHubReadmeService;
+import de.thm.swtp.api.links.github.GitHubRepoRef;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
 import de.thm.swtp.api.project.exception.ProjectNotFoundException;
@@ -16,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -23,6 +28,7 @@ import java.util.UUID;
 public class ProjectLinkService {
     private final ProjectLinkRepository projectLinkRepository;
     private final ProjectRepository projectRepository;
+    private final GitHubReadmeService gitHubReadmeService;
 
 
 
@@ -43,6 +49,19 @@ public class ProjectLinkService {
                 .stream()
                 .map(ProjectLinkMapper::toDomain)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<ProjectReadme> getProjectReadme(UUID projectId, UUID currentUserId){
+        return getProjectLinks(projectId, currentUserId).stream()
+                .filter(ProjectLink::isShowReadme)
+                .findFirst()
+                .flatMap(link -> GitHubRepoRef.parse(link.getUrl())
+                        .flatMap(repoRef -> gitHubReadmeService.getReadme(repoRef.owner(), repoRef.repo()))
+                        .map(content -> ProjectReadme.builder()
+                                .repoUrl(link.getUrl())
+                                .content(content)
+                                .build()));
     }
 
     @Transactional
@@ -72,7 +91,7 @@ public class ProjectLinkService {
 
 
     @Transactional
-    public ProjectLink updateProjectLink(UUID projectId, UUID linkId, String label, String url, LinkVisibility visibility){
+    public ProjectLink updateProjectLink(UUID projectId, UUID linkId, String label, String url, LinkVisibility visibility, Boolean showReadme){
         ProjectEntity projectEntity = getProjectOrThrowError(projectId);
 
         ProjectLinkEntity projectLinkEntity = getProjectLinkOrThrowError(linkId);
@@ -98,8 +117,31 @@ public class ProjectLinkService {
             projectLinkEntity.setVisibility(visibility);
         }
 
+        if (showReadme != null) {
+            applyShowReadme(projectEntity, projectLinkEntity, showReadme);
+        }
+
         ProjectLinkEntity saved = projectLinkRepository.save(projectLinkEntity);
         return ProjectLinkMapper.toDomain(saved);
+    }
+
+    private void applyShowReadme(ProjectEntity projectEntity, ProjectLinkEntity projectLinkEntity, boolean showReadme){
+        if (!showReadme) {
+            projectLinkEntity.setShowReadme(false);
+            return;
+        }
+
+        if (GitHubRepoRef.parse(projectLinkEntity.getUrl()).isEmpty()) {
+            throw new LinkIsNotGitHubRepositoryException();
+        }
+
+        List<ProjectLinkEntity> siblingsWithReadmeShown = projectLinkRepository
+                .findByProjectIdAndShowReadmeTrueAndIdNot(projectEntity.getId(), projectLinkEntity.getId());
+
+        siblingsWithReadmeShown.forEach(sibling -> sibling.setShowReadme(false));
+        projectLinkRepository.saveAll(siblingsWithReadmeShown);
+
+        projectLinkEntity.setShowReadme(true);
     }
 
     @Transactional
