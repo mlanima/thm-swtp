@@ -1,6 +1,6 @@
 package de.thm.swtp.api.location;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import de.thm.swtp.api.location.exception.GooglePlacesApiException;
 import de.thm.swtp.api.location.exception.InvalidPlaceException;
 import org.junit.jupiter.api.Test;
