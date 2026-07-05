@@ -11,7 +11,6 @@ import de.thm.swtp.api.projectPost.domain.PostContentFormat;
 import de.thm.swtp.api.projectPost.domain.ProjectPost;
 import de.thm.swtp.api.projectPost.domain.ProjectPostStatus;
 import de.thm.swtp.api.projectPost.entity.ProjectPostEntity;
-import de.thm.swtp.api.projectPost.mapper.ProjectPostMapper;
 import de.thm.swtp.api.projectPost.repository.ProjectPostRepository;
 import de.thm.swtp.api.projectPost.service.ProjectPostService;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
@@ -20,7 +19,6 @@ import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
