@@ -1,0 +1,66 @@
+<div class="fixed inset-0 z-60 flex items-center justify-center bg-slate-900/50 px-4">
+  <section class="w-full max-w-md rounded-xl bg-white p-6 shadow-2xl">
+    <h2 class="text-lg font-bold text-slate-800">
+      {{ 'MODERATOR.USER_MANAGEMENT.MODAL.TITLE' | translate }}
+    </h2>
+
+    <p class="mt-2 text-sm text-slate-500">
+      {{ 'MODERATOR.USER_MANAGEMENT.MODAL.DESCRIPTION' | translate }}
+    </p>
+
+    <div class="mt-5 rounded-lg border border-orange-200 bg-orange-50 p-4">
+      <div class="flex items-center gap-3">
+        <div class="flex size-10 items-center justify-center rounded-full bg-slate-700 text-sm font-bold text-white">
+          {{ getInitials(user().username) }}
+        </div>
+
+        <div>
+          <p class="text-sm font-semibold text-slate-800">
+            {{ user().username }}
+          </p>
+          <p class="text-xs text-slate-500">
+            {{ user().email || '-' }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <label class="mt-5 block text-sm font-medium text-slate-700" for="banReason">
+      {{ 'MODERATOR.USER_MANAGEMENT.MODAL.REASON_LABEL' | translate }}
+    </label>
+
+    <textarea
+      id="banReason"
+      rows="4"
+      maxlength="1000"
+      class="mt-2 w-full resize-none rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 outline-none transition placeholder:text-slate-300 focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+      [placeholder]="'MODERATOR.USER_MANAGEMENT.MODAL.REASON_PLACEHOLDER' | translate"
+      [value]="banReason()"
+      (input)="banReason.set($any($event.target).value)"
+    ></textarea>
+
+    <p class="mt-1 text-right text-xs text-slate-400">
+      {{ banReason().length }}/1000
+    </p>
+
+    <div class="mt-6 flex justify-end gap-3">
+      <button
+        type="button"
+        class="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50 disabled:opacity-60"
+        (click)="closeDialog.emit()"
+        [disabled]="isSubmitting()"
+      >
+        {{ 'COMMON.CANCEL' | translate }}
+      </button>
+
+      <button
+        type="button"
+        class="rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-orange-600 disabled:opacity-60"
+        (click)="submit()"
+        [disabled]="isSubmitting()"
+      >
+        {{ 'MODERATOR.USER_MANAGEMENT.ACTIONS.BAN_USER' | translate }}
+      </button>
+    </div>
+  </section>
+</div>

@@ -4,6 +4,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { ManagedUser, ManagedUserSortField, SortDirection } from '../models/managed-user.model';
 import { UserManagementService } from '../service/user-management.service';
 import { Pagination } from '../../shared/pagination/pagination';
+import { BanUserDialogComponent } from '../components/ban-user-dialog/ban-user-dialog.component';
 
 type ModTab = 'active' | 'banned';
 const PAGE_SIZE = 10;
@@ -12,14 +13,13 @@ const PAGE_SIZE = 10;
 @Component({
   selector: 'app-user-management',
   standalone: true,
-  imports: [DatePipe, TranslatePipe, Pagination],
+  imports: [DatePipe, TranslatePipe, Pagination, BanUserDialogComponent],
   templateUrl: './user-management.html',
 })
 export class UserManagement implements OnInit {
   private readonly userManagementService = inject(UserManagementService);
   private readonly platformId = inject(PLATFORM_ID);
 
-  private readonly maxBanReasonLength = 1000;
   private readonly banReasonPreviewLength = 50;
 
   activeTab = signal<ModTab>('active');
@@ -40,7 +40,6 @@ export class UserManagement implements OnInit {
   errorMessage = signal<string | null>(null);
 
   selectedUser = signal<ManagedUser | null>(null);
-  banReason = signal('');
 
   activeUserCount = signal(0);
   bannedUserCount = signal(0);
@@ -175,24 +174,20 @@ export class UserManagement implements OnInit {
 
   openBanDialog(user: ManagedUser): void {
     this.selectedUser.set(user);
-    this.banReason.set('');
   }
 
   closeBanDialog(): void {
     this.selectedUser.set(null);
-    this.banReason.set('');
   }
 
-  banUser(): void {
+  banUser(reason?: string): void {
     const user = this.selectedUser();
 
     if (!user) {
       return;
     }
 
-    const trimmedReason = this.banReason().trim().slice(0, this.maxBanReasonLength);
-
-    this.userManagementService.banUser(user.keycloakId, trimmedReason || undefined).subscribe({
+    this.userManagementService.banUser(user.keycloakId, reason).subscribe({
       next: () => {
         this.closeBanDialog();
         this.activeTab.set('banned');
