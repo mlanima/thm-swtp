@@ -13,6 +13,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -67,7 +68,8 @@ public class BlocklistService {
         if (text == null || text.isBlank()) {
             return false;
         }
-        var lower = text.toLowerCase();
-        return blockedWords.stream().anyMatch(lower::contains);
+        return blockedWords.stream().anyMatch(word ->
+                Pattern.compile("\\b" + Pattern.quote(word) + "\\b", Pattern.CASE_INSENSITIVE)
+                        .matcher(text).find());
     }
 }
