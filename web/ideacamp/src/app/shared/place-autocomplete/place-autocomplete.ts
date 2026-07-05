@@ -65,8 +65,8 @@ export class PlaceAutocomplete implements AfterViewInit, OnDestroy {
   }
 
   onInput(): void {
-    var value = this.inputElement.nativeElement.value;
-    var placeId = value === this.selectedLocation ? this.currentPlaceId : '';
+    const value = this.inputElement.nativeElement.value;
+    const placeId = value === this.selectedLocation ? this.currentPlaceId : '';
     this.placeChange.emit({ placeId, location: value });
   }
 
