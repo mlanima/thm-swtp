@@ -132,7 +132,7 @@ class ContentModerationServiceTest {
         var content = "test content";
         var hash = new ContentModerationService(moderationClient, blocklistService, realCacheManager, true)
                 .hash(content);
-        realCacheManager.getCache("content-moderation").put(hash, false);
+        realCacheManager.getCache("content-moderation").put(hash, true);
 
         var serviceWithCache = new ContentModerationService(moderationClient, blocklistService, realCacheManager, true);
 
