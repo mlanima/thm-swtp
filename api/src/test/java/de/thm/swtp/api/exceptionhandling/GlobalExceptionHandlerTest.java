@@ -164,7 +164,7 @@ class GlobalExceptionHandlerTest {
                 new ResourceAccessException("I/O error: Timeout"));
         assertStatus(r, HttpStatus.BAD_GATEWAY);
         assertThat(r.getBody().getError()).isEqualTo("Bad Gateway");
-        assertThat(r.getBody().getMessage()).isEqualTo("Moderation service temporarily unavailable.");
+        assertThat(r.getBody().getMessage()).isEqualTo("External service temporarily unreachable.");
     }
 
     // ── catch-all: 500 with a generic body, never the raw exception message ──

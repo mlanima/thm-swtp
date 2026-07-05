@@ -6,6 +6,7 @@ import de.thm.swtp.api.common.LogSafe;
 import de.thm.swtp.api.location.exception.GooglePlacesApiException;
 import de.thm.swtp.api.location.exception.InvalidPlaceException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ public class GooglePlacesClient {
     private final String apiKey;
     private final ObjectMapper objectMapper;
 
+    @Autowired
     public GooglePlacesClient(
             @Value("${google.api.base-url}") final String baseUrl,
             @Value("${google.api.key}") final String apiKey,
