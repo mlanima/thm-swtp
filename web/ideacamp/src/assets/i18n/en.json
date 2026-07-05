@@ -187,6 +187,11 @@
         "BANNED_AT": "Banned at",
         "REASON": "Reason"
       },
+      "SORT": {
+        "ASC": "Sorted ascending",
+        "DESC": "Sorted descending",
+        "NOT_SORTED": "Not sorted"
+      },
       "ROLES": {
         "PROFESSOR": "Professor",
         "MEMBER": "Member"
