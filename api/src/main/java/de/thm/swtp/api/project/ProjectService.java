@@ -85,13 +85,13 @@ public class ProjectService {
 
     @Transactional
     public ProjectResponse createProject(CreateProjectRequest request, UUID currentUserId) {
-        contentModerationService.assertAppropriate(request.name(), "name");
-        contentModerationService.assertAppropriate(request.description(), "description");
-        contentModerationService.assertAppropriate(request.shortDescription(), "shortDescription");
-
         if (projectRepository.existsByName(request.name())) {
             throw new ExceptionProjectResponse(request.name());
         }
+
+        contentModerationService.assertAppropriate(request.name(), "name");
+        contentModerationService.assertAppropriate(request.description(), "description");
+        contentModerationService.assertAppropriate(request.shortDescription(), "shortDescription");
 
         UserProfile owner = userProfileRepository.findById(currentUserId)
                 .orElseThrow(() -> new UserProfileNotFoundException(currentUserId.toString()));

@@ -24,7 +24,6 @@ public class UserSearchMapper {
                 .username(user.getUsername())
                 .title(user.getTitle())
                 .location(user.getLocation())
-                .placeId(user.getPlaceId())
                 .tags(user.getTags().stream().map(TagEntity::getName).toList())
                 .build();
     }

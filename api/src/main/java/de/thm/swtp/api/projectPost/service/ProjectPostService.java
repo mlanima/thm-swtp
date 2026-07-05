@@ -50,12 +50,13 @@ public class ProjectPostService {
 
     @Transactional
     public ProjectPost createProjectPost(UUID projectId, UUID authorId, String title, String content, PostContentFormat contentFormat, ProjectPostStatus status) {
-        contentModerationService.assertAppropriate(title, "postTitle");
-        contentModerationService.assertAppropriate(content, "postContent");
         validateCreatePost(status, contentFormat);
 
         ProjectEntity projectEntity = getProjectOrThrowError(projectId);
         UserProfile author = getUserOrThrowError(authorId);
+
+        contentModerationService.assertAppropriate(title, "postTitle");
+        contentModerationService.assertAppropriate(content, "postContent");
 
         ProjectPostEntity projectPostEntity = ProjectPostEntity.builder()
                 .project(projectEntity)

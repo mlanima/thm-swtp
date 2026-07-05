@@ -181,7 +181,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleResourceAccess(ResourceAccessException ex) {
         log.error("External API unreachable: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
-                .body(ErrorResponse.of(502, "Bad Gateway", "Moderation service temporarily unavailable."));
+                .body(ErrorResponse.of(502, "Bad Gateway", "External service temporarily unreachable."));
     }
 
     @ExceptionHandler(ProjectJoinRequestAccessDeniedException.class)

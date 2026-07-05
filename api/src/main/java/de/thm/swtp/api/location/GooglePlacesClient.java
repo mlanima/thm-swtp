@@ -28,12 +28,23 @@ public class GooglePlacesClient {
             @Value("${google.api.base-url}") final String baseUrl,
             @Value("${google.api.key}") final String apiKey,
             final ObjectMapper objectMapper) {
+        this(apiKey, objectMapper, buildClient(baseUrl));
+    }
+
+    GooglePlacesClient(
+            final String apiKey,
+            final ObjectMapper objectMapper,
+            final RestClient restClient) {
         this.apiKey = apiKey;
         this.objectMapper = objectMapper;
+        this.restClient = restClient;
+    }
+
+    private static RestClient buildClient(final String baseUrl) {
         var factory = new SimpleClientHttpRequestFactory();
         factory.setConnectTimeout(3000);
         factory.setReadTimeout(5000);
-        this.restClient = RestClient.builder()
+        return RestClient.builder()
                 .baseUrl(baseUrl)
                 .requestFactory(factory)
                 .build();

@@ -5,7 +5,6 @@ export const UserSearchResultSchema = z.object({
   username: z.string(),
   title: z.string().nullable(),
   location: z.string().nullable(),
-  placeId: z.string().nullable(),
 });
 
 export type UserSearchResult = z.infer<typeof UserSearchResultSchema>;

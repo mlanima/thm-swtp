@@ -30,7 +30,7 @@ import { ToastService } from './toast.service';
           <button
             class="shrink-0 opacity-60 hover:opacity-100"
             (click)="toastService.dismiss(toast.id)"
-            aria-label="Schliessen"
+            aria-label="Close"
           >
             <i class="pi pi-times text-xs"></i>
           </button>
