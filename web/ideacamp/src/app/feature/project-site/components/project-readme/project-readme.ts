@@ -1,5 +1,5 @@
 import { Component, effect, inject, input, PLATFORM_ID, signal, ViewEncapsulation } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser, Location } from '@angular/common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { TranslatePipe } from '@ngx-translate/core';
 import { marked } from 'marked';
@@ -20,6 +20,7 @@ export class ProjectReadme {
   private readonly projectLinkService = inject(ProjectLinkService);
   private readonly sanitizer = inject(DomSanitizer);
   private readonly platformId = inject(PLATFORM_ID);
+  private readonly location = inject(Location);
 
   projectId = input.required<string>();
   refreshToken = input(0);
@@ -77,6 +78,15 @@ export class ProjectReadme {
 
     template.content.querySelectorAll('a[href]').forEach((a) => {
       const href = a.getAttribute('href') ?? '';
+
+      if (href.startsWith('#') && href.length > 1) {
+        // A bare "#fragment" resolves against <base href="/"> (see index.html) and
+        // would navigate to the site root instead of scrolling on this page, so the
+        // current path is made explicit for a same-document fragment navigation.
+        a.setAttribute('href', `${this.location.path()}${href}`);
+        return;
+      }
+
       if (RELATIVE_URL.test(href)) {
         a.setAttribute('href', blobBase + href.replace(/^\.?\//, ''));
       }
