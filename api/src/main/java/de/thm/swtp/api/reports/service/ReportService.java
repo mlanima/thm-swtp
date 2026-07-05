@@ -48,7 +48,7 @@ public class ReportService {
             throw new InvalidReportTargetException("Users cannot report themselves.");
         }
 
-        validateReportTarget(target,targetId);
+        validateReportTarget(target, targetId);
 
         ReportEntity reportEntity = ReportEntity.builder()
                 .reporter(reporter)
