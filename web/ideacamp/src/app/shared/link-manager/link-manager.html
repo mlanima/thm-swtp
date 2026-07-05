@@ -180,18 +180,22 @@
                 class="min-w-0 flex-1 cursor-pointer text-left hover:text-lime-500">
                 <div class="flex min-w-0 items-center gap-2">
                   @if (allowGithubReadme && isGitHubRepo(link.url)) {
-                    <i class="pi pi-github shrink-0 text-slate-500" [attr.aria-label]="'COMMON.QUICKLINKS.GITHUB_REPO' | translate"></i>
+                    <span class="relative shrink-0">
+                      <i class="pi pi-github text-slate-500" [attr.aria-label]="'COMMON.QUICKLINKS.GITHUB_REPO' | translate"></i>
+
+                      @if (link.showReadme) {
+                        <span
+                          class="absolute -right-0.5 -top-0.5 block size-1.5 rounded-full bg-lime-500"
+                          [attr.aria-label]="'COMMON.QUICKLINKS.README_SHOWN' | translate"
+                          [title]="'COMMON.QUICKLINKS.README_SHOWN' | translate">
+                        </span>
+                      }
+                    </span>
                   }
 
                   <p class="truncate font-medium">
                     {{ link.label }}
                   </p>
-
-                  @if (allowGithubReadme && link.showReadme) {
-                    <span class="inline-flex shrink-0 items-center gap-1 rounded-full bg-lime-50 px-2 py-0.5 text-[10px] font-medium text-lime-700">
-                      {{ 'COMMON.QUICKLINKS.README_SHOWN' | translate }}
-                    </span>
-                  }
 
                   @if (allowVisibility && link.visibility) {
                     <i
