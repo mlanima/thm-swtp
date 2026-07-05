@@ -7,7 +7,7 @@ import {
 } from '../services/moderator-projects.service';
 import { ProjectResponse } from '../../../models/project.model';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
-import { ProjectView, DeleteState } from './projects.types';
+import { ProjectView, DeleteState, ManagedProjectSortField, SortDirection } from './projects.types';
 import { ProjectTable } from './project-table/project-table';
 import { Pagination } from '../shared/pagination/pagination';
 import { DeleteDialog } from './delete-dialog/delete-dialog';
@@ -46,6 +46,9 @@ export class ProjectsComponent implements OnInit {
 
   private readonly searchSubject = new Subject<string>();
 
+  sortField = signal<ManagedProjectSortField>('name');
+  sortDirection = signal<SortDirection>('asc');
+
   ngOnInit(): void {
     const sub = this.searchSubject
       .pipe(debounceTime(300), distinctUntilChanged())
@@ -61,6 +64,18 @@ export class ProjectsComponent implements OnInit {
   onSearchChange(value: string): void {
     this.searchQuery.set(value);
     this.searchSubject.next(value);
+  }
+
+  changeSort(field: ManagedProjectSortField): void {
+    if (this.sortField() === field) {
+      this.sortDirection.set(this.sortDirection() === 'asc' ? 'desc' : 'asc');
+    } else {
+      this.sortField.set(field);
+      this.sortDirection.set('asc');
+    }
+
+    this.currentPage.set(0);
+    this.loadProjects(0, this.searchQuery());
   }
 
   onPageChange(page: number): void {
@@ -107,7 +122,7 @@ export class ProjectsComponent implements OnInit {
     this.isLoading.set(true);
     this.errorMessage.set('');
 
-    const params: ProjectSearchParams = { page, size: PAGE_SIZE };
+    const params: ProjectSearchParams = { page, size: PAGE_SIZE, sortField: this.sortField(), sortDirection: this.sortDirection() };
     if (name.trim()) {
       params.name = name.trim();
     }
@@ -131,11 +146,13 @@ export class ProjectsComponent implements OnInit {
     return {
       id: p.id,
       name: p.name,
-      memberCount: p.memberIds.length,
+      memberCount: p.stats.contributors,
       ownerUsername: p.ownerUsername,
       ownerInitials: this.getInitials(p.ownerUsername),
       createdAt: this.formatDate(p.createdAt),
       createdAtShort: this.formatDateShort(p.createdAt),
+      updatedAt: this.formatDate(p.updatedAt),
+      updatedAtShort: this.formatDateShort(p.updatedAt),
       isPrivate: p.isPrivateProject,
     };
   }
