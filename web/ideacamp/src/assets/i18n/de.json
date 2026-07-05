@@ -117,6 +117,19 @@
     "UNFOLLOW": "Entfolgen",
     "INVITE": "Einladen"
   },
+  "REPORT_DIALOG": {
+    "REPORT": "Melden",
+    "TITLE": "Inhalt melden",
+    "DESCRIPTION": "Wählen Sie einen Grund aus und ergänzen Sie optional eine Nachricht.",
+    "REPORTED_CONTENT": "Gemeldeter Inhalt",
+    "REASON_LABEL": "Grund",
+    "REASON_PLACEHOLDER": "Grund auswählen",
+    "MESSAGE_LABEL": "Kommentar (optional)",
+    "MESSAGE_PLACEHOLDER": "Beschreiben Sie kurz, warum Sie diesen Inhalt melden...",
+    "SUBMIT": "Meldung senden",
+    "ERROR_SEND": "Die Meldung konnte nicht gesendet werden.",
+    "SUCCESS": "Die Meldung wurde gesendet."
+  },
   "CONTACT-REQUESTS": {
     "CONTACT": "Kontaktanfragen",
     "CONTACT-PROJECT": "Kontaktanfragen für mein Projekt verwalten",

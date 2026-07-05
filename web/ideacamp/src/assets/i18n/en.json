@@ -117,6 +117,18 @@
     "UNFOLLOW": "Unfollow",
     "INVITE": "Invite"
   },
+  "REPORT_DIALOG": {
+    "TITLE": "Report content",
+    "DESCRIPTION": "Choose a reason and optionally add a comment.",
+    "REPORTED_CONTENT": "Reported content",
+    "REASON_LABEL": "Reason",
+    "REASON_PLACEHOLDER": "Select a reason",
+    "MESSAGE_LABEL": "Comment (optional)",
+    "MESSAGE_PLACEHOLDER": "Briefly describe why you are reporting this content...",
+    "SUBMIT": "Submit report",
+    "ERROR_SEND": "The report could not be submitted.",
+    "SUCCESS": "The report has been submitted."
+  },
   "CONTACT-REQUESTS": {
     "CONTACT": "Contact Requests",
     "CONTACT-PROJECT": "Manage contact requests for my project",
