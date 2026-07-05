@@ -429,6 +429,21 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
     }
 
+    @ExceptionHandler(InvalidUserManagementSortFieldException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidUserManagementSortField(InvalidUserManagementSortFieldException ex) {
+        log.debug("Bad Request (400): {}", LogSafe.clean(ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
+    }
+
+
+    @ExceptionHandler(InvalidProjectManagementSortFieldException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidProjectManagementSortField(InvalidProjectManagementSortFieldException ex) {
+        log.debug("Bad Request (400): {}", LogSafe.clean(ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
+    }
+
 
     // ── Framework exceptions: explicit handlers so the catch-all doesn't shadow them ─
 
