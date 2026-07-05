@@ -240,7 +240,7 @@
                     (click)="startEdit(link)"
                     class="rounded-md px-2 py-1 text-sm text-slate-400 hover:bg-slate-100 hover:text-lime-500"
                     [attr.aria-label]="'COMMON.QUICKLINKS.EDIT_LINK' | translate">
-                    ✎
+                    <i class="pi pi-pencil"></i>
                   </button>
 
                   <button
@@ -248,7 +248,7 @@
                     (click)="deleteLink(link.id)"
                     class="rounded-md px-2 py-1 text-sm text-slate-400 hover:bg-red-50 hover:text-red-500"
                     [attr.aria-label]="'COMMON.QUICKLINKS.DELETE_LINK' | translate">
-                    ×
+                    <i class="pi pi-trash"></i>
                   </button>
                 </div>
               }
