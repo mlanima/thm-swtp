@@ -179,7 +179,10 @@ class UserProfileServiceTest {
     void updateProfile_shouldThrow_whenAboutFlagged() {
         when(userProfileRepository.findByUsername("Chris")).thenReturn(Optional.of(userProfile));
         var ex = new ContentNotValidException("about");
-        org.mockito.Mockito.doThrow(ex).when(contentModerationService).assertAppropriate("bad", "about");
+        org.mockito.Mockito.lenient()
+                .doThrow(ex)
+                .when(contentModerationService)
+                .assertAppropriate("bad", "about");
 
         assertThatThrownBy(() -> userProfileService.updateProfile("Chris", "title", null, "bad", null, null))
                 .isInstanceOf(ContentNotValidException.class);
@@ -191,7 +194,10 @@ class UserProfileServiceTest {
     void updateProfile_shouldThrow_whenExperienceFlagged() {
         when(userProfileRepository.findByUsername("Chris")).thenReturn(Optional.of(userProfile));
         var ex = new ContentNotValidException("experience");
-        org.mockito.Mockito.doThrow(ex).when(contentModerationService).assertAppropriate("bad", "experience");
+        org.mockito.Mockito.lenient()
+                .doThrow(ex)
+                .when(contentModerationService)
+                .assertAppropriate("bad", "experience");
 
         assertThatThrownBy(() -> userProfileService.updateProfile("Chris", "title", null, null, "bad", null))
                 .isInstanceOf(ContentNotValidException.class);
