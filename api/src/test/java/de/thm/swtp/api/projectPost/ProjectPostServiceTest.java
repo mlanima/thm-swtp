@@ -115,6 +115,7 @@ class ProjectPostServiceTest {
 
     @Test
     void shouldThrowWhenContentFlagged() {
+        doNothing().when(contentModerationService).assertAppropriate("good title", "postTitle");
         doThrow(new ContentNotValidException("postContent"))
                 .when(contentModerationService).assertAppropriate("bad content", "postContent");
 
