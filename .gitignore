@@ -2,7 +2,3 @@
 ./web/.idea
 .env
 *.local
-.git-rewrite/
-filter.sh
-docs/PLAN_OPENAI_MODERATION.md
-docs/CI_CD_INFRA_GUIDE.md
