@@ -106,6 +106,8 @@ public class ProjectService {
             projectUrl = request.projectUrl();
         }
 
+        contentModerationService.assertAppropriate(projectUrl, "projectUrl");
+
         ProjectEntity project = ProjectEntity.builder()
                 .name(request.name())
                 .description(request.description())
@@ -252,6 +254,7 @@ public class ProjectService {
                     projectRepository.existsByProjectUrl(request.getProjectUrl())) {
                 throw new ExceptionProjectUrlAlreadyExists(request.getProjectUrl());
             }
+            contentModerationService.assertAppropriate(request.getProjectUrl(), "projectUrl");
             project.setProjectUrl(request.getProjectUrl());
         }
         project.setPrivateProject(request.isPrivateProject());
