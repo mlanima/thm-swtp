@@ -106,10 +106,9 @@ public class ProjectService {
             if (projectRepository.existsByProjectUrl(request.projectUrl())) {
                 throw new ExceptionProjectUrlAlreadyExists(request.projectUrl());
             }
+            contentModerationService.assertAppropriate(request.projectUrl(), "projectUrl");
             projectUrl = request.projectUrl();
         }
-
-        contentModerationService.assertAppropriate(projectUrl, "projectUrl");
 
         ProjectEntity project = ProjectEntity.builder()
                 .name(request.name())

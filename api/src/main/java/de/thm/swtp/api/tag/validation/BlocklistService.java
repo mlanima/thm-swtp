@@ -51,7 +51,7 @@ public class BlocklistService {
             String line;
             var count = 0;
             while ((line = reader.readLine()) != null) {
-                var trimmed = line.trim().toLowerCase();
+                var trimmed = line.trim().toLowerCase(Locale.ROOT);
                 if (!trimmed.isEmpty() && !trimmed.startsWith("#")) {
                     words.add(trimmed);
                     count++;
@@ -64,7 +64,7 @@ public class BlocklistService {
     }
 
     public boolean contains(final String word) {
-        return blockedWords.contains(word.toLowerCase().trim());
+        return blockedWords.contains(word.toLowerCase(Locale.ROOT).trim());
     }
 
     public boolean containsAny(final String text) {

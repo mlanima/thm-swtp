@@ -88,11 +88,6 @@ export class PlaceAutocomplete implements AfterViewInit, OnDestroy {
     }
   }
 
-  clear(): void {
-    this.inputElement.nativeElement.value = '';
-    this.currentPlaceId = '';
-  }
-
   ngOnDestroy(): void {
     this.listener.forEach((l) => l.remove());
   }
