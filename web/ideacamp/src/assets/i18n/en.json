@@ -342,7 +342,25 @@
     "SHOW_ALL_USERS": "Show all {{ count }} users",
     "PREVIOUS": "Previous",
     "NEXT": "Next",
-    "ERROR_FAILED": "The search failed. Please try again."
+    "ERROR_FAILED": "The search failed. Please try again.",
+    "FILTERS": {
+      "TITLE": "Filters",
+      "CLEAR_ALL": "Clear all",
+      "HAS_OPEN_POSITIONS": "Has open positions",
+      "ALLOW_JOIN_REQUESTS": "Accepts join requests",
+      "IS_PROFESSOR": "Verified professors only",
+      "LOCATION": "Location",
+      "LOCATION_PLACEHOLDER": "Filter by location...",
+      "DATE_RANGE": {
+        "LABEL": "Created",
+        "ANY_TIME": "Any time",
+        "LAST_7_DAYS": "Last 7 days",
+        "LAST_30_DAYS": "Last 30 days",
+        "LAST_YEAR": "Last year"
+      },
+      "PROFESSOR_BADGE": "Professor",
+      "OPEN_POSITIONS_BADGE": "{{ count }} open position(s)"
+    }
   },
   "IMPRESSUM": {
     "BADGE": "Legal information",

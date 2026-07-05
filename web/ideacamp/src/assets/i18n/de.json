@@ -342,7 +342,25 @@
     "SHOW_ALL_USERS": "Alle {{ count }} Nutzer anzeigen",
     "PREVIOUS": "Zurück",
     "NEXT": "Weiter",
-    "ERROR_FAILED": "Die Suche ist fehlgeschlagen. Bitte versuche es erneut."
+    "ERROR_FAILED": "Die Suche ist fehlgeschlagen. Bitte versuche es erneut.",
+    "FILTERS": {
+      "TITLE": "Filter",
+      "CLEAR_ALL": "Alle zurücksetzen",
+      "HAS_OPEN_POSITIONS": "Hat offene Positionen",
+      "ALLOW_JOIN_REQUESTS": "Nimmt Beitrittsanfragen an",
+      "IS_PROFESSOR": "Verifizierte Professoren",
+      "LOCATION": "Standort",
+      "LOCATION_PLACEHOLDER": "Nach Standort filtern...",
+      "DATE_RANGE": {
+        "LABEL": "Erstellt",
+        "ANY_TIME": "Jederzeit",
+        "LAST_7_DAYS": "Letzte 7 Tage",
+        "LAST_30_DAYS": "Letzte 30 Tage",
+        "LAST_YEAR": "Letztes Jahr"
+      },
+      "PROFESSOR_BADGE": "Professor",
+      "OPEN_POSITIONS_BADGE": "{{ count }} offene Position(en)"
+    }
   },
   "IMPRESSUM": {
     "BADGE": "Rechtliches",
