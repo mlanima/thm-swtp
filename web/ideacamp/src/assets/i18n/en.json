@@ -118,6 +118,7 @@
     "INVITE": "Invite"
   },
   "REPORT_DIALOG": {
+    "REPORT": "Report",
     "TITLE": "Report content",
     "DESCRIPTION": "Choose a reason and optionally add a comment.",
     "REPORTED_CONTENT": "Reported content",
