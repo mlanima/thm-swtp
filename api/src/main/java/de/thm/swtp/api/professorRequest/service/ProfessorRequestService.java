@@ -15,6 +15,7 @@ import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import de.thm.swtp.api.auditlog.AuditLogService;
+import de.thm.swtp.api.auditlog.AuditActor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -127,7 +128,7 @@ public class ProfessorRequestService {
      * Accepts a professor-rights request by setting its status to ACCEPTED and granting the professor role.
      */
     @Transactional
-    public ProfessorRequest acceptProfessorRequest(UUID requestId, UUID actorUserId) {
+    public ProfessorRequest acceptProfessorRequest(UUID requestId, AuditActor actor) {
         ProfessorRequestEntity entity = professorRequestRepository.findById(requestId)
                 .orElseThrow(() -> new ProfessorRequestNotFoundException(requestId));
 
@@ -142,7 +143,7 @@ public class ProfessorRequestService {
         ProfessorRequestEntity saved = professorRequestRepository.save(entity);
 
         auditLogService.logProfessorRequestAccepted(
-                actorUserId,
+                actor,
                 requestId,
                 saved.getRequestingUser().getUsername(),
                 saved.getEmail()
@@ -155,7 +156,7 @@ public class ProfessorRequestService {
      * Rejects a professor-rights request by setting its status to REJECTED.
      */
     @Transactional
-    public ProfessorRequest rejectProfessorRequest(UUID requestId, UUID actorUserId) {
+    public ProfessorRequest rejectProfessorRequest(UUID requestId, AuditActor actor) {
         ProfessorRequestEntity entity = professorRequestRepository.findById(requestId)
                 .orElseThrow(() -> new ProfessorRequestNotFoundException(requestId));
 
@@ -169,7 +170,7 @@ public class ProfessorRequestService {
         ProfessorRequestEntity saved = professorRequestRepository.save(entity);
 
         auditLogService.logProfessorRequestRejected(
-                actorUserId,
+                actor,
                 requestId,
                 saved.getRequestingUser().getUsername(),
                 saved.getEmail()

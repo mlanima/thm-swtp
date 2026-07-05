@@ -5,6 +5,7 @@ import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import de.thm.swtp.api.userprofile.service.UserProfileService;
 import de.thm.swtp.api.auditlog.AuditLogService;
+import de.thm.swtp.api.auditlog.AuditActor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,7 +36,7 @@ class UserProfileServiceTest {
     private UserProfileService userProfileService;
 
     private UUID userId;
-    private UUID actorUserId;
+    private AuditActor actor;
     private UserProfile userProfile;
 
     @BeforeEach
@@ -43,7 +44,11 @@ class UserProfileServiceTest {
         userProfileService = new UserProfileService(userProfileRepository, auditLogService);
 
         userId = UUID.randomUUID();
-        actorUserId = UUID.randomUUID();
+        actor = new AuditActor(
+                UUID.randomUUID(),
+                "moderator",
+                "moderator@test.de"
+        );
 
         userProfile = UserProfile.builder()
                 .keycloakId(userId)
@@ -74,7 +79,7 @@ class UserProfileServiceTest {
         when(userProfileRepository.findById(userId)).thenReturn(Optional.of(userProfile));
         when(userProfileRepository.save(userProfile)).thenReturn(userProfile);
 
-        UserProfile result = userProfileService.banUser(userId, "Spam", actorUserId);
+        UserProfile result = userProfileService.banUser(userId, "Spam", actor);
 
         assertThat(result.getStatus()).isEqualTo(UserStatus.BANNED);
         assertThat(result.getBanReason()).isEqualTo("Spam");
@@ -93,7 +98,7 @@ class UserProfileServiceTest {
         when(userProfileRepository.findById(userId)).thenReturn(Optional.of(userProfile));
         when(userProfileRepository.save(userProfile)).thenReturn(userProfile);
 
-        UserProfile result = userProfileService.unbanUser(userId, actorUserId);
+        UserProfile result = userProfileService.unbanUser(userId, actor);
 
         assertThat(result.getStatus()).isEqualTo(UserStatus.ACTIVE);
         assertThat(result.getBanReason()).isNull();
@@ -110,7 +115,7 @@ class UserProfileServiceTest {
     void banUser_shouldThrow_whenUserDoesNotExist() {
         when(userProfileRepository.findById(userId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> userProfileService.banUser(userId, "Spam", actorUserId))
+        assertThatThrownBy(() -> userProfileService.banUser(userId, "Spam", actor))
                 .isInstanceOf(UserProfileNotFoundException.class);
 
         verify(userProfileRepository).findById(userId);

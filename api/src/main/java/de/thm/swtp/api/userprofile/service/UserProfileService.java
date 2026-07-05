@@ -6,6 +6,7 @@ import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import de.thm.swtp.api.auditlog.AuditLogService;
+import de.thm.swtp.api.auditlog.AuditActor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -87,7 +88,7 @@ public class UserProfileService {
     }
 
     @Transactional
-    public UserProfile banUser(UUID userId, String reason, UUID actorUserId) {
+    public UserProfile banUser(UUID userId, String reason, AuditActor actor) {
         UserProfile userProfile = userProfileRepository.findById(userId)
                 .orElseThrow(() -> new UserProfileNotFoundException(userId.toString()));
 
@@ -98,18 +99,18 @@ public class UserProfileService {
         UserProfile saved =  userProfileRepository.save(userProfile);
 
         auditLogService.logUserBanned(
-                actorUserId,
+                actor,
                 userId,
                 saved.getUsername(),
                 reason
         );
 
-        TxLogger.afterCommit(log, "User banned: username={}, userId={}", userProfile.getUsername(), userId);
+        TxLogger.afterCommit(log, "User banned: username={}, userId={}, actor={}", saved.getUsername(), userId, actor.userId());
         return saved;
     }
 
     @Transactional
-    public UserProfile unbanUser(UUID userId, UUID  actorUserId) {
+    public UserProfile unbanUser(UUID userId, AuditActor actor) {
         UserProfile userProfile = userProfileRepository.findById(userId)
                 .orElseThrow(() -> new UserProfileNotFoundException(userId.toString()));
 
@@ -122,12 +123,12 @@ public class UserProfileService {
         UserProfile saved =  userProfileRepository.save(userProfile);
 
         auditLogService.logUserUnbanned(
-                actorUserId,
+                actor,
                 userId,
                 username
         );
 
-        TxLogger.afterCommit(log, "User unbanned: username={}, userId={}", userProfile.getUsername(), userId);
+        TxLogger.afterCommit(log, "User unbanned: username={}, userId={}, actor={}", username, userId, actor.userId());
         return saved;
     }
 

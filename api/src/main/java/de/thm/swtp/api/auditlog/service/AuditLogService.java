@@ -1,7 +1,5 @@
 package de.thm.swtp.api.auditlog;
 
-import de.thm.swtp.api.userprofile.entity.UserProfile;
-import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

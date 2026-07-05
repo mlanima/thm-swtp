@@ -6,6 +6,7 @@ import de.thm.swtp.api.userprofile.dto.BanUserRequest;
 import de.thm.swtp.api.userprofile.dto.ManagedUserResponse;
 import de.thm.swtp.api.userprofile.mapper.ManagedUserMapper;
 import de.thm.swtp.api.userprofile.service.UserProfileService;
+import de.thm.swtp.api.auditlog.AuditActor;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -40,16 +41,16 @@ public class UserManagementController {
     @PatchMapping("/{userId}/ban")
     @PreAuthorize("@security.canBanUser(#userId, authentication)")
     public ManagedUserResponse banUser(@PathVariable UUID userId, @AuthenticationPrincipal Jwt jwt, @Valid @RequestBody(required = false) BanUserRequest banUserRequest) {
-        UUID actorUserId = UUID.fromString(jwt.getSubject());
+        AuditActor actor = AuditActor.fromJwt(jwt);
         String banReason = banUserRequest == null ? null : banUserRequest.reason();
-        return managedUserMapper.toResponse(userProfileService.banUser(userId, banReason, actorUserId));
+        return managedUserMapper.toResponse(userProfileService.banUser(userId, banReason, actor));
     }
 
     @PatchMapping("/{userId}/unban")
     @PreAuthorize("@security.canUnbanUser(#userId, authentication)")
-    public ManagedUserResponse unbanUser(@PathVariable UUID userId, @AuthenticationPrincipal Jwt jwt){
-        UUID actorUserId = UUID.fromString(jwt.getSubject());
-        return managedUserMapper.toResponse(userProfileService.unbanUser(userId, actorUserId));
+    public ManagedUserResponse unbanUser(@PathVariable UUID userId, @AuthenticationPrincipal Jwt jwt) {
+        AuditActor actor = AuditActor.fromJwt(jwt);
+        return managedUserMapper.toResponse(userProfileService.unbanUser(userId, actor));
     }
 
 }

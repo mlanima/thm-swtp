@@ -290,7 +290,8 @@
     "USER_MANAGEMENT": "Nutzerverwaltung",
     "PROFESSOR_REQUESTS": "Professorverwaltung",
     "IMPRESSUM": "Impressum",
-    "MENU": "Menü"
+    "MENU": "Menü",
+    "AUDIT_LOGS": "Audit Logs"
   },
   "PROJECTCREATE": {
     "PAGE_TITLE": "Erstelle ein neues Projekt",
