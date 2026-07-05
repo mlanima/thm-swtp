@@ -4,7 +4,6 @@ import de.thm.swtp.api.auditlog.domain.AuditActor;
 import de.thm.swtp.api.auditlog.domain.AuditLogAction;
 import de.thm.swtp.api.auditlog.domain.AuditLogTargetType;
 import de.thm.swtp.api.auditlog.entity.AuditLogEntity;
-import de.thm.swtp.api.auditlog.exception.InvalidAuditLogSortFieldException;
 import de.thm.swtp.api.auditlog.repository.AuditLogRepository;
 import de.thm.swtp.api.exceptionhandling.exceptions.InvalidAuditLogSortFieldException;
 

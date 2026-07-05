@@ -1,8 +1,9 @@
 package de.thm.swtp.api.auditlog.dto;
 
-import de.thm.swtp.api.auditlog.AuditLogAction;
-import de.thm.swtp.api.auditlog.AuditLogEntity;
-import de.thm.swtp.api.auditlog.AuditLogTargetType;
+import de.thm.swtp.api.auditlog.domain.AuditLogAction;
+import de.thm.swtp.api.auditlog.domain.AuditLogTargetType;
+import de.thm.swtp.api.auditlog.entity.AuditLogEntity;
+
 
 import java.time.LocalDateTime;
 import java.util.UUID;
