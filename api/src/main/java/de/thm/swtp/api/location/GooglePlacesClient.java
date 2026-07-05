@@ -43,6 +43,12 @@ public class GooglePlacesClient {
         var body = restClient.get()
                 .uri(DETAILS_PATH, placeId, apiKey)
                 .retrieve()
+                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                        (request, res) -> {
+                            log.warn("Google Places API returned {} for placeId={}",
+                                    res.getStatusCode(), LogSafe.clean(placeId));
+                            throw new GooglePlacesApiException("Places API request failed: " + res.getStatusCode());
+                        })
                 .body(String.class);
 
         if (body == null || body.isBlank()) {

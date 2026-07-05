@@ -78,7 +78,7 @@ public class ContentModerationService {
         }
         var appropriate = isContentAppropriate(content);
         if (appropriate) {
-            log.info("Moderation '{}' passed: {}", fieldName, LogSafe.clean(content));
+            log.debug("Moderation '{}' passed", fieldName);
         } else {
             log.warn("Moderation '{}' rejected: {}", fieldName, LogSafe.clean(content));
             throw new ContentNotValidException(fieldName);
