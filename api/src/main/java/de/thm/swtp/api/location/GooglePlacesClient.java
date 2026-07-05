@@ -2,6 +2,7 @@ package de.thm.swtp.api.location;
 
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
+import de.thm.swtp.api.common.LogSafe;
 import de.thm.swtp.api.location.exception.GooglePlacesApiException;
 import de.thm.swtp.api.location.exception.InvalidPlaceException;
 import lombok.extern.slf4j.Slf4j;
@@ -58,7 +59,7 @@ public class GooglePlacesClient {
         var status = node.path("status").asString();
         if (!"OK".equals(status)) {
             var errorMsg = node.path("error_message").asString("");
-            log.warn("Google Places API returned status '{}' for placeId={}: {}", status, placeId, errorMsg);
+            log.warn("Google Places API returned status '{}' for placeId={}: {}", status, LogSafe.clean(placeId), errorMsg);
             if ("OVER_QUERY_LIMIT".equals(status) || "REQUEST_DENIED".equals(status) || "UNKNOWN_ERROR".equals(status)) {
                 throw new GooglePlacesApiException("Places API request failed: " + status);
             }
@@ -76,7 +77,7 @@ public class GooglePlacesClient {
             locationName = locationName + ", " + country;
         }
 
-        log.info("Validated placeId={} -> '{}'", placeId, locationName);
+        log.info("Validated placeId={} -> '{}'", LogSafe.clean(placeId), locationName);
         return locationName;
     }
 

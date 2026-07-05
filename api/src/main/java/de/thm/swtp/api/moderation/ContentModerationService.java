@@ -6,6 +6,7 @@ import de.thm.swtp.api.moderation.exception.ContentNotValidException;
 import de.thm.swtp.api.moderation.exception.ModerationApiException;
 import de.thm.swtp.api.tag.validation.BlocklistService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
@@ -62,7 +63,7 @@ public class ContentModerationService {
     private boolean checkContent(final String content) {
         try {
             return !moderationClient.isFlagged(content);
-        } catch (ModerationApiException e) {
+        } catch (ModerationApiException | ResourceAccessException e) {
             if (blocklistFallback) {
                 log.warn("OpenAI moderation unavailable, falling back to blocklist");
                 return !blocklistService.containsAny(content);
