@@ -38,15 +38,23 @@ public class ContentModerationService {
 
     public boolean isContentAppropriate(final String content) {
         var key = hash(content);
-        var cached = cache != null ? cache.get(key, Boolean.class) : null;
-        if (cached != null) {
-            log.info("Cache hit for content moderation");
-            return cached;
+        try {
+            var cached = cache != null ? cache.get(key, Boolean.class) : null;
+            if (cached != null) {
+                log.info("Cache hit for content moderation");
+                return cached;
+            }
+        } catch (Exception e) {
+            log.warn("Cache read failed, falling through to moderation: {}", e.getMessage());
         }
         log.info("Cache miss for content moderation — querying OpenAI");
         var result = checkContent(content);
         if (cache != null) {
-            cache.put(key, result);
+            try {
+                cache.put(key, result);
+            } catch (Exception e) {
+                log.warn("Cache write failed: {}", e.getMessage());
+            }
         }
         return result;
     }
