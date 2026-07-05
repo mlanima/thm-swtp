@@ -1,5 +1,6 @@
 package de.thm.swtp.api.reports.service;
 
+import de.thm.swtp.api.common.TxLogger;
 import de.thm.swtp.api.exceptionhandling.exceptions.*;
 import de.thm.swtp.api.project.ProjectRepository;
 import de.thm.swtp.api.projectPost.entity.ProjectPostEntity;
@@ -12,6 +13,7 @@ import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ import java.util.UUID;
 /** Service for creating, searching and moderation reports.*/
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ReportService {
     private final ReportRepository reportRepository;
     private final UserProfileRepository userProfileRepository;
@@ -56,6 +59,15 @@ public class ReportService {
                 .build();
 
         ReportEntity saved = reportRepository.save(reportEntity);
+
+        TxLogger.afterCommit(log, "Report created: report={}, reporter={}, target={}, targetId={}, reason={}",
+                saved.getId(),
+                currentUserId,
+                target,
+                targetId,
+                reason
+        );
+
         return ReportMapper.toDomain(saved);
 
     }
@@ -82,7 +94,39 @@ public class ReportService {
         }
 
         ReportEntity saved =  reportRepository.save(reportEntity);
+
+        TxLogger.afterCommit(log, "Report status updated: report={}, status={}, moderator={}",
+                reportId,
+                status,
+                moderatorKeycloakId
+        );
+
         return toDomainWithTargetSummary(saved);
+    }
+
+    /** Resolves all active reports for the same target after a moderator action was performed*/
+    @Transactional
+    public void resolveActiveReportsForTarget(ReportTarget target, UUID targetId, UUID moderatorKeycloakId,
+                                              String moderatorUsername, String moderatorMessage) {
+
+        List<ReportEntity> activeReports = reportRepository.findAllByTargetAndTargetIdAndStatusIn(
+                target, targetId, ACTIVE_REPORT_STATUSES);
+
+        LocalDateTime now = LocalDateTime.now();
+
+        activeReports.forEach(report -> {
+            report.setStatus(ReportStatus.RESOLVED);
+            report.setReviewerKeycloakId(moderatorKeycloakId);
+            report.setReviewerUsername(moderatorUsername);
+            report.setReviewedAt(now);
+            report.setModeratorMessage(moderatorMessage);
+        });
+
+        TxLogger.afterCommit(log, "Active reports resolved for target: target={}, targetId={}, count={}, moderator={}",
+                target,
+                targetId,
+                activeReports.size(),
+                moderatorKeycloakId);
     }
 
 
@@ -129,11 +173,13 @@ public class ReportService {
                 .map(user -> new ReportTargetSummary(
                         user.getUsername(),
                         "USER",
-                        "/profiles/" + user.getUsername()
+                        "/profiles/" + user.getUsername(),
+                        null
                 ))
                 .orElse(new ReportTargetSummary(
                         "Deleted user",
                         "USER",
+                        null,
                         null
                 ));
     }
@@ -144,11 +190,13 @@ public class ReportService {
                 .map(project -> new ReportTargetSummary(
                         project.getName(),
                         "PROJECT",
-                        "/project/" + project.getProjectUrl()
+                        "/project/" + project.getProjectUrl(),
+                        null
                 ))
                 .orElse(new ReportTargetSummary(
                         "Deleted project",
                         "PROJECT",
+                        null,
                         null
                 ));
     }
@@ -159,11 +207,13 @@ public class ReportService {
                 .map(post -> new ReportTargetSummary(
                         getProjectPostTitle(post),
                         post.getProject().getName(),
-                        "/project/" + post.getProject().getProjectUrl()
+                        "/project/" + post.getProject().getProjectUrl(),
+                        post.getProject().getId()
                 ))
                 .orElse(new ReportTargetSummary(
                         "Deleted project post",
                         "PROJECT_POST",
+                        null,
                         null
                 ));
     }

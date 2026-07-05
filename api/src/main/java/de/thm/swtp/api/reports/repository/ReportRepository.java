@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 /** Repository for report entities.*/
@@ -41,5 +42,9 @@ public interface ReportRepository extends JpaRepository<ReportEntity, UUID> {
             Pageable pageable
     );
 
-    long countByTargetAndTargetIdAndStatusIn(ReportTarget target, UUID reportId, Collection<ReportStatus> statuses);
+    /** Counts active reports for the same reported target.*/
+    long countByTargetAndTargetIdAndStatusIn(ReportTarget target, UUID targetId, Collection<ReportStatus> statuses);
+
+    /** Returns all reports for the same reported target with the specified status.*/
+    List<ReportEntity> findAllByTargetAndTargetIdAndStatusIn(ReportTarget target, UUID targetId, Collection<ReportStatus> statuses);
 }

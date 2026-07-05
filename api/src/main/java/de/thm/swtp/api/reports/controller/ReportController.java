@@ -4,10 +4,7 @@ import de.thm.swtp.api.common.PageResponse;
 import de.thm.swtp.api.reports.domain.ReportReason;
 import de.thm.swtp.api.reports.domain.ReportStatus;
 import de.thm.swtp.api.reports.domain.ReportTarget;
-import de.thm.swtp.api.reports.dto.CreateReportRequest;
-import de.thm.swtp.api.reports.dto.ModeratorReportResponse;
-import de.thm.swtp.api.reports.dto.ReportResponse;
-import de.thm.swtp.api.reports.dto.UpdateReportStatusRequest;
+import de.thm.swtp.api.reports.dto.*;
 import de.thm.swtp.api.reports.service.ReportService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -51,9 +49,9 @@ public class ReportController {
         UUID currentUserId = UUID.fromString(jwt.getSubject());
         return ReportResponse.toResponse(reportService.createReport(
                 currentUserId,
-                createReportRequest.reportTarget(),
+                createReportRequest.target(),
                 createReportRequest.targetId(),
-                createReportRequest.reportReason(),
+                createReportRequest.reason(),
                 createReportRequest.message()));
     }
 
@@ -71,6 +69,25 @@ public class ReportController {
                 moderatorUsername,
                 request.moderatorMessage()
         ));
+    }
+
+    /** Resolves all open or in-review reports for the given reported target.*/
+    @PatchMapping("/targets/{target}/{targetId}/resolve-active")
+    @PreAuthorize("@security.canManageReports(authentication)")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void resolveActiveReportsForTarget(@PathVariable ReportTarget target, @PathVariable UUID targetId,
+            @Valid @RequestBody ResolveReportsForTargetRequest request, @AuthenticationPrincipal Jwt jwt) {
+
+        UUID moderatorKeycloakId = UUID.fromString(jwt.getSubject());
+        String moderatorUsername = jwt.getClaimAsString("preferred_username");
+
+        reportService.resolveActiveReportsForTarget(
+                target,
+                targetId,
+                moderatorKeycloakId,
+                moderatorUsername,
+                request.moderatorMessage()
+        );
     }
 
 }

@@ -215,9 +215,18 @@ public class SecurityService {
 
     /** Allowed to delete a post on a  project.*/
     public boolean canDeleteProjectPost(UUID projectId, UUID postId, Authentication authentication) {
-        if (!hasAuthenticationContext(projectId, authentication) || postId == null || !isRegularUser(authentication)) {
+        if (!hasAuthenticationContext(projectId, authentication) || postId == null) {
             return false;
         }
+
+        if (hasModeratorRole(authentication)) {
+            return true;
+        }
+
+        if (!isRegularUser(authentication)) {
+            return false;
+        }
+
         return isProjectOwner(projectId, authentication) || isProjectPostAuthor(projectId, postId, authentication);
     }
 
