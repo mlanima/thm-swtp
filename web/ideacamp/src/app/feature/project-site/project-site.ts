@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import{CommonModule} from '@angular/common';
@@ -116,8 +117,12 @@ export class ProjectSite  implements OnInit {
           this.isSaving.set(false);
           this.showSuccessModal.set(true);
         },
-        error: () => {
-          this.toastService.error(this.translateService.instant('PROJECTSITE.ERRORS.SAVE_PROJECT'));
+        error: (err: HttpErrorResponse) => {
+          if (err.error?.errorCode === 'CONTENT_NOT_VALID') {
+            this.toastService.error(this.translateService.instant('PROJECTSITE.ERRORS.CONTENT_NOT_VALID'));
+          } else {
+            this.toastService.error(this.translateService.instant('PROJECTSITE.ERRORS.SAVE_PROJECT'));
+          }
           this.isSaving.set(false);
         },
       });

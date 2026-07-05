@@ -457,7 +457,8 @@
     "ERRORS": {
       "NO_PROJECT_URL": "No project URL provided.",
       "LOAD_PROJECT": "Project data could not be loaded.",
-      "SAVE_PROJECT": "Project could not be saved."
+      "SAVE_PROJECT": "Project could not be saved.",
+      "CONTENT_NOT_VALID": "This input contains content that is not allowed."
     },
     "INFO": {
       "VISIBILITY": "Visibility",

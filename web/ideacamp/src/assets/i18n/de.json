@@ -457,7 +457,8 @@
     "ERRORS": {
       "NO_PROJECT_URL": "Keine Projekt-URL angegeben.",
       "LOAD_PROJECT": "Projektdaten konnten nicht abgerufen werden.",
-      "SAVE_PROJECT": "Projekt konnte nicht gespeichert werden."
+      "SAVE_PROJECT": "Projekt konnte nicht gespeichert werden.",
+      "CONTENT_NOT_VALID": "Dieser Inhalt ist nicht erlaubt."
     },
     "INFO": {
       "VISIBILITY": "Sichtbarkeit",

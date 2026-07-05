@@ -138,7 +138,8 @@ Parses response JSON manually (Jackson 3 — reads as `String` then `readTree()`
 |-----------|-----------|--------|
 | non-null | non-null | Validate placeId, set both |
 | blank | anything | Clear both (remove location) |
-| non-null | blank/null | Skip silently (no change) |
+| non-null | null | Skip silently (no change) |
+| non-null | `""` | Throw `InvalidPlaceException` (400 INVALID_PLACE) |
 | null | anything | Skip silently (no change) |
 
 ### Exceptions

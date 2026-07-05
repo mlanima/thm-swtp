@@ -53,6 +53,9 @@ public class GooglePlacesClient {
     }
 
     public String validatePlaceId(final String placeId) {
+        if (apiKey == null || apiKey.isBlank()) {
+            throw new GooglePlacesApiException("Places API key is not configured");
+        }
         var body = restClient.get()
                 .uri(DETAILS_PATH, placeId, apiKey)
                 .retrieve()
