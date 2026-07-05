@@ -151,8 +151,10 @@
       "COLUMN_PROJECT": "Project",
       "COLUMN_OWNER": "Owner",
       "COLUMN_CREATED": "Created",
+      "COLUMN_UPDATED": "Last Updated",
       "COLUMN_STATUS": "Status",
       "COLUMN_ACTION": "Action",
+      "MEMBER": "member",
       "MEMBERS": "members",
       "STATUS_PRIVATE": "Private",
       "STATUS_PUBLIC": "Public",
@@ -169,7 +171,12 @@
       "CONFIRM_DELETE_TEXT": "The project \"{{ projectName }}\" will be permanently deleted. All associated data will be lost.",
       "CONFIRM_DELETE_LABEL": "Type the project name to confirm",
       "CONFIRM_DELETE_PLACEHOLDER": "Type the project name to confirm",
-      "CONFIRM_DELETE_HINT_FILLED": "The project name must be entered"
+      "CONFIRM_DELETE_HINT_FILLED": "The project name must be entered",
+      "SORT": {
+        "SORT_BY": "Sort by this column",
+        "ASC": "Sorted ascending",
+        "DESC": "Sorted descending"
+      }
     },
     "USER_MANAGEMENT": {
       "TITLE": "User Management",
