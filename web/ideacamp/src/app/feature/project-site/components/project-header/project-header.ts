@@ -10,11 +10,14 @@ import { JoinRequestButton } from '../../../../shared/join-request-button/join-r
   selector: 'app-project-header',
   standalone: true,
   imports: [FavoriteButton, JoinRequestButton, RouterLink, TranslatePipe],
-  templateUrl: './project-header.html'
+  templateUrl: './project-header.html',
 })
 export class ProjectHeader {
   @Input({ required: true }) project!: ProjectResponse;
   @Output() favoriteCountChanged = new EventEmitter<number>();
+
+  @Input() canReport = false;
+  @Output() reportProject = new EventEmitter<void>();
 
   private readonly authService = inject(AuthService);
 

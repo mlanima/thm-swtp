@@ -18,6 +18,10 @@ import { LinkManagerDataSource } from '../../../../shared/link-manager/link-mana
 import { UserProfileLinkModel } from '../../../../models/user-profile-link.model';
 import { UserProfileLinkService } from '../../services/user-profile-link.service';
 
+import { ReportDialogComponent } from '../../../reports/components/report-dialog/report-dialog.component';
+import { ReportService } from '../../../reports/service/report-service';
+import { ReportReason, ReportTarget } from '../../../reports/models/report-create.model';
+
 interface ProfileViewState {
   /** Indicates whether the profile request is currently running. */
   isLoading: boolean;
@@ -41,6 +45,7 @@ interface ProfileViewState {
     SuccessModal,
     TranslatePipe,
     LinkManagerComponent,
+    ReportDialogComponent,
   ],
   templateUrl: './user-profile.html',
 })
@@ -65,6 +70,8 @@ export class UserProfile implements OnInit, OnDestroy {
 
   private readonly translateService = inject(TranslateService);
 
+  private readonly reportService = inject(ReportService);
+
   /** Username read from the route parameter :username. */
   routeUsername = '';
 
@@ -76,6 +83,16 @@ export class UserProfile implements OnInit, OnDestroy {
     profile: null,
     errorMessage: '',
   });
+
+  readonly reportDialog = signal<{
+    target: ReportTarget;
+    targetId: string;
+    targetTitle: string;
+  } | null>(null);
+
+  readonly isReportSubmitting = signal(false);
+  readonly reportErrorMessage = signal<string | null>(null);
+  readonly showReportSuccess = signal(false);
 
   /** True when the logged-in user is viewing their own profile. */
   get isOwner(): boolean {
@@ -246,6 +263,66 @@ export class UserProfile implements OnInit, OnDestroy {
   /** Closes the success modal after a successful profile update */
   closeSuccessModal(): void {
     this.showSuccessModal = false;
+  }
+
+  canReportProfile(profile: UserProfileModel): boolean {
+    const currentUser = this.authService.user();
+
+    return (
+      !!currentUser && !this.authService.isModerator() && currentUser.id !== profile.keycloakId
+    );
+  }
+
+  openReportDialog(profile: UserProfileModel): void {
+    this.reportDialog.set({
+      target: 'USER',
+      targetId: profile.keycloakId,
+      targetTitle: profile.username,
+    });
+    this.reportErrorMessage.set(null);
+  }
+
+  closeReportDialog(): void {
+    if (this.isReportSubmitting()) {
+      return;
+    }
+
+    this.reportDialog.set(null);
+    this.reportErrorMessage.set(null);
+  }
+
+  submitReport(data: { reason: ReportReason; message?: string }): void {
+    const dialog = this.reportDialog();
+
+    if (!dialog) {
+      return;
+    }
+
+    this.isReportSubmitting.set(true);
+    this.reportErrorMessage.set(null);
+
+    this.reportService
+      .createReport({
+        target: dialog.target,
+        targetId: dialog.targetId,
+        reason: data.reason,
+        message: data.message,
+      })
+      .subscribe({
+        next: () => {
+          this.isReportSubmitting.set(false);
+          this.closeReportDialog();
+          this.showReportSuccess.set(true);
+        },
+        error: () => {
+          this.reportErrorMessage.set('REPORT_DIALOG.ERROR_SEND');
+          this.isReportSubmitting.set(false);
+        },
+      });
+  }
+
+  closeReportSuccess(): void {
+    this.showReportSuccess.set(false);
   }
 
   private createProfileLinkDataSource(userId: string): LinkManagerDataSource<UserProfileLinkModel> {

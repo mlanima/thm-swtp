@@ -62,6 +62,17 @@
           (favoriteCountChanged)="favoriteCountChanged.emit($event)"
         />
 
+        @if (canReport) {
+          <button
+            type="button"
+            class="inline-flex items-center gap-2 rounded-full bg-red-500/15 px-5 py-3 text-sm font-semibold text-red-100 ring-1 ring-inset ring-red-300/40 transition hover:bg-red-500/25"
+            (click)="reportProject.emit()"
+          >
+            <i class="pi pi-flag text-sm"></i>
+            <span>{{ 'REPORT_DIALOG.REPORT' | translate }}</span>
+          </button>
+        }
+
         @if (isOwner) {
           <a
             [routerLink]="['/project', project.projectUrl, 'settings']"

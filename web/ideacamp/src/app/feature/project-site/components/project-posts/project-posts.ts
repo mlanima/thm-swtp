@@ -1,5 +1,16 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnChanges, SimpleChanges, inject, signal, ElementRef, ViewChild } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnChanges,
+  SimpleChanges,
+  inject,
+  signal,
+  ElementRef,
+  ViewChild,
+  Output,
+  EventEmitter,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ProjectPostResponse, ProjectResponse } from '../../../../models/project.model';
 import { ProjectService } from '../../project.service';
@@ -15,10 +26,15 @@ type ProjectPostContentFormat = 'PLAIN_TEXT' | 'MARKDOWN';
   imports: [CommonModule, FormsModule, TranslatePipe, MarkdownPipe, SuccessModal],
   templateUrl: './project-posts.html',
 })
-
 export class ProjectPosts implements OnChanges {
   @Input({ required: true }) project!: ProjectResponse;
   @Input() canCreatePosts = false;
+  @Input() canReportPosts = false;
+
+  @Output() reportPost = new EventEmitter<{
+    id: string;
+    title: string;
+  }>();
 
   private readonly projectService = inject(ProjectService);
   private readonly translateService = inject(TranslateService);
@@ -93,24 +109,26 @@ export class ProjectPosts implements OnChanges {
     this.isCreating.set(true);
     this.errorMessage.set(null);
 
-    this.projectService.createProjectPost(this.project.id, {
-      title,
-      content,
-      contentFormat: this.contentFormat(),
-      status: 'PUBLISHED'
-    }).subscribe({
-      next: (createdPost) => {
-        this.posts.update((posts) => [createdPost, ...posts]);
-        this.title.set('');
-        this.content.set('');
-        this.showCreateForm.set(false);
-        this.isCreating.set(false);
-      },
-      error: () => {
-        this.errorMessage.set(this.translateService.instant('PROJECTPOSTS.ERRORS.CREATE'));
-        this.isCreating.set(false);
-      },
-    });
+    this.projectService
+      .createProjectPost(this.project.id, {
+        title,
+        content,
+        contentFormat: this.contentFormat(),
+        status: 'PUBLISHED',
+      })
+      .subscribe({
+        next: (createdPost) => {
+          this.posts.update((posts) => [createdPost, ...posts]);
+          this.title.set('');
+          this.content.set('');
+          this.showCreateForm.set(false);
+          this.isCreating.set(false);
+        },
+        error: () => {
+          this.errorMessage.set(this.translateService.instant('PROJECTPOSTS.ERRORS.CREATE'));
+          this.isCreating.set(false);
+        },
+      });
   }
 
   setContentFormat(format: ProjectPostContentFormat): void {
@@ -130,12 +148,7 @@ export class ProjectPosts implements OnChanges {
 
     const selectedText = value.slice(start, end) || placeholder;
 
-    const nextValue =
-      value.slice(0, start) +
-      prefix +
-      selectedText +
-      suffix +
-      value.slice(end);
+    const nextValue = value.slice(0, start) + prefix + selectedText + suffix + value.slice(end);
 
     this.content.set(nextValue);
 
@@ -188,9 +201,7 @@ export class ProjectPosts implements OnChanges {
         this.showDeleteSuccessModal.set(true);
       },
       error: () => {
-        this.errorMessage.set(
-          this.translateService.instant('PROJECTPOSTS.ERRORS.DELETE')
-        );
+        this.errorMessage.set(this.translateService.instant('PROJECTPOSTS.ERRORS.DELETE'));
         this.deletingPostId.set(null);
       },
     });

@@ -18,7 +18,9 @@
   @if (!isLoading() && project()) {
     <app-project-header
       [project]="project()!"
+      [canReport]="canReportProject()"
       (favoriteCountChanged)="onFavoriteCountChanged($event)"
+      (reportProject)="openProjectReport()"
     />
 
     <main class="mx-auto grid max-w-6xl grid-cols-1 gap-6 px-6 py-10 lg:grid-cols-[1fr_320px] lg:grid-rows-[auto_auto] lg:items-start">
@@ -112,7 +114,9 @@
       <app-project-posts
         class="lg:col-start-1 lg:row-start-2"
         [project]="project()!"
-        [canCreatePosts]="isOwner">
+        [canCreatePosts]="isOwner"
+        [canReportPosts]="canReportProject()"
+        (reportPost)="openPostReport($event)">
       </app-project-posts>
 
     </main>
@@ -125,4 +129,26 @@
       (closeModal)="closeSuccessModal()">
     </app-success-modal>
   }
+
+  @if (showReportSuccess()) {
+    <app-success-modal
+      [message]="'REPORT_DIALOG.SUCCESS' | translate"
+      [buttonText]="'COMMON.CONTINUE' | translate"
+      (closeModal)="closeReportSuccess()">
+    </app-success-modal>
+  }
+
+  @if (reportDialog(); as dialog) {
+    <app-report-dialog
+      [target]="dialog.target"
+      [targetId]="dialog.targetId"
+      [targetTitle]="dialog.targetTitle"
+      [isSubmitting]="isReportSubmitting()"
+      [errorMessage]="reportErrorMessage()"
+      (closeDialog)="closeReportDialog()"
+      (submitReport)="submitReport($event)"
+    />
+  }
 </div>
+
+

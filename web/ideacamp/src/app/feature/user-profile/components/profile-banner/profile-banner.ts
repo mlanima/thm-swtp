@@ -49,6 +49,10 @@ export class ProfileBanner implements OnChanges {
 
   readonly followerCount = signal(0);
 
+  @Input() canReport = false;
+
+  @Output() report = new EventEmitter<void>();
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['profile']) {
       this.followerCount.set(this.profile.followers);
