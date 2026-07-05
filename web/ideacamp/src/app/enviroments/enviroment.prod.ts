@@ -4,5 +4,5 @@ export const environment = {
   issuer: 'https://auth.swtp-ss26.de/realms/swtp',
   clientId: 'swtp-frontend',
   scope: 'openid profile email',
-  googleMapsApiKey: '__GOOGLE_API_KEY__',
+  googleMapsApiKey: '__GOOGLE_MAPS_API_KEY__',
 };

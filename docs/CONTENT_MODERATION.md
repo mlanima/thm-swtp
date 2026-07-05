@@ -217,13 +217,18 @@ google:
 | Variable | Required For | Default |
 |----------|-------------|---------|
 | `OPENAI_API_KEY` | Content moderation | empty (disabled) |
-| `GOOGLE_API_KEY` | Location validation, frontend Maps | empty |
+| `GOOGLE_API_KEY` | Location validation (server-side) | empty |
+| `GOOGLE_MAPS_API_KEY` | Maps JS / Places Autocomplete (frontend) | empty |
+
+Two separate keys are required because a Google API key can only have one restriction type:
+- **`GOOGLE_API_KEY`** — server-side, IP-restricted, used by `GooglePlacesClient`
+- **`GOOGLE_MAPS_API_KEY`** — frontend, HTTP referrer-restricted to `*.swtp-ss26.de/*`, `*.review.swtp-ss26.de/*`, `localhost:*`, API-limited to Maps JavaScript API + Places API
 
 ### Frontend Environment
 
 ```
 enviroment.dev.ts   → googleMapsApiKey: ''
-enviroment.prod.ts  → googleMapsApiKey: '__GOOGLE_API_KEY__' (replaced at Docker build)
+enviroment.prod.ts  → googleMapsApiKey: '__GOOGLE_MAPS_API_KEY__' (replaced at Docker build)
 ```
 
 `angular.json` uses `fileReplacements` to swap `.dev` → `.prod` in production builds.
@@ -232,25 +237,25 @@ enviroment.prod.ts  → googleMapsApiKey: '__GOOGLE_API_KEY__' (replaced at Dock
 
 ## Deployment
 
-### Frontend — Google API Key (Docker BuildKit Secret)
+### Frontend — Google Maps API Key (Docker BuildKit Secret)
 
 ```dockerfile
-RUN --mount=type=secret,id=google-api-key \
-    GOOGLE_API_KEY=$(cat /run/secrets/google-api-key); \
-    sed -i "s|__GOOGLE_API_KEY__|${GOOGLE_API_KEY}|g" src/app/enviroments/enviroment.prod.ts
+RUN --mount=type=secret,id=google-maps-api-key \
+    GOOGLE_MAPS_API_KEY=$(cat /run/secrets/google-maps-api-key); \
+    sed -i "s|__GOOGLE_MAPS_API_KEY__|${GOOGLE_MAPS_API_KEY}|g" src/app/enviroments/enviroment.prod.ts
 ```
 
 GitHub Actions pass the secret:
 ```yaml
 secrets: |
-  google-api-key=${{ secrets.GOOGLE_API_KEY }}
+  google-maps-api-key=${{ secrets.GOOGLE_MAPS_API_KEY }}
 ```
 
-The `GOOGLE_API_KEY` GitHub Secret must exist in the repository.
+The `GOOGLE_MAPS_API_KEY` GitHub Secret must exist in the repository (referrer-restricted for frontend use).
 
 ### Backend — API Keys
 
-Both `OPENAI_API_KEY` and `GOOGLE_API_KEY` are injected at **runtime** via Docker Compose `.env` — never as build-args.
+`OPENAI_API_KEY` and `GOOGLE_API_KEY` (IP-restricted, server-side only) are injected at **runtime** via Docker Compose `.env` — never as build-args.
 
 ### Redis
 
