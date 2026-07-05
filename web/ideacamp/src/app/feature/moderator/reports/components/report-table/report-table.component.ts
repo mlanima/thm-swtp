@@ -1,11 +1,12 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
-import { DatePipe } from '@angular/common';
+import { DatePipe, NgClass } from '@angular/common';
 import {
   ManagedReport, ReportReason,
   ReportSortField,
   ReportStatus, ReportTarget,
   SortDirection,
+  ReportPriority
 } from '../../models/report.model';
 import { ReportActionMenuComponent } from '../report-action-menu/report-action-menu.component';
 import { RouterLink } from '@angular/router';
@@ -13,7 +14,7 @@ import { RouterLink } from '@angular/router';
 @Component({
   selector: 'app-report-table',
   standalone: true,
-  imports: [DatePipe, TranslatePipe, ReportActionMenuComponent, RouterLink],
+  imports: [DatePipe, TranslatePipe, ReportActionMenuComponent, RouterLink, NgClass],
   templateUrl: './report-table.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -50,12 +51,38 @@ export class ReportTableComponent {
     return this.sortDirection() === 'asc' ? '↑' : '↓';
   }
 
-  isCriticalReason(reason: ReportReason): boolean {
-    return (
-      reason === 'SELF_HARM_OR_SUICIDE' ||
-      reason === 'VIOLENCE_OR_THREATS' ||
-      reason === 'HATE_SPEECH'
-    );
+  getReportPriority(reason: ReportReason): ReportPriority {
+    switch (reason) {
+      case 'SELF_HARM_OR_SUICIDE':
+      case 'VIOLENCE_OR_THREATS':
+      case 'HATE_SPEECH':
+        return 'CRITICAL';
+
+      case 'HARASSMENT':
+      case 'PERSONAL_DATA':
+      case 'FRAUD_OR_IMPERSONATION':
+        return 'MEDIUM';
+
+      default:
+        return 'LOW';
+    }
+  }
+
+  getPriorityBorderClass(report: ManagedReport): string {
+    if (report.status === 'RESOLVED' || report.status === 'DISMISSED') {
+      return 'border-l-transparent';
+    }
+
+    switch (this.getReportPriority(report.reason)) {
+      case 'CRITICAL':
+        return 'border-l-red-400';
+
+      case 'MEDIUM':
+        return 'border-l-amber-300';
+
+      case 'LOW':
+        return 'border-l-transparent';
+    }
   }
 
   getTargetBadgeClasses(target: ReportTarget): string {

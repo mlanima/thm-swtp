@@ -48,3 +48,5 @@ export interface ReportTargetSummary{
   subtitle: string;
   link: string | null;
 }
+
+export type ReportPriority = 'CRITICAL' | 'MEDIUM' | 'LOW';

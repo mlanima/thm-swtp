@@ -1,7 +1,7 @@
-<section class="min-h-screen bg-slate-100 px-6 py-8 text-slate-700">
+<section class="min-h-screen bg-slate-100 px-3 py-6 text-slate-700 sm:px-6 sm:py-8">
   <div class="mx-auto max-w-6xl">
     <header class="mb-6">
-      <div class="flex items-center gap-3">
+      <div class="flex flex-wrap items-center gap-3">
         <h1 class="text-3xl font-bold text-slate-700">
           {{ 'MODERATOR.REPORTS.TITLE' | translate }}
         </h1>
@@ -29,68 +29,72 @@
           />
         </div>
 
-        <div class="flex flex-wrap items-center gap-3">
+        <div class="space-y-2 sm:flex sm:items-center sm:gap-3 sm:space-y-0">
           <span class="text-xs font-bold uppercase tracking-wide text-slate-500">
             {{ 'MODERATOR.REPORTS.FILTER.STATUS' | translate }}:
           </span>
 
-          <div class="flex rounded-xl bg-slate-100 p-1">
-            @for (status of statusOptions; track status ?? 'ALL') {
-              <button
-                type="button"
-                (click)="setStatusFilter(status)"
-                class="rounded-lg px-4 py-1.5 text-sm font-medium transition"
-                [class.bg-white]="statusFilter() === status"
-                [class.text-slate-800]="statusFilter() === status"
-                [class.shadow-sm]="statusFilter() === status"
-                [class.text-slate-500]="statusFilter() !== status"
-              >
-                @if (status === null) {
-                  {{ 'MODERATOR.REPORTS.FILTER.ALL' | translate }}
-                } @else {
-                  {{ ('MODERATOR.REPORTS.STATUS.' + status) | translate }}
-                }
-              </button>
-            }
-          </div>
-        </div>
-
-        <div class="flex flex-wrap items-center gap-4">
-          <div class="flex flex-wrap items-center gap-3">
-            <span class="text-xs font-bold uppercase tracking-wide text-slate-500">
-              {{ 'MODERATOR.REPORTS.FILTER.CONTENT_TYPE' | translate }}:
-            </span>
-
-            <div class="flex rounded-xl bg-slate-100 p-1">
-              @for (target of targetOptions; track target ?? 'ALL') {
+          <div class="-mx-1 overflow-x-auto px-1">
+            <div class="flex min-w-max gap-1 rounded-xl bg-slate-100 p-1">
+              @for (status of statusOptions; track status) {
                 <button
                   type="button"
-                  (click)="setTargetFilter(target)"
-                  class="rounded-lg px-4 py-1.5 text-sm font-medium transition"
-                  [class.bg-white]="targetFilter() === target"
-                  [class.text-slate-800]="targetFilter() === target"
-                  [class.shadow-sm]="targetFilter() === target"
-                  [class.text-slate-500]="targetFilter() !== target"
+                  (click)="setStatusFilter(status)"
+                  class="rounded-lg px-4 py-2 text-sm font-medium transition"
+                  [class.bg-white]="statusFilter() === status"
+                  [class.text-slate-900]="statusFilter() === status"
+                  [class.shadow-sm]="statusFilter() === status"
+                  [class.text-slate-500]="statusFilter() !== status"
                 >
-                  @if (target === null) {
+                  @if (status === null) {
                     {{ 'MODERATOR.REPORTS.FILTER.ALL' | translate }}
                   } @else {
-                    {{ ('MODERATOR.REPORTS.TARGET.' + target) | translate }}
+                    {{ ('MODERATOR.REPORTS.STATUS.' + status) | translate }}
                   }
                 </button>
               }
             </div>
           </div>
+        </div>
 
-          <div class="flex items-center gap-3">
-            <span class="text-xs font-bold uppercase tracking-wide text-slate-500">
-              {{ 'MODERATOR.REPORTS.FILTER.REASON' | translate }}:
-            </span>
+        <div class="grid gap-4 lg:grid-cols-[auto_1fr] lg:items-center">
+          <div class="space-y-2 sm:flex sm:items-center sm:gap-3 sm:space-y-0">
+    <span class="text-xs font-bold uppercase tracking-wide text-slate-500">
+      {{ 'MODERATOR.REPORTS.FILTER.CONTENT_TYPE' | translate }}:
+    </span>
+
+            <div class="-mx-1 overflow-x-auto px-1">
+              <div class="flex min-w-max gap-1 rounded-xl bg-slate-100 p-1">
+                @for (target of targetOptions; track target ?? 'ALL') {
+                  <button
+                    type="button"
+                    (click)="setTargetFilter(target)"
+                    class="rounded-lg px-4 py-2 text-sm font-medium transition"
+                    [class.bg-white]="targetFilter() === target"
+                    [class.text-slate-900]="targetFilter() === target"
+                    [class.shadow-sm]="targetFilter() === target"
+                    [class.text-slate-500]="targetFilter() !== target"
+                  >
+                    @if (target === null) {
+                      {{ 'MODERATOR.REPORTS.FILTER.ALL' | translate }}
+                    } @else {
+                      {{ ('MODERATOR.REPORTS.TARGET.' + target) | translate }}
+                    }
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-2 sm:flex sm:items-center sm:gap-3 sm:space-y-0 lg:justify-end">
+    <span class="text-xs font-bold uppercase tracking-wide text-slate-500">
+      {{ 'MODERATOR.REPORTS.FILTER.REASON' | translate }}:
+    </span>
 
             <select
               [ngModel]="reasonFilter()"
               (ngModelChange)="setReasonFilter($event || null)"
-              class="rounded-xl border border-slate-200 bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 focus:border-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400"
+              class="w-full rounded-xl border border-slate-200 bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 focus:border-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 sm:w-64"
             >
               <option [ngValue]="null">
                 {{ 'MODERATOR.REPORTS.FILTER.ALL_REASONS' | translate }}
