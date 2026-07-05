@@ -63,10 +63,48 @@
     @if (activeTab() === 'active') {
       <section class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
         <div class="grid grid-cols-[2fr_1fr_1fr_1fr] border-b border-slate-200 bg-slate-50 px-6 py-3 text-xs font-bold uppercase tracking-wide text-slate-500">
-          <span>{{ 'MODERATOR.USER_MANAGEMENT.TABLE.USER' | translate }}</span>
-          <span>{{ 'MODERATOR.USER_MANAGEMENT.TABLE.ROLE' | translate }}</span>
-          <span>{{ 'MODERATOR.USER_MANAGEMENT.TABLE.JOINED_AT' | translate }}</span>
-          <span class="text-right">{{ 'MODERATOR.USER_MANAGEMENT.TABLE.ACTIONS' | translate }}</span>
+          <button
+            type="button"
+            class="inline-flex items-center gap-1 text-left uppercase tracking-wide transition hover:text-slate-700"
+            [title]="getActiveSortTitle('username') | translate"
+            (click)="changeActiveSort('username')">
+            {{ 'MODERATOR.USER_MANAGEMENT.TABLE.USER' | translate }}
+            <span
+              class="text-slate-400"
+              [class.text-slate-700]="activeSortField() === 'username'" aria-hidden="true">
+              {{ getActiveSortIndicator('username') }}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            class="inline-flex items-center gap-1 text-left uppercase tracking-wide transition hover:text-slate-700"
+            [title]="getActiveSortTitle('isProfessor') | translate"
+            (click)="changeActiveSort('isProfessor')">
+            {{ 'MODERATOR.USER_MANAGEMENT.TABLE.ROLE' | translate }}
+            <span
+              class="text-slate-400"
+              [class.text-slate-700]="activeSortField() === 'isProfessor'" aria-hidden="true">
+              {{ getActiveSortIndicator('isProfessor') }}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            class="inline-flex items-center gap-1 text-left uppercase tracking-wide transition hover:text-slate-700"
+            [title]="getActiveSortTitle('createdAt') | translate"
+            (click)="changeActiveSort('createdAt')">
+            {{ 'MODERATOR.USER_MANAGEMENT.TABLE.JOINED_AT' | translate }}
+            <span
+              class="text-slate-400"
+              [class.text-slate-700]="activeSortField() === 'createdAt'" aria-hidden="true">
+              {{ getActiveSortIndicator('createdAt') }}
+            </span>
+          </button>
+
+          <span class="text-right">
+            {{ 'MODERATOR.USER_MANAGEMENT.TABLE.ACTIONS' | translate }}
+          </span>
         </div>
 
         @if (activeUserCount() === 0) {
@@ -118,16 +156,71 @@
           }
         }
       </section>
+      <app-pagination
+        [currentPage]="activeCurrentPage()"
+        [totalPages]="activeTotalPages()"
+        (pageChange)="onActivePageChange($event)"
+      />
     }
 
     @if (activeTab() === 'banned') {
       <section class="overflow-hidden rounded-xl border border-red-100 bg-white shadow-sm">
         <div class="grid grid-cols-[1.5fr_1fr_1fr_1.5fr_1fr] border-b border-red-100 bg-red-50 px-6 py-3 text-xs font-bold uppercase tracking-wide text-slate-500">
-          <span>{{ 'MODERATOR.USER_MANAGEMENT.TABLE.USER' | translate }}</span>
-          <span>{{ 'MODERATOR.USER_MANAGEMENT.TABLE.ROLE' | translate }}</span>
-          <span>{{ 'MODERATOR.USER_MANAGEMENT.TABLE.BANNED_AT' | translate }}</span>
-          <span>{{ 'MODERATOR.USER_MANAGEMENT.TABLE.REASON' | translate }}</span>
-          <span class="text-right">{{ 'MODERATOR.USER_MANAGEMENT.TABLE.ACTIONS' | translate }}</span>
+          <button
+            type="button"
+            class="inline-flex items-center gap-1 text-left uppercase tracking-wide transition hover:text-slate-700"
+            [title]="getBannedSortTitle('username') | translate"
+            (click)="changeBannedSort('username')">
+            {{ 'MODERATOR.USER_MANAGEMENT.TABLE.USER' | translate }}
+            <span
+              class="text-slate-400"
+              [class.text-slate-700]="bannedSortField() === 'username'" aria-hidden="true">
+              {{ getBannedSortIndicator('username') }}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            class="inline-flex items-center gap-1 text-left uppercase tracking-wide transition hover:text-slate-700"
+            [title]="getBannedSortTitle('isProfessor') | translate"
+            (click)="changeBannedSort('isProfessor')">
+            {{ 'MODERATOR.USER_MANAGEMENT.TABLE.ROLE' | translate }}
+            <span
+              class="text-slate-400"
+              [class.text-slate-700]="bannedSortField() === 'isProfessor'" aria-hidden="true">
+              {{ getBannedSortIndicator('isProfessor') }}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            class="inline-flex items-center gap-1 text-left uppercase tracking-wide transition hover:text-slate-700"
+            [title]="getBannedSortTitle('bannedAt') | translate"
+            (click)="changeBannedSort('bannedAt')">
+            {{ 'MODERATOR.USER_MANAGEMENT.TABLE.BANNED_AT' | translate }}
+            <span
+              class="text-slate-400"
+              [class.text-slate-700]="bannedSortField() === 'bannedAt'" aria-hidden="true">
+              {{ getBannedSortIndicator('bannedAt') }}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            class="inline-flex items-center gap-1 text-left uppercase tracking-wide transition hover:text-slate-700"
+            [title]="getBannedSortTitle('banReason') | translate"
+            (click)="changeBannedSort('banReason')">
+            {{ 'MODERATOR.USER_MANAGEMENT.TABLE.REASON' | translate }}
+            <span
+              class="text-slate-400"
+              [class.text-slate-700]="bannedSortField() === 'banReason'" aria-hidden="true">
+              {{ getBannedSortIndicator('banReason') }}
+            </span>
+          </button>
+
+          <span class="text-right">
+            {{ 'MODERATOR.USER_MANAGEMENT.TABLE.ACTIONS' | translate }}
+          </span>
         </div>
 
         @if (bannedUserCount() === 0) {
@@ -183,6 +276,11 @@
           }
         }
       </section>
+      <app-pagination
+        [currentPage]="bannedCurrentPage()"
+        [totalPages]="bannedTotalPages()"
+        (pageChange)="onBannedPageChange($event)"
+      />
     }
   </main>
 </div>
