@@ -88,7 +88,7 @@ OpenAI down + blocklist-fallback = false
   └─ throw ContentModerationException ──→ 502 Bad Gateway
 ```
 
-`BlocklistService` does **substring matching** — any match anywhere in the content triggers rejection. Lives in `tag/validation/` and is shared with tag validation.
+`BlocklistService` does **whole-word matching** (Unicode-aware) — tokenizes content on Unicode letter boundaries (`\p{L}+`) and checks each token against the blocklist. Lives in `tag/validation/` and is shared with tag validation.
 
 ### ModerationClient
 
