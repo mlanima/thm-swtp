@@ -11,6 +11,7 @@
   "COMMON": {
     "SAVE": "Speichern",
     "CANCEL": "Abbrechen",
+    "CONFIRM": "Bestätigen",
     "EDIT": "Bearbeiten",
     "DELETE": "Löschen",
     "LOADING": "Wird geladen...",
@@ -310,7 +311,10 @@
         "RESOLVE": "Als gelöst markieren",
         "DISMISS": "Verwerfen",
         "CLOSE": "Schließen",
-        "SAVE": "Speichern"
+        "SAVE": "Speichern",
+        "BAN_USER": "Nutzer bannen",
+        "DELETE_PROJECT": "Projekt löschen",
+        "DELETE_PROJECT_POST": "Projektpost löschen"
       },
 
       "DETAIL": {
@@ -330,7 +334,8 @@
         "REVIEWED_BY": "Bearbeitet von",
         "REVIEWED_AT": "Bearbeitet am",
         "SIMILAR_REPORTS": "Ähnliche Meldungen",
-        "SIMILAR_REPORTS_TEXT": "Zu diesem Inhalt liegen {{count}} aktive Meldungen vor."
+        "SIMILAR_REPORTS_TEXT": "Zu diesem Inhalt liegen {{count}} aktive Meldungen vor.",
+        "TARGET_ACTIONS": "Zielaktionen"
       },
 
       "EMPTY": {
@@ -354,7 +359,17 @@
       "LOADING": "Reports werden geladen...",
       "EMPTY_MESSAGE": "Keine Nachricht angegeben.",
 
-      "SIMILAR_REPORTS": "{{count}} Meldungen"
+      "SIMILAR_REPORTS": "{{count}} Meldungen",
+
+      "CONFIRM": {
+        "BAN_USER_TITLE": "Nutzer wirklich bannen?",
+        "BAN_USER_DESCRIPTION": "Der Nutzer kann danach keine normalen Plattformfunktionen mehr nutzen.",
+        "DELETE_PROJECT_TITLE": "Projekt wirklich löschen?",
+        "DELETE_PROJECT_DESCRIPTION": "Das Projekt wird dauerhaft entfernt. Diese Aktion kann nicht rückgängig gemacht werden.",
+        "DELETE_PROJECT_POST_TITLE": "Projektpost wirklich löschen?",
+        "DELETE_PROJECT_POST_DESCRIPTION": "Der Projektpost wird dauerhaft entfernt. Diese Aktion kann nicht rückgängig gemacht werden."
+      },
+      "ERROR_TARGET_ACTION": "Die Zielaktion konnte nicht ausgeführt werden."
     }
   },
   "SIDEBAR": {

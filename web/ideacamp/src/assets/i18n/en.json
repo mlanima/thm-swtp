@@ -11,6 +11,7 @@
   "COMMON": {
     "SAVE": "Save",
     "CANCEL": "Cancel",
+    "CONFIRM": "Confirm",
     "EDIT": "Edit",
     "DELETE": "Delete",
     "LOADING": "Loading...",
@@ -310,7 +311,10 @@
         "RESOLVE": "Mark as resolved",
         "DISMISS": "Dismiss",
         "CLOSE": "Close",
-        "SAVE": "Save"
+        "SAVE": "Save",
+        "BAN_USER": "Ban user",
+        "DELETE_PROJECT": "Delete project",
+        "DELETE_PROJECT_POST": "Delete project post"
       },
 
       "DETAIL": {
@@ -330,7 +334,8 @@
         "REVIEWED_BY": "Reviewed by",
         "REVIEWED_AT": "Reviewed at",
         "SIMILAR_REPORTS": "Similar reports",
-        "SIMILAR_REPORTS_TEXT": "{{count}} active report(s) exist for this content."
+        "SIMILAR_REPORTS_TEXT": "{{count}} active report(s) exist for this content.",
+        "TARGET_ACTIONS": "Target actions"
       },
 
       "EMPTY": {
@@ -354,7 +359,17 @@
       "LOADING": "Loading reports...",
       "EMPTY_MESSAGE": "No message provided.",
 
-      "SIMILAR_REPORTS": "{{count}} reports"
+      "SIMILAR_REPORTS": "{{count}} reports",
+
+      "CONFIRM": {
+        "BAN_USER_TITLE": "Ban this user?",
+        "BAN_USER_DESCRIPTION": "The user will no longer be able to use regular platform features.",
+        "DELETE_PROJECT_TITLE": "Delete this project?",
+        "DELETE_PROJECT_DESCRIPTION": "The project will be permanently removed. This action cannot be undone.",
+        "DELETE_PROJECT_POST_TITLE": "Delete this project post?",
+        "DELETE_PROJECT_POST_DESCRIPTION": "The project post will be permanently removed. This action cannot be undone."
+      },
+      "ERROR_TARGET_ACTION": "The target action could not be completed."
     }
   },
   "SIDEBAR": {
