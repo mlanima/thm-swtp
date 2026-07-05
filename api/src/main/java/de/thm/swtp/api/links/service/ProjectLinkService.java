@@ -57,11 +57,13 @@ public class ProjectLinkService {
                 .filter(ProjectLink::isShowReadme)
                 .findFirst()
                 .flatMap(link -> GitHubRepoRef.parse(link.getUrl())
-                        .flatMap(repoRef -> gitHubReadmeService.getReadme(repoRef.owner(), repoRef.repo()))
-                        .map(content -> ProjectReadme.builder()
-                                .repoUrl(link.getUrl())
-                                .content(content)
-                                .build()));
+                        .flatMap(repoRef -> gitHubReadmeService.getReadme(repoRef.owner(), repoRef.repo())
+                                .map(content -> ProjectReadme.builder()
+                                        .repoUrl(link.getUrl())
+                                        .content(content)
+                                        .owner(repoRef.owner())
+                                        .repo(repoRef.repo())
+                                        .build())));
     }
 
     @Transactional

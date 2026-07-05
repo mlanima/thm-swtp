@@ -9,4 +9,6 @@ public class ProjectReadme {
 
     private String repoUrl;
     private String content;
+    private String owner;
+    private String repo;
 }

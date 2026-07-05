@@ -491,6 +491,8 @@ public class ProjectLinkServiceTest {
         assertThat(result).isPresent();
         assertThat(result.get().getRepoUrl()).isEqualTo(url);
         assertThat(result.get().getContent()).isEqualTo("# Hello");
+        assertThat(result.get().getOwner()).isEqualTo("mlanima");
+        assertThat(result.get().getRepo()).isEqualTo("thm-swtp");
     }
 
     @Test
