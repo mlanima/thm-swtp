@@ -5,7 +5,7 @@ import de.thm.swtp.api.professorRequest.dto.CreateProfessorRequestRequest;
 import de.thm.swtp.api.professorRequest.dto.ProfessorRequestResponse;
 import de.thm.swtp.api.professorRequest.dto.VerifyProfessorRequestEmailRequest;
 import de.thm.swtp.api.professorRequest.service.ProfessorRequestService;
-import de.thm.swtp.api.auditlog.AuditActor;
+import de.thm.swtp.api.auditlog.domain.AuditActor;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

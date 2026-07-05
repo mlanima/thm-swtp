@@ -6,7 +6,7 @@ import de.thm.swtp.api.userprofile.dto.BanUserRequest;
 import de.thm.swtp.api.userprofile.dto.ManagedUserResponse;
 import de.thm.swtp.api.userprofile.mapper.ManagedUserMapper;
 import de.thm.swtp.api.userprofile.service.UserProfileService;
-import de.thm.swtp.api.auditlog.AuditActor;
+import de.thm.swtp.api.auditlog.domain.AuditActor;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

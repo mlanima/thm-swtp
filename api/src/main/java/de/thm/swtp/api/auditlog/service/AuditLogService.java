@@ -1,10 +1,20 @@
-package de.thm.swtp.api.auditlog;
+package de.thm.swtp.api.auditlog.service;
+
+import de.thm.swtp.api.auditlog.domain.AuditActor;
+import de.thm.swtp.api.auditlog.domain.AuditLogAction;
+import de.thm.swtp.api.auditlog.domain.AuditLogTargetType;
+import de.thm.swtp.api.auditlog.entity.AuditLogEntity;
+import de.thm.swtp.api.auditlog.exception.InvalidAuditLogSortFieldException;
+import de.thm.swtp.api.auditlog.repository.AuditLogRepository;
+import de.thm.swtp.api.exceptionhandling.exceptions.InvalidAuditLogSortFieldException;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Sort;
 
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -13,8 +23,25 @@ public class AuditLogService {
 
     private final AuditLogRepository auditLogRepository;
 
+    private static final Set<String> MANAGED_AUDIT_LOG_SORT_FIELDS = Set.of(
+            "createdAt",
+            "action",
+            "actorUsername",
+            "targetType",
+            "targetName"
+    );
+
     public Page<AuditLogEntity> getAuditLogs(Pageable pageable) {
+        validateAuditLogSort(pageable);
         return auditLogRepository.findAll(pageable);
+    }
+
+    private void validateAuditLogSort(Pageable pageable) {
+        for (Sort.Order order : pageable.getSort()) {
+            if (!MANAGED_AUDIT_LOG_SORT_FIELDS.contains(order.getProperty())) {
+                throw new InvalidAuditLogSortFieldException(order.getProperty());
+            }
+        }
     }
 
     public void logProjectDeleted(AuditActor actor, UUID projectId, String projectName) {
@@ -105,8 +132,5 @@ public class AuditLogService {
                 .build();
 
         auditLogRepository.save(log);
-    }
-
-    private record ActorInfo(String username, String email) {
     }
 }

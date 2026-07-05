@@ -1,4 +1,4 @@
-package de.thm.swtp.api.auditlog;
+package de.thm.swtp.api.auditlog.domain;
 
 public enum AuditLogTargetType {
     PROJECT,

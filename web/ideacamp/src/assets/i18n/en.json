@@ -284,12 +284,12 @@
         "PROFESSOR_REQUEST": "Professor request"
       },
       "DETAILS": {
-        "PROJECT_DELETED": "Project was deleted.",
-        "PROJECT_POST_DELETED": "Project post was deleted.",
-        "USER_BANNED": "User was banned.",
-        "USER_UNBANNED": "User was unbanned.",
-        "PROFESSOR_REQUEST_ACCEPTED": "Professor request was accepted.",
-        "PROFESSOR_REQUEST_REJECTED": "Professor request was rejected."
+        "PROJECT_DELETED": "Project \"{{ targetName }}\" was deleted.",
+        "PROJECT_POST_DELETED": "Project post \"{{ targetName }}\" was deleted. {{ details }}",
+        "USER_BANNED": "User \"{{ targetName }}\" was banned. {{ details }}",
+        "USER_UNBANNED": "User \"{{ targetName }}\" was unbanned.",
+        "PROFESSOR_REQUEST_ACCEPTED": "Professor request from \"{{ targetName }}\" was accepted. {{ details }}",
+        "PROFESSOR_REQUEST_REJECTED": "Professor request from \"{{ targetName }}\" was rejected. {{ details }}"
       }
     }
   },

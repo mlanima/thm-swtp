@@ -1,6 +1,7 @@
-package de.thm.swtp.api.auditlog;
+package de.thm.swtp.api.auditlog.controller;
 
 import de.thm.swtp.api.auditlog.dto.AuditLogResponse;
+import de.thm.swtp.api.auditlog.service.AuditLogService;
 import de.thm.swtp.api.common.PageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

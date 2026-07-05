@@ -17,8 +17,8 @@ import de.thm.swtp.api.projectView.entity.ProjectViewEntity;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import de.thm.swtp.api.projectView.repository.ProjectViewRepository;
-import de.thm.swtp.api.auditlog.AuditLogService;
-import de.thm.swtp.api.auditlog.AuditActor;
+import de.thm.swtp.api.auditlog.service.AuditLogService;
+import de.thm.swtp.api.auditlog.domain.AuditActor;
 
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;

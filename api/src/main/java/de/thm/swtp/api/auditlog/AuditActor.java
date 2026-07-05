@@ -1,4 +1,4 @@
-package de.thm.swtp.api.auditlog;
+package de.thm.swtp.api.auditlog.domain;
 
 import org.springframework.security.oauth2.jwt.Jwt;
 

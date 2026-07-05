@@ -3,7 +3,7 @@ package de.thm.swtp.api.projectPost.controller;
 import de.thm.swtp.api.projectPost.service.ProjectPostService;
 import de.thm.swtp.api.projectPost.dto.CreateProjectPostRequest;
 import de.thm.swtp.api.projectPost.dto.ProjectPostResponse;
-import de.thm.swtp.api.auditlog.AuditActor;
+import de.thm.swtp.api.auditlog.domain.AuditActor;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

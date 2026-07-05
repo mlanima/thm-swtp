@@ -2,7 +2,7 @@ package de.thm.swtp.api.project;
 
 import de.thm.swtp.api.project.dto.request.*;
 import de.thm.swtp.api.project.dto.response.*;
-import de.thm.swtp.api.auditlog.AuditActor;
+import de.thm.swtp.api.auditlog.domain.AuditActor;
 import jakarta.validation.Valid;
 import lombok.*;
 import org.springframework.data.domain.Sort;

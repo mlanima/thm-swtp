@@ -1,4 +1,7 @@
-package de.thm.swtp.api.auditlog;
+package de.thm.swtp.api.auditlog.entity;
+
+import de.thm.swtp.api.auditlog.domain.AuditLogAction;
+import de.thm.swtp.api.auditlog.domain.AuditLogTargetType;
 
 import jakarta.persistence.*;
 import lombok.*;
