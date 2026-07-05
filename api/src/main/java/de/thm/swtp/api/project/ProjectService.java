@@ -172,7 +172,7 @@ public class ProjectService {
         projectJoinRequestRepository.deleteByProjectId(projectId);
         projectRepository.delete(project);
 
-        TxLogger.afterCommit(log, "Project deleted: project={}", projectId, actor.userId());
+        TxLogger.afterCommit(log, "Project deleted: project={}, actor={}", projectId, actor.userId());
         return DeleteProjectResponse.builder()
                 .projectId(projectId)
                 .message("Projekt erfolgreich gelöscht.")

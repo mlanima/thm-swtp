@@ -68,7 +68,7 @@ export const serverRoutes: ServerRoute[] = [
 
   {
     path: 'moderator/audit-logs',
-    renderMode: RenderMode.Client
+    renderMode: RenderMode.Client,
   },
 
   {

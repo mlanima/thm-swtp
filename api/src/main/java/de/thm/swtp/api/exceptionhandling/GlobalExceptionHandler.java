@@ -455,6 +455,13 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
     }
 
+    @ExceptionHandler(InvalidAuditLogSortFieldException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidAuditLogSortField(InvalidAuditLogSortFieldException ex) {
+        log.debug("Bad Request (400): {}", LogSafe.clean(ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
+    }
+
     @ExceptionHandler(InvalidProfessorEmailDomainException.class)
     public ResponseEntity<ErrorResponse> handleInvalidProfessorEmailDomain(InvalidProfessorEmailDomainException ex) {
         log.debug("Bad Request (400): {}", LogSafe.clean(ex.getMessage()));

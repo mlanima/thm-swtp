@@ -61,7 +61,7 @@ public class AuditLogService {
                 AuditLogTargetType.PROJECT_POST,
                 postId,
                 postTitle,
-                "Project post was deleted from project \"" + projectName + "\" (" + projectId + ")."
+                projectName + " (" + projectId + ")"
         );
     }
 
@@ -72,9 +72,7 @@ public class AuditLogService {
                 AuditLogTargetType.USER,
                 bannedUserId,
                 bannedUsername,
-                reason == null || reason.isBlank()
-                        ? "User was banned without a reason."
-                        : "User was banned. Reason: " + reason
+                reason == null || reason.isBlank() ? "—" : reason
         );
     }
 
@@ -85,7 +83,7 @@ public class AuditLogService {
                 AuditLogTargetType.USER,
                 unbannedUserId,
                 unbannedUsername,
-                "User was unbanned."
+                null
         );
     }
 
@@ -96,7 +94,7 @@ public class AuditLogService {
                 AuditLogTargetType.PROFESSOR_REQUEST,
                 requestId,
                 requestingUsername,
-                "Professor request was accepted for " + requestingEmail + "."
+                requestingEmail
         );
     }
 
@@ -107,7 +105,7 @@ public class AuditLogService {
                 AuditLogTargetType.PROFESSOR_REQUEST,
                 requestId,
                 requestingUsername,
-                "Professor request was rejected for " + requestingEmail + "."
+                requestingEmail
         );
     }
 

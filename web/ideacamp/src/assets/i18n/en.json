@@ -285,11 +285,11 @@
       },
       "DETAILS": {
         "PROJECT_DELETED": "Project \"{{ targetName }}\" was deleted.",
-        "PROJECT_POST_DELETED": "Project post \"{{ targetName }}\" was deleted. {{ details }}",
-        "USER_BANNED": "User \"{{ targetName }}\" was banned. {{ details }}",
+        "PROJECT_POST_DELETED": "Project post \"{{ targetName }}\" was deleted from project \"{{ details }}\".",
+        "USER_BANNED": "User \"{{ targetName }}\" was banned. Reason: {{ details }}",
         "USER_UNBANNED": "User \"{{ targetName }}\" was unbanned.",
-        "PROFESSOR_REQUEST_ACCEPTED": "Professor request from \"{{ targetName }}\" was accepted. {{ details }}",
-        "PROFESSOR_REQUEST_REJECTED": "Professor request from \"{{ targetName }}\" was rejected. {{ details }}"
+        "PROFESSOR_REQUEST_ACCEPTED": "Professor request from \"{{ targetName }}\" was accepted. Email: {{ details }}",
+        "PROFESSOR_REQUEST_REJECTED": "Professor request from \"{{ targetName }}\" was rejected. Email: {{ details }}"
       }
     }
   },
