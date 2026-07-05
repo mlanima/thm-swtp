@@ -47,6 +47,8 @@ export class PlaceAutocomplete implements AfterViewInit, OnDestroy {
 
   private autocomplete: google.maps.places.Autocomplete | null = null;
 
+  private currentPlaceId = '';
+
   private readonly listener: google.maps.MapsEventListener[] = [];
 
   ngAfterViewInit(): void {
@@ -58,7 +60,7 @@ export class PlaceAutocomplete implements AfterViewInit, OnDestroy {
 
   onInput(): void {
     this.placeChange.emit({
-      placeId: '',
+      placeId: this.currentPlaceId,
       location: this.inputElement.nativeElement.value,
     });
   }
@@ -72,6 +74,7 @@ export class PlaceAutocomplete implements AfterViewInit, OnDestroy {
       const evt = this.autocomplete.addListener('place_changed', () => {
         const place = this.autocomplete!.getPlace();
         if (place.place_id && place.formatted_address) {
+          this.currentPlaceId = place.place_id;
           this.inputElement.nativeElement.value = place.formatted_address;
           this.placeChange.emit({
             placeId: place.place_id,
@@ -87,6 +90,7 @@ export class PlaceAutocomplete implements AfterViewInit, OnDestroy {
 
   clear(): void {
     this.inputElement.nativeElement.value = '';
+    this.currentPlaceId = '';
   }
 
   ngOnDestroy(): void {

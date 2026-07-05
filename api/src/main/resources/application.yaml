@@ -81,6 +81,8 @@ app:
       - muk.thm.de
     verification-token-valid-hours: 24
     expiration-check-delay-ms: 3600000
+  content-moderation:
+    blocklist-fallback: true
   tags:
     source: openai-github
 

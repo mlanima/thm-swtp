@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.cache.CacheManager;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -123,5 +124,20 @@ class ContentModerationServiceTest {
         var hash1 = service.hash("hello");
         var hash2 = service.hash("world");
         assertThat(hash1).isNotEqualTo(hash2);
+    }
+
+    @Test
+    void shouldUseCacheOnHit() {
+        var realCacheManager = new ConcurrentMapCacheManager();
+        var content = "test content";
+        var hash = new ContentModerationService(moderationClient, blocklistService, realCacheManager, true)
+                .hash(content);
+        realCacheManager.getCache("content-moderation").put(hash, false);
+
+        var serviceWithCache = new ContentModerationService(moderationClient, blocklistService, realCacheManager, true);
+
+        assertThat(serviceWithCache.isContentAppropriate(content)).isTrue();
+        verifyNoInteractions(moderationClient);
+        verifyNoInteractions(blocklistService);
     }
 }
