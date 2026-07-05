@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -23,6 +24,8 @@ public class BlocklistService {
     private final ResourcePatternResolver resourceLoader;
 
     private Set<String> blockedWords = new HashSet<>();
+
+    private Set<Pattern> blockedPatterns = new HashSet<>();
 
     @PostConstruct
     void init() {
@@ -37,6 +40,9 @@ public class BlocklistService {
             log.error("Could not load bad-words blocklist \u2014 blocklist is empty", e);
         }
         this.blockedWords = Set.copyOf(words);
+        this.blockedPatterns = words.stream()
+                .map(w -> Pattern.compile("\\b" + Pattern.quote(w) + "\\b", Pattern.CASE_INSENSITIVE))
+                .collect(Collectors.toUnmodifiableSet());
     }
 
     private static void loadFile(final Resource resource, final Set<String> words) {
@@ -68,8 +74,6 @@ public class BlocklistService {
         if (text == null || text.isBlank()) {
             return false;
         }
-        return blockedWords.stream().anyMatch(word ->
-                Pattern.compile("\\b" + Pattern.quote(word) + "\\b", Pattern.CASE_INSENSITIVE)
-                        .matcher(text).find());
+        return blockedPatterns.stream().anyMatch(p -> p.matcher(text).find());
     }
 }
