@@ -144,7 +144,7 @@ class UserProfileServiceTest {
         when(userProfileRepository.findByUsername("Chris")).thenReturn(Optional.of(userProfile));
         when(userProfileRepository.save(userProfile)).thenReturn(userProfile);
 
-        userProfileService.updateProfile("Chris", "Title", "About", "Exp", null, null);
+        userProfileService.updateProfile("Chris", "Title", null, "About", "Exp", null);
 
         verify(contentModerationService).assertAppropriate("Title", "title");
         verify(contentModerationService).assertAppropriate("About", "about");
@@ -181,7 +181,7 @@ class UserProfileServiceTest {
         var ex = new ContentNotValidException("about");
         org.mockito.Mockito.doThrow(ex).when(contentModerationService).assertAppropriate("bad", "about");
 
-        assertThatThrownBy(() -> userProfileService.updateProfile("Chris", "title", "bad", null, null, null))
+        assertThatThrownBy(() -> userProfileService.updateProfile("Chris", "title", null, "bad", null, null))
                 .isInstanceOf(ContentNotValidException.class);
 
         verify(userProfileRepository, never()).save(any());
@@ -193,7 +193,7 @@ class UserProfileServiceTest {
         var ex = new ContentNotValidException("experience");
         org.mockito.Mockito.doThrow(ex).when(contentModerationService).assertAppropriate("bad", "experience");
 
-        assertThatThrownBy(() -> userProfileService.updateProfile("Chris", "title", null, "bad", null, null))
+        assertThatThrownBy(() -> userProfileService.updateProfile("Chris", "title", null, null, "bad", null))
                 .isInstanceOf(ContentNotValidException.class);
 
         verify(userProfileRepository, never()).save(any());
