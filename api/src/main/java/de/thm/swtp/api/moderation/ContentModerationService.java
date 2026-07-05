@@ -76,6 +76,10 @@ public class ContentModerationService {
         if (content == null || content.isBlank()) {
             return;
         }
+        if (content.length() > 10_000) {
+            log.warn("Content too long for moderation '{}': {} chars", fieldName, content.length());
+            throw new ContentNotValidException(fieldName);
+        }
         var appropriate = isContentAppropriate(content);
         if (appropriate) {
             log.debug("Moderation '{}' passed", fieldName);

@@ -9,14 +9,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import java.util.Arrays;
 import java.util.stream.StreamSupport;
 
 @Slf4j
-@Service
+@Component
 public class GooglePlacesClient {
 
     private static final String DETAILS_PATH = "/details/json?place_id={placeId}&key={key}&fields=address_components,formatted_address";

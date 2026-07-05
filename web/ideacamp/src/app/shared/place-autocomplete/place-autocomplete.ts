@@ -91,5 +91,9 @@ export class PlaceAutocomplete implements AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.listener.forEach((l) => l.remove());
+    if (this.autocomplete) {
+      google.maps.event.clearInstanceListeners(this.autocomplete);
+    }
+    document.querySelectorAll('.pac-container').forEach(el => el.remove());
   }
 }
