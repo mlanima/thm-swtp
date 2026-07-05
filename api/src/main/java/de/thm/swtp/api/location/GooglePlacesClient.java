@@ -59,6 +59,9 @@ public class GooglePlacesClient {
         if (!"OK".equals(status)) {
             var errorMsg = node.path("error_message").asString("");
             log.warn("Google Places API returned status '{}' for placeId={}: {}", status, placeId, errorMsg);
+            if ("OVER_QUERY_LIMIT".equals(status) || "REQUEST_DENIED".equals(status) || "UNKNOWN_ERROR".equals(status)) {
+                throw new GooglePlacesApiException("Places API request failed: " + status);
+            }
             throw new InvalidPlaceException("Invalid place: " + placeId);
         }
 
