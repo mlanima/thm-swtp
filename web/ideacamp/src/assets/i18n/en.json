@@ -64,6 +64,7 @@
   "MYPROJECTS": {
     "TITLE": "My projects",
     "CREATE_PROJECT": "Create project",
+    "CREATE_THESIS": "Create thesis",
     "PROJECTS": "Projects",
     "PROJECTS_COUNT_LABEL": "Projects",
     "OWNED_PROJECTS_COUNT_LABEL": "Owned projects",

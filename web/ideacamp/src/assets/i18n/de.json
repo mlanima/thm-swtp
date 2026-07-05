@@ -64,6 +64,7 @@
   "MYPROJECTS": {
     "TITLE": "Meine Projekte",
     "CREATE_PROJECT": "Projekt erstellen",
+    "CREATE_THESIS": "Abschlussarbeit erstellen",
     "PROJECTS": "Projekte",
     "PROJECTS_COUNT_LABEL": "Projekte",
     "OWNED_PROJECTS_COUNT_LABEL": "Projekte im Besitz",
