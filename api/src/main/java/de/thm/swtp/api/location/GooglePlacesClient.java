@@ -92,12 +92,13 @@ public class GooglePlacesClient {
         var addressComponents = result.path("address_components");
 
         var city = findComponent(addressComponents, "locality", "postal_town");
-        var country = findComponent(addressComponents, "country");
-
-        var locationName = city != null ? city : result.path("formatted_address").asString();
-        if (country != null) {
-            locationName = locationName + ", " + country;
+        if (city == null) {
+            log.warn("Google Places result for placeId={} has no city component", LogSafe.clean(placeId));
+            throw new InvalidPlaceException("Not a city: " + placeId);
         }
+
+        var country = findComponent(addressComponents, "country");
+        var locationName = country != null ? city + ", " + country : city;
 
         log.info("Validated placeId={} -> '{}'", LogSafe.clean(placeId), locationName);
         return locationName;

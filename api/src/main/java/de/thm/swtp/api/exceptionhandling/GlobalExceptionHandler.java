@@ -477,7 +477,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidPlaceException.class)
     public ResponseEntity<ErrorResponse> handleInvalidPlace(InvalidPlaceException ex) {
-        log.warn("Bad Request (400): {}", LogSafe.clean(ex.getMessage()));
+        log.debug("Bad Request (400): {}", LogSafe.clean(ex.getMessage()));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ErrorResponse.of(400, "Bad Request", ex.getMessage(), "INVALID_PLACE"));
     }

@@ -68,7 +68,7 @@ class GooglePlacesClientTest {
     }
 
     @Test
-    void shouldUseFormattedAddressWhenNoCity() {
+    void shouldThrowWhenNoCity() {
         var json = """
                 {
                   "status": "OK",
@@ -78,8 +78,9 @@ class GooglePlacesClientTest {
                   }
                 }
                 """;
-        assertThat(clientWithResponse(200, json).validatePlaceId("ChIJ..."))
-                .isEqualTo("Some Place, Earth");
+        assertThatThrownBy(() -> clientWithResponse(200, json).validatePlaceId("ChIJ..."))
+                .isInstanceOf(InvalidPlaceException.class)
+                .hasMessageContaining("Not a city");
     }
 
     @Test
