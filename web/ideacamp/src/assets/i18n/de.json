@@ -71,6 +71,7 @@
     "INVITED_BY": "Eingeladen von:",
     "ACCEPT": "Annehmen",
     "DECLINE": "Ablehnen",
+    "JOIN_DISCORD": "Discord beitreten",
     "NO_SHORT_DESCRIPTION": "Keine Kurzbeschreibung.",
     "PRIVATE": "Privat",
     "PUBLIC": "Öffentlich",
@@ -115,7 +116,9 @@
     "FOLLOWING": "Folge ich",
     "UNFOLLOW": "Entfolgen",
     "INVITE": "Einladen",
-    "PROFESSOR_BADGE": "Professor"
+    "PROFESSOR_BADGE": "Professor",
+    "DISCORD_SHOW": "Nutzername",
+    "DISCORD_COPIED": "Kopiert!"
   },
   "CONTACT-REQUESTS": {
     "CONTACT": "Kontaktanfragen",
@@ -384,15 +387,19 @@
       "CONNECTED": "Verbunden",
       "CHANNEL_ID": "Kanal-ID",
       "CHANNEL_ID_LABEL": "Discord Kanal-ID",
+      "ADD_BOT": "Discord Server verbinden",
+      "ADD_BOT_LOADING": "Öffne Discord...",
+      "ADD_BOT_HINT": "Der Bot findet oder erstellt einen #posts-Kanal und macht ihn automatisch schreibgeschützt für alle außer dem Projektinhaber.",
+      "AUTO_SETUP_LOADING": "Kanal wird eingerichtet...",
+      "CHANGE_CHANNEL": "Kanal ändern",
       "TEST_AND_CONNECT": "Testen & Verbinden",
       "DISCONNECT": "Trennen",
-      "NOTIFICATIONS": "Benachrichtigungseinstellungen",
-      "NOTIFY_POST_CREATED": "Beitrag erstellt",
-      "NOTIFY_POST_UPDATED": "Beitrag aktualisiert",
-      "NOTIFY_POST_DELETED": "Beitrag gelöscht",
-      "NOTIFY_MEMBER_JOIN": "Mitglied beigetreten",
-      "NOTIFY_MEMBER_LEAVE": "Mitglied ausgetreten",
-      "ERROR_CONNECT": "Konnte keine Verbindung zum Discord-Kanal herstellen."
+      "INVITE_URL_LABEL": "Discord Einladungslink",
+      "INVITE_URL_HINT": "Dieser Link wird eingeladenen Nutzern angezeigt, damit sie dem Server beitreten können.",
+      "ERROR_CONNECT": "Konnte keine Verbindung zum Discord-Kanal herstellen.",
+      "ERROR_LINK": "Verbindung zu Discord fehlgeschlagen.",
+      "NEEDS_DISCORD_LINK": "Du musst dein Discord-Konto verknüpfen, bevor du einen Server verbinden kannst.",
+      "LINK_DISCORD": "Discord-Konto verknüpfen"
     },
     "ERRORS": {
       "NO_PROJECT_URL": "Keine Projekt-URL gegeben.",
@@ -483,9 +490,12 @@
     "HEADER": {
       "SETTINGS": "Einstellungen"
     },
+    "DISCORD_CHANNEL": "Discord Kanal",
     "MEMBERS": {
       "ALL_MEMBERS": "Alle Mitglieder",
-      "NO_MEMBERS": "Noch keine Mitglieder."
+      "NO_MEMBERS": "Noch keine Mitglieder.",
+      "DISCORD_SHOW": "Nutzername",
+      "DISCORD_COPIED": "Kopiert!"
     },
     "TAGS": {
       "ERROR_INVALID_CHARS": "Tag enthält ungültige Zeichen. Erlaubt: Buchstaben, Zahlen, Leerzeichen, Bindestrich und Punkt.",

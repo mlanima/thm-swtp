@@ -1,7 +1,7 @@
 <div class="rounded-xl border border-slate-200 bg-white p-6">
   <h3 class="mb-4 text-lg font-semibold text-slate-700">{{ 'PROJECTSETTINGS.DISCORD.TITLE' | translate }}</h3>
 
-  @if (isLoading()) {
+  @if (isUserLoading() || isLoading()) {
     <p class="text-sm text-slate-400">{{ 'COMMON.LOADING' | translate }}</p>
   }
 
@@ -9,8 +9,25 @@
     <p class="mb-3 text-sm text-red-500">{{ err | translate }}</p>
   }
 
-  @if (!isLoading()) {
-    @if (connectionStatus()?.isActive) {
+  @if (linkError(); as err) {
+    <p class="mb-3 text-sm text-red-500">{{ err | translate }}</p>
+  }
+
+  @if (!isUserLoading() && !isLoading()) {
+    @if (!isDiscordLinked()) {
+      <p class="mb-4 text-sm text-slate-500">{{ 'PROJECTSETTINGS.DISCORD.NEEDS_DISCORD_LINK' | translate }}</p>
+      <button
+        (click)="linkDiscord()"
+        [disabled]="isLinkingDiscord()"
+        class="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:opacity-50"
+      >
+        @if (isLinkingDiscord()) {
+          <i class="pi pi-spin pi-spinner text-xs"></i>
+        }
+        <i class="pi pi-comments"></i>
+        {{ 'PROJECTSETTINGS.DISCORD.LINK_DISCORD' | translate }}
+      </button>
+    } @else if (connectionStatus()?.isActive) {
       <div class="mb-4 flex items-center gap-2">
         <span class="h-2 w-2 rounded-full bg-green-500"></span>
         <span class="text-sm font-medium text-green-700">{{ 'PROJECTSETTINGS.DISCORD.CONNECTED' | translate }}</span>
@@ -19,45 +36,30 @@
         {{ 'PROJECTSETTINGS.DISCORD.CHANNEL_ID' | translate }}: <code class="rounded bg-slate-100 px-1.5 py-0.5 text-xs">{{ connectionStatus()?.channelId }}</code>
       </p>
 
-      @if (settings(); as s) {
-        <div class="mb-4 space-y-3">
-          <h4 class="text-sm font-medium text-slate-600">{{ 'PROJECTSETTINGS.DISCORD.NOTIFICATIONS' | translate }}</h4>
-
-          <label class="flex items-center gap-3 cursor-pointer">
-            <input type="checkbox" [checked]="s.notifyPostCreated" (change)="toggleSetting('notifyPostCreated')" class="h-4 w-4 rounded border-slate-300 text-indigo-600" />
-            <span class="text-sm text-slate-600">{{ 'PROJECTSETTINGS.DISCORD.NOTIFY_POST_CREATED' | translate }}</span>
-          </label>
-
-          <label class="flex items-center gap-3 cursor-pointer">
-            <input type="checkbox" [checked]="s.notifyPostUpdated" (change)="toggleSetting('notifyPostUpdated')" class="h-4 w-4 rounded border-slate-300 text-indigo-600" />
-            <span class="text-sm text-slate-600">{{ 'PROJECTSETTINGS.DISCORD.NOTIFY_POST_UPDATED' | translate }}</span>
-          </label>
-
-          <label class="flex items-center gap-3 cursor-pointer">
-            <input type="checkbox" [checked]="s.notifyPostDeleted" (change)="toggleSetting('notifyPostDeleted')" class="h-4 w-4 rounded border-slate-300 text-indigo-600" />
-            <span class="text-sm text-slate-600">{{ 'PROJECTSETTINGS.DISCORD.NOTIFY_POST_DELETED' | translate }}</span>
-          </label>
-
-          <label class="flex items-center gap-3 cursor-pointer">
-            <input type="checkbox" [checked]="s.notifyMemberJoin" (change)="toggleSetting('notifyMemberJoin')" class="h-4 w-4 rounded border-slate-300 text-indigo-600" />
-            <span class="text-sm text-slate-600">{{ 'PROJECTSETTINGS.DISCORD.NOTIFY_MEMBER_JOIN' | translate }}</span>
-          </label>
-
-          <label class="flex items-center gap-3 cursor-pointer">
-            <input type="checkbox" [checked]="s.notifyMemberLeave" (change)="toggleSetting('notifyMemberLeave')" class="h-4 w-4 rounded border-slate-300 text-indigo-600" />
-            <span class="text-sm text-slate-600">{{ 'PROJECTSETTINGS.DISCORD.NOTIFY_MEMBER_LEAVE' | translate }}</span>
-          </label>
+      <div class="mb-4">
+        <label class="mb-1 block text-sm font-medium text-slate-600">{{ 'PROJECTSETTINGS.DISCORD.INVITE_URL_LABEL' | translate }}</label>
+        <div class="flex gap-2">
+          <input
+            [(ngModel)]="inviteUrl"
+            type="text"
+            placeholder="https://discord.gg/example"
+            class="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+          />
+          <button
+            (click)="updateInviteUrl()"
+            [disabled]="isUpdatingInvite()"
+            class="cursor-pointer rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:opacity-50"
+          >
+            {{ 'COMMON.SAVE' | translate }}
+          </button>
         </div>
-      }
+        @if (connectionStatus()?.discordInviteUrl) {
+          <p class="mt-1 text-xs text-slate-400">
+            {{ 'PROJECTSETTINGS.DISCORD.INVITE_URL_HINT' | translate }}
+          </p>
+        }
+      </div>
 
-      <button
-        (click)="disconnect()"
-        [disabled]="isDisconnecting()"
-        class="cursor-pointer rounded-lg border border-red-300 bg-white px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-50"
-      >
-        {{ 'PROJECTSETTINGS.DISCORD.DISCONNECT' | translate }}
-      </button>
-    } @else {
       <div class="mb-4">
         <label class="mb-1 block text-sm font-medium text-slate-600">{{ 'PROJECTSETTINGS.DISCORD.CHANNEL_ID_LABEL' | translate }}</label>
         <div class="flex gap-2">
@@ -72,9 +74,36 @@
             [disabled]="isConnecting() || !channelId().trim()"
             class="cursor-pointer rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:opacity-50"
           >
-            {{ 'PROJECTSETTINGS.DISCORD.TEST_AND_CONNECT' | translate }}
+            {{ 'PROJECTSETTINGS.DISCORD.CHANGE_CHANNEL' | translate }}
           </button>
         </div>
+      </div>
+
+      <button
+        (click)="disconnect()"
+        [disabled]="isDisconnecting()"
+        class="cursor-pointer rounded-lg border border-red-300 bg-white px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-50"
+      >
+        {{ 'PROJECTSETTINGS.DISCORD.DISCONNECT' | translate }}
+      </button>
+    } @else if (isAutoConnecting()) {
+      <div class="flex items-center gap-2 text-sm text-slate-500">
+        <i class="pi pi-spin pi-spinner text-xs"></i>
+        {{ 'PROJECTSETTINGS.DISCORD.AUTO_SETUP_LOADING' | translate }}
+      </div>
+    } @else {
+      <div class="mb-4">
+        <button
+          (click)="addBotToServer()"
+          [disabled]="isFetchingBotInvite()"
+          class="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:opacity-50"
+        >
+          @if (isFetchingBotInvite()) {
+            <i class="pi pi-spin pi-spinner text-xs"></i>
+          }
+          {{ (isFetchingBotInvite() ? 'PROJECTSETTINGS.DISCORD.ADD_BOT_LOADING' : 'PROJECTSETTINGS.DISCORD.ADD_BOT') | translate }}
+        </button>
+        <p class="mt-2 text-xs text-slate-400">{{ 'PROJECTSETTINGS.DISCORD.ADD_BOT_HINT' | translate }}</p>
       </div>
     }
   }

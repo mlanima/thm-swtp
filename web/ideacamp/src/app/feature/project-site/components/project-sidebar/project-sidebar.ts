@@ -20,7 +20,6 @@ export class ProjectSidebar {
   isOwner = input(false);
   ownerId = input('');
   ownerUsername = input('');
-
   projectLinkDataSource = computed<LinkManagerDataSource<ProjectLinkModel>>(() => {
     const projectId = this.projectId();
 

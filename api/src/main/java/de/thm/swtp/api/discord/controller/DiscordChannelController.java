@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -25,10 +26,41 @@ public class DiscordChannelController {
             return ResponseEntity.badRequest().body(Map.of("error", "channelId is required"));
         }
         LinkedChannelEntity link = discordChannelService.connectChannel(projectId, channelId);
+        Map<String, Object> result = new HashMap<>();
+        result.put("id", link.getId());
+        result.put("discordChannelId", link.getDiscordChannelId());
+        result.put("isActive", link.isActive());
+        result.put("discordInviteUrl", link.getDiscordInviteUrl());
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/bot-invite")
+    public ResponseEntity<Map<String, String>> getBotInviteUrl(@PathVariable UUID projectId) {
+        return ResponseEntity.ok(Map.of("url", discordChannelService.getBotInviteUrl()));
+    }
+
+    @PostMapping("/auto-connect")
+    public ResponseEntity<Map<String, Object>> autoConnect(@PathVariable UUID projectId) {
+        LinkedChannelEntity link = discordChannelService.autoConnectChannel(projectId);
+        Map<String, Object> result = new HashMap<>();
+        result.put("id", link.getId());
+        result.put("discordChannelId", link.getDiscordChannelId());
+        result.put("isActive", link.isActive());
+        result.put("discordInviteUrl", link.getDiscordInviteUrl());
+        return ResponseEntity.ok(result);
+    }
+
+    @PatchMapping("/invite")
+    public ResponseEntity<Map<String, Object>> updateInviteUrl(
+            @PathVariable UUID projectId,
+            @RequestBody Map<String, String> body) {
+        String inviteUrl = body.get("discordInviteUrl");
+        if (inviteUrl == null || inviteUrl.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "discordInviteUrl is required"));
+        }
+        LinkedChannelEntity link = discordChannelService.updateDiscordInviteUrl(projectId, inviteUrl);
         return ResponseEntity.ok(Map.of(
-                "id", link.getId(),
-                "discordChannelId", link.getDiscordChannelId(),
-                "isActive", link.isActive()
+                "discordInviteUrl", link.getDiscordInviteUrl()
         ));
     }
 
@@ -41,10 +73,11 @@ public class DiscordChannelController {
     @GetMapping("/connect")
     public ResponseEntity<Map<String, Object>> getConnection(@PathVariable UUID projectId) {
         LinkedChannelEntity link = discordChannelService.getLinkedChannel(projectId);
-        return ResponseEntity.ok(Map.of(
-                "id", link.getId(),
-                "discordChannelId", link.getDiscordChannelId(),
-                "isActive", link.isActive()
-        ));
+        Map<String, Object> result = new HashMap<>();
+        result.put("id", link.getId());
+        result.put("discordChannelId", link.getDiscordChannelId());
+        result.put("isActive", link.isActive());
+        result.put("discordInviteUrl", link.getDiscordInviteUrl());
+        return ResponseEntity.ok(result);
     }
 }

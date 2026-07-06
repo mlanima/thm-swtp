@@ -1,6 +1,6 @@
 package de.thm.swtp.api.projectInvitation;
 
-import de.thm.swtp.api.discord.stream.DiscordEventPublisher;
+import de.thm.swtp.api.projectInvitation.mapper.ProjectInviteMapper;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
 import de.thm.swtp.api.project.exception.ProjectNotFoundException;
@@ -37,7 +37,7 @@ public class ProjectEntityInviteServiceTest {
     private ProjectRepository projectRepository;
     private UserProfileRepository userProfileRepository;
     private ApplicationEventPublisher eventPublisher;
-    private DiscordEventPublisher discordEventPublisher;
+    private ProjectInviteMapper projectInviteMapper;
 
     private ProjectInviteService projectInviteService;
 
@@ -56,9 +56,24 @@ public class ProjectEntityInviteServiceTest {
         projectRepository = mock(ProjectRepository.class);
         userProfileRepository = mock(UserProfileRepository.class);
         eventPublisher = mock(ApplicationEventPublisher.class);
-        discordEventPublisher = mock(DiscordEventPublisher.class);
+        projectInviteMapper = mock(ProjectInviteMapper.class);
 
-        projectInviteService = new ProjectInviteService(projectInviteRepository, projectRepository, userProfileRepository, eventPublisher, discordEventPublisher);
+        projectInviteService = new ProjectInviteService(projectInviteRepository, projectRepository, userProfileRepository, eventPublisher, projectInviteMapper);
+
+        when(projectInviteMapper.toDomain(any())).thenAnswer(invocation -> {
+            ProjectInviteEntity entity = invocation.getArgument(0);
+            return ProjectInvite.builder()
+                    .id(entity.getId())
+                    .projectId(entity.getProject().getId())
+                    .projectName(entity.getProject().getName())
+                    .projectUrl(entity.getProject().getProjectUrl())
+                    .invitedByUsername(entity.getProject().getOwner().getUsername())
+                    .invitedUserId(entity.getInvitedUser().getKeycloakId())
+                    .message(entity.getMessage())
+                    .createdAt(entity.getCreatedAt())
+                    .status(entity.getStatus())
+                    .build();
+        });
 
         projectId = UUID.randomUUID();
         ownerId = UUID.randomUUID();

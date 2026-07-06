@@ -71,6 +71,7 @@
     "INVITED_BY": "Invited by:",
     "ACCEPT": "Accept",
     "DECLINE": "Decline",
+    "JOIN_DISCORD": "Join Discord",
     "NO_SHORT_DESCRIPTION": "No short description.",
     "PRIVATE": "Private",
     "PUBLIC": "Public",
@@ -115,7 +116,9 @@
     "FOLLOWING": "Following",
     "UNFOLLOW": "Unfollow",
     "INVITE": "Invite",
-    "PROFESSOR_BADGE": "Professor"
+    "PROFESSOR_BADGE": "Professor",
+    "DISCORD_SHOW": "Username",
+    "DISCORD_COPIED": "Copied!"
   },
   "CONTACT-REQUESTS": {
     "CONTACT": "Contact Requests",
@@ -384,15 +387,19 @@
       "CONNECTED": "Connected",
       "CHANNEL_ID": "Channel ID",
       "CHANNEL_ID_LABEL": "Discord Channel ID",
+      "ADD_BOT": "Connect Discord Server",
+      "ADD_BOT_LOADING": "Opening Discord...",
+      "ADD_BOT_HINT": "The bot will find or create a #posts channel and automatically make it read-only for everyone except the project owner.",
+      "AUTO_SETUP_LOADING": "Setting up channel...",
+      "CHANGE_CHANNEL": "Change Channel",
       "TEST_AND_CONNECT": "Test & Connect",
       "DISCONNECT": "Disconnect",
-      "NOTIFICATIONS": "Notification Settings",
-      "NOTIFY_POST_CREATED": "Post created",
-      "NOTIFY_POST_UPDATED": "Post updated",
-      "NOTIFY_POST_DELETED": "Post deleted",
-      "NOTIFY_MEMBER_JOIN": "Member joined",
-      "NOTIFY_MEMBER_LEAVE": "Member left",
-      "ERROR_CONNECT": "Could not connect to Discord channel."
+      "INVITE_URL_LABEL": "Discord Invite Link",
+      "INVITE_URL_HINT": "This link will be shown to invited users so they can join the server.",
+      "ERROR_CONNECT": "Could not connect to Discord channel.",
+      "ERROR_LINK": "Could not connect to Discord.",
+      "NEEDS_DISCORD_LINK": "You need to link your Discord account before connecting a server.",
+      "LINK_DISCORD": "Link Discord Account"
     },
     "ERRORS": {
       "NO_PROJECT_URL": "No project URL provided.",
@@ -483,9 +490,12 @@
     "HEADER": {
       "SETTINGS": "Settings"
     },
+    "DISCORD_CHANNEL": "Discord Channel",
     "MEMBERS": {
       "ALL_MEMBERS": "All members",
-      "NO_MEMBERS": "No members yet."
+      "NO_MEMBERS": "No members yet.",
+      "DISCORD_SHOW": "Username",
+      "DISCORD_COPIED": "Copied!"
     },
     "TAGS": {
       "ERROR_INVALID_CHARS": "Tag contains invalid characters. Allowed: letters, numbers, spaces, hyphen and dot.",

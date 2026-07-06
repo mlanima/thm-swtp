@@ -2,6 +2,8 @@ package de.thm.swtp.api.project;
 
 
 import de.thm.swtp.api.common.TxLogger;
+import de.thm.swtp.api.discord.entity.LinkedChannelEntity;
+import de.thm.swtp.api.discord.repository.LinkedChannelRepository;
 import de.thm.swtp.api.discord.service.DiscordNotificationService;
 import de.thm.swtp.api.exceptionhandling.exceptions.InvalidProjectManagementSortFieldException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectMemberNotFoundException;
@@ -43,6 +45,7 @@ public class ProjectService {
     private static final String PROJECT_CREATION_INVITE_MESSAGE = "You have been invited to join this project.";
     private final ProjectFavoriteRepository projectFavoriteRepository;
     private final ProjectViewRepository projectViewRepository;
+    private final LinkedChannelRepository linkedChannelRepository;
     private final DiscordNotificationService discordNotificationService;
     private static final Set<String> MANAGED_PROJECT_SORT_FIELDS = Set.of("name", "owner.username", "createdAt", "updatedAt", "isPrivateProject");
 
@@ -57,6 +60,8 @@ public class ProjectService {
             contributors++;
         }
 
+        LinkedChannelEntity channel = linkedChannelRepository.findByProjectId(project.getId()).orElse(null);
+
         return ProjectResponse.builder()
                 .id(project.getId())
                 .name(project.getName())
@@ -67,6 +72,11 @@ public class ProjectService {
                 .allowJoinRequests(project.isAllowJoinRequests())
                 .ownerId(project.getOwner().getKeycloakId())
                 .ownerUsername(project.getOwner().getUsername())
+                .ownerDiscordId(project.getOwner().getDiscordId())
+                .ownerDiscordUsername(project.getOwner().getDiscordUsername())
+                .discordChannelId(channel != null && channel.isActive() ? channel.getDiscordChannelId() : null)
+                .discordGuildId(channel != null ? channel.getDiscordGuildId() : null)
+                .discordInviteUrl(channel != null && channel.isActive() ? channel.getDiscordInviteUrl() : null)
                 .memberIds(project.getMembers().stream()
                         .map(UserProfile::getKeycloakId)
                         .collect(java.util.stream.Collectors.toSet()))

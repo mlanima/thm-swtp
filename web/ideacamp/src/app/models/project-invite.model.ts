@@ -8,6 +8,7 @@ export interface ProjectInviteResponse {
   message: string;
   status: 'PENDING' | 'ACCEPTED' | 'REJECTED';
   createdAt: string;
+  discordInviteUrl?: string | null;
 }
 
 

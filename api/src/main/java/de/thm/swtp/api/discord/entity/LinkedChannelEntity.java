@@ -34,6 +34,9 @@ public class LinkedChannelEntity {
     @Column(name = "discord_guild_id", length = 20)
     private String discordGuildId;
 
+    @Column(name = "discord_invite_url", length = 255)
+    private String discordInviteUrl;
+
     @Column(name = "is_active", nullable = false)
     @Builder.Default
     private boolean isActive = true;

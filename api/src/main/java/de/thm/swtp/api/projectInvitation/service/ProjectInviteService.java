@@ -1,7 +1,6 @@
 package de.thm.swtp.api.projectInvitation.service;
 
 import de.thm.swtp.api.common.TxLogger;
-import de.thm.swtp.api.discord.stream.DiscordEventPublisher;
 import de.thm.swtp.api.notification.event.ProjectInviteCreatedEvent;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
@@ -34,7 +33,7 @@ public class ProjectInviteService {
     private final ProjectRepository projectRepository;
     private final UserProfileRepository userProfileRepository;
     private final ApplicationEventPublisher eventPublisher;
-    private final DiscordEventPublisher discordEventPublisher;
+    private final ProjectInviteMapper projectInviteMapper;
 
     /** Creates a new project invitation. Only the project owner is allowed to send an invitation.*/
     @Transactional
@@ -54,22 +53,13 @@ public class ProjectInviteService {
         ProjectInviteEntity saved = projectInviteRepository.save(projectInviteEntity);
         TxLogger.afterCommit(log, "Invite created: invite={}, project={}, from={}, to={}",
                 saved.getId(), projectId, projectEntity.getOwner().getKeycloakId(), invitedUserId);
-        ProjectInvite invite = ProjectInviteMapper.toDomain(saved);
+        ProjectInvite invite = projectInviteMapper.toDomain(saved);
 
         if (invitedUserEntity.getEmail() != null) {
             eventPublisher.publishEvent(new ProjectInviteCreatedEvent(invite, invitedUserEntity.getEmail()));
         } else {
             log.warn("No email address for invited user '{}' — skipping invite notification for project '{}'",
                     invitedUserEntity.getUsername(), invite.getProjectName());
-        }
-
-        if (invitedUserEntity.getDiscordId() != null) {
-            discordEventPublisher.publishProjectInvite(
-                    saved.getId(),
-                    invitedUserEntity.getDiscordId(),
-                    invite.getProjectName(),
-                    projectEntity.getOwner().getUsername()
-            );
         }
 
         return invite;
@@ -80,7 +70,7 @@ public class ProjectInviteService {
     public List<ProjectInvite> getInvitesForUser(UUID userId){
         return projectInviteRepository.findByInvitedUserKeycloakId(userId)
                 .stream()
-                .map(ProjectInviteMapper::toDomain)
+                .map(projectInviteMapper::toDomain)
                 .toList();
     }
 
@@ -92,7 +82,7 @@ public class ProjectInviteService {
 
         return projectInviteRepository.findByProjectId(projectId)
                 .stream()
-                .map(ProjectInviteMapper::toDomain)
+                .map(projectInviteMapper::toDomain)
                 .toList();
 
     }
@@ -102,7 +92,7 @@ public class ProjectInviteService {
     public ProjectInvite updateInviteStatus(UUID inviteId, ProjectInviteStatus newStatus) {
         ProjectInviteEntity inviteEntity = projectInviteRepository.findById(inviteId)
                 .orElseThrow(() -> new ProjectInviteNotFoundException(inviteId));
-        ProjectInvite invite = ProjectInviteMapper.toDomain(inviteEntity);
+        ProjectInvite invite = projectInviteMapper.toDomain(inviteEntity);
 
         checkInviteStatus(invite, newStatus);
         TxLogger.afterCommit(log, "Invite status: invite={}, {}->{}", inviteId, invite.getStatus(), newStatus);
@@ -114,7 +104,7 @@ public class ProjectInviteService {
         }
 
         ProjectInviteEntity saved = projectInviteRepository.save(inviteEntity);
-        return ProjectInviteMapper.toDomain(saved);
+        return projectInviteMapper.toDomain(saved);
     }
 
 

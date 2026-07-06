@@ -53,9 +53,75 @@ public class BotInternalClient {
         }
     }
 
+    public CreateInviteResponse createChannelInvite(String channelId) {
+        try {
+            return restClient.post()
+                    .uri(discordProperties.getBot().getBaseUrl() + "/internal/channels/{channelId}/invite", channelId)
+                    .headers(h -> h.addAll(authHeaders()))
+                    .retrieve()
+                    .body(CreateInviteResponse.class);
+        } catch (Exception e) {
+            log.error("Bot create-invite failed for channel {}: {}", channelId, e.getMessage());
+            return new CreateInviteResponse(false, null, "bot unreachable");
+        }
+    }
+
+    public LeaveGuildResponse leaveGuild(String channelId) {
+        try {
+            return restClient.post()
+                    .uri(discordProperties.getBot().getBaseUrl() + "/internal/channels/{channelId}/leave-guild", channelId)
+                    .headers(h -> h.addAll(authHeaders()))
+                    .retrieve()
+                    .body(LeaveGuildResponse.class);
+        } catch (Exception e) {
+            log.error("Bot leave-guild failed for channel {}: {}", channelId, e.getMessage());
+            return new LeaveGuildResponse(false, "bot unreachable");
+        }
+    }
+
+    public RestrictChannelResponse restrictChannel(String channelId, String ownerDiscordId) {
+        try {
+            return restClient.post()
+                    .uri(discordProperties.getBot().getBaseUrl() + "/internal/channels/{channelId}/restrict", channelId)
+                    .headers(h -> h.addAll(authHeaders()))
+                    .body(Map.of("ownerDiscordId", ownerDiscordId))
+                    .retrieve()
+                    .body(RestrictChannelResponse.class);
+        } catch (Exception e) {
+            log.error("Bot restrict-channel failed for channel {}: {}", channelId, e.getMessage());
+            return new RestrictChannelResponse(false, "bot unreachable");
+        }
+    }
+
+    public AutoSetupResponse autoSetup(String ownerDiscordId) {
+        try {
+            return restClient.post()
+                    .uri(discordProperties.getBot().getBaseUrl() + "/internal/auto-setup")
+                    .headers(h -> h.addAll(authHeaders()))
+                    .body(Map.of("ownerDiscordId", ownerDiscordId))
+                    .retrieve()
+                    .body(AutoSetupResponse.class);
+        } catch (Exception e) {
+            log.error("Bot auto-setup failed: {}", e.getMessage());
+            return new AutoSetupResponse(false, null, null, null, "bot unreachable");
+        }
+    }
+
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record TestConnectionResponse(boolean success, String reason) {}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record RetryJobResponse(boolean success) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record CreateInviteResponse(boolean success, String inviteUrl, String reason) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record AutoSetupResponse(boolean success, String guildId, String channelId, String channelName, String reason) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record LeaveGuildResponse(boolean success, String reason) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record RestrictChannelResponse(boolean success, String reason) {}
 }

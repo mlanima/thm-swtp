@@ -30,5 +30,6 @@ public class DiscordProperties {
     public static class Bot {
         private String baseUrl = "http://discord.ser.mlanima.org:3001";
         private String apiSecret;
+        private int invitePermissions = 76817;
     }
 }

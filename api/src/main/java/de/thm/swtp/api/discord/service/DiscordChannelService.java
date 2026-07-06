@@ -1,6 +1,7 @@
 package de.thm.swtp.api.discord.service;
 
 import de.thm.swtp.api.discord.client.BotInternalClient;
+import de.thm.swtp.api.discord.config.DiscordProperties;
 import de.thm.swtp.api.discord.entity.DiscordChannelSettingsEntity;
 import de.thm.swtp.api.discord.entity.LinkedChannelEntity;
 import de.thm.swtp.api.discord.exception.DiscordConnectionFailedException;
@@ -11,6 +12,7 @@ import de.thm.swtp.api.project.ProjectRepository;
 import de.thm.swtp.api.project.exception.ProjectNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,16 +27,41 @@ public class DiscordChannelService {
     private final DiscordChannelSettingsRepository settingsRepository;
     private final ProjectRepository projectRepository;
     private final BotInternalClient botInternalClient;
+    private final DiscordProperties discordProperties;
+
+    @Value("${DISCORD_CLIENT_ID}")
+    private String clientId;
 
     @Transactional
     public LinkedChannelEntity connectChannel(UUID projectId, String discordChannelId) {
+        return connectChannel(projectId, discordChannelId, null);
+    }
+
+    @Transactional
+    public LinkedChannelEntity connectChannel(UUID projectId, String discordChannelId, String discordGuildId) {
         ProjectEntity project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException(projectId));
+
+        if (project.getOwner().getDiscordId() == null || project.getOwner().getDiscordId().isBlank()) {
+            throw new DiscordConnectionFailedException(
+                    "You must link your Discord account in profile settings before connecting a Discord server");
+        }
+
+        linkedChannelRepository.findByDiscordChannelIdAndIsActiveTrue(discordChannelId)
+                .ifPresent(link -> {
+                    if (!link.getProject().getId().equals(projectId)) {
+                        throw new DiscordConnectionFailedException(
+                                "This Discord server is already linked to another project");
+                    }
+                });
 
         linkedChannelRepository.findByProjectId(projectId)
                 .filter(LinkedChannelEntity::isActive)
                 .ifPresent(link -> {
-                    throw new DiscordConnectionFailedException("Project already has an active Discord channel link");
+                    link.setActive(false);
+                    linkedChannelRepository.save(link);
+                    log.info("Discord channel deactivated for reconnect: project={}, oldChannelId={}",
+                            projectId, link.getDiscordChannelId());
                 });
 
         BotInternalClient.TestConnectionResponse test = botInternalClient.testConnection(discordChannelId);
@@ -44,16 +71,25 @@ public class DiscordChannelService {
         }
 
         LinkedChannelEntity link = linkedChannelRepository.findByProjectId(projectId)
+                .filter(l -> !l.isActive())
                 .map(existing -> {
                     existing.setDiscordChannelId(discordChannelId);
+                    existing.setDiscordGuildId(discordGuildId);
                     existing.setActive(true);
+                    existing.setDiscordInviteUrl(null);
                     return existing;
                 })
                 .orElseGet(() -> LinkedChannelEntity.builder()
                         .project(project)
                         .discordChannelId(discordChannelId)
+                        .discordGuildId(discordGuildId)
                         .isActive(true)
                         .build());
+
+        BotInternalClient.CreateInviteResponse inviteResp = botInternalClient.createChannelInvite(discordChannelId);
+        if (inviteResp.success() && inviteResp.inviteUrl() != null) {
+            link.setDiscordInviteUrl(inviteResp.inviteUrl());
+        }
 
         LinkedChannelEntity saved = linkedChannelRepository.save(link);
 
@@ -73,7 +109,14 @@ public class DiscordChannelService {
         LinkedChannelEntity link = linkedChannelRepository.findByProjectId(projectId)
                 .orElseThrow(() -> new DiscordConnectionFailedException("No Discord channel linked to this project"));
 
+        BotInternalClient.LeaveGuildResponse leaveResp = botInternalClient.leaveGuild(link.getDiscordChannelId());
+        if (!leaveResp.success()) {
+            log.warn("Bot failed to leave guild for project={}, channelId={}: {}",
+                    projectId, link.getDiscordChannelId(), leaveResp.reason());
+        }
+
         link.setActive(false);
+        link.setDiscordInviteUrl(null);
         linkedChannelRepository.save(link);
         log.info("Discord channel disconnected: project={}, channelId={}", projectId, link.getDiscordChannelId());
     }
@@ -82,6 +125,49 @@ public class DiscordChannelService {
     public LinkedChannelEntity getLinkedChannel(UUID projectId) {
         return linkedChannelRepository.findByProjectId(projectId)
                 .orElseThrow(() -> new DiscordConnectionFailedException("No Discord channel linked to this project"));
+    }
+
+    public String getBotInviteUrl() {
+        return "https://discord.com/api/oauth2/authorize"
+                + "?client_id=" + clientId
+                + "&permissions=" + discordProperties.getBot().getInvitePermissions()
+                + "&scope=bot";
+    }
+
+    @Transactional
+    public LinkedChannelEntity updateDiscordInviteUrl(UUID projectId, String inviteUrl) {
+        LinkedChannelEntity link = linkedChannelRepository.findByProjectId(projectId)
+                .orElseThrow(() -> new DiscordConnectionFailedException("No Discord channel linked to this project"));
+
+        link.setDiscordInviteUrl(inviteUrl);
+        LinkedChannelEntity saved = linkedChannelRepository.save(link);
+        log.info("Discord invite URL updated: project={}, url={}", projectId, inviteUrl);
+        return saved;
+    }
+
+    @Transactional
+    public LinkedChannelEntity autoConnectChannel(UUID projectId) {
+        ProjectEntity project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException(projectId));
+
+        if (project.getOwner().getDiscordId() == null || project.getOwner().getDiscordId().isBlank()) {
+            throw new DiscordConnectionFailedException(
+                    "You must link your Discord account in profile settings before connecting a Discord server");
+        }
+
+        BotInternalClient.AutoSetupResponse autoResp = botInternalClient.autoSetup(project.getOwner().getDiscordId());
+        if (!autoResp.success() || autoResp.channelId() == null) {
+            throw new DiscordConnectionFailedException(
+                    "Bot could not auto-setup: " + (autoResp.reason() != null ? autoResp.reason() : "unknown error"));
+        }
+
+        BotInternalClient.TestConnectionResponse test = botInternalClient.testConnection(autoResp.channelId());
+        if (!test.success()) {
+            throw new DiscordConnectionFailedException(
+                    "Bot cannot access auto-created channel: " + (test.reason() != null ? test.reason() : "unknown reason"));
+        }
+
+        return connectChannel(projectId, autoResp.channelId(), autoResp.guildId());
     }
 
     @Transactional(readOnly = true)

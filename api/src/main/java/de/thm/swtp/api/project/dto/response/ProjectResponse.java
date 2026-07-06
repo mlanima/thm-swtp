@@ -20,6 +20,11 @@ public class ProjectResponse {
     private boolean allowJoinRequests;
     private UUID ownerId;
     private String ownerUsername;
+    private String ownerDiscordId;
+    private String ownerDiscordUsername;
+    private String discordChannelId;
+    private String discordGuildId;
+    private String discordInviteUrl;
     private Set<UUID> memberIds;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
