@@ -5,10 +5,12 @@ import de.thm.swtp.api.github.client.GithubOAuthClient;
 import de.thm.swtp.api.github.config.GithubOAuthProperties;
 import de.thm.swtp.api.github.domain.GithubConnection;
 import de.thm.swtp.api.github.domain.GithubConnectionStatus;
+import de.thm.swtp.api.exceptionhandling.exceptions.UserProfileLinkAlreadyExistsException;
 import de.thm.swtp.api.github.entity.GithubConnectionEntity;
 import de.thm.swtp.api.github.exception.GithubIntegrationDisabledException;
 import de.thm.swtp.api.github.mapper.GithubConnectionMapper;
 import de.thm.swtp.api.github.repository.GithubConnectionRepository;
+import de.thm.swtp.api.links.service.UserProfileLinkService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -32,6 +34,7 @@ public class GithubConnectionService {
     private final GithubStateService githubStateService;
     private final TokenCipher tokenCipher;
     private final GithubOAuthProperties properties;
+    private final UserProfileLinkService userProfileLinkService;
 
     public String buildAuthorizeUrl(UUID userId) {
         requireEnabled();
@@ -65,6 +68,7 @@ public class GithubConnectionService {
         entity.setStatus(GithubConnectionStatus.ACTIVE);
 
         GithubConnectionEntity saved = githubConnectionRepository.save(entity);
+        ensureGithubProfileLink(userId, githubUser.login());
         log.info("GitHub connection established for user {}", userId);
         return GithubConnectionMapper.toDomain(saved);
     }
@@ -97,6 +101,17 @@ public class GithubConnectionService {
             githubConnectionRepository.save(entity);
             log.warn("GitHub connection marked invalid for user {} (token rejected by GitHub)", userId);
         });
+    }
+
+    /** Adds a link to the user's GitHub profile to their user-profile links, unless one
+     * already exists (e.g. reconnecting the same account) — a one-time convenience, not a
+     * synced field, so it's left alone afterwards even if the user edits or removes it. */
+    private void ensureGithubProfileLink(UUID userId, String githubLogin) {
+        try {
+            userProfileLinkService.createUserProfileLink(userId, "GitHub", "https://github.com/" + githubLogin);
+        } catch (UserProfileLinkAlreadyExistsException e) {
+            log.debug("GitHub profile link already exists for user {}", userId);
+        }
     }
 
     private void requireEnabled() {

@@ -9,6 +9,8 @@ import de.thm.swtp.api.github.exception.GithubIntegrationDisabledException;
 import de.thm.swtp.api.github.exception.GithubOAuthException;
 import de.thm.swtp.api.github.exception.InvalidGithubStateException;
 import de.thm.swtp.api.github.repository.GithubConnectionRepository;
+import de.thm.swtp.api.exceptionhandling.exceptions.UserProfileLinkAlreadyExistsException;
+import de.thm.swtp.api.links.service.UserProfileLinkService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -28,6 +30,7 @@ class GithubConnectionServiceTest {
     private GithubStateService githubStateService;
     private TokenCipher tokenCipher;
     private GithubOAuthProperties enabledProperties;
+    private UserProfileLinkService userProfileLinkService;
 
     private GithubConnectionService service;
     private UUID userId;
@@ -39,6 +42,7 @@ class GithubConnectionServiceTest {
         githubApiClient = mock(GithubApiClient.class);
         githubStateService = mock(GithubStateService.class);
         tokenCipher = mock(TokenCipher.class);
+        userProfileLinkService = mock(UserProfileLinkService.class);
         enabledProperties = new GithubOAuthProperties(
                 "client-id", "client-secret", "http://localhost:4200/github/callback",
                 "read:user", "https://github.com/login/oauth/authorize",
@@ -47,7 +51,7 @@ class GithubConnectionServiceTest {
         userId = UUID.randomUUID();
         service = new GithubConnectionService(
                 githubConnectionRepository, githubOAuthClient, githubApiClient,
-                githubStateService, tokenCipher, enabledProperties);
+                githubStateService, tokenCipher, enabledProperties, userProfileLinkService);
     }
 
     @Test
@@ -66,7 +70,8 @@ class GithubConnectionServiceTest {
         var disabledService = new GithubConnectionService(
                 githubConnectionRepository, githubOAuthClient, githubApiClient,
                 githubStateService, tokenCipher,
-                new GithubOAuthProperties("", "", "redirect", "read:user", "authorize", "token", ""));
+                new GithubOAuthProperties("", "", "redirect", "read:user", "authorize", "token", ""),
+                userProfileLinkService);
 
         assertThatThrownBy(() -> disabledService.buildAuthorizeUrl(userId))
                 .isInstanceOf(GithubIntegrationDisabledException.class);
@@ -89,6 +94,25 @@ class GithubConnectionServiceTest {
         assertThat(connection.getStatus()).isEqualTo(GithubConnectionStatus.ACTIVE);
         verify(githubStateService).validate("any-state", userId);
         verify(githubConnectionRepository).save(any(GithubConnectionEntity.class));
+        verify(userProfileLinkService).createUserProfileLink(userId, "GitHub", "https://github.com/octocat");
+    }
+
+    @Test
+    void shouldIgnoreAlreadyExistingProfileLinkOnCompleteConnection() {
+        when(githubOAuthClient.exchangeCode("valid-code"))
+                .thenReturn(new GithubOAuthClient.AccessTokenResult("gho_token", "read:user", "bearer", null, null));
+        when(githubApiClient.getAuthenticatedUser("gho_token"))
+                .thenReturn(new GithubApiClient.GithubUser(1L, "octocat", "The Octocat", "https://avatars.example/1"));
+        when(tokenCipher.encrypt("gho_token")).thenReturn("encrypted-token");
+        when(githubConnectionRepository.findById(userId)).thenReturn(Optional.empty());
+        when(githubConnectionRepository.save(any(GithubConnectionEntity.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+        doThrow(new UserProfileLinkAlreadyExistsException("The link already exists for this user profile."))
+                .when(userProfileLinkService).createUserProfileLink(userId, "GitHub", "https://github.com/octocat");
+
+        var connection = service.completeConnection(userId, "valid-code", "any-state");
+
+        assertThat(connection.getGithubLogin()).isEqualTo("octocat");
     }
 
     @Test
@@ -96,7 +120,8 @@ class GithubConnectionServiceTest {
         var disabledService = new GithubConnectionService(
                 githubConnectionRepository, githubOAuthClient, githubApiClient,
                 githubStateService, tokenCipher,
-                new GithubOAuthProperties("", "", "redirect", "read:user", "authorize", "token", ""));
+                new GithubOAuthProperties("", "", "redirect", "read:user", "authorize", "token", ""),
+                userProfileLinkService);
 
         assertThatThrownBy(() -> disabledService.completeConnection(userId, "code", "state"))
                 .isInstanceOf(GithubIntegrationDisabledException.class);
