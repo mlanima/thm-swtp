@@ -130,7 +130,7 @@ The service additionally checks whether join requests are enabled and whether an
 | Publish a draft                           | `canPublishProjectPost` | Denied         | Only as author | Only as author | Allowed                         | Denied    |
 | Republish an archived post                | `canPublishProjectPost` | Denied         | Only as author | Allowed        | Allowed                         | Denied    |
 | Publish an already published post         | `canPublishProjectPost` | Denied         | Only as author | Allowed        | Allowed                         | Denied    |
-| Delete a post                             | `canDeleteProjectPost`  | Denied         | Only as author | Allowed        | Allowed                         | Denied    |
+| Delete a post                             | `canDeleteProjectPost`  | Denied         | Only as author | Allowed        | Allowed                         | Allowed   |
 
 Authorship takes precedence for drafts: a project owner cannot publish another user's draft.
 
