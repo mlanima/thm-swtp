@@ -1,1 +1,0 @@
-{"version":3,"file":"producer.d.ts","sourceRoot":"","sources":["../../src/streams/producer.ts"],"names":[],"mappings":"AAEA,OAAO,EAEL,KAAK,6BAA6B,EAClC,KAAK,4BAA4B,EACjC,KAAK,4BAA4B,EACjC,KAAK,4BAA4B,EACjC,KAAK,qBAAqB,EAC1B,KAAK,0BAA0B,EAChC,MAAM,oBAAoB,CAAC;AAa5B,eAAO,MAAM,cAAc;oCACO,6BAA6B;mCAI9B,4BAA4B;mCAI5B,4BAA4B;mCAI5B,4BAA4B;4BAInC,qBAAqB;iCAIhB,0BAA0B;CAGxD,CAAC"}

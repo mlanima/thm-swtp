@@ -1,1 +1,0 @@
-{"version":3,"file":"client.d.ts","sourceRoot":"","sources":["../../src/bot/client.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,MAAM,EAAqB,MAAM,YAAY,CAAC;AAGvD,eAAO,MAAM,aAAa,iBAOxB,CAAC;AAUH,wBAAsB,kBAAkB,IAAI,OAAO,CAAC,IAAI,CAAC,CAMxD;AAED,wBAAgB,gBAAgB,IAAI,OAAO,GAAG,cAAc,GAAG,cAAc,CAU5E"}
