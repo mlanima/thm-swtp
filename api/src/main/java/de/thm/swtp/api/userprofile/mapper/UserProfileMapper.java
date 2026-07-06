@@ -18,6 +18,8 @@ public class UserProfileMapper {
                 .about(profile.getAbout())
                 .experience(profile.getExperience())
                 .isProfessor(profile.isProfessor())
+                .discordId(profile.getDiscordId())
+                .discordUsername(profile.getDiscordUsername())
                 .build();
     }
 }

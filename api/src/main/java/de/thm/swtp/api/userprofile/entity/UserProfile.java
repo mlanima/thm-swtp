@@ -68,4 +68,12 @@ public class UserProfile {
     private String banReason;
 
     private LocalDateTime bannedAt;
+
+    @Column(unique = true, length = 20)
+    private String discordId;
+
+    @Column(length = 50)
+    private String discordUsername;
+
+    private LocalDateTime discordConnectedAt;
 }
