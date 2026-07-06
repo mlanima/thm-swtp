@@ -582,7 +582,7 @@
     "TITLE": "Einstellungen",
     "TABS": {
       "PROFESSOR_REQUEST": "Professor:in werden",
-      "INTEGRATIONS": "Integrationen",
+      "INTEGRATIONS": "GitHub",
       "CONTACT": "Kontakt",
       "IMPRESSUM": "Impressum"
     },
@@ -625,7 +625,7 @@
       "ERROR_UNLINK": "Die Verknüpfung des Repositorys konnte nicht aufgehoben werden. Bitte versuche es erneut.",
       "INVALID_INPUT": "Gib ein GitHub-Repository als owner/name oder als github.com-URL ein.",
       "CONNECTION_REQUIRED": "Verbinde dein GitHub-Konto, bevor du ein Repository verknüpfst.",
-      "PRIVATE_NOT_ALLOWED": "Es können nur öffentliche GitHub-Repositories verknüpft werden.",
+      "ACCESS_DENIED": "Du hast keinen Schreibzugriff auf dieses Repository auf GitHub.",
       "NOT_FOUND": "Dieses Repository konnte auf GitHub nicht gefunden werden.",
       "GO_TO_SETTINGS": "Zu den Einstellungen",
       "LINK_TITLE": "GitHub-Repository verknüpfen",

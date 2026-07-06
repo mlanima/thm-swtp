@@ -121,5 +121,18 @@ public class GithubApiClient {
             @JsonProperty("html_url") String htmlUrl,
             @JsonProperty("private") boolean isPrivate,
             @JsonProperty("stargazers_count") int stargazersCount,
-            @JsonProperty("forks_count") int forksCount) {}
+            @JsonProperty("forks_count") int forksCount,
+            @JsonProperty("permissions") Permissions permissions) {
+
+        /** {@code permissions} is only present on authenticated responses; absence (an
+         * unauthenticated call) is treated as no write access. */
+        public boolean hasWriteAccess() {
+            return permissions != null && (permissions.push() || permissions.admin());
+        }
+
+        public record Permissions(
+                @JsonProperty("admin") boolean admin,
+                @JsonProperty("push") boolean push,
+                @JsonProperty("pull") boolean pull) {}
+    }
 }

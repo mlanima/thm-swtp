@@ -52,12 +52,37 @@ class GithubApiClientTest {
         var json = """
                 {"id": 42, "name": "thm-swtp", "full_name": "mlanima/thm-swtp",
                  "description": "IdeaCamp", "html_url": "https://github.com/mlanima/thm-swtp",
-                 "private": false, "stargazers_count": 7, "forks_count": 2}
+                 "private": false, "stargazers_count": 7, "forks_count": 2,
+                 "permissions": {"admin": false, "push": true, "pull": true}}
                 """;
         var repo = clientWithResponse(200, json).getRepository("gho_token", "mlanima", "thm-swtp");
         assertThat(repo.fullName()).isEqualTo("mlanima/thm-swtp");
         assertThat(repo.isPrivate()).isFalse();
         assertThat(repo.stargazersCount()).isEqualTo(7);
+        assertThat(repo.hasWriteAccess()).isTrue();
+    }
+
+    @Test
+    void shouldNotHaveWriteAccessWhenPermissionsAreAllFalse() {
+        var json = """
+                {"id": 42, "name": "thm-swtp", "full_name": "mlanima/thm-swtp",
+                 "description": "IdeaCamp", "html_url": "https://github.com/mlanima/thm-swtp",
+                 "private": false, "stargazers_count": 7, "forks_count": 2,
+                 "permissions": {"admin": false, "push": false, "pull": true}}
+                """;
+        var repo = clientWithResponse(200, json).getRepository("gho_token", "mlanima", "thm-swtp");
+        assertThat(repo.hasWriteAccess()).isFalse();
+    }
+
+    @Test
+    void shouldNotHaveWriteAccessWhenPermissionsAreAbsent() {
+        var json = """
+                {"id": 42, "name": "thm-swtp", "full_name": "mlanima/thm-swtp",
+                 "description": "IdeaCamp", "html_url": "https://github.com/mlanima/thm-swtp",
+                 "private": false, "stargazers_count": 7, "forks_count": 2}
+                """;
+        var repo = clientWithResponse(200, json).getRepository("gho_token", "mlanima", "thm-swtp");
+        assertThat(repo.hasWriteAccess()).isFalse();
     }
 
     @Test

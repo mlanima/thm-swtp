@@ -6,11 +6,11 @@ import de.thm.swtp.api.github.exception.GithubApiException;
 import de.thm.swtp.api.github.exception.GithubConnectionRequiredException;
 import de.thm.swtp.api.github.exception.GithubIntegrationDisabledException;
 import de.thm.swtp.api.github.exception.GithubOAuthException;
+import de.thm.swtp.api.github.exception.GithubRepoAccessDeniedException;
 import de.thm.swtp.api.github.exception.GithubRepoNotFoundException;
 import de.thm.swtp.api.github.exception.GithubRepoNotLinkedException;
 import de.thm.swtp.api.github.exception.GithubTokenInvalidException;
 import de.thm.swtp.api.github.exception.InvalidGithubStateException;
-import de.thm.swtp.api.github.exception.PrivateRepoNotAllowedException;
 import de.thm.swtp.api.professorRequest.exception.ProfessorRequestAlreadyExistsException;
 import de.thm.swtp.api.professorRequest.exception.ProfessorRequestInvalidStatusException;
 import de.thm.swtp.api.professorRequest.exception.ProfessorRequestNotFoundException;
@@ -520,12 +520,6 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
     }
 
-    @ExceptionHandler(PrivateRepoNotAllowedException.class)
-    public ResponseEntity<ErrorResponse> handlePrivateRepoNotAllowed(PrivateRepoNotAllowedException ex) {
-        log.debug("Bad Request (400): {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
-    }
 
     @ExceptionHandler(GithubRepoNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleGithubRepoNotFound(GithubRepoNotFoundException ex) {
@@ -539,5 +533,12 @@ public class GlobalExceptionHandler {
         log.debug("Not Found (404): {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
+    }
+
+    @ExceptionHandler(GithubRepoAccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleGithubRepoAccessDenied(GithubRepoAccessDeniedException ex) {
+        log.warn("Forbidden (403): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ErrorResponse.of(403, "Forbidden", ex.getMessage()));
     }
 }

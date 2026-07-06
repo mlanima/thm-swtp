@@ -85,8 +85,10 @@ export class GithubTab implements OnInit {
         if (error.status === 409) {
           this.needsGithubConnection.set(true);
           this.errorMessage.set(this.translate.instant('GITHUB.REPO.CONNECTION_REQUIRED'));
+        } else if (error.status === 403) {
+          this.errorMessage.set(this.translate.instant('GITHUB.REPO.ACCESS_DENIED'));
         } else if (error.status === 400) {
-          this.errorMessage.set(this.translate.instant('GITHUB.REPO.PRIVATE_NOT_ALLOWED'));
+          this.errorMessage.set(this.translate.instant('GITHUB.REPO.INVALID_INPUT'));
         } else if (error.status === 404) {
           this.errorMessage.set(this.translate.instant('GITHUB.REPO.NOT_FOUND'));
         } else {

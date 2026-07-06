@@ -34,7 +34,7 @@ class GithubRepoDataServiceTest {
         when(githubConnectionService.getActiveDecryptedToken(linkerId)).thenReturn(Optional.of("gho_token"));
         when(githubApiClient.getRepository("gho_token", "mlanima", "thm-swtp"))
                 .thenReturn(new GithubApiClient.GithubRepo(1L, "thm-swtp", "mlanima/thm-swtp",
-                        "desc", "https://github.com/mlanima/thm-swtp", false, 5, 1));
+                        "desc", "https://github.com/mlanima/thm-swtp", false, 5, 1, null));
         when(githubApiClient.getRepositoryLanguages("gho_token", "mlanima", "thm-swtp"))
                 .thenReturn(Map.of("Java", 80L, "TypeScript", 20L));
 
@@ -52,7 +52,7 @@ class GithubRepoDataServiceTest {
         when(githubConnectionService.getActiveDecryptedToken(linkerId)).thenReturn(Optional.empty());
         when(githubApiClient.getRepository(null, "mlanima", "thm-swtp"))
                 .thenReturn(new GithubApiClient.GithubRepo(1L, "thm-swtp", "mlanima/thm-swtp",
-                        "desc", "https://github.com/mlanima/thm-swtp", false, 5, 1));
+                        "desc", "https://github.com/mlanima/thm-swtp", false, 5, 1, null));
         when(githubApiClient.getRepositoryLanguages(null, "mlanima", "thm-swtp")).thenReturn(Map.of());
 
         var data = service.fetch("mlanima", "thm-swtp", linkerId);
@@ -68,7 +68,7 @@ class GithubRepoDataServiceTest {
                 .thenThrow(new GithubTokenInvalidException("rejected"));
         when(githubApiClient.getRepository(null, "mlanima", "thm-swtp"))
                 .thenReturn(new GithubApiClient.GithubRepo(1L, "thm-swtp", "mlanima/thm-swtp",
-                        "desc", "https://github.com/mlanima/thm-swtp", false, 5, 1));
+                        "desc", "https://github.com/mlanima/thm-swtp", false, 5, 1, null));
         when(githubApiClient.getRepositoryLanguages(null, "mlanima", "thm-swtp")).thenReturn(Map.of());
 
         var data = service.fetch("mlanima", "thm-swtp", linkerId);

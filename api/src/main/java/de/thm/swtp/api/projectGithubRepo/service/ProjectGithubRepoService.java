@@ -1,8 +1,8 @@
 package de.thm.swtp.api.projectGithubRepo.service;
 
 import de.thm.swtp.api.github.exception.GithubConnectionRequiredException;
+import de.thm.swtp.api.github.exception.GithubRepoAccessDeniedException;
 import de.thm.swtp.api.github.exception.GithubTokenInvalidException;
-import de.thm.swtp.api.github.exception.PrivateRepoNotAllowedException;
 import de.thm.swtp.api.github.service.GithubConnectionService;
 import de.thm.swtp.api.github.client.GithubApiClient;
 import de.thm.swtp.api.project.ProjectEntity;
@@ -46,8 +46,8 @@ public class ProjectGithubRepoService {
             throw e;
         }
 
-        if (repo.isPrivate()) {
-            throw new PrivateRepoNotAllowedException();
+        if (!repo.hasWriteAccess()) {
+            throw new GithubRepoAccessDeniedException();
         }
 
         ProjectGithubRepoEntity entity = projectGithubRepoRepository.findByProjectId(projectId)

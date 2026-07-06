@@ -2,8 +2,8 @@ package de.thm.swtp.api.projectGithubRepo.service;
 
 import de.thm.swtp.api.github.client.GithubApiClient;
 import de.thm.swtp.api.github.exception.GithubConnectionRequiredException;
+import de.thm.swtp.api.github.exception.GithubRepoAccessDeniedException;
 import de.thm.swtp.api.github.exception.GithubRepoNotLinkedException;
-import de.thm.swtp.api.github.exception.PrivateRepoNotAllowedException;
 import de.thm.swtp.api.github.service.GithubConnectionService;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
@@ -24,6 +24,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class ProjectGithubRepoServiceTest {
+
+    private static final GithubApiClient.GithubRepo.Permissions WRITE_ACCESS =
+            new GithubApiClient.GithubRepo.Permissions(false, true, true);
+    private static final GithubApiClient.GithubRepo.Permissions NO_WRITE_ACCESS =
+            new GithubApiClient.GithubRepo.Permissions(false, false, true);
 
     private ProjectGithubRepoRepository projectGithubRepoRepository;
     private ProjectRepository projectRepository;
@@ -73,16 +78,42 @@ class ProjectGithubRepoServiceTest {
     }
 
     @Test
-    void shouldThrowWhenRepoIsPrivate() {
+    void shouldThrowWhenUserLacksWriteAccess() {
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
         when(githubConnectionService.getActiveDecryptedToken(userId)).thenReturn(Optional.of("gho_token"));
         when(githubApiClient.getRepository("gho_token", "mlanima", "thm-swtp"))
                 .thenReturn(new GithubApiClient.GithubRepo(1L, "thm-swtp", "mlanima/thm-swtp",
-                        "desc", "https://github.com/mlanima/thm-swtp", true, 1, 0));
+                        "desc", "https://github.com/mlanima/thm-swtp", false, 1, 0, NO_WRITE_ACCESS));
 
         assertThatThrownBy(() -> service.link(projectId, userId, "mlanima", "thm-swtp"))
-                .isInstanceOf(PrivateRepoNotAllowedException.class);
+                .isInstanceOf(GithubRepoAccessDeniedException.class);
         verify(projectGithubRepoRepository, never()).save(any());
+    }
+
+    @Test
+    void shouldLinkPrivateRepoWhenUserHasWriteAccess() {
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(githubConnectionService.getActiveDecryptedToken(userId)).thenReturn(Optional.of("gho_token"));
+        when(githubApiClient.getRepository("gho_token", "mlanima", "private-repo"))
+                .thenReturn(new GithubApiClient.GithubRepo(1L, "private-repo", "mlanima/private-repo",
+                        "desc", "https://github.com/mlanima/private-repo", true, 0, 0, WRITE_ACCESS));
+        when(projectGithubRepoRepository.save(any(ProjectGithubRepoEntity.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+        when(projectGithubRepoRepository.findByProjectId(projectId))
+                .thenReturn(Optional.empty())
+                .thenAnswer(invocation -> Optional.of(ProjectGithubRepoEntity.builder()
+                        .project(project)
+                        .repoOwner("mlanima")
+                        .repoName("private-repo")
+                        .linkedByKeycloakId(userId)
+                        .build()));
+        when(githubRepoDataService.fetch("mlanima", "private-repo", userId))
+                .thenReturn(GithubRepoData.builder().fullName("mlanima/private-repo").languages(List.of()).build());
+
+        var card = service.link(projectId, userId, "mlanima", "private-repo");
+
+        verify(projectGithubRepoRepository).save(any(ProjectGithubRepoEntity.class));
+        assertThat(card.getLink().getRepoOwner()).isEqualTo("mlanima");
     }
 
     @Test
@@ -91,7 +122,7 @@ class ProjectGithubRepoServiceTest {
         when(githubConnectionService.getActiveDecryptedToken(userId)).thenReturn(Optional.of("gho_token"));
         when(githubApiClient.getRepository("gho_token", "mlanima", "thm-swtp"))
                 .thenReturn(new GithubApiClient.GithubRepo(1L, "thm-swtp", "mlanima/thm-swtp",
-                        "desc", "https://github.com/mlanima/thm-swtp", false, 7, 2));
+                        "desc", "https://github.com/mlanima/thm-swtp", false, 7, 2, WRITE_ACCESS));
         when(projectGithubRepoRepository.save(any(ProjectGithubRepoEntity.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -138,7 +169,7 @@ class ProjectGithubRepoServiceTest {
         when(githubConnectionService.getActiveDecryptedToken(userId)).thenReturn(Optional.of("gho_token"));
         when(githubApiClient.getRepository("gho_token", "new-owner", "new-repo"))
                 .thenReturn(new GithubApiClient.GithubRepo(2L, "new-repo", "new-owner/new-repo",
-                        "desc", "https://github.com/new-owner/new-repo", false, 0, 0));
+                        "desc", "https://github.com/new-owner/new-repo", false, 0, 0, WRITE_ACCESS));
         when(projectGithubRepoRepository.findByProjectId(projectId)).thenReturn(Optional.of(existing));
         when(projectGithubRepoRepository.save(any(ProjectGithubRepoEntity.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
