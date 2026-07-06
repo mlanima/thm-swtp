@@ -1,5 +1,6 @@
 package de.thm.swtp.api.projectInvitation;
 
+import de.thm.swtp.api.discord.stream.DiscordEventPublisher;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
 import de.thm.swtp.api.project.exception.ProjectNotFoundException;
@@ -36,6 +37,7 @@ public class ProjectEntityInviteServiceTest {
     private ProjectRepository projectRepository;
     private UserProfileRepository userProfileRepository;
     private ApplicationEventPublisher eventPublisher;
+    private DiscordEventPublisher discordEventPublisher;
 
     private ProjectInviteService projectInviteService;
 
@@ -54,8 +56,9 @@ public class ProjectEntityInviteServiceTest {
         projectRepository = mock(ProjectRepository.class);
         userProfileRepository = mock(UserProfileRepository.class);
         eventPublisher = mock(ApplicationEventPublisher.class);
+        discordEventPublisher = mock(DiscordEventPublisher.class);
 
-        projectInviteService = new ProjectInviteService(projectInviteRepository, projectRepository, userProfileRepository, eventPublisher);
+        projectInviteService = new ProjectInviteService(projectInviteRepository, projectRepository, userProfileRepository, eventPublisher, discordEventPublisher);
 
         projectId = UUID.randomUUID();
         ownerId = UUID.randomUUID();

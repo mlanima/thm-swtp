@@ -1,6 +1,8 @@
 package de.thm.swtp.api.exceptionhandling;
 
 import de.thm.swtp.api.common.LogSafe;
+import de.thm.swtp.api.discord.exception.DiscordAccountAlreadyLinkedException;
+import de.thm.swtp.api.discord.exception.DiscordConnectionFailedException;
 import de.thm.swtp.api.exceptionhandling.exceptions.*;
 import de.thm.swtp.api.professorRequest.exception.ProfessorRequestAlreadyExistsException;
 import de.thm.swtp.api.professorRequest.exception.ProfessorRequestInvalidStatusException;
@@ -465,6 +467,20 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidProjectManagementSortFieldException.class)
     public ResponseEntity<ErrorResponse> handleInvalidProjectManagementSortField(InvalidProjectManagementSortFieldException ex) {
         log.debug("Bad Request (400): {}", LogSafe.clean(ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
+    }
+
+    @ExceptionHandler(DiscordAccountAlreadyLinkedException.class)
+    public ResponseEntity<ErrorResponse> handleDiscordAccountAlreadyLinked(DiscordAccountAlreadyLinkedException ex) {
+        log.warn("Conflict (409): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
+    }
+
+    @ExceptionHandler(DiscordConnectionFailedException.class)
+    public ResponseEntity<ErrorResponse> handleDiscordConnectionFailed(DiscordConnectionFailedException ex) {
+        log.warn("Bad Request (400): {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
     }

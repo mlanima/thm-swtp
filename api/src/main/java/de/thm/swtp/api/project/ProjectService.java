@@ -2,6 +2,7 @@ package de.thm.swtp.api.project;
 
 
 import de.thm.swtp.api.common.TxLogger;
+import de.thm.swtp.api.discord.service.DiscordNotificationService;
 import de.thm.swtp.api.exceptionhandling.exceptions.InvalidProjectManagementSortFieldException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectMemberNotFoundException;
 import de.thm.swtp.api.project.dto.request.*;
@@ -42,6 +43,7 @@ public class ProjectService {
     private static final String PROJECT_CREATION_INVITE_MESSAGE = "You have been invited to join this project.";
     private final ProjectFavoriteRepository projectFavoriteRepository;
     private final ProjectViewRepository projectViewRepository;
+    private final DiscordNotificationService discordNotificationService;
     private static final Set<String> MANAGED_PROJECT_SORT_FIELDS = Set.of("name", "owner.username", "createdAt", "updatedAt", "isPrivateProject");
 
     private ProjectResponse toResponse(ProjectEntity project) {
@@ -326,6 +328,7 @@ public class ProjectService {
 
         projectEntity.getMembers().remove(member);
         projectRepository.save(projectEntity);
+        discordNotificationService.notifyMemberLeft(projectId, projectEntity.getName(), member.getUsername());
         TxLogger.afterCommit(log, "Project member removed: project={}, member={}", projectId, memberId);
     }
 

@@ -1,6 +1,7 @@
 package de.thm.swtp.api.projectInvitation.service;
 
 import de.thm.swtp.api.common.TxLogger;
+import de.thm.swtp.api.discord.stream.DiscordEventPublisher;
 import de.thm.swtp.api.notification.event.ProjectInviteCreatedEvent;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
@@ -33,6 +34,7 @@ public class ProjectInviteService {
     private final ProjectRepository projectRepository;
     private final UserProfileRepository userProfileRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final DiscordEventPublisher discordEventPublisher;
 
     /** Creates a new project invitation. Only the project owner is allowed to send an invitation.*/
     @Transactional
@@ -59,6 +61,15 @@ public class ProjectInviteService {
         } else {
             log.warn("No email address for invited user '{}' — skipping invite notification for project '{}'",
                     invitedUserEntity.getUsername(), invite.getProjectName());
+        }
+
+        if (invitedUserEntity.getDiscordId() != null) {
+            discordEventPublisher.publishProjectInvite(
+                    saved.getId(),
+                    invitedUserEntity.getDiscordId(),
+                    invite.getProjectName(),
+                    projectEntity.getOwner().getUsername()
+            );
         }
 
         return invite;
