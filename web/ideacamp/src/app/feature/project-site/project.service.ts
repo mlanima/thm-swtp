@@ -56,8 +56,19 @@ export class ProjectService {
     return this.http.get<ProjectPostResponse[]>(`${this.baseUrl}/${projectId}/posts`);
   }
 
+  getProjectPostImage(projectId: string, postId: string) {
+    return this.http.get(`${this.baseUrl}/${projectId}/posts/${postId}/image`, { responseType: 'blob' });
+  }
+  
   createProjectPost(projectId: string, request: CreateProjectPostRequest): Observable<ProjectPostResponse> {
     return this.http.post<ProjectPostResponse>(`${this.baseUrl}/${projectId}/posts`, request);
+  }
+
+  uploadProjectPostImage(projectId: string, postId: string, image: File): Observable<ProjectPostResponse> {
+    const formData = new FormData();
+    formData.append('image', image);
+
+    return this.http.post<ProjectPostResponse>(`${this.baseUrl}/${projectId}/posts/${postId}/image`, formData);
   }
 
   deleteProjectPost(projectId: string, postId: string) {
