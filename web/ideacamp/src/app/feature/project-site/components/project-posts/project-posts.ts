@@ -3,6 +3,7 @@ import {
   Component,
   Input,
   OnChanges,
+  OnDestroy,
   SimpleChanges,
   inject,
   signal,
@@ -12,6 +13,7 @@ import {
   EventEmitter,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { catchError, finalize, of, switchMap } from 'rxjs';
 import { ProjectPostResponse, ProjectResponse } from '../../../../models/project.model';
 import { ProjectService } from '../../project.service';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -26,7 +28,8 @@ type ProjectPostContentFormat = 'PLAIN_TEXT' | 'MARKDOWN';
   imports: [CommonModule, FormsModule, TranslatePipe, MarkdownPipe, SuccessModal],
   templateUrl: './project-posts.html',
 })
-export class ProjectPosts implements OnChanges {
+
+export class ProjectPosts implements OnChanges, OnDestroy {
   @Input({ required: true }) project!: ProjectResponse;
   @Input() canCreatePosts = false;
   @Input() canReportPosts = false;
@@ -38,6 +41,8 @@ export class ProjectPosts implements OnChanges {
 
   private readonly projectService = inject(ProjectService);
   private readonly translateService = inject(TranslateService);
+  private readonly maxImageSize = 5 * 1024 * 1024;
+  private readonly allowedImageTypes = ['image/jpeg', 'image/png', 'image/webp'];
 
   posts = signal<ProjectPostResponse[]>([]);
   isLoading = signal(false);
@@ -54,13 +59,25 @@ export class ProjectPosts implements OnChanges {
   deletingPostId = signal<string | null>(null);
   showDeleteSuccessModal = signal(false);
 
+  selectedImage = signal<File | null>(null);
+  imagePreviewUrl = signal<string | null>(null);
+  postImageUrls = signal<Record<string, string>>({});
+
   @ViewChild('postContentInput')
   postContentInput?: ElementRef<HTMLTextAreaElement>;
+
+  @ViewChild('postImageInput')
+  postImageInput?: ElementRef<HTMLInputElement>;
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['project'] && this.project?.id) {
       this.loadPosts();
     }
+  }
+
+  ngOnDestroy(): void {
+    this.revokeImagePreviewUrl();
+    this.clearPostImageUrls();
   }
 
   get visiblePosts(): ProjectPostResponse[] {
@@ -77,8 +94,10 @@ export class ProjectPosts implements OnChanges {
 
     this.projectService.getProjectPosts(this.project.id).subscribe({
       next: (posts) => {
+        this.clearPostImageUrls();
         this.posts.set(posts);
         this.visibleCount.set(3);
+        this.loadPostImages(posts);
         this.isLoading.set(false);
       },
       error: () => {
@@ -93,8 +112,12 @@ export class ProjectPosts implements OnChanges {
   }
 
   toggleCreateForm(): void {
-    this.showCreateForm.update((value) => !value);
+    const nextValue = !this.showCreateForm();
+
+    this.showCreateForm.set(nextValue);
     this.errorMessage.set(null);
+
+    if (!nextValue) { this.resetCreateForm(); }
   }
 
   createPost(): void {
@@ -109,26 +132,51 @@ export class ProjectPosts implements OnChanges {
     this.isCreating.set(true);
     this.errorMessage.set(null);
 
-    this.projectService
-      .createProjectPost(this.project.id, {
-        title,
-        content,
-        contentFormat: this.contentFormat(),
-        status: 'PUBLISHED',
+    const image = this.selectedImage();
+
+    this.projectService.createProjectPost(this.project.id, {
+      title,
+      content,
+      contentFormat: this.contentFormat(),
+      status: 'PUBLISHED',
+    }).pipe(
+      switchMap((createdPost) => {
+        if (!image) {
+          return of(createdPost);
+        }
+
+        return this.projectService.uploadProjectPostImage(
+          this.project.id,
+          createdPost.id,
+          image
+        ).pipe(
+          catchError(() => {
+            this.errorMessage.set(
+              this.translateService.instant('PROJECTPOSTS.ERRORS.IMAGE_UPLOAD')
+            );
+
+            return of(createdPost);
+          })
+        );
+      }),
+      finalize(() => {
+        this.isCreating.set(false);
       })
-      .subscribe({
-        next: (createdPost) => {
-          this.posts.update((posts) => [createdPost, ...posts]);
-          this.title.set('');
-          this.content.set('');
-          this.showCreateForm.set(false);
-          this.isCreating.set(false);
-        },
-        error: () => {
-          this.errorMessage.set(this.translateService.instant('PROJECTPOSTS.ERRORS.CREATE'));
-          this.isCreating.set(false);
-        },
-      });
+    ).subscribe({
+      next: (createdOrUpdatedPost) => {
+        this.posts.update((posts) => [createdOrUpdatedPost, ...posts]);
+
+        if (createdOrUpdatedPost.imageUrl) {
+          this.loadPostImage(createdOrUpdatedPost);
+        }
+
+        this.resetCreateForm();
+        this.showCreateForm.set(false);
+      },
+      error: () => {
+        this.errorMessage.set(this.translateService.instant('PROJECTPOSTS.ERRORS.CREATE'));
+      },
+    });
   }
 
   setContentFormat(format: ProjectPostContentFormat): void {
@@ -209,5 +257,104 @@ export class ProjectPosts implements OnChanges {
 
   closeDeleteSuccessModal(): void {
     this.showDeleteSuccessModal.set(false);
+  }
+
+  onImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    if (!this.allowedImageTypes.includes(file.type)) {
+      this.errorMessage.set(this.translateService.instant('PROJECTPOSTS.ERRORS.IMAGE_TYPE'));
+      input.value = '';
+      return;
+    }
+
+    if (file.size > this.maxImageSize) {
+      this.errorMessage.set(this.translateService.instant('PROJECTPOSTS.ERRORS.IMAGE_SIZE'));
+      input.value = '';
+      return;
+    }
+
+    this.errorMessage.set(null);
+    this.revokeImagePreviewUrl();
+
+    this.selectedImage.set(file);
+    this.imagePreviewUrl.set(URL.createObjectURL(file));
+  }
+
+  removeSelectedImage(): void {
+    this.selectedImage.set(null);
+    this.revokeImagePreviewUrl();
+
+    if (this.postImageInput) {
+      this.postImageInput.nativeElement.value = '';
+    }
+  }
+
+  private resetCreateForm(): void {
+    this.title.set('');
+    this.content.set('');
+    this.contentFormat.set('MARKDOWN');
+    this.selectedImage.set(null);
+    this.revokeImagePreviewUrl();
+
+    if (this.postImageInput) {
+      this.postImageInput.nativeElement.value = '';
+    }
+  }
+
+  private revokeImagePreviewUrl(): void {
+    const previewUrl = this.imagePreviewUrl();
+
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+      this.imagePreviewUrl.set(null);
+    }
+  }
+
+  private loadPostImages(posts: ProjectPostResponse[]): void {
+    posts
+      .filter((post) => !!post.imageUrl)
+      .forEach((post) => this.loadPostImage(post));
+  }
+
+  private loadPostImage(post: ProjectPostResponse): void {
+    this.projectService.getProjectPostImage(this.project.id, post.id).subscribe({
+      next: (blob) => {
+        const objectUrl = URL.createObjectURL(blob);
+
+        this.postImageUrls.update((urls) => {
+          const oldUrl = urls[post.id];
+
+          if (oldUrl) {
+            URL.revokeObjectURL(oldUrl);
+          }
+
+          return {
+            ...urls,
+            [post.id]: objectUrl,
+          };
+        });
+      },
+      error: () => {
+        this.postImageUrls.update((urls) => {
+          const remainingUrls = { ...urls };
+          delete remainingUrls[post.id];
+          return remainingUrls;
+        });
+      },
+    });
+  }
+
+  private clearPostImageUrls(): void {
+    Object.values(this.postImageUrls()).forEach((url) => {
+      URL.revokeObjectURL(url);
+    });
+
+    this.postImageUrls.set({});
   }
 }
