@@ -40,6 +40,8 @@ export class ProfileBanner implements OnChanges {
     experience: string;
   };
 
+  @Input() canFollow = true;
+
   /** Emits when the edit button inside the banner is clicked */
   @Output() edit = new EventEmitter<void>();
 

@@ -24,6 +24,7 @@
           [profile]="state.profile"
           [isOwnProfile]="isOwner"
           [canReport]="canReportProfile(state.profile)"
+          [canFollow]="!isModerator"
           [isEditing]="editingSection === 'banner'"
           [isSaving]="isSaving"
           [editForm]="editForm"

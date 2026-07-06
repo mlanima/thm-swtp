@@ -69,12 +69,13 @@
 
   @if (!isOwnProfile) {
     <div class="absolute right-4 top-4 flex gap-2">
+    @if (canFollow) {
       <app-follow-button
         [username]="profile.username"
         [count]="profile.followers"
         (followerCountChanged)="followerCount.set($event)">
       </app-follow-button>
-
+    }
       @if (canReport) {
         <button
           type="button"

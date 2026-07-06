@@ -33,7 +33,11 @@ export class ProjectHeader {
     return this.project.memberIds.includes(user.id);
   }
 
+  get isModerator(): boolean {
+    return this.authService.isModerator();
+  }
+
   get showJoinButton(): boolean {
-    return this.authService.isLoggedIn() && !this.isOwner && !this.isMember;
+    return this.authService.isLoggedIn() && !this.isModerator && !this.isOwner && !this.isMember;
   }
 }

@@ -99,6 +99,10 @@ export class UserProfile implements OnInit, OnDestroy {
     return this.authService.username() === this.routeUsername;
   }
 
+  get isModerator(): boolean {
+    return this.authService.isModerator();
+  }
+
   /** Currently edited inline profile section */
   editingSection: 'banner' | 'about' | 'experience' | null = null;
 

@@ -55,12 +55,14 @@
           <app-join-request-button [projectId]="project.id" [onDark]="true" [allowJoinRequests]="project.allowJoinRequests" />
         }
 
+      @if (!isModerator){
         <app-favorite-button
           [projectId]="project.id"
           [count]="project.favoriteCount"
           [onDark]="true"
           (favoriteCountChanged)="favoriteCountChanged.emit($event)"
         />
+      }  
 
         @if (canReport) {
           <button
