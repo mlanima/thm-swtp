@@ -394,6 +394,7 @@
       "JOIN_REQUESTS": "Beitrittsanfragen",
       "MEMBERS": "Mitglieder",
       "PRIVACY": "Privatsphäre",
+      "GITHUB": "GitHub",
       "DANGER_ZONE": "Gefahrenzone"
     },
     "ERRORS": {
@@ -617,6 +618,22 @@
       "ERROR_TITLE": "Verbindung fehlgeschlagen",
       "ERROR_DESCRIPTION": "Dein GitHub-Konto konnte nicht verbunden werden. Bitte versuche es erneut.",
       "BACK_TO_SETTINGS": "Zurück zu den Einstellungen"
+    },
+    "REPO": {
+      "ERROR_LOAD": "Das verknüpfte GitHub-Repository konnte nicht geladen werden.",
+      "ERROR_LINK": "Das Repository konnte nicht verknüpft werden. Bitte versuche es erneut.",
+      "ERROR_UNLINK": "Die Verknüpfung des Repositorys konnte nicht aufgehoben werden. Bitte versuche es erneut.",
+      "INVALID_INPUT": "Gib ein GitHub-Repository als owner/name oder als github.com-URL ein.",
+      "CONNECTION_REQUIRED": "Verbinde dein GitHub-Konto, bevor du ein Repository verknüpfst.",
+      "PRIVATE_NOT_ALLOWED": "Es können nur öffentliche GitHub-Repositories verknüpft werden.",
+      "NOT_FOUND": "Dieses Repository konnte auf GitHub nicht gefunden werden.",
+      "GO_TO_SETTINGS": "Zu den Einstellungen",
+      "LINK_TITLE": "GitHub-Repository verknüpfen",
+      "LINK_DESCRIPTION": "Zeige Beschreibung, Stars, Forks und Sprachen des Repositorys auf der Projektseite an.",
+      "LINK_PLACEHOLDER": "owner/repository oder https://github.com/owner/repository",
+      "LINK": "Repository verknüpfen",
+      "UNLINK": "Verknüpfung aufheben",
+      "UNAVAILABLE": "Repository-Daten sind vorübergehend nicht verfügbar."
     }
   },
   "PROFESSOR_REQUEST": {

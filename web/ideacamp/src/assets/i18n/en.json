@@ -394,6 +394,7 @@
       "JOIN_REQUESTS": "Join requests",
       "MEMBERS": "Members",
       "PRIVACY": "Privacy",
+      "GITHUB": "GitHub",
       "DANGER_ZONE": "Danger zone"
     },
     "ERRORS": {
@@ -617,6 +618,22 @@
       "ERROR_TITLE": "Connection failed",
       "ERROR_DESCRIPTION": "Your GitHub account could not be connected. Please try again.",
       "BACK_TO_SETTINGS": "Back to settings"
+    },
+    "REPO": {
+      "ERROR_LOAD": "The linked GitHub repository could not be loaded.",
+      "ERROR_LINK": "The repository could not be linked. Please try again.",
+      "ERROR_UNLINK": "The repository could not be unlinked. Please try again.",
+      "INVALID_INPUT": "Enter a GitHub repository as owner/name or a github.com URL.",
+      "CONNECTION_REQUIRED": "Connect your GitHub account before linking a repository.",
+      "PRIVATE_NOT_ALLOWED": "Only public GitHub repositories can be linked.",
+      "NOT_FOUND": "That repository could not be found on GitHub.",
+      "GO_TO_SETTINGS": "Go to settings",
+      "LINK_TITLE": "Link a GitHub repository",
+      "LINK_DESCRIPTION": "Show the repository's description, stars, forks and languages on the project page.",
+      "LINK_PLACEHOLDER": "owner/repository or https://github.com/owner/repository",
+      "LINK": "Link repository",
+      "UNLINK": "Unlink repository",
+      "UNAVAILABLE": "Repository data is temporarily unavailable."
     }
   },
   "PROFESSOR_REQUEST": {
