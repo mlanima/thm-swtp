@@ -1,5 +1,11 @@
 import { Client, GatewayIntentBits } from 'discord.js';
 import { logger } from '../config/logger.js';
+import { registerMessageCreateHandler } from './handlers/messageCreate.js';
+import { registerMessageUpdateHandler } from './handlers/messageUpdate.js';
+import { registerMessageDeleteHandler } from './handlers/messageDelete.js';
+import { registerInteractionCreateHandler } from './handlers/interactionCreate.js';
+import { registerChannelDeleteHandler } from './handlers/channelDelete.js';
+import { registerGuildBanAddHandler } from './handlers/guildBanAdd.js';
 
 export const discordClient = new Client({
   intents: [
@@ -23,6 +29,14 @@ export async function startDiscordClient(): Promise<void> {
   if (!token) {
     throw new Error('DISCORD_TOKEN is not set');
   }
+
+  registerMessageCreateHandler(discordClient);
+  registerMessageUpdateHandler(discordClient);
+  registerMessageDeleteHandler(discordClient);
+  registerInteractionCreateHandler(discordClient);
+  registerChannelDeleteHandler(discordClient);
+  registerGuildBanAddHandler(discordClient);
+
   await discordClient.login(token);
 }
 

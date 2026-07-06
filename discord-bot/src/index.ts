@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { logger } from './config/logger.js';
 import { startDiscordClient } from './bot/client.js';
 import { startStreamConsumer } from './streams/consumer.js';

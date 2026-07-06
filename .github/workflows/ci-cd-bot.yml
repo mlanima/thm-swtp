@@ -1,0 +1,76 @@
+name: Discord Bot CI/CD
+
+on:
+  pull_request:
+    paths:
+      - 'discord-bot/**'
+    branches: [main, developer]
+  push:
+    paths:
+      - 'discord-bot/**'
+    branches: [main, developer]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: discord-bot
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: discord-bot/package-lock.json
+
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
+
+  deploy:
+    if: github.event_name == 'push'
+    needs: ci
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Determine image tag
+        id: tags
+        run: |
+          if [ "${{ github.ref_name }}" = "main" ]; then
+            echo "tag=latest" >> $GITHUB_OUTPUT
+            echo "deploy_env=main" >> $GITHUB_OUTPUT
+          else
+            echo "tag=dev" >> $GITHUB_OUTPUT
+            echo "deploy_env=dev" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: discord-bot
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/swtp-bot:${{ steps.tags.outputs.tag }}
+
+      - name: Deploy bot
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ser.mlanima.org
+          username: deploy
+          key: ${{ secrets.BOT_DEPLOY_SSH_KEY }}
+          script: |
+            cd /opt/stacks/discord-bot
+            docker compose pull
+            docker compose up -d

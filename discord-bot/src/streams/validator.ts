@@ -6,7 +6,7 @@ export const PostCreatedSchema = z.object({
   channelId: z.string(),
   content: z.string().max(3900),
   authorName: z.string().max(100),
-  authorAvatar: z.string().url().optional(),
+  authorAvatar: z.string().optional(),
   platformUrl: z.string().url(),
 });
 
