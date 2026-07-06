@@ -6,6 +6,7 @@ import de.thm.swtp.api.github.exception.GithubApiException;
 import de.thm.swtp.api.github.exception.GithubConnectionRequiredException;
 import de.thm.swtp.api.github.exception.GithubIntegrationDisabledException;
 import de.thm.swtp.api.github.exception.GithubOAuthException;
+import de.thm.swtp.api.github.exception.GithubReadmeNotEnabledException;
 import de.thm.swtp.api.github.exception.GithubRepoAccessDeniedException;
 import de.thm.swtp.api.github.exception.GithubRepoNotFoundException;
 import de.thm.swtp.api.github.exception.GithubRepoNotLinkedException;
@@ -540,5 +541,12 @@ public class GlobalExceptionHandler {
         log.warn("Forbidden (403): {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(ErrorResponse.of(403, "Forbidden", ex.getMessage()));
+    }
+
+    @ExceptionHandler(GithubReadmeNotEnabledException.class)
+    public ResponseEntity<ErrorResponse> handleGithubReadmeNotEnabled(GithubReadmeNotEnabledException ex) {
+        log.debug("Not Found (404): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
     }
 }

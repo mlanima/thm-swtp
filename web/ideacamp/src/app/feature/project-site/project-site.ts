@@ -11,11 +11,12 @@ import { ProjectSidebar } from './components/project-sidebar/project-sidebar';
 import {AuthService} from '../auth/auth.service';
 import { SuccessModal } from '../../shared/success-modal/success-modal';
 import { ProjectPosts } from './components/project-posts/project-posts';
+import { ProjectReadme } from './components/project-readme/project-readme';
 
 @Component({
   selector: 'app-project-site',
   standalone: true,
-  imports: [ProjectHeader, InfoCard, ProjectSidebar, FormsModule, CommonModule, SuccessModal, TranslatePipe, ProjectPosts],
+  imports: [ProjectHeader, InfoCard, ProjectSidebar, FormsModule, CommonModule, SuccessModal, TranslatePipe, ProjectPosts, ProjectReadme],
   templateUrl: './project-site.html',
 })
 export class ProjectSite  implements OnInit {

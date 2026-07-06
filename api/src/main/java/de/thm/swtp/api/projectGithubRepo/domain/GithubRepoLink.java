@@ -14,5 +14,7 @@ public class GithubRepoLink {
     String repoOwner;
     String repoName;
     UUID linkedByKeycloakId;
+    String defaultBranch;
+    boolean showReadme;
     LocalDateTime createdAt;
 }

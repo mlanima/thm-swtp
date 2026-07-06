@@ -11,6 +11,8 @@ public class ProjectGithubRepoMapper {
                 .repoOwner(entity.getRepoOwner())
                 .repoName(entity.getRepoName())
                 .linkedByKeycloakId(entity.getLinkedByKeycloakId())
+                .defaultBranch(entity.getDefaultBranch())
+                .showReadme(entity.isShowReadme())
                 .createdAt(entity.getCreatedAt())
                 .build();
     }

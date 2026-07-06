@@ -17,6 +17,7 @@ const repoCard: GithubRepoCardModel = {
     { name: 'TypeScript', percentage: 40 },
   ],
   dataUnavailable: false,
+  showReadme: false,
 };
 
 class MockProjectGithubRepoService {

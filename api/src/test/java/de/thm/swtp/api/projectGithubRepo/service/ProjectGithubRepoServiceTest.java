@@ -2,6 +2,7 @@ package de.thm.swtp.api.projectGithubRepo.service;
 
 import de.thm.swtp.api.github.client.GithubApiClient;
 import de.thm.swtp.api.github.exception.GithubConnectionRequiredException;
+import de.thm.swtp.api.github.exception.GithubReadmeNotEnabledException;
 import de.thm.swtp.api.github.exception.GithubRepoAccessDeniedException;
 import de.thm.swtp.api.github.exception.GithubRepoNotLinkedException;
 import de.thm.swtp.api.github.service.GithubConnectionService;
@@ -83,7 +84,7 @@ class ProjectGithubRepoServiceTest {
         when(githubConnectionService.getActiveDecryptedToken(userId)).thenReturn(Optional.of("gho_token"));
         when(githubApiClient.getRepository("gho_token", "mlanima", "thm-swtp"))
                 .thenReturn(new GithubApiClient.GithubRepo(1L, "thm-swtp", "mlanima/thm-swtp",
-                        "desc", "https://github.com/mlanima/thm-swtp", false, 1, 0, NO_WRITE_ACCESS));
+                        "desc", "https://github.com/mlanima/thm-swtp", false, 1, 0, "main", NO_WRITE_ACCESS));
 
         assertThatThrownBy(() -> service.link(projectId, userId, "mlanima", "thm-swtp"))
                 .isInstanceOf(GithubRepoAccessDeniedException.class);
@@ -96,7 +97,7 @@ class ProjectGithubRepoServiceTest {
         when(githubConnectionService.getActiveDecryptedToken(userId)).thenReturn(Optional.of("gho_token"));
         when(githubApiClient.getRepository("gho_token", "mlanima", "private-repo"))
                 .thenReturn(new GithubApiClient.GithubRepo(1L, "private-repo", "mlanima/private-repo",
-                        "desc", "https://github.com/mlanima/private-repo", true, 0, 0, WRITE_ACCESS));
+                        "desc", "https://github.com/mlanima/private-repo", true, 0, 0, "main", WRITE_ACCESS));
         when(projectGithubRepoRepository.save(any(ProjectGithubRepoEntity.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
         when(projectGithubRepoRepository.findByProjectId(projectId))
@@ -122,7 +123,7 @@ class ProjectGithubRepoServiceTest {
         when(githubConnectionService.getActiveDecryptedToken(userId)).thenReturn(Optional.of("gho_token"));
         when(githubApiClient.getRepository("gho_token", "mlanima", "thm-swtp"))
                 .thenReturn(new GithubApiClient.GithubRepo(1L, "thm-swtp", "mlanima/thm-swtp",
-                        "desc", "https://github.com/mlanima/thm-swtp", false, 7, 2, WRITE_ACCESS));
+                        "desc", "https://github.com/mlanima/thm-swtp", false, 7, 2, "main", WRITE_ACCESS));
         when(projectGithubRepoRepository.save(any(ProjectGithubRepoEntity.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -169,7 +170,7 @@ class ProjectGithubRepoServiceTest {
         when(githubConnectionService.getActiveDecryptedToken(userId)).thenReturn(Optional.of("gho_token"));
         when(githubApiClient.getRepository("gho_token", "new-owner", "new-repo"))
                 .thenReturn(new GithubApiClient.GithubRepo(2L, "new-repo", "new-owner/new-repo",
-                        "desc", "https://github.com/new-owner/new-repo", false, 0, 0, WRITE_ACCESS));
+                        "desc", "https://github.com/new-owner/new-repo", false, 0, 0, "main", WRITE_ACCESS));
         when(projectGithubRepoRepository.findByProjectId(projectId)).thenReturn(Optional.of(existing));
         when(projectGithubRepoRepository.save(any(ProjectGithubRepoEntity.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
@@ -225,5 +226,93 @@ class ProjectGithubRepoServiceTest {
         assertThatThrownBy(() -> service.unlink(projectId))
                 .isInstanceOf(GithubRepoNotLinkedException.class);
         verify(projectGithubRepoRepository, never()).delete(any(ProjectGithubRepoEntity.class));
+    }
+
+    @Test
+    void shouldEnableReadmeVisibility() {
+        var entity = ProjectGithubRepoEntity.builder()
+                .project(project)
+                .repoOwner("mlanima")
+                .repoName("thm-swtp")
+                .linkedByKeycloakId(userId)
+                .build();
+        when(projectGithubRepoRepository.findByProjectId(projectId)).thenReturn(Optional.of(entity));
+        when(githubRepoDataService.fetch("mlanima", "thm-swtp", userId))
+                .thenReturn(GithubRepoData.builder().fullName("mlanima/thm-swtp").languages(List.of()).build());
+
+        service.setReadmeVisibility(projectId, true);
+
+        assertThat(entity.isShowReadme()).isTrue();
+        verify(projectGithubRepoRepository).save(entity);
+    }
+
+    @Test
+    void shouldThrowWhenSettingReadmeVisibilityForUnlinkedProject() {
+        when(projectGithubRepoRepository.findByProjectId(projectId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.setReadmeVisibility(projectId, true))
+                .isInstanceOf(GithubRepoNotLinkedException.class);
+    }
+
+    @Test
+    void shouldReturnReadmeWhenEnabledAndAvailable() {
+        var entity = ProjectGithubRepoEntity.builder()
+                .project(project)
+                .repoOwner("mlanima")
+                .repoName("thm-swtp")
+                .linkedByKeycloakId(userId)
+                .defaultBranch("main")
+                .showReadme(true)
+                .build();
+        when(projectGithubRepoRepository.findByProjectId(projectId)).thenReturn(Optional.of(entity));
+        when(githubRepoDataService.fetchReadme("mlanima", "thm-swtp", userId)).thenReturn("# Hello");
+
+        var readme = service.getReadme(projectId);
+
+        assertThat(readme.getMarkdown()).isEqualTo("# Hello");
+        assertThat(readme.getDefaultBranch()).isEqualTo("main");
+        assertThat(readme.isAvailable()).isTrue();
+    }
+
+    @Test
+    void shouldReturnUnavailableReadmeWhenFetchFails() {
+        var entity = ProjectGithubRepoEntity.builder()
+                .project(project)
+                .repoOwner("mlanima")
+                .repoName("thm-swtp")
+                .linkedByKeycloakId(userId)
+                .showReadme(true)
+                .build();
+        when(projectGithubRepoRepository.findByProjectId(projectId)).thenReturn(Optional.of(entity));
+        when(githubRepoDataService.fetchReadme("mlanima", "thm-swtp", userId)).thenReturn(null);
+
+        var readme = service.getReadme(projectId);
+
+        assertThat(readme.isAvailable()).isFalse();
+        assertThat(readme.getMarkdown()).isNull();
+    }
+
+    @Test
+    void shouldThrowWhenReadmeNotEnabled() {
+        var entity = ProjectGithubRepoEntity.builder()
+                .project(project)
+                .repoOwner("mlanima")
+                .repoName("thm-swtp")
+                .linkedByKeycloakId(userId)
+                .showReadme(false)
+                .build();
+        when(projectGithubRepoRepository.findByProjectId(projectId)).thenReturn(Optional.of(entity));
+
+        assertThatThrownBy(() -> service.getReadme(projectId))
+                .isInstanceOf(GithubReadmeNotEnabledException.class);
+        verifyNoInteractions(githubRepoDataService);
+    }
+
+    @Test
+    void shouldThrowWhenGettingReadmeForUnlinkedProject() {
+        when(projectGithubRepoRepository.findByProjectId(projectId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.getReadme(projectId))
+                .isInstanceOf(GithubRepoNotLinkedException.class);
     }
 }

@@ -3,6 +3,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, catchError, map, of, throwError } from 'rxjs';
 import { environment } from '../../../enviroments/enviroment.dev';
 import { GithubRepoCardModel, GithubRepoCardSchema } from '../../../models/github-repo-card.model';
+import { GithubReadmeModel, GithubReadmeSchema } from '../../../models/github-readme.model';
 
 export interface LinkGithubRepoRequest {
   repoOwner: string;
@@ -34,5 +35,23 @@ export class ProjectGithubRepoService {
 
   unlinkRepo(projectId: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${projectId}/github-repo`);
+  }
+
+  getReadme(projectId: string): Observable<GithubReadmeModel | null> {
+    return this.http.get<unknown>(`${this.baseUrl}/${projectId}/github-repo/readme`).pipe(
+      map((data) => GithubReadmeSchema.parse(data)),
+      catchError((error: HttpErrorResponse) => {
+        if (error.status === 404) {
+          return of(null);
+        }
+        return throwError(() => error);
+      }),
+    );
+  }
+
+  setReadmeVisibility(projectId: string, show: boolean): Observable<GithubRepoCardModel> {
+    return this.http
+      .patch<unknown>(`${this.baseUrl}/${projectId}/github-repo/readme-visibility`, { show })
+      .pipe(map((data) => GithubRepoCardSchema.parse(data)));
   }
 }

@@ -13,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -99,6 +101,34 @@ public class GithubApiClient {
         return languages == null ? Map.of() : languages;
     }
 
+    /** Returns the repository's README as raw markdown source (decoded from the API's
+     * Base64-encoded content), or throws {@link GithubRepoNotFoundException} if the repo has
+     * no README file. */
+    public String getReadme(final String accessToken, final String owner, final String repo) {
+        var readme = restClient.get()
+                .uri("/repos/{owner}/{repo}/readme", owner, repo)
+                .headers(withAuth(accessToken))
+                .retrieve()
+                .onStatus(HttpStatus.UNAUTHORIZED::equals, (request, res) -> {
+                    throw new GithubTokenInvalidException("GitHub rejected the access token");
+                })
+                .onStatus(HttpStatus.NOT_FOUND::equals, (request, res) -> {
+                    throw new GithubRepoNotFoundException(owner, repo);
+                })
+                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(), (request, res) -> {
+                    log.debug("GitHub API returned {} for GET /repos/{}/{}/readme", res.getStatusCode(), owner, repo);
+                    throw new GithubApiException("GitHub API request failed");
+                })
+                .body(ReadmeContent.class);
+
+        if (readme == null || readme.content() == null) {
+            throw new GithubRepoNotFoundException(owner, repo);
+        }
+
+        byte[] decoded = Base64.getDecoder().decode(readme.content().replaceAll("\\s", ""));
+        return new String(decoded, StandardCharsets.UTF_8);
+    }
+
     private Consumer<HttpHeaders> withAuth(final String accessToken) {
         return headers -> {
             if (accessToken != null && !accessToken.isBlank()) {
@@ -122,6 +152,7 @@ public class GithubApiClient {
             @JsonProperty("private") boolean isPrivate,
             @JsonProperty("stargazers_count") int stargazersCount,
             @JsonProperty("forks_count") int forksCount,
+            @JsonProperty("default_branch") String defaultBranch,
             @JsonProperty("permissions") Permissions permissions) {
 
         /** {@code permissions} is only present on authenticated responses; absence (an
@@ -135,4 +166,8 @@ public class GithubApiClient {
                 @JsonProperty("push") boolean push,
                 @JsonProperty("pull") boolean pull) {}
     }
+
+    private record ReadmeContent(
+            @JsonProperty("content") String content,
+            @JsonProperty("encoding") String encoding) {}
 }

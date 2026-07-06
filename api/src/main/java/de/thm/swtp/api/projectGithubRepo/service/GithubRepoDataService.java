@@ -14,12 +14,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
 
-/** Fetches (and caches) the public GitHub metadata shown on a project's repo card. Uses the
- * linker's token when available for the higher authenticated rate limit, falling back to an
- * unauthenticated call — since only public repos can be linked, that fallback always works
- * unless the repo was deleted or renamed. The cache key is owner/repo only; the token never
- * enters the cache. */
+/** Fetches (and caches) the public GitHub metadata shown on a project's repo card and README.
+ * Uses the linker's token when available for the higher authenticated rate limit (and private-repo
+ * access), falling back to an unauthenticated call — since a linked repo the linker no longer has
+ * access to just renders as unavailable rather than failing outright. Cache keys are owner/repo
+ * only; the token never enters the cache. */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -32,32 +33,43 @@ public class GithubRepoDataService {
 
     @Cacheable(cacheNames = "github-repo-card", key = "#owner + '/' + #repo")
     public GithubRepoData fetch(String owner, String repo, UUID linkedByKeycloakId) {
-        var token = githubConnectionService.getActiveDecryptedToken(linkedByKeycloakId);
+        return fetchWithFallback(linkedByKeycloakId, owner, repo, token -> {
+            var repository = githubApiClient.getRepository(token, owner, repo);
+            var languages = githubApiClient.getRepositoryLanguages(token, owner, repo);
+            return buildData(repository, languages);
+        });
+    }
+
+    @Cacheable(cacheNames = "github-readme", key = "#owner + '/' + #repo")
+    public String fetchReadme(String owner, String repo, UUID linkedByKeycloakId) {
+        return fetchWithFallback(linkedByKeycloakId, owner, repo,
+                token -> githubApiClient.getReadme(token, owner, repo));
+    }
+
+    /** Tries the linker's active token first; on 401 marks the connection invalid and falls back
+     * to an unauthenticated call; on not-found/API error returns {@code null} so callers can
+     * render an "unavailable" state instead of failing the request outright. */
+    private <T> T fetchWithFallback(UUID linkerId, String owner, String repo, Function<String, T> fetcher) {
+        var token = githubConnectionService.getActiveDecryptedToken(linkerId);
         if (token.isPresent()) {
             try {
-                return fetchWithToken(owner, repo, token.get());
+                return fetcher.apply(token.get());
             } catch (GithubTokenInvalidException e) {
-                githubConnectionService.markInvalid(linkedByKeycloakId);
+                githubConnectionService.markInvalid(linkerId);
                 log.warn("GitHub token for user {} rejected while fetching {}/{}; falling back to unauthenticated",
-                        linkedByKeycloakId, owner, repo);
+                        linkerId, owner, repo);
             } catch (GithubApiException | GithubRepoNotFoundException e) {
-                log.debug("GitHub repo data unavailable for {}/{}: {}", owner, repo, e.getMessage());
+                log.debug("GitHub data unavailable for {}/{}: {}", owner, repo, e.getMessage());
                 return null;
             }
         }
 
         try {
-            return fetchWithToken(owner, repo, null);
+            return fetcher.apply(null);
         } catch (GithubApiException | GithubRepoNotFoundException | GithubTokenInvalidException e) {
-            log.debug("GitHub repo data unavailable for {}/{}: {}", owner, repo, e.getMessage());
+            log.debug("GitHub data unavailable for {}/{}: {}", owner, repo, e.getMessage());
             return null;
         }
-    }
-
-    private GithubRepoData fetchWithToken(String owner, String repo, String token) {
-        var repository = githubApiClient.getRepository(token, owner, repo);
-        var languages = githubApiClient.getRepositoryLanguages(token, owner, repo);
-        return buildData(repository, languages);
     }
 
     private GithubRepoData buildData(GithubApiClient.GithubRepo repo, Map<String, Long> languages) {

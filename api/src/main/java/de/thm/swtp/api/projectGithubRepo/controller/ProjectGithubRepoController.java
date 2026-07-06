@@ -1,7 +1,9 @@
 package de.thm.swtp.api.projectGithubRepo.controller;
 
+import de.thm.swtp.api.projectGithubRepo.dto.GithubReadmeResponse;
 import de.thm.swtp.api.projectGithubRepo.dto.GithubRepoCardResponse;
 import de.thm.swtp.api.projectGithubRepo.dto.LinkGithubRepoRequest;
+import de.thm.swtp.api.projectGithubRepo.dto.SetReadmeVisibilityRequest;
 import de.thm.swtp.api.projectGithubRepo.service.ProjectGithubRepoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -42,5 +44,19 @@ public class ProjectGithubRepoController {
     @PreAuthorize("@security.canManageProjectGithubRepo(#projectId, authentication)")
     public void unlinkRepo(@PathVariable UUID projectId) {
         projectGithubRepoService.unlink(projectId);
+    }
+
+    @GetMapping("/readme")
+    @PreAuthorize("@security.canViewProjectGithubRepo(#projectId, authentication)")
+    public GithubReadmeResponse getReadme(@PathVariable UUID projectId) {
+        return GithubReadmeResponse.toResponse(projectGithubRepoService.getReadme(projectId));
+    }
+
+    @PatchMapping("/readme-visibility")
+    @PreAuthorize("@security.canManageProjectGithubRepo(#projectId, authentication)")
+    public GithubRepoCardResponse setReadmeVisibility(
+            @PathVariable UUID projectId,
+            @Valid @RequestBody SetReadmeVisibilityRequest request) {
+        return GithubRepoCardResponse.toResponse(projectGithubRepoService.setReadmeVisibility(projectId, request.show()));
     }
 }

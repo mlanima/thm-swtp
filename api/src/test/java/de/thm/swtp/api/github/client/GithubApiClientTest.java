@@ -113,4 +113,35 @@ class GithubApiClientTest {
         var languages = clientWithResponse(200, "null").getRepositoryLanguages("gho_token", "mlanima", "thm-swtp");
         assertThat(languages).isEqualTo(Map.of());
     }
+
+    @Test
+    void shouldDecodeReadmeContent() {
+        // GitHub wraps base64 content at ~60 chars with embedded newlines — the decoder must strip them.
+        var json = """
+                {"content": "IyBIZWxsbyBXb3Js\\nZAoKU29tZSB0ZXh0\\nLg==", "encoding": "base64"}
+                """;
+        var markdown = clientWithResponse(200, json).getReadme("gho_token", "mlanima", "thm-swtp");
+        assertThat(markdown).isEqualTo("# Hello World\n\nSome text.");
+    }
+
+    @Test
+    void shouldThrowNotFoundWhenNoReadme() {
+        assertThatThrownBy(() -> clientWithResponse(404, "Not Found")
+                .getReadme("gho_token", "mlanima", "thm-swtp"))
+                .isInstanceOf(GithubRepoNotFoundException.class);
+    }
+
+    @Test
+    void shouldThrowTokenInvalidForReadmeWhenUnauthorized() {
+        assertThatThrownBy(() -> clientWithResponse(401, "Unauthorized")
+                .getReadme("bad-token", "mlanima", "thm-swtp"))
+                .isInstanceOf(GithubTokenInvalidException.class);
+    }
+
+    @Test
+    void shouldThrowApiExceptionForReadmeOnServerError() {
+        assertThatThrownBy(() -> clientWithResponse(500, "Internal Server Error")
+                .getReadme("gho_token", "mlanima", "thm-swtp"))
+                .isInstanceOf(GithubApiException.class);
+    }
 }

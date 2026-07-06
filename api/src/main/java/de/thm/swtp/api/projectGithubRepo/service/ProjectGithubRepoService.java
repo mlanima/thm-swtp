@@ -1,6 +1,7 @@
 package de.thm.swtp.api.projectGithubRepo.service;
 
 import de.thm.swtp.api.github.exception.GithubConnectionRequiredException;
+import de.thm.swtp.api.github.exception.GithubReadmeNotEnabledException;
 import de.thm.swtp.api.github.exception.GithubRepoAccessDeniedException;
 import de.thm.swtp.api.github.exception.GithubTokenInvalidException;
 import de.thm.swtp.api.github.service.GithubConnectionService;
@@ -8,6 +9,7 @@ import de.thm.swtp.api.github.client.GithubApiClient;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
 import de.thm.swtp.api.project.exception.ProjectNotFoundException;
+import de.thm.swtp.api.projectGithubRepo.domain.GithubReadme;
 import de.thm.swtp.api.projectGithubRepo.domain.GithubRepoCard;
 import de.thm.swtp.api.projectGithubRepo.domain.GithubRepoLink;
 import de.thm.swtp.api.projectGithubRepo.entity.ProjectGithubRepoEntity;
@@ -55,6 +57,7 @@ public class ProjectGithubRepoService {
         entity.setRepoOwner(repoOwner);
         entity.setRepoName(repoName);
         entity.setLinkedByKeycloakId(userId);
+        entity.setDefaultBranch(repo.defaultBranch());
 
         projectGithubRepoRepository.save(entity);
         return getCard(projectId);
@@ -80,5 +83,36 @@ public class ProjectGithubRepoService {
         ProjectGithubRepoEntity entity = projectGithubRepoRepository.findByProjectId(projectId)
                 .orElseThrow(() -> new GithubRepoNotLinkedException(projectId));
         projectGithubRepoRepository.delete(entity);
+    }
+
+    @Transactional
+    public GithubRepoCard setReadmeVisibility(UUID projectId, boolean show) {
+        ProjectGithubRepoEntity entity = projectGithubRepoRepository.findByProjectId(projectId)
+                .orElseThrow(() -> new GithubRepoNotLinkedException(projectId));
+        entity.setShowReadme(show);
+        projectGithubRepoRepository.save(entity);
+        return getCard(projectId);
+    }
+
+    @Transactional(readOnly = true)
+    public GithubReadme getReadme(UUID projectId) {
+        ProjectGithubRepoEntity entity = projectGithubRepoRepository.findByProjectId(projectId)
+                .orElseThrow(() -> new GithubRepoNotLinkedException(projectId));
+
+        if (!entity.isShowReadme()) {
+            throw new GithubReadmeNotEnabledException(projectId);
+        }
+
+        GithubRepoLink link = ProjectGithubRepoMapper.toDomain(entity);
+        String markdown = githubRepoDataService.fetchReadme(
+                link.getRepoOwner(), link.getRepoName(), link.getLinkedByKeycloakId());
+
+        return GithubReadme.builder()
+                .repoOwner(link.getRepoOwner())
+                .repoName(link.getRepoName())
+                .defaultBranch(link.getDefaultBranch())
+                .markdown(markdown)
+                .available(markdown != null)
+                .build();
     }
 }

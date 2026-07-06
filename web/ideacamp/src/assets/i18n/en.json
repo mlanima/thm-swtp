@@ -633,7 +633,9 @@
       "LINK_PLACEHOLDER": "owner/repository or https://github.com/owner/repository",
       "LINK": "Link repository",
       "UNLINK": "Unlink repository",
-      "UNAVAILABLE": "Repository data is temporarily unavailable."
+      "UNAVAILABLE": "Repository data is temporarily unavailable.",
+      "SHOW_README": "Show README on project page",
+      "ERROR_README_TOGGLE": "Could not update the README visibility. Please try again."
     }
   },
   "PROFESSOR_REQUEST": {

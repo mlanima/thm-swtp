@@ -14,6 +14,7 @@ export const GithubRepoCardSchema = z.object({
   forksCount: z.number().nullable(),
   languages: z.array(LanguageShareSchema),
   dataUnavailable: z.boolean(),
+  showReadme: z.boolean(),
 });
 
 export type GithubRepoCardModel = z.infer<typeof GithubRepoCardSchema>;

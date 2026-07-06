@@ -47,6 +47,13 @@ public class ProjectGithubRepoEntity {
     @Column(nullable = false)
     private UUID linkedByKeycloakId;
 
+    @Column(length = 255)
+    private String defaultBranch;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean showReadme = false;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;

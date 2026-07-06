@@ -39,6 +39,7 @@ export class GithubTab implements OnInit {
   readonly repoInput = signal('');
   readonly isLinking = signal(false);
   readonly isUnlinking = signal(false);
+  readonly isTogglingReadme = signal(false);
   readonly errorMessage = signal('');
   readonly needsGithubConnection = signal(false);
 
@@ -95,6 +96,26 @@ export class GithubTab implements OnInit {
           this.errorMessage.set(this.translate.instant('GITHUB.REPO.ERROR_LINK'));
         }
         this.isLinking.set(false);
+      },
+    });
+  }
+
+  toggleShowReadme(): void {
+    const project = this.store.project();
+    const currentCard = this.repoCard();
+    if (!project || !currentCard || this.isTogglingReadme()) return;
+
+    this.isTogglingReadme.set(true);
+    this.errorMessage.set('');
+
+    this.projectGithubRepoService.setReadmeVisibility(project.id, !currentCard.showReadme).subscribe({
+      next: (card) => {
+        this.repoCard.set(card);
+        this.isTogglingReadme.set(false);
+      },
+      error: () => {
+        this.errorMessage.set(this.translate.instant('GITHUB.REPO.ERROR_README_TOGGLE'));
+        this.isTogglingReadme.set(false);
       },
     });
   }

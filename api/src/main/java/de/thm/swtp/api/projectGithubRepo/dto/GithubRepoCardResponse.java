@@ -13,14 +13,15 @@ public record GithubRepoCardResponse(
         Integer stargazersCount,
         Integer forksCount,
         List<LanguageShareResponse> languages,
-        boolean dataUnavailable) {
+        boolean dataUnavailable,
+        boolean showReadme) {
 
     public static GithubRepoCardResponse toResponse(GithubRepoCard card) {
         var link = card.getLink();
         var data = card.getData();
         if (data == null) {
             return new GithubRepoCardResponse(
-                    link.getRepoOwner(), link.getRepoName(), null, null, null, null, List.of(), true);
+                    link.getRepoOwner(), link.getRepoName(), null, null, null, null, List.of(), true, link.isShowReadme());
         }
         return new GithubRepoCardResponse(
                 link.getRepoOwner(),
@@ -30,7 +31,8 @@ public record GithubRepoCardResponse(
                 data.getStargazersCount(),
                 data.getForksCount(),
                 data.getLanguages().stream().map(LanguageShareResponse::toResponse).toList(),
-                false);
+                false,
+                link.isShowReadme());
     }
 
     public record LanguageShareResponse(String name, double percentage) {

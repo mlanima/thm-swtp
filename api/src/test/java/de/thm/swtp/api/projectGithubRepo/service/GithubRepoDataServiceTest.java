@@ -34,7 +34,7 @@ class GithubRepoDataServiceTest {
         when(githubConnectionService.getActiveDecryptedToken(linkerId)).thenReturn(Optional.of("gho_token"));
         when(githubApiClient.getRepository("gho_token", "mlanima", "thm-swtp"))
                 .thenReturn(new GithubApiClient.GithubRepo(1L, "thm-swtp", "mlanima/thm-swtp",
-                        "desc", "https://github.com/mlanima/thm-swtp", false, 5, 1, null));
+                        "desc", "https://github.com/mlanima/thm-swtp", false, 5, 1, "main", null));
         when(githubApiClient.getRepositoryLanguages("gho_token", "mlanima", "thm-swtp"))
                 .thenReturn(Map.of("Java", 80L, "TypeScript", 20L));
 
@@ -52,7 +52,7 @@ class GithubRepoDataServiceTest {
         when(githubConnectionService.getActiveDecryptedToken(linkerId)).thenReturn(Optional.empty());
         when(githubApiClient.getRepository(null, "mlanima", "thm-swtp"))
                 .thenReturn(new GithubApiClient.GithubRepo(1L, "thm-swtp", "mlanima/thm-swtp",
-                        "desc", "https://github.com/mlanima/thm-swtp", false, 5, 1, null));
+                        "desc", "https://github.com/mlanima/thm-swtp", false, 5, 1, "main", null));
         when(githubApiClient.getRepositoryLanguages(null, "mlanima", "thm-swtp")).thenReturn(Map.of());
 
         var data = service.fetch("mlanima", "thm-swtp", linkerId);
@@ -68,7 +68,7 @@ class GithubRepoDataServiceTest {
                 .thenThrow(new GithubTokenInvalidException("rejected"));
         when(githubApiClient.getRepository(null, "mlanima", "thm-swtp"))
                 .thenReturn(new GithubApiClient.GithubRepo(1L, "thm-swtp", "mlanima/thm-swtp",
-                        "desc", "https://github.com/mlanima/thm-swtp", false, 5, 1, null));
+                        "desc", "https://github.com/mlanima/thm-swtp", false, 5, 1, "main", null));
         when(githubApiClient.getRepositoryLanguages(null, "mlanima", "thm-swtp")).thenReturn(Map.of());
 
         var data = service.fetch("mlanima", "thm-swtp", linkerId);
@@ -97,5 +97,49 @@ class GithubRepoDataServiceTest {
         var data = service.fetch("mlanima", "thm-swtp", linkerId);
 
         assertThat(data).isNull();
+    }
+
+    @Test
+    void shouldFetchReadmeWithLinkerTokenWhenActive() {
+        when(githubConnectionService.getActiveDecryptedToken(linkerId)).thenReturn(Optional.of("gho_token"));
+        when(githubApiClient.getReadme("gho_token", "mlanima", "thm-swtp")).thenReturn("# Hello");
+
+        var markdown = service.fetchReadme("mlanima", "thm-swtp", linkerId);
+
+        assertThat(markdown).isEqualTo("# Hello");
+    }
+
+    @Test
+    void shouldFallBackToUnauthenticatedReadmeWhenNoActiveConnection() {
+        when(githubConnectionService.getActiveDecryptedToken(linkerId)).thenReturn(Optional.empty());
+        when(githubApiClient.getReadme(null, "mlanima", "thm-swtp")).thenReturn("# Hello");
+
+        var markdown = service.fetchReadme("mlanima", "thm-swtp", linkerId);
+
+        assertThat(markdown).isEqualTo("# Hello");
+    }
+
+    @Test
+    void shouldMarkInvalidAndFallBackWhenTokenRejectedForReadme() {
+        when(githubConnectionService.getActiveDecryptedToken(linkerId)).thenReturn(Optional.of("gho_stale"));
+        when(githubApiClient.getReadme("gho_stale", "mlanima", "thm-swtp"))
+                .thenThrow(new GithubTokenInvalidException("rejected"));
+        when(githubApiClient.getReadme(null, "mlanima", "thm-swtp")).thenReturn("# Hello");
+
+        var markdown = service.fetchReadme("mlanima", "thm-swtp", linkerId);
+
+        verify(githubConnectionService).markInvalid(linkerId);
+        assertThat(markdown).isEqualTo("# Hello");
+    }
+
+    @Test
+    void shouldReturnNullWhenNoReadmeFile() {
+        when(githubConnectionService.getActiveDecryptedToken(linkerId)).thenReturn(Optional.of("gho_token"));
+        when(githubApiClient.getReadme("gho_token", "mlanima", "thm-swtp"))
+                .thenThrow(new GithubRepoNotFoundException("mlanima", "thm-swtp"));
+
+        var markdown = service.fetchReadme("mlanima", "thm-swtp", linkerId);
+
+        assertThat(markdown).isNull();
     }
 }
