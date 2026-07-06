@@ -86,7 +86,7 @@ public class ProjectFileServiceTest {
         when(projectFileRepository.findByProjectIdOrderByCreatedAtAsc(projectId))
                 .thenReturn(List.of(publicFile, privateFile));
 
-        List<ProjectFile> result = projectFileService.getProjectFiles(projectId, ownerId);
+        List<ProjectFile> result = projectFileService.getProjectFiles(projectId, ownerId, false);
 
         assertThat(result).hasSize(2);
         assertThat(result)
@@ -105,10 +105,30 @@ public class ProjectFileServiceTest {
         when(projectFileRepository.findByProjectIdOrderByCreatedAtAsc(projectId))
                 .thenReturn(List.of(privateFile));
 
-        List<ProjectFile> result = projectFileService.getProjectFiles(projectId, memberId);
+        List<ProjectFile> result = projectFileService.getProjectFiles(projectId, memberId, false);
 
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().getVisibility()).isEqualTo(FileVisibility.PRIVATE);
+
+        verify(projectFileRepository).findByProjectIdOrderByCreatedAtAsc(projectId);
+        verify(projectFileRepository, never()).findByProjectIdAndVisibilityOrderByCreatedAtAsc(any(), any());
+    }
+
+    @Test
+    void getProjectFiles_shouldReturnAllFiles_whenCurrentUserIsModerator() {
+        ProjectFileEntity publicFile = createProjectFileEntity(project, "public.pdf", FileVisibility.PUBLIC);
+        ProjectFileEntity privateFile = createProjectFileEntity(project, "private.pdf", FileVisibility.PRIVATE);
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(projectFileRepository.findByProjectIdOrderByCreatedAtAsc(projectId))
+                .thenReturn(List.of(publicFile, privateFile));
+
+        List<ProjectFile> result = projectFileService.getProjectFiles(projectId, otherUserId, true);
+
+        assertThat(result).hasSize(2);
+        assertThat(result)
+                .extracting(ProjectFile::getVisibility)
+                .containsExactly(FileVisibility.PUBLIC, FileVisibility.PRIVATE);
 
         verify(projectFileRepository).findByProjectIdOrderByCreatedAtAsc(projectId);
         verify(projectFileRepository, never()).findByProjectIdAndVisibilityOrderByCreatedAtAsc(any(), any());
@@ -124,7 +144,7 @@ public class ProjectFileServiceTest {
                 FileVisibility.PUBLIC
         )).thenReturn(List.of(publicFile));
 
-        List<ProjectFile> result = projectFileService.getProjectFiles(projectId, otherUserId);
+        List<ProjectFile> result = projectFileService.getProjectFiles(projectId, otherUserId, false);
 
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().getVisibility()).isEqualTo(FileVisibility.PUBLIC);
@@ -137,7 +157,7 @@ public class ProjectFileServiceTest {
     void getProjectFiles_shouldThrowProjectNotFound_whenProjectDoesNotExist() {
         when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> projectFileService.getProjectFiles(projectId, ownerId))
+        assertThatThrownBy(() -> projectFileService.getProjectFiles(projectId, ownerId, false))
                 .isInstanceOf(ProjectNotFoundException.class);
 
         verify(projectFileRepository, never()).findByProjectIdOrderByCreatedAtAsc(any());

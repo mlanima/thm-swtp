@@ -72,10 +72,12 @@ public class ProjectFileService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProjectFile> getProjectFiles(UUID projectId, UUID currentUserId) {
+    public List<ProjectFile> getProjectFiles(UUID projectId, UUID currentUserId, boolean isModerator) {
         ProjectEntity project = getProjectOrThrow(projectId);
 
-        boolean allowedToSeePrivateFiles = isProjectOwner(project, currentUserId) || isProjectMember(project, currentUserId);
+        boolean allowedToSeePrivateFiles = isModerator
+                || isProjectOwner(project, currentUserId)
+                || isProjectMember(project, currentUserId);
 
         if (allowedToSeePrivateFiles) {
             return projectFileRepository.findByProjectIdOrderByCreatedAtAsc(projectId)

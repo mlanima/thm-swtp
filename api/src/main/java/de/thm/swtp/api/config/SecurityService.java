@@ -156,10 +156,13 @@ public class SecurityService {
         return canViewProject(projectId, authentication);
     }
 
-    /** Allowed to download a project-file. Private files are restricted to the project owner/members.*/
+    /** Allowed to download a project-file. Private files are restricted to the project owner/members/moderators.*/
     public boolean canDownloadProjectFile(UUID projectId, UUID fileId, Authentication authentication) {
         if (!hasAuthenticationContext(projectId, authentication) || fileId == null || !canViewProject(projectId, authentication)) {
             return false;
+        }
+        if (hasModeratorRole(authentication)) {
+            return true;
         }
         if (projectFileRepository.existsByIdAndProjectIdAndVisibility(fileId, projectId, FileVisibility.PUBLIC)) {
             return true;
