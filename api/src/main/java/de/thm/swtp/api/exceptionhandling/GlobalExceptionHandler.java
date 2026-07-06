@@ -2,6 +2,11 @@ package de.thm.swtp.api.exceptionhandling;
 
 import de.thm.swtp.api.common.LogSafe;
 import de.thm.swtp.api.exceptionhandling.exceptions.*;
+import de.thm.swtp.api.github.exception.GithubApiException;
+import de.thm.swtp.api.github.exception.GithubIntegrationDisabledException;
+import de.thm.swtp.api.github.exception.GithubOAuthException;
+import de.thm.swtp.api.github.exception.GithubTokenInvalidException;
+import de.thm.swtp.api.github.exception.InvalidGithubStateException;
 import de.thm.swtp.api.professorRequest.exception.ProfessorRequestAlreadyExistsException;
 import de.thm.swtp.api.professorRequest.exception.ProfessorRequestInvalidStatusException;
 import de.thm.swtp.api.professorRequest.exception.ProfessorRequestNotFoundException;
@@ -467,5 +472,40 @@ public class GlobalExceptionHandler {
         log.debug("Bad Request (400): {}", LogSafe.clean(ex.getMessage()));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
+    }
+
+    @ExceptionHandler(GithubIntegrationDisabledException.class)
+    public ResponseEntity<ErrorResponse> handleGithubIntegrationDisabled(GithubIntegrationDisabledException ex) {
+        log.warn("Service Unavailable (503): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(ErrorResponse.of(503, "Service Unavailable", ex.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidGithubStateException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidGithubState(InvalidGithubStateException ex) {
+        log.debug("Bad Request (400): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
+    }
+
+    @ExceptionHandler(GithubOAuthException.class)
+    public ResponseEntity<ErrorResponse> handleGithubOAuthError(GithubOAuthException ex) {
+        log.debug("Bad Request (400): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
+    }
+
+    @ExceptionHandler(GithubTokenInvalidException.class)
+    public ResponseEntity<ErrorResponse> handleGithubTokenInvalid(GithubTokenInvalidException ex) {
+        log.debug("Conflict (409): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
+    }
+
+    @ExceptionHandler(GithubApiException.class)
+    public ResponseEntity<ErrorResponse> handleGithubApiError(GithubApiException ex) {
+        log.error("GitHub API error: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                .body(ErrorResponse.of(502, "Bad Gateway", "GitHub service temporarily unavailable."));
     }
 }
