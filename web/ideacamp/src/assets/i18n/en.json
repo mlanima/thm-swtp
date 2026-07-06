@@ -581,6 +581,7 @@
     "TITLE": "Settings",
     "TABS": {
       "PROFESSOR_REQUEST": "Become a professor",
+      "INTEGRATIONS": "Integrations",
       "CONTACT": "Contact",
       "IMPRESSUM": "Legal notice"
     },
@@ -590,6 +591,32 @@
       "SEND_EMAIL": "Send email",
       "COPIED": "Email copied",
       "COPY": "Copy email"
+    }
+  },
+  "GITHUB": {
+    "LOADING": "Loading GitHub connection",
+    "ERROR_LOAD": "The GitHub connection status could not be loaded.",
+    "ERROR_CONNECT": "Could not start the GitHub connection. Please try again.",
+    "ERROR_DISCONNECT": "The GitHub account could not be disconnected. Please try again.",
+    "CARD_TITLE": "GitHub",
+    "CARD_DESCRIPTION": "Connect your GitHub account to link repositories to your projects.",
+    "DISABLED": "GitHub integration is currently not available.",
+    "CONNECT": "Connect GitHub account",
+    "RECONNECT": "Reconnect",
+    "DISCONNECT": "Disconnect",
+    "STATUS_CONNECTED": "Connected",
+    "STATUS_RECONNECT_REQUIRED": "Reconnect required",
+    "DISCONNECT_CONFIRM_TITLE": "Disconnect GitHub account?",
+    "DISCONNECT_CONFIRM_DESCRIPTION": "Repositories already linked to your projects stay linked, but you'll need to reconnect to link new ones.",
+    "CANCEL": "Cancel",
+    "CALLBACK": {
+      "LOADING": "Connecting your GitHub account...",
+      "SUCCESS": "GitHub account connected successfully.",
+      "DENIED_TITLE": "Connection cancelled",
+      "DENIED_DESCRIPTION": "You cancelled the GitHub authorization. No changes were made.",
+      "ERROR_TITLE": "Connection failed",
+      "ERROR_DESCRIPTION": "Your GitHub account could not be connected. Please try again.",
+      "BACK_TO_SETTINGS": "Back to settings"
     }
   },
   "PROFESSOR_REQUEST": {

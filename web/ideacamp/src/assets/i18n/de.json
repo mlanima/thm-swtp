@@ -581,6 +581,7 @@
     "TITLE": "Einstellungen",
     "TABS": {
       "PROFESSOR_REQUEST": "Professor:in werden",
+      "INTEGRATIONS": "Integrationen",
       "CONTACT": "Kontakt",
       "IMPRESSUM": "Impressum"
     },
@@ -590,6 +591,32 @@
       "SEND_EMAIL": "E-Mail senden",
       "COPIED": "Email kopiert",
       "COPY": "Email kopieren"
+    }
+  },
+  "GITHUB": {
+    "LOADING": "GitHub-Verbindung wird geladen",
+    "ERROR_LOAD": "Der Status der GitHub-Verbindung konnte nicht geladen werden.",
+    "ERROR_CONNECT": "Die GitHub-Verbindung konnte nicht gestartet werden. Bitte versuche es erneut.",
+    "ERROR_DISCONNECT": "Das GitHub-Konto konnte nicht getrennt werden. Bitte versuche es erneut.",
+    "CARD_TITLE": "GitHub",
+    "CARD_DESCRIPTION": "Verbinde dein GitHub-Konto, um Repositories mit deinen Projekten zu verknüpfen.",
+    "DISABLED": "Die GitHub-Integration ist derzeit nicht verfügbar.",
+    "CONNECT": "GitHub-Konto verbinden",
+    "RECONNECT": "Erneut verbinden",
+    "DISCONNECT": "Trennen",
+    "STATUS_CONNECTED": "Verbunden",
+    "STATUS_RECONNECT_REQUIRED": "Erneute Verbindung erforderlich",
+    "DISCONNECT_CONFIRM_TITLE": "GitHub-Konto trennen?",
+    "DISCONNECT_CONFIRM_DESCRIPTION": "Bereits mit Projekten verknüpfte Repositories bleiben verknüpft, aber du musst dich erneut verbinden, um neue zu verknüpfen.",
+    "CANCEL": "Abbrechen",
+    "CALLBACK": {
+      "LOADING": "Dein GitHub-Konto wird verbunden...",
+      "SUCCESS": "GitHub-Konto erfolgreich verbunden.",
+      "DENIED_TITLE": "Verbindung abgebrochen",
+      "DENIED_DESCRIPTION": "Du hast die GitHub-Autorisierung abgebrochen. Es wurden keine Änderungen vorgenommen.",
+      "ERROR_TITLE": "Verbindung fehlgeschlagen",
+      "ERROR_DESCRIPTION": "Dein GitHub-Konto konnte nicht verbunden werden. Bitte versuche es erneut.",
+      "BACK_TO_SETTINGS": "Zurück zu den Einstellungen"
     }
   },
   "PROFESSOR_REQUEST": {
