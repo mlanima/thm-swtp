@@ -376,7 +376,23 @@
       "JOIN_REQUESTS": "Join requests",
       "MEMBERS": "Members",
       "PRIVACY": "Privacy",
-      "DANGER_ZONE": "Danger zone"
+      "DANGER_ZONE": "Danger zone",
+      "DISCORD": "Discord"
+    },
+    "DISCORD": {
+      "TITLE": "Discord Integration",
+      "CONNECTED": "Connected",
+      "CHANNEL_ID": "Channel ID",
+      "CHANNEL_ID_LABEL": "Discord Channel ID",
+      "TEST_AND_CONNECT": "Test & Connect",
+      "DISCONNECT": "Disconnect",
+      "NOTIFICATIONS": "Notification Settings",
+      "NOTIFY_POST_CREATED": "Post created",
+      "NOTIFY_POST_UPDATED": "Post updated",
+      "NOTIFY_POST_DELETED": "Post deleted",
+      "NOTIFY_MEMBER_JOIN": "Member joined",
+      "NOTIFY_MEMBER_LEAVE": "Member left",
+      "ERROR_CONNECT": "Could not connect to Discord channel."
     },
     "ERRORS": {
       "NO_PROJECT_URL": "No project URL provided.",
@@ -557,7 +573,8 @@
     "TABS": {
       "PROFESSOR_REQUEST": "Become a professor",
       "CONTACT": "Contact",
-      "IMPRESSUM": "Legal notice"
+      "IMPRESSUM": "Legal notice",
+      "DISCORD": "Discord"
     },
     "CONTACT": {
       "TITLE": "Contact",
@@ -565,6 +582,15 @@
       "SEND_EMAIL": "Send email",
       "COPIED": "Email copied",
       "COPY": "Copy email"
+    },
+    "DISCORD": {
+      "TITLE": "Discord Connection",
+      "CONNECT": "Connect Discord",
+      "DISCONNECT": "Disconnect",
+      "NOT_CONNECTED": "You are not connected to Discord.",
+      "ERROR_LOAD": "Could not load Discord connection status.",
+      "ERROR_CONNECT": "Could not connect Discord account.",
+      "ERROR_DISCONNECT": "Could not disconnect Discord account."
     }
   },
   "PROFESSOR_REQUEST": {

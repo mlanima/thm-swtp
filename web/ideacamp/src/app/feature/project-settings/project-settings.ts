@@ -9,13 +9,14 @@ import { JoinRequestsTab } from './tabs/join-requests-tab/join-requests-tab';
 import { MembersTab } from './tabs/members-tab/members-tab';
 import { PrivacyTab } from './tabs/privacy-tab/privacy-tab';
 import { DangerZoneTab } from './tabs/danger-zone-tab/danger-zone-tab';
+import { DiscordTab } from './tabs/discord-tab/discord-tab';
 
-type Tab = 'join-requests' | 'members' | 'privacy' | 'danger-zone';
+type Tab = 'join-requests' | 'members' | 'privacy' | 'danger-zone' | 'discord';
 
 @Component({
   selector: 'app-project-settings',
   standalone: true,
-  imports: [NgClass, RouterLink, JoinRequestsTab, MembersTab, PrivacyTab, DangerZoneTab, TranslatePipe],
+  imports: [NgClass, RouterLink, JoinRequestsTab, MembersTab, PrivacyTab, DangerZoneTab, DiscordTab, TranslatePipe],
   templateUrl: './project-settings.html',
 })
 export class ProjectSettings implements OnInit {
@@ -32,6 +33,7 @@ export class ProjectSettings implements OnInit {
     { id: 'members', label: 'PROJECTSETTINGS.TABS.MEMBERS', icon: 'pi-user' },
     { id: 'privacy', label: 'PROJECTSETTINGS.TABS.PRIVACY', icon: 'pi-lock' },
     { id: 'danger-zone', label: 'PROJECTSETTINGS.TABS.DANGER_ZONE', icon: 'pi-trash' },
+    { id: 'discord', label: 'PROJECTSETTINGS.TABS.DISCORD', icon: 'pi-comments' },
   ];
 
   ngOnInit(): void {
