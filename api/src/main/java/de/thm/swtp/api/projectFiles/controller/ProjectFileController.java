@@ -1,5 +1,5 @@
 package de.thm.swtp.api.projectFiles.controller;
-import de.thm.swtp.api.config.SecurityService;
+
 import de.thm.swtp.api.projectFiles.domain.FileVisibility;
 import de.thm.swtp.api.projectFiles.domain.ProjectFileDownload;
 import de.thm.swtp.api.projectFiles.dto.ProjectFileResponse;
@@ -13,9 +13,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+
 import java.nio.charset.StandardCharsets;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
@@ -30,16 +30,13 @@ import java.util.UUID;
 public class ProjectFileController {
 
     private final ProjectFileService projectFileService;
-    private final SecurityService securityService;
 
     @GetMapping
     @PreAuthorize("@security.canViewProjectFiles(#projectId, authentication)")
-    public List<ProjectFileResponse> getProjectFiles(@PathVariable UUID projectId, @AuthenticationPrincipal Jwt jwt,
-                                                      Authentication authentication) {
+    public List<ProjectFileResponse> getProjectFiles(@PathVariable UUID projectId, @AuthenticationPrincipal Jwt jwt) {
         UUID currentUserId = getCurrentUserId(jwt);
-        boolean isModerator = securityService.hasModeratorRole(authentication);
 
-        return projectFileService.getProjectFiles(projectId, currentUserId, isModerator)
+        return projectFileService.getProjectFiles(projectId, currentUserId)
                 .stream()
                 .map(ProjectFileResponse::toResponse)
                 .toList();

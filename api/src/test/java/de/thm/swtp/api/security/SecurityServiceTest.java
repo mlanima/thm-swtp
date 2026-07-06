@@ -236,10 +236,12 @@ class SecurityServiceTest {
     }
 
     @Test
-    void canDownloadProjectFile_allowsModerator_forPrivateFileWithoutMembership() {
+    void canDownloadProjectFile_deniesModerator_forPrivateFileWithoutMembership() {
+        when(projectFileRepository.existsByIdAndProjectIdAndVisibility(resourceId, projectId, FileVisibility.PUBLIC))
+                .thenReturn(false);
+
         assertThat(securityService.canDownloadProjectFile(projectId, resourceId, authentication("ROLE_MODERATOR")))
-                .isTrue();
-        verifyNoInteractions(projectFileRepository);
+                .isFalse();
     }
 
     @Test
