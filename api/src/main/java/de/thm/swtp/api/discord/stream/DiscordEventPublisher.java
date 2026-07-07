@@ -7,7 +7,6 @@ import de.thm.swtp.api.discord.repository.DiscordChannelSettingsRepository;
 import de.thm.swtp.api.discord.repository.DiscordMessageSyncRepository;
 import de.thm.swtp.api.discord.repository.LinkedChannelRepository;
 import de.thm.swtp.api.projectPost.entity.ProjectPostEntity;
-import de.thm.swtp.api.userprofile.entity.UserProfile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -30,11 +29,15 @@ public class DiscordEventPublisher {
 
     public void publishPostCreated(ProjectPostEntity post) {
         var channelRef = findActiveChannel(post.getProject().getId());
-        if (channelRef.isEmpty()) return;
+        if (channelRef.isEmpty()) {
+            return;
+        }
 
         var link = channelRef.get();
         String content = post.getContent();
-        if (content.length() > 3900) content = content.substring(0, 3897) + "...";
+        if (content.length() > 3900) {
+            content = content.substring(0, 3897) + "...";
+        }
 
         send("POST_CREATED", Map.of(
                 "postId", post.getId().toString(),
@@ -48,10 +51,14 @@ public class DiscordEventPublisher {
 
     public void publishPostUpdated(ProjectPostEntity post, String discordMsgId) {
         var channelRef = findActiveChannel(post.getProject().getId());
-        if (channelRef.isEmpty()) return;
+        if (channelRef.isEmpty()) {
+            return;
+        }
 
         String content = post.getContent();
-        if (content.length() > 3900) content = content.substring(0, 3897) + "...";
+        if (content.length() > 3900) {
+            content = content.substring(0, 3897) + "...";
+        }
 
         send("POST_UPDATED", Map.of(
                 "postId", post.getId().toString(),
@@ -82,12 +89,16 @@ public class DiscordEventPublisher {
 
     public void publishProjectEvent(UUID projectId, String eventType, String message) {
         var channelRef = findActiveChannel(projectId);
-        if (channelRef.isEmpty()) return;
+        if (channelRef.isEmpty()) {
+            return;
+        }
 
         var link = channelRef.get();
         var settings = settingsRepository.findByLinkedChannelId(link.getId());
 
-        if (settings.isEmpty() || !shouldNotify(eventType, settings.get())) return;
+        if (settings.isEmpty() || !shouldNotify(eventType, settings.get())) {
+            return;
+        }
 
         send("PROJECT_EVENT", Map.of(
                 "eventType", eventType,

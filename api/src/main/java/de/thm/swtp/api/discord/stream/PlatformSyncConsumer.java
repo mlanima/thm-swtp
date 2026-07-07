@@ -27,7 +27,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -84,7 +83,9 @@ public class PlatformSyncConsumer {
                     StreamOffset.create(discordProperties.getStreams().getInbound(), ReadOffset.lastConsumed())
             );
 
-            if (records == null) return;
+            if (records == null) {
+                return;
+            }
 
             for (var record : records) {
                 try {
@@ -124,7 +125,9 @@ public class PlatformSyncConsumer {
         String type = fields.get("type");
         String payloadJson = fields.get("payload");
 
-        if (type == null || payloadJson == null) return;
+        if (type == null || payloadJson == null) {
+            return;
+        }
 
         try {
             Map<String, String> payload = objectMapper.readValue(payloadJson, new TypeReference<>() {});
