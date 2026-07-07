@@ -117,7 +117,7 @@ discord:
     inbound: stream:platform:sync
     consumer-group: spring-platform
     batch-size: 10
-    block-ms: 5000
+    block-ms: 1500
     pending-timeout-ms: 30000
   bot:
     base-url: ${DISCORD_BOT_BASEURL:http://discord.ser.mlanima.org:3001}

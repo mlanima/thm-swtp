@@ -71,6 +71,22 @@ public class PlatformSyncConsumer {
                 log.warn("Failed to create consumer group: {}", e.getMessage());
             }
         }
+
+        var bot = discordProperties.getBot();
+        var oauth = discordProperties.getOauth();
+        if (bot.getApiSecret() == null || bot.getApiSecret().isBlank()) {
+            log.warn("DISCORD_BOT_API_SECRET is not set — bot will reject API requests");
+        }
+        if (oauth.getClientId() == null || oauth.getClientId().isBlank()) {
+            log.warn("DISCORD_CLIENT_ID is not set — Discord OAuth login will fail");
+        }
+        if (oauth.getClientSecret() == null || oauth.getClientSecret().isBlank()) {
+            log.warn("DISCORD_CLIENT_SECRET is not set — Discord OAuth login will fail");
+        }
+        log.info("Discord config: bot={}, inbound={}, outbound={}",
+                bot.getBaseUrl(),
+                discordProperties.getStreams().getInbound(),
+                discordProperties.getStreams().getOutbound());
     }
 
     @Scheduled(fixedDelay = 100)

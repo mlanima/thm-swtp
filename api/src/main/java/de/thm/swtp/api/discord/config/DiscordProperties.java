@@ -22,7 +22,7 @@ public class DiscordProperties {
         private String inbound = "stream:platform:sync";
         private String consumerGroup = "spring-platform";
         private int batchSize = 10;
-        private int blockMs = 5000;
+        private int blockMs = 1500;
         private int pendingTimeoutMs = 30000;
     }
 
