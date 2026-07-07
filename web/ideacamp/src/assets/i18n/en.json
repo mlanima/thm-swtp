@@ -115,7 +115,8 @@
     "FOLLOW": "Follow",
     "FOLLOWING": "Following",
     "UNFOLLOW": "Unfollow",
-    "INVITE": "Invite"
+    "INVITE": "Invite",
+    "PROFESSOR_BADGE": "Professor"
   },
   "REPORT_DIALOG": {
     "REPORT": "Report",
@@ -485,7 +486,25 @@
     "SHOW_ALL_USERS": "Show all {{ count }} users",
     "PREVIOUS": "Previous",
     "NEXT": "Next",
-    "ERROR_FAILED": "The search failed. Please try again."
+    "ERROR_FAILED": "The search failed. Please try again.",
+    "FILTERS": {
+      "TITLE": "Filters",
+      "CLEAR_ALL": "Clear all",
+      "HAS_OPEN_POSITIONS": "Has open positions",
+      "ALLOW_JOIN_REQUESTS": "Accepts join requests",
+      "IS_PROFESSOR": "Verified professors only",
+      "LOCATION": "Location",
+      "LOCATION_PLACEHOLDER": "Filter by location...",
+      "DATE_RANGE": {
+        "LABEL": "Created",
+        "ANY_TIME": "Any time",
+        "LAST_7_DAYS": "Last 7 days",
+        "LAST_30_DAYS": "Last 30 days",
+        "LAST_YEAR": "Last year"
+      },
+      "PROFESSOR_BADGE": "Professor",
+      "OPEN_POSITIONS_BADGE": "{{ count }} open position(s)"
+    }
   },
   "IMPRESSUM": {
     "BADGE": "Legal information",
@@ -679,7 +698,10 @@
       "LOAD": "Posts could not be loaded.",
       "EMPTY_FIELDS": "Title and content must not be empty.",
       "CREATE": "Post could not be created.",
-      "DELETE": "Post could not be deleted."
+      "DELETE": "Post could not be deleted.",
+      "IMAGE_TYPE": "Please select an image in JPG, PNG or WEBP format.",
+      "IMAGE_SIZE": "The image must not be larger than 5 MB.",
+      "IMAGE_UPLOAD": "The post was created, but the image could not be uploaded."
     },
     "PLAIN_TEXT": "Plain text",
     "MARKDOWN_HINT": "You can use Markdown, e.g. headings, lists, links and emphasis.",
@@ -693,7 +715,11 @@
     },
     "DELETE_POST": "Delete post",
     "DELETING": "Deleting…",
-    "DELETE_SUCCESS": "Post deleted successfully."
+    "DELETE_SUCCESS": "Post deleted successfully.",
+    "SELECT_IMAGE": "Select image",
+    "IMAGE_LABEL": "Add image",
+    "IMAGE_HINT": "Allowed formats are JPG, PNG and WEBP up to 5 MB.",
+    "REMOVE_IMAGE": "Remove image"
   },
   "USER_SETTINGS": {
     "TITLE": "Settings",
