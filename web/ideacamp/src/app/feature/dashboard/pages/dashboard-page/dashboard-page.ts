@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../../auth/auth.service';
 import { MyProjectsService } from '../../../my-projects/services/my-projects.service';
 import { ProjectResponse } from '../../../../models/project.model';
@@ -10,7 +10,7 @@ import { CurrentProjects } from '../../components/current-projects/current-proje
 @Component({
   selector: 'app-dashboard-page',
   standalone: true,
-  imports: [InvitationsSection, RecentPosts, CurrentProjects],
+  imports: [InvitationsSection, RecentPosts, CurrentProjects, TranslatePipe],
   templateUrl: './dashboard-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

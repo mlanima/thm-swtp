@@ -203,6 +203,10 @@ public class ProjectService {
 
     private void recordView(ProjectEntity project, UUID viewerId) {
         UserProfile viewer = userProfileRepository.findById(viewerId).orElse(null);
+        if (viewer == null) {
+            log.warn("No UserProfile found for viewer={}, recording anonymous view for project={}",
+                    viewerId, project.getId());
+        }
         projectViewRepository.save(
                 ProjectViewEntity.builder()
                         .project(project)
@@ -279,7 +283,7 @@ public class ProjectService {
     @Transactional
     public List<ProjectResponse> getRecentProjectsByUsername(String username, UUID viewerId) {
         List<ProjectEntity> projects =
-                projectRepository.findAllByOwnerUsernameAndDeletedAtIsNullOrderByCreatedAtDesc(username);
+                projectRepository.findAllByOwnerOrMemberUsernameAndDeletedAtIsNull(username);
 
         if (projects.isEmpty()) {
             return List.of();

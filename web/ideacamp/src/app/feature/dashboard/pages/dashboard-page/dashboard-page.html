@@ -12,11 +12,23 @@
       </div>
 
       <div>
-        <app-recent-posts [projects]="projects()" />
+        @if (isLoading()) {
+          <div class="rounded-2xl bg-white p-6 text-sm text-slate-400 shadow-sm">
+            {{ 'DASHBOARD.POSTS.LOADING' | translate }}
+          </div>
+        } @else {
+          <app-recent-posts [projects]="projects()" />
+        }
       </div>
 
       <div>
-        <app-current-projects [projects]="projects()" />
+        @if (isLoading()) {
+          <div class="rounded-2xl bg-white p-6 text-sm text-slate-400 shadow-sm">
+            {{ 'DASHBOARD.POSTS.LOADING' | translate }}
+          </div>
+        } @else {
+          <app-current-projects [projects]="projects()" />
+        }
       </div>
     </div>
   </div>
