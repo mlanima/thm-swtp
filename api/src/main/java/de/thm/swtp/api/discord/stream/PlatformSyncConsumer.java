@@ -251,6 +251,7 @@ public class PlatformSyncConsumer {
         String postId = payload.get("postId");
         String discordMsgId = payload.get("discordMsgId");
         String channelId = payload.get("channelId");
+        String guildId = payload.get("guildId");
 
         if (messageSyncRepository.existsByDiscordMessageId(discordMsgId)) {
             return;
@@ -260,6 +261,7 @@ public class PlatformSyncConsumer {
                 .platformPostId(UUID.fromString(postId))
                 .discordMessageId(discordMsgId)
                 .discordChannelId(channelId)
+                .discordGuildId(guildId)
                 .direction(DiscordMessageSyncEntity.SyncDirection.PLATFORM_TO_DISCORD)
                 .build();
         messageSyncRepository.save(sync);

@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -39,14 +40,20 @@ public class DiscordEventPublisher {
             content = content.substring(0, 3897) + "...";
         }
 
-        send("POST_CREATED", Map.of(
-                "postId", post.getId().toString(),
-                "projectId", post.getProject().getId().toString(),
-                "channelId", link.getDiscordChannelId(),
-                "content", content,
-                "authorName", post.getAuthor().getUsername(),
-                "platformUrl", buildPostUrl(post)
-        ));
+        var payload = new HashMap<String, String>();
+        payload.put("postId", post.getId().toString());
+        payload.put("projectId", post.getProject().getId().toString());
+        payload.put("channelId", link.getDiscordChannelId());
+        payload.put("content", content);
+        payload.put("authorName", post.getAuthor().getUsername());
+        payload.put("platformUrl", buildPostUrl(post));
+
+        var authorAvatar = post.getAuthor().getDiscordAvatar();
+        if (authorAvatar != null && !authorAvatar.isBlank()) {
+            payload.put("authorAvatar", authorAvatar);
+        }
+
+        send("POST_CREATED", payload);
     }
 
     public void publishPostUpdated(ProjectPostEntity post, String discordMsgId) {
@@ -109,7 +116,7 @@ public class DiscordEventPublisher {
         ));
     }
 
-    private void send(String type, Map<String, String> payload) {
+    private void send(String type, Map<String, ?> payload) {
         try {
             redis.opsForStream().add(
                     discordProperties.getStreams().getOutbound(),
@@ -134,9 +141,9 @@ public class DiscordEventPublisher {
         };
     }
 
-    private String serialize(Map<String, String> map) {
+    private String serialize(Map<String, ?> map) {
         return map.entrySet().stream()
-                .map(e -> "\"" + e.getKey() + "\":\"" + escape(e.getValue()) + "\"")
+                .map(e -> "\"" + e.getKey() + "\":\"" + escape(e.getValue() != null ? e.getValue().toString() : "") + "\"")
                 .reduce((a, b) -> a + "," + b)
                 .map(s -> "{" + s + "}")
                 .orElse("{}");

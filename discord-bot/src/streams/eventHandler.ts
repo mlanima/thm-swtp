@@ -42,10 +42,13 @@ export async function handleSendPost(job: Job<PostCreatedPayload>): Promise<void
   const message = await channel.send({ embeds: [embed] });
   messagesSent.inc({ status: 'success' });
 
+  const guildId = 'guildId' in channel ? (channel as { guildId?: string }).guildId : undefined;
+
   await streamProducer.discordMessageAssigned({
     postId,
     discordMsgId: message.id,
     channelId,
+    guildId,
   });
 
   logger.info({ postId, discordMsgId: message.id }, 'post sent to discord');

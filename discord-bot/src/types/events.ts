@@ -69,6 +69,7 @@ export interface DiscordMessageAssignedPayload {
   postId: string;
   discordMsgId: string;
   channelId: string;
+  guildId?: string;
 }
 
 export interface DiscordMessageCreatedPayload {
@@ -96,6 +97,7 @@ export interface InviteResponsePayload {
 
 export interface ChannelDisconnectedPayload {
   channelId: string;
+  guildId?: string;
   reason: string;
 }
 

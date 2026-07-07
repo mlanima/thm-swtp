@@ -27,6 +27,7 @@ public class DiscordChannelService {
     private final DiscordChannelSettingsRepository settingsRepository;
     private final ProjectRepository projectRepository;
     private final BotInternalClient botInternalClient;
+    private final DiscordAuthService discordAuthService;
     private final DiscordProperties discordProperties;
 
     @Value("${DISCORD_CLIENT_ID:}")
@@ -51,7 +52,7 @@ public class DiscordChannelService {
                 .ifPresent(link -> {
                     if (!link.getProject().getId().equals(projectId)) {
                         throw new DiscordConnectionFailedException(
-                                "This Discord server is already linked to another project");
+                                "This Discord channel is already linked to another project");
                     }
                 });
 
@@ -64,7 +65,7 @@ public class DiscordChannelService {
                             projectId, link.getDiscordChannelId());
                 });
 
-        BotInternalClient.TestConnectionResponse test = botInternalClient.testConnection(discordChannelId);
+        BotInternalClient.TestConnectionResponse test = botInternalClient.testConnection(discordChannelId, discordGuildId);
         if (!test.success()) {
             throw new DiscordConnectionFailedException(
                     "Bot cannot access channel: " + (test.reason() != null ? test.reason() : "unknown reason"));
@@ -127,11 +128,13 @@ public class DiscordChannelService {
                 .orElseThrow(() -> new DiscordConnectionFailedException("No Discord channel linked to this project"));
     }
 
-    public String getBotInviteUrl() {
+    public String getBotInviteUrl(UUID projectId) {
         return "https://discord.com/api/oauth2/authorize"
                 + "?client_id=" + clientId
                 + "&permissions=" + discordProperties.getBot().getInvitePermissions()
-                + "&scope=bot";
+                + "&scope=bot"
+                + "&redirect_uri=" + discordAuthService.getRedirectUri()
+                + "&state=" + projectId.toString();
     }
 
     @Transactional
@@ -147,6 +150,11 @@ public class DiscordChannelService {
 
     @Transactional
     public LinkedChannelEntity autoConnectChannel(UUID projectId) {
+        return autoConnectChannel(projectId, null);
+    }
+
+    @Transactional
+    public LinkedChannelEntity autoConnectChannel(UUID projectId, String guildId) {
         ProjectEntity project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException(projectId));
 
@@ -155,13 +163,17 @@ public class DiscordChannelService {
                     "You must link your Discord account in profile settings before connecting a Discord server");
         }
 
-        BotInternalClient.AutoSetupResponse autoResp = botInternalClient.autoSetup(project.getOwner().getDiscordId());
+        var effectiveGuildId = guildId != null ? guildId : discordAuthService.consumeBotGuild(projectId);
+
+        BotInternalClient.AutoSetupResponse autoResp = botInternalClient.autoSetup(
+                project.getOwner().getDiscordId(), effectiveGuildId);
         if (!autoResp.success() || autoResp.channelId() == null) {
             throw new DiscordConnectionFailedException(
                     "Bot could not auto-setup: " + (autoResp.reason() != null ? autoResp.reason() : "unknown error"));
         }
 
-        BotInternalClient.TestConnectionResponse test = botInternalClient.testConnection(autoResp.channelId());
+        BotInternalClient.TestConnectionResponse test = botInternalClient.testConnection(
+                autoResp.channelId(), autoResp.guildId());
         if (!test.success()) {
             throw new DiscordConnectionFailedException(
                     "Bot cannot access auto-created channel: " + (test.reason() != null ? test.reason() : "unknown reason"));

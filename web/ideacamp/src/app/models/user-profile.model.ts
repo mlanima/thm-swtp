@@ -37,4 +37,7 @@ export interface UserProfileModel {
 
   /** Discord username if linked */
   discordUsername?: string | null;
+
+  /** Discord avatar URL if linked */
+  discordAvatar?: string | null;
 }

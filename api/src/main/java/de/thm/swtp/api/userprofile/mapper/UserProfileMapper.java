@@ -20,6 +20,7 @@ public class UserProfileMapper {
                 .isProfessor(profile.isProfessor())
                 .discordId(profile.getDiscordId())
                 .discordUsername(profile.getDiscordUsername())
+                .discordAvatar(profile.getDiscordAvatar())
                 .build();
     }
 }

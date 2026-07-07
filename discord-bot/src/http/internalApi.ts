@@ -116,13 +116,30 @@ internalApi.post('/internal/channels/:channelId/invite', validateSecret, async (
 });
 
 internalApi.post('/internal/auto-setup', validateSecret, async (req, res) => {
-  const { ownerDiscordId } = req.body as { ownerDiscordId?: string };
+  const { ownerDiscordId, guildId } = req.body as { ownerDiscordId?: string; guildId?: string };
+
   try {
-    const guild = discordClient.guilds.cache.first();
+    let guild = null;
+    if (guildId) {
+      guild = discordClient.guilds.cache.get(guildId) ?? await discordClient.guilds.fetch(guildId).catch(() => null);
+    } else {
+      const allGuilds = discordClient.guilds.cache;
+      if (allGuilds.size === 0) {
+        res.json({ success: false, reason: 'bot is not in any guild' });
+        return;
+      }
+      if (allGuilds.size > 1) {
+        res.json({ success: false, reason: 'bot is in multiple guilds — specify guildId' });
+        return;
+      }
+      guild = allGuilds.first();
+    }
+
     if (!guild) {
-      res.json({ success: false, reason: 'bot is not in any guild' });
+      res.json({ success: false, reason: 'guild not found' });
       return;
     }
+
     const channelName = 'posts';
     const existing = guild.channels.cache.find(
       c => c.name === channelName && c.isTextBased()
@@ -164,7 +181,7 @@ internalApi.post('/internal/auto-setup', validateSecret, async (req, res) => {
 });
 
 internalApi.post('/internal/test-connection', validateSecret, async (req, res) => {
-  const { channelId } = req.body as { channelId?: string };
+  const { channelId, guildId } = req.body as { channelId?: string; guildId?: string };
   if (!channelId) {
     res.status(400).json({ success: false, reason: 'channelId is required' });
     return;
@@ -173,6 +190,10 @@ internalApi.post('/internal/test-connection', validateSecret, async (req, res) =
     const channel = await discordClient.channels.fetch(channelId);
     if (!channel?.isTextBased()) {
       res.json({ success: false, reason: 'channel not found or not a text channel' });
+      return;
+    }
+    if (guildId && 'guildId' in channel && (channel as { guildId: string }).guildId !== guildId) {
+      res.json({ success: false, reason: 'channel does not belong to the specified guild' });
       return;
     }
     res.json({ success: true });

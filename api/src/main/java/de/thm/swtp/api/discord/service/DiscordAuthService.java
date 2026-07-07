@@ -21,6 +21,7 @@ public class DiscordAuthService {
     private final DiscordOAuthClient discordOAuthClient;
     private final UserProfileRepository userProfileRepository;
     private final ConcurrentHashMap<String, UUID> pendingStates = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<UUID, String> pendingBotGuilds = new ConcurrentHashMap<>();
 
     private final String clientId;
     private final String redirectUri;
@@ -61,6 +62,27 @@ public class DiscordAuthService {
         return frontendUrl;
     }
 
+    public String getRedirectUri() {
+        return redirectUri;
+    }
+
+    public void storeBotGuild(UUID projectId, String guildId) {
+        pendingBotGuilds.put(projectId, guildId);
+        log.info("Bot guild stored for project {}: guildId={}", projectId, guildId);
+    }
+
+    public String consumeBotGuild(UUID projectId) {
+        return pendingBotGuilds.remove(projectId);
+    }
+
+    private String buildAvatarUrl(String discordId, Object avatarField) {
+        if (avatarField instanceof String hash && !hash.isBlank()) {
+            String extension = hash.startsWith("a_") ? "gif" : "png";
+            return "https://cdn.discordapp.com/avatars/" + discordId + "/" + hash + "." + extension;
+        }
+        return null;
+    }
+
     @Transactional
     public UserProfile handleCallback(String code, String state) {
         UUID userId = pendingStates.remove(state);
@@ -74,6 +96,8 @@ public class DiscordAuthService {
         Map<String, Object> discordUser = discordOAuthClient.getUser(accessToken);
         String discordId = discordUser.get("id").toString();
         String discordUsername = (String) discordUser.get("username");
+        Object avatarField = discordUser.get("avatar");
+        String discordAvatar = buildAvatarUrl(discordId, avatarField);
 
         UserProfile profile = userProfileRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -92,6 +116,7 @@ public class DiscordAuthService {
 
         profile.setDiscordId(discordId);
         profile.setDiscordUsername(discordUsername);
+        profile.setDiscordAvatar(discordAvatar);
         profile.setDiscordConnectedAt(LocalDateTime.now());
         UserProfile saved = userProfileRepository.save(profile);
         log.info("Discord account linked: user={}, discordId={}", userId, discordId);
@@ -105,6 +130,7 @@ public class DiscordAuthService {
 
         profile.setDiscordId(null);
         profile.setDiscordUsername(null);
+        profile.setDiscordAvatar(null);
         profile.setDiscordConnectedAt(null);
         userProfileRepository.save(profile);
         log.info("Discord account disconnected: user={}", userId);

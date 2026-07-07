@@ -27,11 +27,18 @@ public class BotInternalClient {
     }
 
     public TestConnectionResponse testConnection(String channelId) {
+        return testConnection(channelId, null);
+    }
+
+    public TestConnectionResponse testConnection(String channelId, String guildId) {
         try {
+            var body = guildId != null
+                    ? Map.of("channelId", channelId, "guildId", guildId)
+                    : Map.of("channelId", channelId);
             return restClient.post()
                     .uri(discordProperties.getBot().getBaseUrl() + "/internal/test-connection")
                     .headers(h -> h.addAll(authHeaders()))
-                    .body(Map.of("channelId", channelId))
+                    .body(body)
                     .retrieve()
                     .body(TestConnectionResponse.class);
         } catch (Exception e) {
@@ -94,11 +101,18 @@ public class BotInternalClient {
     }
 
     public AutoSetupResponse autoSetup(String ownerDiscordId) {
+        return autoSetup(ownerDiscordId, null);
+    }
+
+    public AutoSetupResponse autoSetup(String ownerDiscordId, String guildId) {
         try {
+            var body = guildId != null
+                    ? Map.of("ownerDiscordId", ownerDiscordId, "guildId", guildId)
+                    : Map.of("ownerDiscordId", ownerDiscordId);
             return restClient.post()
                     .uri(discordProperties.getBot().getBaseUrl() + "/internal/auto-setup")
                     .headers(h -> h.addAll(authHeaders()))
-                    .body(Map.of("ownerDiscordId", ownerDiscordId))
+                    .body(body)
                     .retrieve()
                     .body(AutoSetupResponse.class);
         } catch (Exception e) {

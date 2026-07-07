@@ -15,5 +15,6 @@ public record UserProfileResponse(
         String experience,
         boolean isProfessor,
         String discordId,
-        String discordUsername
+        String discordUsername,
+        String discordAvatar
 ) {}

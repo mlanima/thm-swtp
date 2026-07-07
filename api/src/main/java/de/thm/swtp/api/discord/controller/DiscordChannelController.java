@@ -22,13 +22,15 @@ public class DiscordChannelController {
             @PathVariable UUID projectId,
             @RequestBody Map<String, String> body) {
         String channelId = body.get("channelId");
+        String guildId = body.get("guildId");
         if (channelId == null || channelId.isBlank()) {
             return ResponseEntity.badRequest().body(Map.of("error", "channelId is required"));
         }
-        LinkedChannelEntity link = discordChannelService.connectChannel(projectId, channelId);
+        LinkedChannelEntity link = discordChannelService.connectChannel(projectId, channelId, guildId);
         Map<String, Object> result = new HashMap<>();
         result.put("id", link.getId());
         result.put("discordChannelId", link.getDiscordChannelId());
+        result.put("discordGuildId", link.getDiscordGuildId());
         result.put("isActive", link.isActive());
         result.put("discordInviteUrl", link.getDiscordInviteUrl());
         return ResponseEntity.ok(result);
@@ -36,15 +38,16 @@ public class DiscordChannelController {
 
     @GetMapping("/bot-invite")
     public ResponseEntity<Map<String, String>> getBotInviteUrl(@PathVariable UUID projectId) {
-        return ResponseEntity.ok(Map.of("url", discordChannelService.getBotInviteUrl()));
+        return ResponseEntity.ok(Map.of("url", discordChannelService.getBotInviteUrl(projectId)));
     }
 
     @PostMapping("/auto-connect")
     public ResponseEntity<Map<String, Object>> autoConnect(@PathVariable UUID projectId) {
-        LinkedChannelEntity link = discordChannelService.autoConnectChannel(projectId);
+        LinkedChannelEntity link = discordChannelService.autoConnectChannel(projectId, null);
         Map<String, Object> result = new HashMap<>();
         result.put("id", link.getId());
         result.put("discordChannelId", link.getDiscordChannelId());
+        result.put("discordGuildId", link.getDiscordGuildId());
         result.put("isActive", link.isActive());
         result.put("discordInviteUrl", link.getDiscordInviteUrl());
         return ResponseEntity.ok(result);
@@ -76,6 +79,7 @@ public class DiscordChannelController {
         Map<String, Object> result = new HashMap<>();
         result.put("id", link.getId());
         result.put("discordChannelId", link.getDiscordChannelId());
+        result.put("discordGuildId", link.getDiscordGuildId());
         result.put("isActive", link.isActive());
         result.put("discordInviteUrl", link.getDiscordInviteUrl());
         return ResponseEntity.ok(result);

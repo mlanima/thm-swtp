@@ -5,6 +5,7 @@ import de.thm.swtp.api.userprofile.entity.UserProfile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -33,9 +34,35 @@ public class DiscordAuthController {
     }
 
     @GetMapping("/callback")
-    public ResponseEntity<Void> callback(
-            @RequestParam String code,
-            @RequestParam String state) {
+    public ResponseEntity<?> callback(
+            @RequestParam(required = false) String code,
+            @RequestParam(required = false) String guildId,
+            @RequestParam(required = false) String state,
+            @RequestParam(required = false) String error) {
+
+        if (guildId != null && state != null) {
+            return handleBotCallback(UUID.fromString(state), guildId);
+        }
+
+        if (error != null) {
+            log.warn("Discord OAuth error: {}", error);
+            return ResponseEntity.status(HttpStatus.FOUND)
+                    .location(URI.create(discordAuthService.getFrontendUrl() + "/settings?discord=error"))
+                    .build();
+        }
+
+        return handleUserCallback(code, state);
+    }
+
+    private ResponseEntity<?> handleBotCallback(UUID projectId, String guildId) {
+        discordAuthService.storeBotGuild(projectId, guildId);
+        String html = "<!DOCTYPE html><html><body><script>window.close()</script></body></html>";
+        return ResponseEntity.ok()
+                .contentType(MediaType.TEXT_HTML)
+                .body(html);
+    }
+
+    private ResponseEntity<Void> handleUserCallback(String code, String state) {
         try {
             UserProfile profile = discordAuthService.handleCallback(code, state);
             log.info("Discord account linked successfully: discordId={}", profile.getDiscordId());

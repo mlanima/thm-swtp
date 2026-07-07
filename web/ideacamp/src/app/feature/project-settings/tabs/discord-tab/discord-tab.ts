@@ -9,6 +9,7 @@ import { UserProfileService } from '../../../../services/user-profile.service';
 interface ChannelResponse {
   id: string;
   discordChannelId: string;
+  discordGuildId?: string | null;
   isActive: boolean;
   discordInviteUrl?: string | null;
 }
@@ -67,7 +68,6 @@ export class DiscordTab implements OnInit, OnDestroy {
     const pending = localStorage.getItem('discord-pending-setup');
     if (pending === projectId) {
       localStorage.removeItem('discord-pending-setup');
-      this.isLoading.set(false);
       this.autoConnect();
     }
   };
@@ -217,7 +217,6 @@ export class DiscordTab implements OnInit, OnDestroy {
         const pending = localStorage.getItem('discord-pending-setup');
         if (pending === projectId) {
           localStorage.removeItem('discord-pending-setup');
-          this.isLoading.set(false);
           this.autoConnect();
         } else {
           this.isLoading.set(false);

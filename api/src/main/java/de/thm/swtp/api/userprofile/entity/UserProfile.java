@@ -75,5 +75,8 @@ public class UserProfile {
     @Column(length = 50)
     private String discordUsername;
 
+    @Column(length = 100)
+    private String discordAvatar;
+
     private LocalDateTime discordConnectedAt;
 }

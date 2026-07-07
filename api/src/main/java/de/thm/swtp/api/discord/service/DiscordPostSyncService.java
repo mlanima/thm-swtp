@@ -37,10 +37,17 @@ public class DiscordPostSyncService {
     @Transactional
     public void saveSync(UUID postId, String discordMessageId, String channelId,
                          DiscordMessageSyncEntity.SyncDirection direction) {
+        saveSync(postId, discordMessageId, channelId, null, direction);
+    }
+
+    @Transactional
+    public void saveSync(UUID postId, String discordMessageId, String channelId, String guildId,
+                         DiscordMessageSyncEntity.SyncDirection direction) {
         DiscordMessageSyncEntity sync = DiscordMessageSyncEntity.builder()
                 .platformPostId(postId)
                 .discordMessageId(discordMessageId)
                 .discordChannelId(channelId)
+                .discordGuildId(guildId)
                 .direction(direction)
                 .build();
         messageSyncRepository.save(sync);
