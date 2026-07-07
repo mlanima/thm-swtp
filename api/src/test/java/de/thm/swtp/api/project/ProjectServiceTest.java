@@ -44,9 +44,6 @@ class ProjectServiceTest {
     @Mock
     private DiscordNotificationService discordNotificationService;
 
-    @Mock
-    private ContentModerationService contentModerationService;
-
     @InjectMocks
     private ProjectService projectService;
 

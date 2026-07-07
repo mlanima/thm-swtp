@@ -42,7 +42,6 @@ public class ProjectPostService {
     private final UserProfileRepository userProfileRepository;
     private final DiscordEventPublisher discordEventPublisher;
     private final DiscordPostSyncService discordPostSyncService;
-    private final ContentModerationService contentModerationService;
     private final ProjectFileService projectFileService;
     @Transactional(readOnly = true)
     public List<ProjectPost> getPublishedPostsForProject(UUID projectId) {
