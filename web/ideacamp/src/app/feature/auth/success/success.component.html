@@ -18,3 +18,10 @@
 
   </div>
 </section>
+
+@if (showOnboarding()) {
+  <app-onboarding
+    (completed)="completeOnboarding()"
+    (skipped)="completeOnboarding()"
+  />
+}

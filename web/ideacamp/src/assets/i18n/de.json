@@ -661,5 +661,31 @@
     "NO_REASON": "Kein Grund angegeben",
     "BANNED_AT": "Gesperrt am:",
     "CONTACT_HINT": "Wenn du Fragen hast, wende dich bitte an das Projektteam."
+  },
+  "ONBOARDING": {
+    "LABEL": "Kurze Einführung",
+    "TITLE": "Willkommen bei IdeaCamp",
+    "SKIP": "Überspringen",
+    "BACK": "Zurück",
+    "NEXT": "Weiter",
+    "FINISH": "Fertig",
+    "STEPS": {
+      "SEARCH": {
+        "TITLE": "Projekte entdecken",
+        "TEXT": "Über die Suche findest du Projekte, Themen und Ideen, die zu deinen Interessen passen."
+      },
+      "PROJECTS": {
+        "TITLE": "Eigene Projekte verwalten",
+        "TEXT": "Unter „Meine Projekte“ findest du deine Projekte, Einladungen und alles, woran du beteiligt bist."
+      },
+      "PROFILE": {
+        "TITLE": "Dein Profil pflegen",
+        "TEXT": "In deinem Profil kannst du Informationen zu dir, deinen Interessen und deiner Erfahrung ergänzen."
+      },
+      "SETTINGS": {
+        "TITLE": "Einstellungen nutzen",
+        "TEXT": "In den Einstellungen findest du weitere Optionen, Kontaktinformationen und zusätzliche Funktionen."
+      }
+    }
   }
 }

@@ -58,4 +58,9 @@ export class UserProfileService {
   updateProfile(username: string, profile: UpdateUserProfileRequest): Observable<UserProfileModel> {
     return this.http.put<UserProfileModel>(`${this.apiUrl}/${username}/profile`, profile);
   }
+
+  updateOnboardingCompleted(onboardingCompleted: boolean): Observable<void> {
+    return this.http.patch<void>(`${this.apiUrl}/me/onboarding`, { onboardingCompleted });
+  }
+
 }
