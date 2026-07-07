@@ -134,7 +134,6 @@ public class DiscordChannelService {
         return "https://discord.com/api/oauth2/authorize"
                 + "?client_id=" + clientId
                 + "&permissions=" + discordProperties.getBot().getInvitePermissions()
-                + "&response_type=code"
                 + "&scope=bot"
                 + "&redirect_uri=" + discordAuthService.getRedirectUri()
                 + "&state=" + projectId.toString();

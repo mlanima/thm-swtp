@@ -62,13 +62,17 @@ public class DiscordAuthController {
                 .body(html);
     }
 
-    private ResponseEntity<Void> handleUserCallback(String code, String state) {
+    private ResponseEntity<?> handleUserCallback(String code, String state) {
         try {
             UserProfile profile = discordAuthService.handleCallback(code, state);
             log.info("Discord account linked successfully: discordId={}", profile.getDiscordId());
             return ResponseEntity.status(HttpStatus.FOUND)
                     .location(URI.create(discordAuthService.getFrontendUrl() + "/settings?discord=connected"))
                     .build();
+        } catch (IllegalArgumentException e) {
+            log.info("State not recognised, likely a bot callback without guild_id — closing popup");
+            String html = "<!DOCTYPE html><html><body><script>window.close()</script></body></html>";
+            return ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body(html);
         } catch (Exception e) {
             log.warn("Discord callback failed: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.FOUND)
