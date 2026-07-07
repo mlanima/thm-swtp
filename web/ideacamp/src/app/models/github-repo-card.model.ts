@@ -15,6 +15,7 @@ export const GithubRepoCardSchema = z.object({
   languages: z.array(LanguageShareSchema),
   dataUnavailable: z.boolean(),
   showReadme: z.boolean(),
+  autoInviteCollaborators: z.boolean(),
 });
 
 export type GithubRepoCardModel = z.infer<typeof GithubRepoCardSchema>;

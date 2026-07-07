@@ -15,6 +15,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -53,6 +54,11 @@ public class ProjectGithubRepoEntity {
     @Column(nullable = false)
     @Builder.Default
     private boolean showReadme = false;
+
+    @Column(nullable = false)
+    @ColumnDefault("false")
+    @Builder.Default
+    private boolean autoInviteCollaborators = false;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

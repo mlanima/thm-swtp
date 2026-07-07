@@ -14,14 +14,16 @@ public record GithubRepoCardResponse(
         Integer forksCount,
         List<LanguageShareResponse> languages,
         boolean dataUnavailable,
-        boolean showReadme) {
+        boolean showReadme,
+        boolean autoInviteCollaborators) {
 
     public static GithubRepoCardResponse toResponse(GithubRepoCard card) {
         var link = card.getLink();
         var data = card.getData();
         if (data == null) {
             return new GithubRepoCardResponse(
-                    link.getRepoOwner(), link.getRepoName(), null, null, null, null, List.of(), true, link.isShowReadme());
+                    link.getRepoOwner(), link.getRepoName(), null, null, null, null, List.of(), true,
+                    link.isShowReadme(), link.isAutoInviteCollaborators());
         }
         return new GithubRepoCardResponse(
                 link.getRepoOwner(),
@@ -32,7 +34,8 @@ public record GithubRepoCardResponse(
                 data.getForksCount(),
                 data.getLanguages().stream().map(LanguageShareResponse::toResponse).toList(),
                 false,
-                link.isShowReadme());
+                link.isShowReadme(),
+                link.isAutoInviteCollaborators());
     }
 
     public record LanguageShareResponse(String name, double percentage) {

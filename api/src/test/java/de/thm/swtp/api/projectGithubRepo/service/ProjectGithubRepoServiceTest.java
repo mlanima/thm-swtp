@@ -255,6 +255,51 @@ class ProjectGithubRepoServiceTest {
     }
 
     @Test
+    void shouldEnableAutoInviteCollaborators() {
+        var entity = ProjectGithubRepoEntity.builder()
+                .project(project)
+                .repoOwner("mlanima")
+                .repoName("thm-swtp")
+                .linkedByKeycloakId(userId)
+                .build();
+        when(projectGithubRepoRepository.findByProjectId(projectId)).thenReturn(Optional.of(entity));
+        when(githubRepoDataService.fetch("mlanima", "thm-swtp", userId))
+                .thenReturn(GithubRepoData.builder().fullName("mlanima/thm-swtp").languages(List.of()).build());
+
+        service.setAutoInviteCollaborators(projectId, true);
+
+        assertThat(entity.isAutoInviteCollaborators()).isTrue();
+        verify(projectGithubRepoRepository).save(entity);
+    }
+
+    @Test
+    void shouldDisableAutoInviteCollaborators() {
+        var entity = ProjectGithubRepoEntity.builder()
+                .project(project)
+                .repoOwner("mlanima")
+                .repoName("thm-swtp")
+                .linkedByKeycloakId(userId)
+                .autoInviteCollaborators(true)
+                .build();
+        when(projectGithubRepoRepository.findByProjectId(projectId)).thenReturn(Optional.of(entity));
+        when(githubRepoDataService.fetch("mlanima", "thm-swtp", userId))
+                .thenReturn(GithubRepoData.builder().fullName("mlanima/thm-swtp").languages(List.of()).build());
+
+        service.setAutoInviteCollaborators(projectId, false);
+
+        assertThat(entity.isAutoInviteCollaborators()).isFalse();
+        verify(projectGithubRepoRepository).save(entity);
+    }
+
+    @Test
+    void shouldThrowWhenSettingAutoInviteCollaboratorsForUnlinkedProject() {
+        when(projectGithubRepoRepository.findByProjectId(projectId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.setAutoInviteCollaborators(projectId, true))
+                .isInstanceOf(GithubRepoNotLinkedException.class);
+    }
+
+    @Test
     void shouldReturnReadmeWhenEnabledAndAvailable() {
         var entity = ProjectGithubRepoEntity.builder()
                 .project(project)

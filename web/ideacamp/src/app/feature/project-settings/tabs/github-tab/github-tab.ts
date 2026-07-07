@@ -40,6 +40,7 @@ export class GithubTab implements OnInit {
   readonly isLinking = signal(false);
   readonly isUnlinking = signal(false);
   readonly isTogglingReadme = signal(false);
+  readonly isTogglingAutoInvite = signal(false);
   readonly errorMessage = signal('');
   readonly needsGithubConnection = signal(false);
 
@@ -118,6 +119,28 @@ export class GithubTab implements OnInit {
         this.isTogglingReadme.set(false);
       },
     });
+  }
+
+  toggleAutoInviteCollaborators(): void {
+    const project = this.store.project();
+    const currentCard = this.repoCard();
+    if (!project || !currentCard || this.isTogglingAutoInvite()) return;
+
+    this.isTogglingAutoInvite.set(true);
+    this.errorMessage.set('');
+
+    this.projectGithubRepoService
+      .setAutoInviteCollaborators(project.id, !currentCard.autoInviteCollaborators)
+      .subscribe({
+        next: (card) => {
+          this.repoCard.set(card);
+          this.isTogglingAutoInvite.set(false);
+        },
+        error: () => {
+          this.errorMessage.set(this.translate.instant('GITHUB.REPO.ERROR_AUTO_INVITE_TOGGLE'));
+          this.isTogglingAutoInvite.set(false);
+        },
+      });
   }
 
   unlinkRepo(): void {

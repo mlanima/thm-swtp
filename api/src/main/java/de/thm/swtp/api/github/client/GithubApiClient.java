@@ -129,6 +129,28 @@ public class GithubApiClient {
         return new String(decoded, StandardCharsets.UTF_8);
     }
 
+    /** Invites (or directly adds, for org repos where the caller has sufficient rights) a user
+     * as a repository collaborator. GitHub returns 201 for a new pending invitation or 204 if
+     * the user is already a collaborator — both are treated as success. */
+    public void addCollaborator(
+            final String accessToken, final String owner, final String repo,
+            final String username, final String permission) {
+        restClient.put()
+                .uri("/repos/{owner}/{repo}/collaborators/{username}", owner, repo, username)
+                .headers(withAuth(accessToken))
+                .body(new AddCollaboratorRequest(permission))
+                .retrieve()
+                .onStatus(HttpStatus.UNAUTHORIZED::equals, (request, res) -> {
+                    throw new GithubTokenInvalidException("GitHub rejected the access token");
+                })
+                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(), (request, res) -> {
+                    log.debug("GitHub API returned {} for PUT /repos/{}/{}/collaborators/{}",
+                            res.getStatusCode(), owner, repo, username);
+                    throw new GithubApiException("GitHub API request failed");
+                })
+                .toBodilessEntity();
+    }
+
     private Consumer<HttpHeaders> withAuth(final String accessToken) {
         return headers -> {
             if (accessToken != null && !accessToken.isBlank()) {
@@ -170,4 +192,6 @@ public class GithubApiClient {
     private record ReadmeContent(
             @JsonProperty("content") String content,
             @JsonProperty("encoding") String encoding) {}
+
+    private record AddCollaboratorRequest(@JsonProperty("permission") String permission) {}
 }

@@ -635,7 +635,9 @@
       "UNLINK": "Unlink repository",
       "UNAVAILABLE": "Repository data is temporarily unavailable.",
       "SHOW_README": "Show README on project page",
-      "ERROR_README_TOGGLE": "Could not update the README visibility. Please try again."
+      "ERROR_README_TOGGLE": "Could not update the README visibility. Please try again.",
+      "AUTO_INVITE_COLLABORATORS": "Automatically invite new members as GitHub collaborators",
+      "ERROR_AUTO_INVITE_TOGGLE": "Could not update the auto-invite setting. Please try again."
     }
   },
   "PROFESSOR_REQUEST": {

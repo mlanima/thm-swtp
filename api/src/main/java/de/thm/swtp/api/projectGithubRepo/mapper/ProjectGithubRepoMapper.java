@@ -13,6 +13,7 @@ public class ProjectGithubRepoMapper {
                 .linkedByKeycloakId(entity.getLinkedByKeycloakId())
                 .defaultBranch(entity.getDefaultBranch())
                 .showReadme(entity.isShowReadme())
+                .autoInviteCollaborators(entity.isAutoInviteCollaborators())
                 .createdAt(entity.getCreatedAt())
                 .build();
     }

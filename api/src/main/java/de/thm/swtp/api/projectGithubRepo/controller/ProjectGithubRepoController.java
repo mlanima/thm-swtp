@@ -3,6 +3,7 @@ package de.thm.swtp.api.projectGithubRepo.controller;
 import de.thm.swtp.api.projectGithubRepo.dto.GithubReadmeResponse;
 import de.thm.swtp.api.projectGithubRepo.dto.GithubRepoCardResponse;
 import de.thm.swtp.api.projectGithubRepo.dto.LinkGithubRepoRequest;
+import de.thm.swtp.api.projectGithubRepo.dto.SetAutoInviteRequest;
 import de.thm.swtp.api.projectGithubRepo.dto.SetReadmeVisibilityRequest;
 import de.thm.swtp.api.projectGithubRepo.service.ProjectGithubRepoService;
 import jakarta.validation.Valid;
@@ -58,5 +59,14 @@ public class ProjectGithubRepoController {
             @PathVariable UUID projectId,
             @Valid @RequestBody SetReadmeVisibilityRequest request) {
         return GithubRepoCardResponse.toResponse(projectGithubRepoService.setReadmeVisibility(projectId, request.show()));
+    }
+
+    @PatchMapping("/auto-invite")
+    @PreAuthorize("@security.canManageProjectGithubRepo(#projectId, authentication)")
+    public GithubRepoCardResponse setAutoInviteCollaborators(
+            @PathVariable UUID projectId,
+            @Valid @RequestBody SetAutoInviteRequest request) {
+        return GithubRepoCardResponse.toResponse(
+                projectGithubRepoService.setAutoInviteCollaborators(projectId, request.enabled()));
     }
 }

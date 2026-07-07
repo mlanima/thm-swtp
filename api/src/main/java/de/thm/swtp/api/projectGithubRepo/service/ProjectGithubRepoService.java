@@ -94,6 +94,15 @@ public class ProjectGithubRepoService {
         return getCard(projectId);
     }
 
+    @Transactional
+    public GithubRepoCard setAutoInviteCollaborators(UUID projectId, boolean enabled) {
+        ProjectGithubRepoEntity entity = projectGithubRepoRepository.findByProjectId(projectId)
+                .orElseThrow(() -> new GithubRepoNotLinkedException(projectId));
+        entity.setAutoInviteCollaborators(enabled);
+        projectGithubRepoRepository.save(entity);
+        return getCard(projectId);
+    }
+
     @Transactional(readOnly = true)
     public GithubReadme getReadme(UUID projectId) {
         ProjectGithubRepoEntity entity = projectGithubRepoRepository.findByProjectId(projectId)

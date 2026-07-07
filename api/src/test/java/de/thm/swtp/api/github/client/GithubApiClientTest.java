@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class GithubApiClientTest {
@@ -142,6 +143,37 @@ class GithubApiClientTest {
     void shouldThrowApiExceptionForReadmeOnServerError() {
         assertThatThrownBy(() -> clientWithResponse(500, "Internal Server Error")
                 .getReadme("gho_token", "mlanima", "thm-swtp"))
+                .isInstanceOf(GithubApiException.class);
+    }
+
+    @Test
+    void shouldAddCollaboratorOnNewInvitation() {
+        var json = """
+                {"id": 1, "permissions": {"pull": true, "push": true}}
+                """;
+        assertThatCode(() -> clientWithResponse(201, json)
+                .addCollaborator("gho_token", "mlanima", "thm-swtp", "octocat", "push"))
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    void shouldAddCollaboratorWhenAlreadyACollaborator() {
+        assertThatCode(() -> clientWithResponse(204, "")
+                .addCollaborator("gho_token", "mlanima", "thm-swtp", "octocat", "push"))
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    void shouldThrowTokenInvalidForAddCollaboratorWhenUnauthorized() {
+        assertThatThrownBy(() -> clientWithResponse(401, "Unauthorized")
+                .addCollaborator("bad-token", "mlanima", "thm-swtp", "octocat", "push"))
+                .isInstanceOf(GithubTokenInvalidException.class);
+    }
+
+    @Test
+    void shouldThrowApiExceptionForAddCollaboratorOnForbidden() {
+        assertThatThrownBy(() -> clientWithResponse(403, "Forbidden")
+                .addCollaborator("gho_token", "mlanima", "thm-swtp", "octocat", "push"))
                 .isInstanceOf(GithubApiException.class);
     }
 }

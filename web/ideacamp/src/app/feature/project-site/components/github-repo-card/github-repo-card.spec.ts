@@ -18,6 +18,7 @@ const repoCard: GithubRepoCardModel = {
   ],
   dataUnavailable: false,
   showReadme: false,
+  autoInviteCollaborators: false,
 };
 
 class MockProjectGithubRepoService {

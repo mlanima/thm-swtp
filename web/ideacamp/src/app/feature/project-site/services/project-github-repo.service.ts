@@ -54,4 +54,10 @@ export class ProjectGithubRepoService {
       .patch<unknown>(`${this.baseUrl}/${projectId}/github-repo/readme-visibility`, { show })
       .pipe(map((data) => GithubRepoCardSchema.parse(data)));
   }
+
+  setAutoInviteCollaborators(projectId: string, enabled: boolean): Observable<GithubRepoCardModel> {
+    return this.http
+      .patch<unknown>(`${this.baseUrl}/${projectId}/github-repo/auto-invite`, { enabled })
+      .pipe(map((data) => GithubRepoCardSchema.parse(data)));
+  }
 }

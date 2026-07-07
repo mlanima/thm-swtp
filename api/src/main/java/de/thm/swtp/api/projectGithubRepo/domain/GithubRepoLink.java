@@ -16,5 +16,6 @@ public class GithubRepoLink {
     UUID linkedByKeycloakId;
     String defaultBranch;
     boolean showReadme;
+    boolean autoInviteCollaborators;
     LocalDateTime createdAt;
 }
