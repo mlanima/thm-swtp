@@ -37,7 +37,7 @@ async function resolveGuildChannel(channelId: string): Promise<{
 
 internalApi.get('/internal/guilds', validateSecret, async (_req, res) => {
   const guilds = discordClient.guilds.cache.map(g => ({ id: g.id, name: g.name }));
-  res.json({ guilds });
+  res.json({ guilds, success: true, reason: null });
 });
 
 internalApi.get('/health', async (_req, res) => {
