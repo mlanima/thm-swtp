@@ -3,7 +3,7 @@ import { validateStreamMessage } from '../streams/validator.js';
 
 function validPostCreated() {
   return {
-    type: 'POST_CREATED',
+    type: 'POST_CREATED' as const,
     payload: {
       postId: '550e8400-e29b-41d4-a716-446655440000',
       projectId: '660e8400-e29b-41d4-a716-446655440001',
@@ -17,7 +17,7 @@ function validPostCreated() {
 
 function validPostUpdated() {
   return {
-    type: 'POST_UPDATED',
+    type: 'POST_UPDATED' as const,
     payload: {
       postId: '550e8400-e29b-41d4-a716-446655440000',
       discordMsgId: '987654321098765432',
@@ -29,7 +29,7 @@ function validPostUpdated() {
 
 function validPostDeleted() {
   return {
-    type: 'POST_DELETED',
+    type: 'POST_DELETED' as const,
     payload: {
       postId: '550e8400-e29b-41d4-a716-446655440000',
       discordMsgId: '987654321098765432',
@@ -40,7 +40,7 @@ function validPostDeleted() {
 
 function validProjectInvite() {
   return {
-    type: 'PROJECT_INVITE',
+    type: 'PROJECT_INVITE' as const,
     payload: {
       inviteId: '550e8400-e29b-41d4-a716-446655440000',
       targetDiscordId: '123456789012345678',
@@ -52,7 +52,7 @@ function validProjectInvite() {
 
 function validProjectEvent() {
   return {
-    type: 'PROJECT_EVENT',
+    type: 'PROJECT_EVENT' as const,
     payload: {
       eventType: 'MEMBER_JOIN',
       projectId: '550e8400-e29b-41d4-a716-446655440000',
@@ -63,49 +63,63 @@ function validProjectEvent() {
   };
 }
 
+function extractPayload<T extends { payload: unknown }>(msg: T): T['payload'] {
+  return msg.payload;
+}
+
 describe('validateStreamMessage', () => {
   describe('POST_CREATED', () => {
     it('accepts a valid payload', () => {
       const result = validateStreamMessage(validPostCreated());
       expect(result.type).toBe('POST_CREATED');
-      expect(result.payload.platformUrl).toBe('https://swtp-ss26.de/project/test-project');
+      if (result.type === 'POST_CREATED') {
+        expect(result.payload.platformUrl).toBe('https://swtp-ss26.de/project/test-project');
+      }
     });
 
     it('accepts optional authorAvatar', () => {
-      const msg = validPostCreated();
-      msg.payload.authorAvatar = 'https://cdn.discord.com/avatars/123/abc.png';
-      const result = validateStreamMessage(msg);
-      expect(result.payload.authorAvatar).toBe('https://cdn.discord.com/avatars/123/abc.png');
+      const input = {
+        ...validPostCreated(),
+        payload: { ...validPostCreated().payload, authorAvatar: 'https://cdn.discord.com/avatars/123/abc.png' },
+      };
+      const result = validateStreamMessage(input);
+      if (result.type === 'POST_CREATED') {
+        expect(result.payload.authorAvatar).toBe('https://cdn.discord.com/avatars/123/abc.png');
+      }
     });
 
     it('rejects missing postId', () => {
-      const msg = validPostCreated();
-      delete (msg.payload as any).postId;
-      expect(() => validateStreamMessage(msg)).toThrow();
+      const input = { ...validPostCreated(), payload: extractPayload(validPostCreated()) };
+      const { postId: _, ...payload } = input.payload;
+      expect(() => validateStreamMessage({ type: 'POST_CREATED', payload })).toThrow();
     });
 
     it('rejects invalid UUID in postId', () => {
-      const msg = validPostCreated();
-      msg.payload.postId = 'not-a-uuid';
-      expect(() => validateStreamMessage(msg)).toThrow();
+      expect(() => validateStreamMessage({
+        ...validPostCreated(),
+        payload: { ...validPostCreated().payload, postId: 'not-a-uuid' },
+      })).toThrow();
     });
 
     it('rejects non-url platformUrl', () => {
-      const msg = validPostCreated();
-      msg.payload.platformUrl = 'not-a-url';
-      expect(() => validateStreamMessage(msg)).toThrow();
+      expect(() => validateStreamMessage({
+        ...validPostCreated(),
+        payload: { ...validPostCreated().payload, platformUrl: 'not-a-url' },
+      })).toThrow();
     });
 
     it('rejects authorName exceeding 100 chars', () => {
-      const msg = validPostCreated();
-      msg.payload.authorName = 'a'.repeat(101);
-      expect(() => validateStreamMessage(msg)).toThrow();
+      expect(() => validateStreamMessage({
+        ...validPostCreated(),
+        payload: { ...validPostCreated().payload, authorName: 'a'.repeat(101) },
+      })).toThrow();
     });
 
     it('rejects content exceeding 3900 chars', () => {
-      const msg = validPostCreated();
-      msg.payload.content = 'a'.repeat(3901);
-      expect(() => validateStreamMessage(msg)).toThrow();
+      expect(() => validateStreamMessage({
+        ...validPostCreated(),
+        payload: { ...validPostCreated().payload, content: 'a'.repeat(3901) },
+      })).toThrow();
     });
   });
 
@@ -116,9 +130,8 @@ describe('validateStreamMessage', () => {
     });
 
     it('rejects missing content', () => {
-      const msg = validPostUpdated();
-      delete (msg.payload as any).content;
-      expect(() => validateStreamMessage(msg)).toThrow();
+      const { content: _, ...payload } = validPostUpdated().payload;
+      expect(() => validateStreamMessage({ type: 'POST_UPDATED', payload })).toThrow();
     });
   });
 
@@ -129,9 +142,8 @@ describe('validateStreamMessage', () => {
     });
 
     it('rejects missing discordMsgId', () => {
-      const msg = validPostDeleted();
-      delete (msg.payload as any).discordMsgId;
-      expect(() => validateStreamMessage(msg)).toThrow();
+      const { discordMsgId: _, ...payload } = validPostDeleted().payload;
+      expect(() => validateStreamMessage({ type: 'POST_DELETED', payload })).toThrow();
     });
   });
 
@@ -142,9 +154,10 @@ describe('validateStreamMessage', () => {
     });
 
     it('rejects projectName exceeding 200 chars', () => {
-      const msg = validProjectInvite();
-      msg.payload.projectName = 'a'.repeat(201);
-      expect(() => validateStreamMessage(msg)).toThrow();
+      expect(() => validateStreamMessage({
+        ...validProjectInvite(),
+        payload: { ...validProjectInvite().payload, projectName: 'a'.repeat(201) },
+      })).toThrow();
     });
   });
 
@@ -155,16 +168,14 @@ describe('validateStreamMessage', () => {
     });
 
     it('rejects missing eventType', () => {
-      const msg = validProjectEvent();
-      delete (msg.payload as any).eventType;
-      expect(() => validateStreamMessage(msg)).toThrow();
+      const { eventType: _, ...payload } = validProjectEvent().payload;
+      expect(() => validateStreamMessage({ type: 'PROJECT_EVENT', payload })).toThrow();
     });
   });
 
   describe('discriminated union', () => {
     it('rejects unknown event type', () => {
-      const msg = { type: 'POST_SOMETHING', payload: {} };
-      expect(() => validateStreamMessage(msg)).toThrow();
+      expect(() => validateStreamMessage({ type: 'POST_SOMETHING', payload: {} })).toThrow();
     });
 
     it('rejects completely empty input', () => {
