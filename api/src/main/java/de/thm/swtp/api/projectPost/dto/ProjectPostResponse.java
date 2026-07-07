@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record ProjectPostResponse(UUID id, UUID projectId, UUID authorId,
-                                  String authorName, String title, String content,
+                                  String authorName, String title, String content, String imageUrl,
                                   PostContentFormat contentFormat, ProjectPostStatus status,
                                   LocalDateTime publishedAt, LocalDateTime archivedAt,
                                   LocalDateTime createdAt, LocalDateTime updatedAt) {
@@ -22,6 +22,7 @@ public record ProjectPostResponse(UUID id, UUID projectId, UUID authorId,
                 projectPost.getAuthorName(),
                 projectPost.getTitle(),
                 projectPost.getContent(),
+                projectPost.getImageUrl(),
                 projectPost.getContentFormat(),
                 projectPost.getStatus(),
                 projectPost.getPublishedAt(),
