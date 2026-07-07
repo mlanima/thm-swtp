@@ -2,7 +2,6 @@ package de.thm.swtp.api.search.service;
 
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.projectFavorite.repository.ProjectFavoriteRepository;
-import de.thm.swtp.api.search.dto.ProjectSearchFilter;
 import de.thm.swtp.api.search.repository.ProjectSearchRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,8 +45,7 @@ class ProjectSearchServiceTest {
 
     @Test
     void searchProjects_shouldReturnAll_whenSingleQuery() {
-        when(repository.searchIdsByQuery(eq("java"), isNull(), isNull(), eq(List.of()), eq(0), isNull(), isNull()))
-                .thenReturn(List.of(id1, id2));
+        when(repository.searchIdsByQuery("java")).thenReturn(List.of(id1, id2));
         when(repository.findAllWithTagsById(Set.of(id1, id2))).thenReturn(List.of(project1, project2));
 
         List<ProjectEntity> result = service.searchProjects(List.of("java"));
@@ -57,10 +55,8 @@ class ProjectSearchServiceTest {
 
     @Test
     void searchProjects_shouldIntersect_whenMultipleQueries() {
-        when(repository.searchIdsByQuery(eq("web"), isNull(), isNull(), eq(List.of()), eq(0), isNull(), isNull()))
-                .thenReturn(List.of(id1, id2));
-        when(repository.searchIdsByQuery(eq("java"), isNull(), isNull(), eq(List.of()), eq(0), isNull(), isNull()))
-                .thenReturn(List.of(id2));
+        when(repository.searchIdsByQuery("web")).thenReturn(List.of(id1, id2));
+        when(repository.searchIdsByQuery("java")).thenReturn(List.of(id2));
         when(repository.findAllWithTagsById(Set.of(id2))).thenReturn(List.of(project2));
 
         List<ProjectEntity> result = service.searchProjects(List.of("web", "java"));
@@ -70,8 +66,7 @@ class ProjectSearchServiceTest {
 
     @Test
     void searchProjects_shouldReturnEmpty_whenNoMatch() {
-        when(repository.searchIdsByQuery(eq("web"), isNull(), isNull(), eq(List.of()), eq(0), isNull(), isNull()))
-                .thenReturn(List.of());
+        when(repository.searchIdsByQuery("web")).thenReturn(List.of());
 
         List<ProjectEntity> result = service.searchProjects(List.of("web"));
 
@@ -87,8 +82,7 @@ class ProjectSearchServiceTest {
 
     @Test
     void searchProjectsPaged_shouldReturnPage() {
-        when(repository.searchIdsByQuery(eq("java"), isNull(), isNull(), eq(List.of()), eq(0), isNull(), isNull()))
-                .thenReturn(List.of(id1, id2));
+        when(repository.searchIdsByQuery("java")).thenReturn(List.of(id1, id2));
         when(favoriteRepository.countByProjectIdIn(any())).thenReturn(List.of());
         when(repository.findAllWithTagsById(any())).thenAnswer(invocation -> {
             Collection<UUID> ids = invocation.getArgument(0);
@@ -103,8 +97,7 @@ class ProjectSearchServiceTest {
 
     @Test
     void searchProjectsPaged_shouldOrderByFavoriteCount() {
-        when(repository.searchIdsByQuery(eq("java"), isNull(), isNull(), eq(List.of()), eq(0), isNull(), isNull()))
-                .thenReturn(List.of(id1, id2));
+        when(repository.searchIdsByQuery("java")).thenReturn(List.of(id1, id2));
         when(favoriteRepository.countByProjectIdIn(any())).thenReturn(
                 List.of(favoriteCount(id2, 5))
         );
@@ -117,32 +110,6 @@ class ProjectSearchServiceTest {
 
         assertThat(page.getContent()).containsExactly(project2);
         assertThat(page.getTotalElements()).isEqualTo(2);
-    }
-
-    @Test
-    void searchProjectsPaged_shouldPassFilterArgsToRepository_whenFilterGiven() {
-        ProjectSearchFilter filter = new ProjectSearchFilter(true, false, List.of("backend"), null, null);
-        when(repository.searchIdsByQuery(eq("java"), eq(true), eq(false), eq(List.of("backend")), eq(1), isNull(), isNull()))
-                .thenReturn(List.of(id1));
-        when(favoriteRepository.countByProjectIdIn(any())).thenReturn(List.of());
-        when(repository.findAllWithTagsById(any())).thenReturn(List.of(project1));
-
-        var page = service.searchProjects(List.of("java"), filter, PageRequest.of(0, 10));
-
-        assertThat(page.getContent()).containsExactly(project1);
-        verify(repository).searchIdsByQuery(eq("java"), eq(true), eq(false), eq(List.of("backend")), eq(1), isNull(), isNull());
-    }
-
-    @Test
-    void searchProjects_shouldDelegateWithEmptyFilter_whenNoFilterOverloadUsed() {
-        when(repository.searchIdsByQuery(eq("java"), isNull(), isNull(), eq(List.of()), eq(0), isNull(), isNull()))
-                .thenReturn(List.of(id1));
-        when(favoriteRepository.countByProjectIdIn(any())).thenReturn(List.of());
-        when(repository.findAllWithTagsById(any())).thenReturn(List.of(project1));
-
-        var page = service.searchProjects(List.of("java"), PageRequest.of(0, 10));
-
-        assertThat(page.getContent()).containsExactly(project1);
     }
 
     private static ProjectFavoriteRepository.ProjectFavoriteCount favoriteCount(UUID projectId, long count) {
