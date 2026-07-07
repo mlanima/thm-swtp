@@ -36,6 +36,10 @@ public class DiscordAuthService {
         this.clientId = clientId;
         this.redirectUri = redirectUri;
         this.frontendUrl = frontendUrl;
+        log.info("Discord OAuth configured: clientId={}, redirectUri={}, frontendUrl={}",
+                clientId != null && !clientId.isBlank() ? "present" : "missing",
+                redirectUri != null && !redirectUri.isBlank() ? redirectUri : "missing",
+                frontendUrl);
     }
 
     public boolean isOAuthConfigured() {
