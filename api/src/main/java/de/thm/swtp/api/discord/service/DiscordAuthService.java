@@ -38,6 +38,10 @@ public class DiscordAuthService {
         this.frontendUrl = frontendUrl;
     }
 
+    public boolean isOAuthConfigured() {
+        return clientId != null && !clientId.isBlank() && redirectUri != null && !redirectUri.isBlank();
+    }
+
     public String buildAuthorizationUrl(UUID userId) {
         String state = UUID.randomUUID().toString();
         pendingStates.put(state, userId);

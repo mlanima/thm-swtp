@@ -24,7 +24,10 @@ public class DiscordAuthController {
     private final DiscordAuthService discordAuthService;
 
     @GetMapping("/authorize")
-    public ResponseEntity<Map<String, String>> authorize(@AuthenticationPrincipal Jwt jwt) {
+    public ResponseEntity<?> authorize(@AuthenticationPrincipal Jwt jwt) {
+        if (!discordAuthService.isOAuthConfigured()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Discord OAuth is not configured"));
+        }
         UUID userId = UUID.fromString(jwt.getSubject());
         String url = discordAuthService.buildAuthorizationUrl(userId);
         return ResponseEntity.ok(Map.of("url", url));

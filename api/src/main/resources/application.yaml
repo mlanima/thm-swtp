@@ -114,9 +114,9 @@ discord:
     base-url: ${DISCORD_BOT_BASEURL:http://localhost:3001}
     api-secret: ${DISCORD_BOT_API_SECRET}
 
-DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID}
-DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET}
-DISCORD_REDIRECT_URI: ${DISCORD_REDIRECT_URI}
+DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID:}
+DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET:}
+DISCORD_REDIRECT_URI: ${DISCORD_REDIRECT_URI:}
 
 # --- local overrides (uncomment and fill in for local dev) ---
 # spring.data.redis.host: localhost
