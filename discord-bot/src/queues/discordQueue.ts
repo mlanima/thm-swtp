@@ -17,8 +17,10 @@ export const discordQueue = new Queue('discord-actions', {
   },
 });
 
-export function startDiscordWorker(): void {
-  const worker = new Worker(
+let worker: Worker | null = null;
+
+export function startDiscordWorker(): Worker {
+  worker = new Worker(
     'discord-actions',
     async (job) => {
       switch (job.name) {
@@ -47,4 +49,12 @@ export function startDiscordWorker(): void {
   worker.on('failed', (job, err) => logger.error({ jobId: job?.id, name: job?.name, err }, 'job failed'));
 
   logger.info('discord worker started');
+  return worker;
+}
+
+export async function stopDiscordWorker(): Promise<void> {
+  if (worker) {
+    await worker.close();
+    worker = null;
+  }
 }
