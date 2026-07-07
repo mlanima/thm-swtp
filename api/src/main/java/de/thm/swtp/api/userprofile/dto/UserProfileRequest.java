@@ -4,5 +4,6 @@ public record UserProfileRequest(
         String title,
         String location,
         String about,
-        String experience
+        String experience,
+        String placeId
 ) {}

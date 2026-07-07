@@ -7,6 +7,7 @@ import de.thm.swtp.api.discord.repository.LinkedChannelRepository;
 import de.thm.swtp.api.discord.service.DiscordNotificationService;
 import de.thm.swtp.api.exceptionhandling.exceptions.InvalidProjectManagementSortFieldException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectMemberNotFoundException;
+import de.thm.swtp.api.moderation.ContentModerationService;
 import de.thm.swtp.api.project.dto.request.*;
 import de.thm.swtp.api.project.dto.response.*;
 import de.thm.swtp.api.project.exception.*;
@@ -41,6 +42,7 @@ public class ProjectService {
 
     private final ProjectRepository projectRepository;
     private final UserProfileRepository userProfileRepository;
+    private final ContentModerationService contentModerationService;
     private final ProjectInviteService projectInviteService;
     private final ProjectInviteRepository projectInviteRepository;
     private final ProjectJoinRequestRepository projectJoinRequestRepository;
@@ -106,10 +108,13 @@ public class ProjectService {
 
     @Transactional
     public ProjectResponse createProject(CreateProjectRequest request, UUID currentUserId) {
-
         if (projectRepository.existsByName(request.name())) {
             throw new ExceptionProjectResponse(request.name());
         }
+
+        contentModerationService.assertAppropriate(request.name(), "name");
+        contentModerationService.assertAppropriate(request.description(), "description");
+        contentModerationService.assertAppropriate(request.shortDescription(), "shortDescription");
 
         UserProfile owner = userProfileRepository.findById(currentUserId)
                 .orElseThrow(() -> new UserProfileNotFoundException(currentUserId.toString()));
@@ -124,6 +129,7 @@ public class ProjectService {
             if (projectRepository.existsByProjectUrl(request.projectUrl())) {
                 throw new ExceptionProjectUrlAlreadyExists(request.projectUrl());
             }
+            contentModerationService.assertAppropriate(request.projectUrl(), "projectUrl");
             projectUrl = request.projectUrl();
         }
 
@@ -254,12 +260,15 @@ public class ProjectService {
         }
 
         if (request.getName() != null) {
+            contentModerationService.assertAppropriate(request.getName(), "name");
             project.setName(request.getName());
         }
         if (request.getDescription() != null) {
+            contentModerationService.assertAppropriate(request.getDescription(), "description");
             project.setDescription(request.getDescription());
         }
         if (request.getShortDescription() != null) {
+            contentModerationService.assertAppropriate(request.getShortDescription(), "shortDescription");
             project.setShortDescription(request.getShortDescription());
         }
         if (request.getProjectUrl() != null) {
@@ -270,6 +279,7 @@ public class ProjectService {
                     projectRepository.existsByProjectUrl(request.getProjectUrl())) {
                 throw new ExceptionProjectUrlAlreadyExists(request.getProjectUrl());
             }
+            contentModerationService.assertAppropriate(request.getProjectUrl(), "projectUrl");
             project.setProjectUrl(request.getProjectUrl());
         }
         project.setPrivateProject(request.isPrivateProject());

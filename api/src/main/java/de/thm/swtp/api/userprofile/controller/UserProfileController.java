@@ -57,7 +57,7 @@ public class UserProfileController {
     public UserProfileResponse updateProfile(
             @PathVariable String username,
             @RequestBody UserProfileRequest request) {
-        return userProfileMapper.toResponse(userProfileService.updateProfile(username, request.title(), request.location(), request.about(), request.experience()));
+        return userProfileMapper.toResponse(userProfileService.updateProfile(username, request.title(), request.location(), request.about(), request.experience(), request.placeId()));
     }
 
     @DeleteMapping("/api/v1/users/{username}/profile")

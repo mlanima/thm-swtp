@@ -20,6 +20,9 @@ export interface UserProfileModel {
   /** Optional location displayed on the user's profile */
   location: string | null;
 
+  /** Google Place ID for the validated location */
+  placeId: string | null;
+
   /** Number of followers the user has */
   followers: number;
 

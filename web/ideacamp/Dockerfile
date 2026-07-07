@@ -5,7 +5,10 @@ ARG API_URL=https://api.swtp-ss26.de/api
 COPY package.json package-lock.json ./
 RUN npm ci --ignore-scripts
 COPY . .
-RUN sed -i "s|__API_URL__|${API_URL}|g" src/app/enviroments/enviroment.prod.ts
+RUN --mount=type=secret,id=google-maps-api-key \
+    GOOGLE_MAPS_API_KEY=$(cat /run/secrets/google-maps-api-key); \
+    sed -i "s|__API_URL__|${API_URL}|g" src/app/enviroments/enviroment.prod.ts; \
+    sed -i "s|__GOOGLE_MAPS_API_KEY__|${GOOGLE_MAPS_API_KEY}|g" src/app/enviroments/enviroment.prod.ts
 RUN npm run build -- --configuration=production
 
 # Stage 2: Runtime
