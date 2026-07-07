@@ -172,7 +172,7 @@ public class ProjectService {
                 .build();
     }
     @Transactional
-    public ProjectResponse getProject(UUID projectId) {
+    public ProjectResponse getProject(UUID projectId, UUID viewerId) {
 
         ProjectEntity project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ExceptionProjectNotFound(projectId));
@@ -181,17 +181,13 @@ public class ProjectService {
             throw new ExceptionProjectAlreadyDeleted(projectId);
         }
 
-        projectViewRepository.save(
-                ProjectViewEntity.builder()
-                        .project(project)
-                        .build()
-        );
+        recordView(project, viewerId);
 
         return toResponse(project);
     }
 
     @Transactional
-    public ProjectResponse getProjectByUrl(String projectUrl) {
+    public ProjectResponse getProjectByUrl(String projectUrl, UUID viewerId) {
 
         ProjectEntity project = projectRepository.findByProjectUrl(projectUrl)
                 .orElseThrow(() -> new ProjectNotFoundByUrlException(projectUrl));
@@ -200,13 +196,19 @@ public class ProjectService {
             throw new ExceptionProjectAlreadyDeleted(project.getId());
         }
 
+        recordView(project, viewerId);
+
+        return toResponse(project);
+    }
+
+    private void recordView(ProjectEntity project, UUID viewerId) {
+        UserProfile viewer = userProfileRepository.findById(viewerId).orElse(null);
         projectViewRepository.save(
                 ProjectViewEntity.builder()
                         .project(project)
+                        .user(viewer)
                         .build()
         );
-
-        return toResponse(project);
     }
 
     @Transactional
@@ -270,6 +272,31 @@ public class ProjectService {
     public List<ProjectResponse> getProjectsByUsername(String username) {
         return projectRepository.findAllByOwnerUsernameAndDeletedAtIsNullOrderByCreatedAtDesc(username)
                 .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    @Transactional
+    public List<ProjectResponse> getRecentProjectsByUsername(String username, UUID viewerId) {
+        List<ProjectEntity> projects =
+                projectRepository.findAllByOwnerUsernameAndDeletedAtIsNullOrderByCreatedAtDesc(username);
+
+        if (projects.isEmpty()) {
+            return List.of();
+        }
+
+        List<UUID> projectIds = projects.stream().map(ProjectEntity::getId).toList();
+        Map<UUID, LocalDateTime> lastViewedByProjectId = projectViewRepository
+                .findLastViewedByUserAndProjectIdIn(viewerId, projectIds)
+                .stream()
+                .collect(java.util.stream.Collectors.toMap(
+                        ProjectViewRepository.ProjectLastViewed::getProjectId,
+                        ProjectViewRepository.ProjectLastViewed::getLastViewedAt));
+
+        return projects.stream()
+                .sorted(Comparator.comparing(
+                        (ProjectEntity p) -> lastViewedByProjectId.getOrDefault(p.getId(), LocalDateTime.MIN))
+                        .reversed())
                 .map(this::toResponse)
                 .toList();
     }
