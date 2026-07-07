@@ -33,6 +33,8 @@ public class UserProfile {
 
     private String location;
 
+    private String placeId;
+
     @Column(columnDefinition = "INTEGER DEFAULT 0")
     private int followers;
 

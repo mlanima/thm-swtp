@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -19,25 +18,15 @@ import java.util.UUID;
 public interface ProjectSearchRepository extends JpaRepository<ProjectEntity, UUID> {
 
     /**
-     * Returns only the IDs of projects matching the given query term and filters.
+     * Returns only the IDs of projects matching the given query term.
      * Matches are performed case-insensitively against the project name
      * and assigned tag names. Soft-deleted projects are excluded.
-     * <p>
-     * Every filter parameter is optional: passing {@code null} (or, for
-     * {@code tags}/{@code tagCount}, an empty list/zero) leaves that
-     * constraint unapplied.
      * <p>
      * Returning just the IDs avoids loading full entities during the
      * intersection phase, which is more efficient for multi-term search.
      *
-     * @param query              a single search term
-     * @param hasOpenPositions   restrict to projects with (true) or without (false) open positions; {@code null} = no constraint
-     * @param allowJoinRequests  restrict to projects accepting (or not) join requests; {@code null} = no constraint
-     * @param tags               tag names to match against (any one must be present); ignored when {@code tagCount} is 0
-     * @param tagCount           number of entries in {@code tags}; must be provided separately since JPQL cannot check collection size of a bind parameter
-     * @param createdAfter       restrict to projects created at or after this timestamp; {@code null} = no constraint
-     * @param createdBefore      restrict to projects created at or before this timestamp; {@code null} = no constraint
-     * @return distinct project IDs matching the term and all given filters
+     * @param query a single search term
+     * @return distinct project IDs matching the term
      */
     @Query("""
             SELECT DISTINCT p.id FROM projects p
@@ -46,23 +35,8 @@ public interface ProjectSearchRepository extends JpaRepository<ProjectEntity, UU
             AND p.isPrivateProject = false
             AND (LOWER(p.name) LIKE LOWER(CONCAT('%', :query, '%'))
                  OR LOWER(t.name) LIKE LOWER(CONCAT('%', :query, '%')))
-            AND (:hasOpenPositions IS NULL
-                 OR (:hasOpenPositions = TRUE AND p.openPositionsCount > 0)
-                 OR (:hasOpenPositions = FALSE AND p.openPositionsCount = 0))
-            AND (:allowJoinRequests IS NULL OR p.allowJoinRequests = :allowJoinRequests)
-            AND (:createdAfter IS NULL OR p.createdAt >= :createdAfter)
-            AND (:createdBefore IS NULL OR p.createdAt <= :createdBefore)
-            AND (:tagCount = 0 OR EXISTS (SELECT 1 FROM p.tags ft WHERE ft.name IN :tags))
             """)
-    List<UUID> searchIdsByQuery(
-            @Param("query") String query,
-            @Param("hasOpenPositions") Boolean hasOpenPositions,
-            @Param("allowJoinRequests") Boolean allowJoinRequests,
-            @Param("tags") Collection<String> tags,
-            @Param("tagCount") int tagCount,
-            @Param("createdAfter") LocalDateTime createdAfter,
-            @Param("createdBefore") LocalDateTime createdBefore
-    );
+    List<UUID> searchIdsByQuery(@Param("query") String query);
 
     /**
      * Fetches projects by their IDs with their tags eagerly loaded.

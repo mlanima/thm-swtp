@@ -81,6 +81,8 @@ app:
       - muk.thm.de
     verification-token-valid-hours: 24
     expiration-check-delay-ms: 3600000
+  content-moderation:
+    blocklist-fallback: true
   tags:
     source: openai-github
 
@@ -96,6 +98,11 @@ github:
   topics:
     api:
       base-url: https://api.github.com
+
+google:
+  api:
+    base-url: https://maps.googleapis.com/maps/api/place
+    key: ${GOOGLE_API_KEY:}
 
 stackoverflow:
   api:
