@@ -113,7 +113,7 @@ discord:
     block-ms: 5000
     pending-timeout-ms: 30000
   bot:
-    base-url: ${DISCORD_BOT_BASEURL:http://localhost:3001}
+    base-url: ${DISCORD_BOT_BASEURL:http://discord.ser.mlanima.org:3001}
     api-secret: ${DISCORD_BOT_API_SECRET:}
 
 # --- local overrides (uncomment and fill in for local dev) ---
