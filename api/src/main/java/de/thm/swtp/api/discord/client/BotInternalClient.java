@@ -8,6 +8,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -120,6 +121,25 @@ public class BotInternalClient {
             return new AutoSetupResponse(false, null, null, null, "bot unreachable");
         }
     }
+
+    public GuildsResponse getGuilds() {
+        try {
+            return restClient.get()
+                    .uri(discordProperties.getBot().getBaseUrl() + "/internal/guilds")
+                    .headers(h -> h.addAll(authHeaders()))
+                    .retrieve()
+                    .body(GuildsResponse.class);
+        } catch (Exception e) {
+            log.error("Bot get-guilds failed: {}", e.getMessage());
+            return new GuildsResponse(null, false, "bot unreachable");
+        }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record GuildInfo(String id, String name) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record GuildsResponse(List<GuildInfo> guilds, boolean success, String reason) {}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record TestConnectionResponse(boolean success, String reason) {}

@@ -1,5 +1,6 @@
 package de.thm.swtp.api.discord.controller;
 
+import de.thm.swtp.api.discord.client.BotInternalClient.GuildInfo;
 import de.thm.swtp.api.discord.dto.DiscordChannelResponse;
 import de.thm.swtp.api.discord.entity.LinkedChannelEntity;
 import de.thm.swtp.api.discord.service.DiscordChannelService;
@@ -8,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -38,10 +40,19 @@ public class DiscordChannelController {
         return ResponseEntity.ok(Map.of("url", discordChannelService.getBotInviteUrl(projectId)));
     }
 
+    @GetMapping("/guilds")
+    @PreAuthorize("@security.canEditProject(#projectId, authentication)")
+    public ResponseEntity<List<GuildInfo>> getGuilds(@PathVariable UUID projectId) {
+        return ResponseEntity.ok(discordChannelService.getAvailableGuilds(projectId));
+    }
+
     @PostMapping("/auto-connect")
     @PreAuthorize("@security.canEditProject(#projectId, authentication)")
-    public ResponseEntity<DiscordChannelResponse> autoConnect(@PathVariable UUID projectId) {
-        LinkedChannelEntity link = discordChannelService.autoConnectChannel(projectId, null);
+    public ResponseEntity<DiscordChannelResponse> autoConnect(
+            @PathVariable UUID projectId,
+            @RequestBody(required = false) Map<String, String> body) {
+        String guildId = body != null ? body.get("guildId") : null;
+        LinkedChannelEntity link = discordChannelService.autoConnectChannel(projectId, guildId);
         return ResponseEntity.ok(DiscordChannelResponse.from(link));
     }
 

@@ -1,5 +1,6 @@
 package de.thm.swtp.api.discord.service;
 
+import de.thm.swtp.api.discord.client.BotInternalClient.GuildInfo;
 import de.thm.swtp.api.discord.client.BotInternalClient;
 import de.thm.swtp.api.discord.config.DiscordProperties;
 import de.thm.swtp.api.discord.entity.DiscordChannelSettingsEntity;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -146,6 +148,15 @@ public class DiscordChannelService {
         LinkedChannelEntity saved = linkedChannelRepository.save(link);
         log.info("Discord invite URL updated: project={}, url={}", projectId, inviteUrl);
         return saved;
+    }
+
+    public List<GuildInfo> getAvailableGuilds(UUID projectId) {
+        var resp = botInternalClient.getGuilds();
+        if (!resp.success() || resp.guilds() == null) {
+            throw new DiscordConnectionFailedException(
+                    "Failed to fetch guilds: " + (resp.reason() != null ? resp.reason() : "unknown error"));
+        }
+        return resp.guilds();
     }
 
     @Transactional
