@@ -6,9 +6,12 @@ import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.UUID;
@@ -21,7 +24,7 @@ public class DiscordAuthService {
     private final DiscordOAuthClient discordOAuthClient;
     private final UserProfileRepository userProfileRepository;
     private final ConcurrentHashMap<String, UUID> pendingStates = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<UUID, String> pendingBotGuilds = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<UUID, PendingBotGuild> pendingBotGuilds = new ConcurrentHashMap<>();
 
     private final String clientId;
     private final String redirectUri;
@@ -67,12 +70,28 @@ public class DiscordAuthService {
     }
 
     public void storeBotGuild(UUID projectId, String guildId) {
-        pendingBotGuilds.put(projectId, guildId);
+        pendingBotGuilds.put(projectId, new PendingBotGuild(guildId));
         log.info("Bot guild stored for project {}: guildId={}", projectId, guildId);
     }
 
     public String consumeBotGuild(UUID projectId) {
-        return pendingBotGuilds.remove(projectId);
+        var entry = pendingBotGuilds.remove(projectId);
+        return entry != null ? entry.guildId() : null;
+    }
+
+    @Scheduled(fixedRate = 300_000)
+    public void purgeStaleBotGuilds() {
+        pendingBotGuilds.values().removeIf(PendingBotGuild::isExpired);
+    }
+
+    private record PendingBotGuild(String guildId, Instant createdAt) {
+        PendingBotGuild(String guildId) {
+            this(guildId, Instant.now());
+        }
+
+        boolean isExpired() {
+            return Duration.between(createdAt, Instant.now()).toMinutes() >= 30;
+        }
     }
 
     private String buildAvatarUrl(String discordId, Object avatarField) {
