@@ -1,7 +1,5 @@
 package de.thm.swtp.api.tag.validation;
 
-import de.thm.swtp.api.moderation.ModerationClient;
-import de.thm.swtp.api.moderation.exception.ModerationApiException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,7 +13,7 @@ import static org.mockito.Mockito.*;
 class OpenAIModeratedGithubTagSourceTest {
 
     @Mock
-    private ModerationClient moderationClient;
+    private OpenAIModerationClient moderationClient;
 
     @Mock
     private BlocklistService blocklistService;
@@ -64,7 +62,7 @@ class OpenAIModeratedGithubTagSourceTest {
 
     @Test
     void shouldFallbackToBlocklistWhenOpenAiThrows() {
-        when(moderationClient.isFlagged("fuck")).thenThrow(new ModerationApiException("down"));
+        when(moderationClient.isFlagged("fuck")).thenThrow(new TagValidationException("down"));
         when(blocklistService.contains("fuck")).thenReturn(true);
 
         assertThat(tagSource.tagExists("fuck")).isFalse();
@@ -75,7 +73,7 @@ class OpenAIModeratedGithubTagSourceTest {
 
     @Test
     void shouldUseGitHubWhenOpenAiFailsAndBlocklistPasses() {
-        when(moderationClient.isFlagged("typescript")).thenThrow(new ModerationApiException("down"));
+        when(moderationClient.isFlagged("typescript")).thenThrow(new TagValidationException("down"));
         when(blocklistService.contains("typescript")).thenReturn(false);
         when(gitHubTopicsClient.tagExists("typescript")).thenReturn(true);
 
@@ -87,7 +85,7 @@ class OpenAIModeratedGithubTagSourceTest {
 
     @Test
     void shouldRejectWhenOpenAiFailsAndBlocklistCatches() {
-        when(moderationClient.isFlagged("fuck")).thenThrow(new ModerationApiException("down"));
+        when(moderationClient.isFlagged("fuck")).thenThrow(new TagValidationException("down"));
         when(blocklistService.contains("fuck")).thenReturn(true);
 
         assertThat(tagSource.tagExists("fuck")).isFalse();

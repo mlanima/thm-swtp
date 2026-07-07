@@ -1,4 +1,4 @@
-import {Component, input, output} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {ProjectCreateData} from '../schemas/project-create.schema';
 import { ProjectInviteMember } from '../../../models/project-invite-member.model';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -14,10 +14,9 @@ import { TranslatePipe } from '@ngx-translate/core';
  * Shows summary of collected project data
  * */
 export class ProjectFinishForm {
-  readonly projectData = input<Partial<ProjectCreateData>>({});
-  readonly members = input<ProjectInviteMember[]>([]);
-  readonly isLoading = input(false);
+  @Input() projectData : Partial<ProjectCreateData> = {};
+  @Input() members : ProjectInviteMember[] = [];
 
-  readonly back = output<void>();
-  readonly finished = output<void>();
+  @Output() back = new EventEmitter<void>();
+  @Output() finished = new EventEmitter<void>();
 }

@@ -5,6 +5,7 @@
   [isLoading]="isLoading()"
   [isSaving]="isSaving()"
   [isDeleting]="isDeleting()"
+  [errorMessage]="errorMessage()"
   (addTag)="saveTag($event)"
   (deleteTag)="deleteTag($event)">
 </app-editable-tag-list>

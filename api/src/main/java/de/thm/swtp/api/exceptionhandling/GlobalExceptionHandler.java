@@ -16,18 +16,12 @@ import de.thm.swtp.api.projectInvitation.exception.InvalidProjectInviteException
 import de.thm.swtp.api.projectInvitation.exception.ProjectInviteAccessDeniedException;
 import de.thm.swtp.api.projectInvitation.exception.ProjectInviteNotFoundException;
 import de.thm.swtp.api.tag.exception.TagAccessDeniedException;
-import de.thm.swtp.api.tag.exception.TagSourceApiException;
-import de.thm.swtp.api.location.exception.GooglePlacesApiException;
-import de.thm.swtp.api.location.exception.InvalidPlaceException;
-import de.thm.swtp.api.moderation.exception.ContentModerationException;
-import de.thm.swtp.api.moderation.exception.ContentNotValidException;
-import de.thm.swtp.api.moderation.exception.ModerationApiException;
 import de.thm.swtp.api.tag.exception.TagNotValidException;
+import de.thm.swtp.api.tag.validation.TagValidationException;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.project.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -151,39 +145,18 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(400, "Bad Request", ex.getMessage(), "TAG_NOT_VALID"));
     }
 
-    @ExceptionHandler(TagSourceApiException.class)
-    public ResponseEntity<ErrorResponse> handleTagSourceApiError(TagSourceApiException ex) {
-        log.error("Tag source API error: {}", ex.getMessage(), ex);
+    @ExceptionHandler(TagValidationException.class)
+    public ResponseEntity<ErrorResponse> handleTagValidationError(TagValidationException ex) {
+        log.error("Tag validation failed due to external API error: {}", ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
                 .body(ErrorResponse.of(502, "Bad Gateway", "Tag validation service temporarily unavailable."));
-    }
-
-    @ExceptionHandler(ContentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleContentNotValid(ContentNotValidException ex) {
-        log.debug("Bad Request (400): {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage(), "CONTENT_NOT_VALID"));
-    }
-
-    @ExceptionHandler(ContentModerationException.class)
-    public ResponseEntity<ErrorResponse> handleContentModerationError(ContentModerationException ex) {
-        log.error("Content moderation failed: {}", ex.getMessage(), ex);
-        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
-                .body(ErrorResponse.of(502, "Bad Gateway", "Content moderation service temporarily unavailable."));
-    }
-
-    @ExceptionHandler(ModerationApiException.class)
-    public ResponseEntity<ErrorResponse> handleModerationApiError(ModerationApiException ex) {
-        log.error("Moderation API error: {}", ex.getMessage(), ex);
-        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
-                .body(ErrorResponse.of(502, "Bad Gateway", "Moderation service temporarily unavailable."));
     }
 
     @ExceptionHandler(ResourceAccessException.class)
     public ResponseEntity<ErrorResponse> handleResourceAccess(ResourceAccessException ex) {
         log.error("External API unreachable: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
-                .body(ErrorResponse.of(502, "Bad Gateway", "External service temporarily unreachable."));
+                .body(ErrorResponse.of(502, "Bad Gateway", "Tag validation service temporarily unavailable."));
     }
 
     @ExceptionHandler(ProjectJoinRequestAccessDeniedException.class)
@@ -405,14 +378,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ProjectOwnerTransferToSelfException.class)
     public ResponseEntity<ErrorResponse> handleProjectOwnerTransferToSelf(ProjectOwnerTransferToSelfException ex) {
         log.warn("Unprocessable Entity (422): {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatusCode.valueOf(422))
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
                 .body(ErrorResponse.of(422, "Unprocessable Entity", ex.getMessage()));
     }
 
     @ExceptionHandler(ProjectOwnerTransferToNonMemberException.class)
     public ResponseEntity<ErrorResponse> handleProjectOwnerTransferToNonMember(ProjectOwnerTransferToNonMemberException ex) {
         log.warn("Unprocessable Entity (422): {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatusCode.valueOf(422))
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
                 .body(ErrorResponse.of(422, "Unprocessable Entity", ex.getMessage()));
     }
 
@@ -475,20 +448,6 @@ public class GlobalExceptionHandler {
         log.error("Unhandled exception: type={}, message={}", ex.getClass().getName(), ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ErrorResponse.of(500, "Internal Server Error", "An unexpected error occurred."));
-    }
-
-    @ExceptionHandler(InvalidPlaceException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidPlace(InvalidPlaceException ex) {
-        log.debug("Bad Request (400): {}", LogSafe.clean(ex.getMessage()));
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage(), "INVALID_PLACE"));
-    }
-
-    @ExceptionHandler(GooglePlacesApiException.class)
-    public ResponseEntity<ErrorResponse> handleGooglePlacesApiError(GooglePlacesApiException ex) {
-        log.error("Google Places API error: {}", ex.getMessage(), ex);
-        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
-                .body(ErrorResponse.of(502, "Bad Gateway", "Places service temporarily unavailable."));
     }
 
     @ExceptionHandler(InvalidUserManagementSortFieldException.class)

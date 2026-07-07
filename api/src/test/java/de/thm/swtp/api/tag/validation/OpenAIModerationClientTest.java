@@ -1,6 +1,5 @@
-package de.thm.swtp.api.moderation;
+package de.thm.swtp.api.tag.validation;
 
-import de.thm.swtp.api.moderation.exception.ModerationApiException;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
@@ -8,14 +7,15 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.mock.http.client.MockClientHttpResponse;
 import org.springframework.web.client.RestClient;
 
+import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class ModerationClientTest {
+class OpenAIModerationClientTest {
 
-    private ModerationClient clientWithResponse(final int statusCode, final String body) {
+    private OpenAIModerationClient clientWithResponse(final int statusCode, final String body) {
         var interceptor = (ClientHttpRequestInterceptor) (request, bodyBytes, execution) -> {
             var response = new MockClientHttpResponse(
                     body.getBytes(StandardCharsets.UTF_8),
@@ -27,7 +27,7 @@ class ModerationClientTest {
                 .baseUrl("https://test.openai.com")
                 .requestInterceptor(interceptor)
                 .build();
-        return new ModerationClient(restClient, "omni-moderation-latest", 0.1, true);
+        return new OpenAIModerationClient(restClient, "omni-moderation-latest", 0.1, true);
     }
 
     @Test
@@ -65,22 +65,22 @@ class ModerationClientTest {
     @Test
     void shouldThrowWhenServerError() {
         assertThatThrownBy(() -> clientWithResponse(500, "Internal Server Error").isFlagged("test"))
-                .isInstanceOf(ModerationApiException.class)
-                .hasMessage("Moderation service temporarily unavailable");
+                .isInstanceOf(TagValidationException.class)
+                .hasMessage("Tag validation service temporarily unavailable");
     }
 
     @Test
     void shouldThrowWhenClientError() {
         assertThatThrownBy(() -> clientWithResponse(401, "Unauthorized").isFlagged("test"))
-                .isInstanceOf(ModerationApiException.class)
-                .hasMessage("Moderation service temporarily unavailable");
+                .isInstanceOf(TagValidationException.class)
+                .hasMessage("Tag validation service temporarily unavailable");
     }
 
     @Test
     void shouldThrowWhenNullResponse() {
         assertThatThrownBy(() -> clientWithResponse(200, "null").isFlagged("test"))
-                .isInstanceOf(ModerationApiException.class)
-                .hasMessage("Moderation service temporarily unavailable");
+                .isInstanceOf(TagValidationException.class)
+                .hasMessage("Tag validation service temporarily unavailable");
     }
 
     @Test
@@ -89,16 +89,16 @@ class ModerationClientTest {
                 {"results": []}
                 """;
         assertThatThrownBy(() -> clientWithResponse(200, json).isFlagged("test"))
-                .isInstanceOf(ModerationApiException.class)
-                .hasMessage("Moderation service temporarily unavailable");
+                .isInstanceOf(TagValidationException.class)
+                .hasMessage("Tag validation service temporarily unavailable");
     }
 
     @Test
     void shouldThrowWhenApiKeyMissing() {
         var restClient = RestClient.builder().baseUrl("https://test.openai.com").build();
-        var clientNoKey = new ModerationClient(restClient, "omni-moderation-latest", 0.1, false);
+        var clientNoKey = new OpenAIModerationClient(restClient, "omni-moderation-latest", 0.1, false);
         assertThatThrownBy(() -> clientNoKey.isFlagged("test"))
-                .isInstanceOf(ModerationApiException.class)
-                .hasMessage("Moderation service temporarily unavailable");
+                .isInstanceOf(TagValidationException.class)
+                .hasMessage("Tag validation service temporarily unavailable");
     }
 }
