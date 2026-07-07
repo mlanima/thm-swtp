@@ -71,6 +71,7 @@ public class UserProfile {
 
     private LocalDateTime bannedAt;
 
+    @Builder.Default
     @Column(nullable = false)
     private boolean onboardingCompleted = false;
 }

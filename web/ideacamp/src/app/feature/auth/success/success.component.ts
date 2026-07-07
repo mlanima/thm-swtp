@@ -17,6 +17,8 @@ export class SuccessComponent implements OnInit {
   private readonly router = inject(Router);
 
   readonly showOnboarding = signal(false);
+
+  private readonly defaultRedirectUrl = '/dashboard';
   private redirectUrl: string | null = null;
 
   async ngOnInit(): Promise<void> {
@@ -74,6 +76,6 @@ export class SuccessComponent implements OnInit {
   }
 
   private navigateAfterSuccess(): void {
-    void this.router.navigateByUrl('/dashboard');
+    void this.router.navigateByUrl(this.redirectUrl ?? this.defaultRedirectUrl);
   }
 }
