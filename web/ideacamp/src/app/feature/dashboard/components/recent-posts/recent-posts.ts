@@ -1,5 +1,5 @@
-import { Component, input, signal, effect, inject, ChangeDetectionStrategy } from '@angular/core';
-import { forkJoin, of } from 'rxjs';
+import { Component, input, signal, effect, inject, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
+import { forkJoin, of, Subscription } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ProjectResponse, ProjectPostResponse } from '../../../../models/project.model';
@@ -37,6 +37,9 @@ export class RecentPosts {
 
   private readonly projectService = inject(ProjectService);
   private readonly translateService = inject(TranslateService);
+  private readonly destroyRef = inject(DestroyRef);
+
+  private postsSubscription?: Subscription;
 
   readonly posts = signal<FeedPost[]>([]);
   readonly isLoading = signal(false);
@@ -51,11 +54,14 @@ export class RecentPosts {
     effect(() => {
       const projects = this.projects();
       if (projects.length === 0) {
+        this.postsSubscription?.unsubscribe();
         this.posts.set([]);
         return;
       }
       this.loadPosts(projects);
     });
+
+    this.destroyRef.onDestroy(() => this.postsSubscription?.unsubscribe());
   }
 
   getInitials(name: string): string {
@@ -71,6 +77,8 @@ export class RecentPosts {
   }
 
   private loadPosts(projects: ProjectResponse[]): void {
+    this.postsSubscription?.unsubscribe();
+
     this.isLoading.set(true);
     this.errorMessage.set('');
 
@@ -80,7 +88,7 @@ export class RecentPosts {
       ),
     );
 
-    forkJoin(requests).subscribe({
+    this.postsSubscription = forkJoin(requests).subscribe({
       next: (results) => {
         const merged: FeedPost[] = results.flatMap((posts, index) =>
           posts.map((post) => ({

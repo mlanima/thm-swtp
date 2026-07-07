@@ -675,6 +675,7 @@
     },
     "PROJECTS": {
       "TITLE": "Recent",
+      "LOADING": "Projects are loading…",
       "EMPTY": "You are not a member of any projects yet."
     }
   }

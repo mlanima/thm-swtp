@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject, signal, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../../auth/auth.service';
 import { MyProjectsService } from '../../../my-projects/services/my-projects.service';
@@ -18,6 +18,7 @@ export class DashboardPage implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly myProjectsService = inject(MyProjectsService);
   private readonly translateService = inject(TranslateService);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly projects = signal<ProjectResponse[]>([]);
   readonly isLoading = signal(true);
@@ -36,7 +37,7 @@ export class DashboardPage implements OnInit {
       return;
     }
 
-    this.myProjectsService.getRecentProjects(username).subscribe({
+    const sub = this.myProjectsService.getRecentProjects(username).subscribe({
       next: (projects) => {
         this.projects.set(projects);
         this.isLoading.set(false);
@@ -46,5 +47,6 @@ export class DashboardPage implements OnInit {
         this.isLoading.set(false);
       },
     });
+    this.destroyRef.onDestroy(() => sub.unsubscribe());
   }
 }
