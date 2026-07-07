@@ -18,7 +18,7 @@
           {{ invite().message }}
         </blockquote>
       }
-      <div class="mt-4 flex gap-2">
+      <div class="mt-4 flex flex-wrap gap-2">
         <button
           (click)="accept.emit(invite())"
           class="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-700"

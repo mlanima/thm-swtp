@@ -257,6 +257,7 @@
     }
   },
   "SIDEBAR": {
+    "DASHBOARD": "Dashboard",
     "MYPROJECTS": "My projects",
     "FAVORITE": "Favorites",
     "PROFILE": "My profile",
@@ -686,6 +687,21 @@
         "TITLE": "Use settings",
         "TEXT": "In settings you can find additional options, contact information and extra features."
       }
+    }
+  },
+  "DASHBOARD": {
+    "POSTS": {
+      "TITLE": "Recent Posts",
+      "SUBTITLE": "Updates from your projects",
+      "POSTED_IN": "Posted in {{ project }}",
+      "LOADING": "Posts are loading…",
+      "EMPTY": "There are no posts yet. Posts from your projects will appear here.",
+      "ERROR_LOAD": "Posts could not be loaded.",
+      "UNKNOWN_AUTHOR": "Unknown"
+    },
+    "PROJECTS": {
+      "TITLE": "Recent",
+      "EMPTY": "You are not a member of any projects yet."
     }
   }
 }

@@ -69,6 +69,6 @@ export class SuccessComponent implements OnInit {
   }
 
   private navigateAfterSuccess(): void {
-    void this.router.navigateByUrl(this.redirectUrl ?? '/my-projects');
+    void this.router.navigateByUrl('/dashboard');
   }
 }

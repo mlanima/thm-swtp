@@ -257,6 +257,7 @@
     }
   },
   "SIDEBAR": {
+    "DASHBOARD": "Dashboard",
     "MYPROJECTS": "Meine Projekte",
     "FAVORITE": "Favoriten",
     "PROFILE": "Mein Profil",
@@ -687,5 +688,21 @@
         "TEXT": "In den Einstellungen findest du weitere Optionen, Kontaktinformationen und zusätzliche Funktionen."
       }
     }
+  },
+  "DASHBOARD": {
+    "POSTS": {
+      "TITLE": "Neueste Beiträge",
+      "SUBTITLE": "Updates aus deinen Projekten",
+      "POSTED_IN": "Veröffentlicht in {{ project }}",
+      "LOADING": "Beiträge werden geladen…",
+      "EMPTY": "Es gibt noch keine Beiträge. Beiträge aus deinen Projekten erscheinen hier.",
+      "ERROR_LOAD": "Beiträge konnten nicht geladen werden.",
+      "UNKNOWN_AUTHOR": "Unbekannt"
+    },
+    "PROJECTS": {
+      "TITLE": "Zuletzt",
+      "EMPTY": "Du bist noch in keinem Projekt Mitglied."
+    }
   }
 }
+
