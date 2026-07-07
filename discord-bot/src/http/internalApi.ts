@@ -1,4 +1,4 @@
-import { PermissionFlagsBits } from 'discord.js';
+import { PermissionFlagsBits, type TextChannel, type NewsChannel, type GuildBasedChannel, type NonThreadGuildBasedChannel } from 'discord.js';
 import express from 'express';
 import { logger } from '../config/logger.js';
 import { pingRedis } from '../config/redis.js';
@@ -18,6 +18,23 @@ function validateSecret(req: express.Request, res: express.Response, next: expre
   next();
 }
 
+async function resolveGuildChannel(channelId: string): Promise<{
+  channel: GuildBasedChannel & NonThreadGuildBasedChannel;
+  error: null;
+} | {
+  channel: null;
+  error: { status: number; json: Record<string, unknown> };
+}> {
+  const channel = await discordClient.channels.fetch(channelId);
+  if (!channel || !channel.isTextBased() || !('guild' in channel) || !channel.guild) {
+    return {
+      channel: null,
+      error: { status: 200, json: { success: false, reason: 'channel not found or not a text channel in a guild' } },
+    };
+  }
+  return { channel: channel as GuildBasedChannel & NonThreadGuildBasedChannel, error: null };
+}
+
 internalApi.get('/health', async (_req, res) => {
   const redis = await pingRedis();
   const discord = getDiscordStatus();
@@ -33,15 +50,15 @@ internalApi.get('/metrics', async (_req, res) => {
 internalApi.post('/internal/channels/:channelId/leave-guild', validateSecret, async (req, res) => {
   const channelId = String(req.params.channelId);
   try {
-    const channel = await discordClient.channels.fetch(channelId);
-    if (!channel || !('guild' in channel) || !channel.guild) {
-      res.json({ success: false, reason: 'channel not found or not in a guild' });
+    const { channel, error } = await resolveGuildChannel(channelId);
+    if (error) {
+      res.json(error.json);
       return;
     }
     await channel.guild.leave();
     logger.info({ guildId: channel.guild.id, channelId }, 'bot left guild');
     res.json({ success: true });
-  } catch (err: any) {
+  } catch (err: unknown) {
     logger.error({ err, channelId }, 'leave-guild failed');
     res.json({ success: false, reason: 'failed to leave guild' });
   }
@@ -55,9 +72,9 @@ internalApi.post('/internal/channels/:channelId/restrict', validateSecret, async
     return;
   }
   try {
-    const channel = await discordClient.channels.fetch(channelId);
-    if (!channel || !channel.isTextBased() || !('guild' in channel) || !channel.guild) {
-      res.json({ success: false, reason: 'channel not found or not a text channel in a guild' });
+    const { channel, error } = await resolveGuildChannel(channelId);
+    if (error) {
+      res.json(error.json);
       return;
     }
     const guild = channel.guild;
@@ -66,8 +83,7 @@ internalApi.post('/internal/channels/:channelId/restrict', validateSecret, async
       res.json({ success: false, reason: 'bot is not a member of this guild' });
       return;
     }
-    // Set permission overwrites via direct REST calls for reliability
-    const rest = (discordClient as any).rest;
+    const rest = discordClient.rest;
     const sm = String(PermissionFlagsBits.SendMessages);
     await rest.put(`/channels/${channelId}/permissions/${guild.roles.everyone.id}`, {
       body: { type: 0, allow: '0', deny: sm },
@@ -79,14 +95,16 @@ internalApi.post('/internal/channels/:channelId/restrict', validateSecret, async
       await rest.put(`/channels/${channelId}/permissions/${botMember.id}`, {
         body: { type: 1, allow: sm, deny: '0' },
       });
-    } catch (innerErr: any) {
-      logger.warn({ err: innerErr, channelId }, 'member permission overwrites failed, everyone restrict still applied');
+    } catch (innerErr: unknown) {
+      const msg = innerErr instanceof Error ? innerErr : new Error(String(innerErr));
+      logger.warn({ err: msg, channelId }, 'member permission overwrites failed, everyone restrict still applied');
     }
     logger.info({ channelId, guildId: guild.id }, 'channel restricted to owner and bot');
     res.json({ success: true });
-  } catch (err: any) {
+  } catch (err: unknown) {
     logger.error({ err, channelId }, 'restrict channel failed');
-    if (err.code === 50013) {
+    const code = err instanceof Error ? (err as unknown as { code: unknown }).code : undefined;
+    if (code === 50013) {
       res.json({ success: false, reason: 'bot missing Manage Channels permission' });
     } else {
       res.json({ success: false, reason: 'failed to restrict channel' });
@@ -97,17 +115,22 @@ internalApi.post('/internal/channels/:channelId/restrict', validateSecret, async
 internalApi.post('/internal/channels/:channelId/invite', validateSecret, async (req, res) => {
   const channelId = String(req.params.channelId);
   try {
-    const channel = await discordClient.channels.fetch(channelId);
-    if (!channel || !channel.isTextBased() || !('guild' in channel) || !channel.guild) {
-      res.json({ success: false, reason: 'channel not found, not a text channel, or not in a guild' });
+    const { channel, error } = await resolveGuildChannel(channelId);
+    if (error) {
+      res.json(error.json);
       return;
     }
-    const invite = await (channel as any).createInvite({ maxAge: 0, maxUses: 0 });
+    if (!('createInvite' in channel)) {
+      res.json({ success: false, reason: 'channel type does not support invites' });
+      return;
+    }
+    const invite = await (channel as TextChannel | NewsChannel).createInvite({ maxAge: 0, maxUses: 0 });
     logger.info({ channelId, code: invite.code }, 'discord invite created');
     res.json({ success: true, inviteUrl: `https://discord.gg/${invite.code}` });
-  } catch (err: any) {
+  } catch (err: unknown) {
     logger.error({ err, channelId }, 'create-invite failed');
-    if (err.code === 50013) {
+    const code = err instanceof Error ? (err as unknown as { code: unknown }).code : undefined;
+    if (code === 50013) {
       res.json({ success: false, reason: 'bot missing Create Invite permission' });
     } else {
       res.json({ success: false, reason: 'failed to create invite' });
@@ -170,9 +193,10 @@ internalApi.post('/internal/auto-setup', validateSecret, async (req, res) => {
     });
     logger.info({ guildId: guild.id, channelId: created.id }, 'auto-setup: created restricted #posts');
     res.json({ success: true, guildId: guild.id, channelId: created.id, channelName: created.name });
-  } catch (err: any) {
+  } catch (err: unknown) {
     logger.error({ err }, 'auto-setup failed');
-    if (err.code === 50013) {
+    const code = err instanceof Error ? (err as unknown as { code: unknown }).code : undefined;
+    if (code === 50013) {
       res.json({ success: false, reason: 'bot missing Manage Channels permission' });
     } else {
       res.json({ success: false, reason: 'failed to create or find channel' });
@@ -192,7 +216,7 @@ internalApi.post('/internal/test-connection', validateSecret, async (req, res) =
       res.json({ success: false, reason: 'channel not found or not a text channel' });
       return;
     }
-    if (guildId && 'guildId' in channel && (channel as { guildId: string }).guildId !== guildId) {
+    if (guildId && 'guildId' in channel && channel.guildId !== guildId) {
       res.json({ success: false, reason: 'channel does not belong to the specified guild' });
       return;
     }
@@ -223,9 +247,22 @@ internalApi.post('/internal/jobs/:jobId/retry', validateSecret, async (req, res)
   }
 });
 
-export function startInternalApi(port: number): void {
-  internalApi.listen(port, () => {
+let server: ReturnType<typeof internalApi.listen> | null = null;
+
+export function startInternalApi(port: number): ReturnType<typeof internalApi.listen> {
+  server = internalApi.listen(port, () => {
     logger.info({ port }, 'internal API listening');
   });
+  return server;
 }
 
+export async function stopInternalApi(): Promise<void> {
+  return new Promise((resolve) => {
+    if (server) {
+      server.close(() => resolve());
+      server = null;
+    } else {
+      resolve();
+    }
+  });
+}
