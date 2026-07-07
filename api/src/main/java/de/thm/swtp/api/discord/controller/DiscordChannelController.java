@@ -1,12 +1,13 @@
 package de.thm.swtp.api.discord.controller;
 
+import de.thm.swtp.api.discord.dto.DiscordChannelResponse;
 import de.thm.swtp.api.discord.entity.LinkedChannelEntity;
 import de.thm.swtp.api.discord.service.DiscordChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -18,70 +19,56 @@ public class DiscordChannelController {
     private final DiscordChannelService discordChannelService;
 
     @PostMapping("/connect")
-    public ResponseEntity<Map<String, Object>> connect(
+    @PreAuthorize("@security.canEditProject(#projectId, authentication)")
+    public ResponseEntity<DiscordChannelResponse> connect(
             @PathVariable UUID projectId,
             @RequestBody Map<String, String> body) {
         String channelId = body.get("channelId");
         String guildId = body.get("guildId");
         if (channelId == null || channelId.isBlank()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "channelId is required"));
+            return ResponseEntity.badRequest().build();
         }
         LinkedChannelEntity link = discordChannelService.connectChannel(projectId, channelId, guildId);
-        Map<String, Object> result = new HashMap<>();
-        result.put("id", link.getId());
-        result.put("discordChannelId", link.getDiscordChannelId());
-        result.put("discordGuildId", link.getDiscordGuildId());
-        result.put("isActive", link.isActive());
-        result.put("discordInviteUrl", link.getDiscordInviteUrl());
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(DiscordChannelResponse.from(link));
     }
 
     @GetMapping("/bot-invite")
+    @PreAuthorize("@security.canEditProject(#projectId, authentication)")
     public ResponseEntity<Map<String, String>> getBotInviteUrl(@PathVariable UUID projectId) {
         return ResponseEntity.ok(Map.of("url", discordChannelService.getBotInviteUrl(projectId)));
     }
 
     @PostMapping("/auto-connect")
-    public ResponseEntity<Map<String, Object>> autoConnect(@PathVariable UUID projectId) {
+    @PreAuthorize("@security.canEditProject(#projectId, authentication)")
+    public ResponseEntity<DiscordChannelResponse> autoConnect(@PathVariable UUID projectId) {
         LinkedChannelEntity link = discordChannelService.autoConnectChannel(projectId, null);
-        Map<String, Object> result = new HashMap<>();
-        result.put("id", link.getId());
-        result.put("discordChannelId", link.getDiscordChannelId());
-        result.put("discordGuildId", link.getDiscordGuildId());
-        result.put("isActive", link.isActive());
-        result.put("discordInviteUrl", link.getDiscordInviteUrl());
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(DiscordChannelResponse.from(link));
     }
 
     @PatchMapping("/invite")
-    public ResponseEntity<Map<String, Object>> updateInviteUrl(
+    @PreAuthorize("@security.canEditProject(#projectId, authentication)")
+    public ResponseEntity<DiscordChannelResponse> updateInviteUrl(
             @PathVariable UUID projectId,
             @RequestBody Map<String, String> body) {
         String inviteUrl = body.get("discordInviteUrl");
         if (inviteUrl == null || inviteUrl.isBlank()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "discordInviteUrl is required"));
+            return ResponseEntity.badRequest().build();
         }
         LinkedChannelEntity link = discordChannelService.updateDiscordInviteUrl(projectId, inviteUrl);
-        return ResponseEntity.ok(Map.of(
-                "discordInviteUrl", link.getDiscordInviteUrl()
-        ));
+        return ResponseEntity.ok(DiscordChannelResponse.from(link));
     }
 
     @DeleteMapping("/connect")
+    @PreAuthorize("@security.canEditProject(#projectId, authentication)")
     public ResponseEntity<Void> disconnect(@PathVariable UUID projectId) {
         discordChannelService.disconnectChannel(projectId);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/connect")
-    public ResponseEntity<Map<String, Object>> getConnection(@PathVariable UUID projectId) {
+    @PreAuthorize("@security.canViewProject(#projectId, authentication)")
+    public ResponseEntity<DiscordChannelResponse> getConnection(@PathVariable UUID projectId) {
         LinkedChannelEntity link = discordChannelService.getLinkedChannel(projectId);
-        Map<String, Object> result = new HashMap<>();
-        result.put("id", link.getId());
-        result.put("discordChannelId", link.getDiscordChannelId());
-        result.put("discordGuildId", link.getDiscordGuildId());
-        result.put("isActive", link.isActive());
-        result.put("discordInviteUrl", link.getDiscordInviteUrl());
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(DiscordChannelResponse.from(link));
     }
 }

@@ -1,11 +1,12 @@
 package de.thm.swtp.api.discord.controller;
 
+import de.thm.swtp.api.discord.dto.DiscordStatusResponse;
 import de.thm.swtp.api.discord.service.DiscordStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -16,7 +17,8 @@ public class DiscordStatusController {
     private final DiscordStatusService discordStatusService;
 
     @GetMapping
-    public ResponseEntity<Map<String, Object>> getStatus(@PathVariable UUID projectId) {
+    @PreAuthorize("@security.canViewProject(#projectId, authentication)")
+    public ResponseEntity<DiscordStatusResponse> getStatus(@PathVariable UUID projectId) {
         return ResponseEntity.ok(discordStatusService.getStatus(projectId));
     }
 }

@@ -1,12 +1,13 @@
 package de.thm.swtp.api.discord.controller;
 
+import de.thm.swtp.api.discord.dto.DiscordSettingsResponse;
 import de.thm.swtp.api.discord.entity.DiscordChannelSettingsEntity;
 import de.thm.swtp.api.discord.service.DiscordChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -17,35 +18,25 @@ public class DiscordSettingsController {
     private final DiscordChannelService discordChannelService;
 
     @GetMapping
-    public ResponseEntity<Map<String, Object>> getSettings(@PathVariable UUID projectId) {
+    @PreAuthorize("@security.canViewProject(#projectId, authentication)")
+    public ResponseEntity<DiscordSettingsResponse> getSettings(@PathVariable UUID projectId) {
         DiscordChannelSettingsEntity settings = discordChannelService.getSettings(projectId);
-        return ResponseEntity.ok(Map.of(
-                "notifyPostCreated", settings.isNotifyPostCreated(),
-                "notifyPostUpdated", settings.isNotifyPostUpdated(),
-                "notifyPostDeleted", settings.isNotifyPostDeleted(),
-                "notifyMemberJoin", settings.isNotifyMemberJoin(),
-                "notifyMemberLeave", settings.isNotifyMemberLeave()
-        ));
+        return ResponseEntity.ok(DiscordSettingsResponse.from(settings));
     }
 
     @PutMapping
-    public ResponseEntity<Map<String, Object>> updateSettings(
+    @PreAuthorize("@security.canEditProject(#projectId, authentication)")
+    public ResponseEntity<DiscordSettingsResponse> updateSettings(
             @PathVariable UUID projectId,
-            @RequestBody Map<String, Boolean> body) {
+            @RequestBody DiscordSettingsResponse.UpdateRequest body) {
         DiscordChannelSettingsEntity updated = new DiscordChannelSettingsEntity();
-        updated.setNotifyPostCreated(body.getOrDefault("notifyPostCreated", true));
-        updated.setNotifyPostUpdated(body.getOrDefault("notifyPostUpdated", true));
-        updated.setNotifyPostDeleted(body.getOrDefault("notifyPostDeleted", false));
-        updated.setNotifyMemberJoin(body.getOrDefault("notifyMemberJoin", true));
-        updated.setNotifyMemberLeave(body.getOrDefault("notifyMemberLeave", false));
+        updated.setNotifyPostCreated(body.notifyPostCreated());
+        updated.setNotifyPostUpdated(body.notifyPostUpdated());
+        updated.setNotifyPostDeleted(body.notifyPostDeleted());
+        updated.setNotifyMemberJoin(body.notifyMemberJoin());
+        updated.setNotifyMemberLeave(body.notifyMemberLeave());
 
         DiscordChannelSettingsEntity settings = discordChannelService.updateSettings(projectId, updated);
-        return ResponseEntity.ok(Map.of(
-                "notifyPostCreated", settings.isNotifyPostCreated(),
-                "notifyPostUpdated", settings.isNotifyPostUpdated(),
-                "notifyPostDeleted", settings.isNotifyPostDeleted(),
-                "notifyMemberJoin", settings.isNotifyMemberJoin(),
-                "notifyMemberLeave", settings.isNotifyMemberLeave()
-        ));
+        return ResponseEntity.ok(DiscordSettingsResponse.from(settings));
     }
 }
