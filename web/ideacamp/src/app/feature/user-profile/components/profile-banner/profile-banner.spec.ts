@@ -23,7 +23,6 @@ describe('ProfileBanner', () => {
       email: '',
       title: '',
       location: '',
-      placeId: null,
       followers: 0,
       about: '',
       experience: '',
@@ -37,5 +36,20 @@ describe('ProfileBanner', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should not show the professor badge when isProfessor is false', () => {
+    const badge = fixture.nativeElement.querySelector('.pi-graduation-cap');
+    expect(badge).toBeNull();
+  });
+
+  it('should show the professor badge when isProfessor is true', async () => {
+    const professorFixture = TestBed.createComponent(ProfileBanner);
+    professorFixture.componentInstance.profile = { ...component.profile, isProfessor: true };
+    professorFixture.detectChanges();
+    await professorFixture.whenStable();
+
+    const badge = professorFixture.nativeElement.querySelector('.pi-graduation-cap');
+    expect(badge).not.toBeNull();
   });
 });

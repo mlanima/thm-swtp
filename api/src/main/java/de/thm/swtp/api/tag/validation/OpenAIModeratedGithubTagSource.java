@@ -1,8 +1,6 @@
 package de.thm.swtp.api.tag.validation;
 
 import de.thm.swtp.api.common.LogSafe;
-import de.thm.swtp.api.moderation.ModerationClient;
-import de.thm.swtp.api.moderation.exception.ModerationApiException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -14,7 +12,7 @@ import org.springframework.stereotype.Component;
 @ConditionalOnProperty(name = "app.tags.source", havingValue = "openai-github")
 public class OpenAIModeratedGithubTagSource implements TagSource {
 
-    private final ModerationClient moderationClient;
+    private final OpenAIModerationClient moderationClient;
     private final BlocklistService blocklistService;
     private final GitHubTopicsClient gitHubTopicsClient;
 
@@ -28,7 +26,7 @@ public class OpenAIModeratedGithubTagSource implements TagSource {
                 return false;
             }
             log.info("Tag passed OpenAI moderation: {}", LogSafe.clean(tagName));
-        } catch (ModerationApiException e) {
+        } catch (TagValidationException e) {
             log.warn("OpenAI moderation unavailable, falling back to blocklist: {}",
                     LogSafe.clean(tagName));
             if (blocklistService.contains(cleaned)) {
