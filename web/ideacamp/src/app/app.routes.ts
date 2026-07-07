@@ -10,6 +10,7 @@ import {moderatorGuard} from './feature/auth/moderator.guard';
 import { bannedAccountGuard } from './feature/auth/banned-account.guard';
 import { SearchPage } from './feature/search/pages/search-page/search-page';
 import { MyProjectsPage } from './feature/my-projects/pages/my-projects-page/my-projects-page';
+import { DashboardPage } from './feature/dashboard/pages/dashboard-page/dashboard-page';
 import { ProjectSettings } from './feature/project-settings/project-settings';
 import { FavoritesPage } from './feature/favorites/pages/favorites-page/favorites-page';
 import { LandingPage } from './feature/landing-page/pages/landing-page/landing-page';
@@ -34,6 +35,7 @@ export const routes: Routes = [
   {path: 'search', component: SearchPage, canActivate: [authGuard]},
   {path: 'createProject', component: ProjectCreate, canActivate: [authGuard]},
   {path: 'my-projects', component: MyProjectsPage, canActivate: [authGuard]},
+  {path: 'dashboard', component: DashboardPage, canActivate: [authGuard]},
   {path: 'favorites', component: FavoritesPage, canActivate: [authGuard]},
   {path: 'settings', component: UserSettings, canActivate: [authGuard]},
   {path: 'professor-request', redirectTo: 'settings', pathMatch: 'full'},

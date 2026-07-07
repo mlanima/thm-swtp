@@ -257,6 +257,7 @@
     }
   },
   "SIDEBAR": {
+    "DASHBOARD": "Dashboard",
     "MYPROJECTS": "Meine Projekte",
     "FAVORITE": "Favoriten",
     "PROFILE": "Mein Profil",
@@ -654,5 +655,20 @@
     "NO_REASON": "Kein Grund angegeben",
     "BANNED_AT": "Gesperrt am:",
     "CONTACT_HINT": "Wenn du Fragen hast, wende dich bitte an das Projektteam."
+  },
+  "DASHBOARD": {
+    "POSTS": {
+      "TITLE": "Neueste Beiträge",
+      "SUBTITLE": "Updates aus deinen Projekten",
+      "POSTED_IN": "Veröffentlicht in {{ project }}",
+      "LOADING": "Beiträge werden geladen…",
+      "EMPTY": "Es gibt noch keine Beiträge. Beiträge aus deinen Projekten erscheinen hier.",
+      "ERROR_LOAD": "Beiträge konnten nicht geladen werden.",
+      "UNKNOWN_AUTHOR": "Unbekannt"
+    },
+    "PROJECTS": {
+      "TITLE": "Zuletzt",
+      "EMPTY": "Du bist noch in keinem Projekt Mitglied."
+    }
   }
 }

@@ -1,0 +1,23 @@
+<section class="min-h-screen bg-slate-100 px-6 py-8 text-slate-700">
+  <div class="mx-auto max-w-7xl">
+    @if (errorMessage()) {
+      <div class="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-[320px_1fr_320px]">
+      <div>
+        <app-invitations-section />
+      </div>
+
+      <div>
+        <app-recent-posts [projects]="projects()" />
+      </div>
+
+      <div>
+        <app-current-projects [projects]="projects()" />
+      </div>
+    </div>
+  </div>
+</section>

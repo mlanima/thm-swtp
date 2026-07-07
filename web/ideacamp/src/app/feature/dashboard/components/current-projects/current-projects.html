@@ -1,0 +1,35 @@
+<section class="rounded-2xl bg-white p-6 shadow-sm">
+  <div class="flex items-center gap-2">
+    <i class="pi pi-folder text-slate-400"></i>
+    <h2 class="text-lg font-semibold text-slate-700">{{ 'DASHBOARD.PROJECTS.TITLE' | translate }}</h2>
+  </div>
+
+  @if (projects().length === 0) {
+    <p class="mt-6 rounded-xl border border-dashed border-slate-200 p-6 text-center text-sm text-slate-400">
+      {{ 'DASHBOARD.PROJECTS.EMPTY' | translate }}
+    </p>
+  } @else {
+    <div class="mt-4 space-y-3">
+      @for (project of projects(); track project.id) {
+        <a
+          [routerLink]="['/project', project.projectUrl]"
+          class="flex items-center gap-3 rounded-xl p-2 transition hover:bg-slate-50"
+        >
+          <div
+            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
+            [class]="getAvatarColor(project.name)"
+          >
+            {{ getInitials(project.name) }}
+          </div>
+          <div class="min-w-0 flex-1">
+            <p class="truncate text-sm font-semibold text-slate-700">{{ project.name }}</p>
+            <p class="truncate text-xs text-slate-400">
+              {{ project.shortDescription || ('MYPROJECTS.NO_SHORT_DESCRIPTION' | translate) }}
+            </p>
+          </div>
+          <app-favorite-button [projectId]="project.id" [count]="project.favoriteCount" />
+        </a>
+      }
+    </div>
+  }
+</section>

@@ -50,6 +50,12 @@
               </app-menu-link>
             </a>
           } @else {
+            <a routerLink="/dashboard" (click)="requestClose()">
+            <app-menu-link>
+               <i class="pi pi-th-large text-sm text-zinc-400"></i>
+               <span>{{ 'SIDEBAR.DASHBOARD' | translate }}</span>
+             </app-menu-link>
+            </a>
             <a routerLink="/search" (click)="requestClose()">
             <app-menu-link>
                <i class="pi pi-search text-sm text-zinc-400"></i>
