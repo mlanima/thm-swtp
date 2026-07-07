@@ -213,7 +213,8 @@
       "SORT": {
         "ASC": "Sorted ascending",
         "DESC": "Sorted descending",
-        "NOT_SORTED": "Not sorted"
+        "NOT_SORTED": "Not sorted",
+        "LABEL": "Sort"
       },
       "ROLES": {
         "PROFESSOR": "Professor",
