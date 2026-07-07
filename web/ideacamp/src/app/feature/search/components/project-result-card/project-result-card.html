@@ -15,21 +15,26 @@
       <h3 class="truncate text-base font-semibold text-slate-700">
         {{ project().name }}
       </h3>
+      @if (project().openPositionsCount > 0) {
+        <span class="shrink-0 rounded-full bg-lime-100 px-2 py-0.5 text-xs font-medium text-lime-700">
+          {{ 'SEARCH.FILTERS.OPEN_POSITIONS_BADGE' | translate: { count: project().openPositionsCount } }}
+        </span>
+      }
     </div>
     <p class="mt-0.5 truncate text-sm text-slate-400">
       {{ project().shortDescription || ('MYPROJECTS.NO_SHORT_DESCRIPTION' | translate) }}
     </p>
   </div>
 
-  @if (tags().length > 0) {
+  @if (project().tags.length > 0) {
     <div class="hidden flex-wrap items-center justify-end gap-1.5 lg:flex">
-      @for (tag of tags().slice(0, 3); track tag) {
+      @for (tag of project().tags.slice(0, 3); track tag) {
         <span class="rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">{{
           tag
         }}</span>
       }
-      @if (tags().length > 3) {
-        <span class="text-xs text-slate-400">+{{ tags().length - 3 }}</span>
+      @if (project().tags.length > 3) {
+        <span class="text-xs text-slate-400">+{{ project().tags.length - 3 }}</span>
       }
     </div>
   }

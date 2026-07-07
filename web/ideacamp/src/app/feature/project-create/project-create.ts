@@ -1,16 +1,14 @@
 import { Component, HostListener, ViewChild, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { HttpErrorResponse } from '@angular/common/http';
 import {z} from 'zod';
 import {WizardLayout} from './wizard-layout/wizard-layout';
 import {Stepper} from './stepper/stepper';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {ProjectGeneralForm} from './project-general-form/project-general-form';
 import {ProjectSettingsForm} from './project-settings-form/project-settings-form';
 import {ProjectMembersForm} from './project-members-form/project-members-form';
 import {ProjectFinishForm} from './project-finish-form/project-finish-form';
 import { ProjectService } from '../project-site/project.service';
-import { ToastService } from '../../shared/toast/toast.service';
 
 import {ProjectGeneralData, ProjectSettingsData, ProjectCreateData, projectCreateSchema} from './schemas/project-create.schema';
 import {generateProjectUrl} from './project-url.utils';
@@ -25,7 +23,8 @@ import {ProjectInviteMember } from '../../models/project-invite-member.model';
     ProjectGeneralForm,
     ProjectSettingsForm,
     ProjectMembersForm,
-    ProjectFinishForm
+    ProjectFinishForm,
+    TranslatePipe
   ],
   templateUrl: './project-create.html',
 })
@@ -34,11 +33,12 @@ export class ProjectCreate {
   private readonly projectService = inject(ProjectService);
   private readonly router = inject(Router);
   private readonly translateService = inject(TranslateService);
-  private readonly toastService = inject(ToastService);
 
   @ViewChild(ProjectMembersForm) membersForm?: ProjectMembersForm;
 
   isLoading = false;
+  errorMessage: string | null = null;
+  successMessage: string | null = null;
 
   currentStep = 0;
 
@@ -130,24 +130,21 @@ export class ProjectCreate {
       return;
     }
     this.isLoading = true;
+    this.errorMessage = null;
 
     this.projectService.createProject({ ...res.data, shortDescription: res.data.shortDescription ?? null, description: res.data.description ?? null,memberIds: this.invitedMembers.map(member => member.keycloakId), tagIds: [] }).subscribe({
       next: (project) => {
         this.isLoading = false;
-        this.toastService.success(this.translateService.instant(
+        this.successMessage = this.translateService.instant(
           this.invitedMembers.length > 0 ? 'PROJECTCREATE.SUCCESS_CREATED_WITH_INVITES' : 'PROJECTCREATE.SUCCESS_CREATED',
-        ));
+        );
         setTimeout(() => {
           this.router.navigate(['/project', project.projectUrl]);
         }, 1500);
       },
-      error: (err: HttpErrorResponse) => {
+      error: () => {
         this.isLoading = false;
-        if (err.error?.errorCode === 'CONTENT_NOT_VALID') {
-          this.toastService.error(this.translateService.instant('PROJECTCREATE.ERROR_MODERATION'));
-        } else {
-          this.toastService.error(this.translateService.instant('PROJECTCREATE.ERROR_CREATE_PROJECT'));
-        }
+        this.errorMessage = this.translateService.instant('PROJECTCREATE.ERROR_CREATE_PROJECT');
       },
     });
   }
