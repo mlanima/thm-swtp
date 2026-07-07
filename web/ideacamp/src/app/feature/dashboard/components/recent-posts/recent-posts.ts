@@ -45,7 +45,6 @@ export class RecentPosts {
   readonly isLoading = signal(false);
   readonly errorMessage = signal('');
   readonly expanded = signal(true);
-  readonly postImageUrls = signal<Record<string, string>>({});
 
   toggle(): void {
     this.expanded.update((v) => !v);
@@ -57,7 +56,6 @@ export class RecentPosts {
       if (projects.length === 0) {
         this.postsSubscription?.unsubscribe();
         this.posts.set([]);
-        this.clearPostImageUrls();
         return;
       }
       this.loadPosts(projects);
@@ -65,7 +63,6 @@ export class RecentPosts {
 
     this.destroyRef.onDestroy(() => {
       this.postsSubscription?.unsubscribe();
-      this.clearPostImageUrls();
     });
   }
 
@@ -110,31 +107,11 @@ export class RecentPosts {
         const visiblePosts = merged.slice(0, MAX_POSTS);
         this.posts.set(visiblePosts);
         this.isLoading.set(false);
-        this.clearPostImageUrls();
-        this.loadPostImages(visiblePosts);
       },
       error: () => {
         this.errorMessage.set(this.translateService.instant('DASHBOARD.POSTS.ERROR_LOAD'));
         this.isLoading.set(false);
       },
     });
-  }
-
-  private loadPostImages(posts: FeedPost[]): void {
-    posts
-      .filter((post) => !!post.imageUrl)
-      .forEach((post) => {
-        this.projectService.getProjectPostImage(post.projectId, post.id).subscribe({
-          next: (blob) => {
-            const objectUrl = URL.createObjectURL(blob);
-            this.postImageUrls.update((urls) => ({ ...urls, [post.id]: objectUrl }));
-          },
-        });
-      });
-  }
-
-  private clearPostImageUrls(): void {
-    Object.values(this.postImageUrls()).forEach((url) => URL.revokeObjectURL(url));
-    this.postImageUrls.set({});
   }
 }
