@@ -417,7 +417,10 @@
       "ERROR_CONNECT": "Konnte keine Verbindung zum Discord-Kanal herstellen.",
       "ERROR_LINK": "Verbindung zu Discord fehlgeschlagen.",
       "NEEDS_DISCORD_LINK": "Du musst dein Discord-Konto verknüpfen, bevor du einen Server verbinden kannst.",
-      "LINK_DISCORD": "Discord-Konto verknüpfen"
+      "LINK_DISCORD": "Discord-Konto verknüpfen",
+      "SELECT_SERVER": "Bot ist in mehreren Servern — wähle einen aus:",
+      "SELECT_SERVER_PLACEHOLDER": "Server auswählen...",
+      "CONNECT_SERVER": "Verbinden"
     },
     "ERRORS": {
       "NO_PROJECT_URL": "Keine Projekt-URL gegeben.",

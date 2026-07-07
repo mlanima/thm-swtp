@@ -49,6 +49,11 @@ export class DiscordTab implements OnInit, OnDestroy {
   readonly linkError = signal<string | null>(null);
   readonly isLinkingDiscord = signal(false);
 
+  readonly showGuildPicker = signal(false);
+  readonly availableGuilds = signal<{ id: string; name: string }[]>([]);
+  readonly selectedGuildId = signal('');
+  readonly isConnectingGuild = signal(false);
+
   ngOnInit(): void {
     const projectId = this.store.project()?.id;
     if (!projectId) return;
@@ -178,18 +183,21 @@ export class DiscordTab implements OnInit, OnDestroy {
     });
   }
 
-  private autoConnect(): void {
+  private autoConnect(guildId?: string): void {
     const projectId = this.store.project()?.id;
     if (!projectId) return;
 
     this.isAutoConnecting.set(true);
     this.connectError.set(null);
 
+    const body = guildId ? { guildId } : {};
+
     this.http.post<ChannelResponse>(
       `${environment.apiUrl}/v1/projects/${projectId}/discord/auto-connect`,
-      {},
+      body,
     ).subscribe({
       next: (res) => {
+        this.showGuildPicker.set(false);
         this.connectionStatus.set({ isActive: res.isActive, channelId: res.discordChannelId, discordInviteUrl: res.discordInviteUrl, syncedToday: 0 });
         this.inviteUrl.set(res.discordInviteUrl ?? '');
         this.isAutoConnecting.set(false);
@@ -197,8 +205,31 @@ export class DiscordTab implements OnInit, OnDestroy {
       error: (err) => {
         this.connectError.set(this.errorKey(err));
         this.isAutoConnecting.set(false);
+        if (err.error?.message?.includes('multiple guilds')) {
+          this.loadAvailableGuilds();
+        }
       },
     });
+  }
+
+  private loadAvailableGuilds(): void {
+    const projectId = this.store.project()?.id;
+    if (!projectId) return;
+    this.http.get<{ id: string; name: string }[]>(
+      `${environment.apiUrl}/v1/projects/${projectId}/discord/guilds`,
+    ).subscribe({
+      next: (guilds) => {
+        this.availableGuilds.set(guilds);
+        this.showGuildPicker.set(true);
+      },
+    });
+  }
+
+  connectWithSelectedGuild(): void {
+    const guildId = this.selectedGuildId();
+    if (!guildId) return;
+    this.showGuildPicker.set(false);
+    this.autoConnect(guildId);
   }
 
   private loadStatus(): void {

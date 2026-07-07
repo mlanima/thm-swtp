@@ -417,7 +417,10 @@
       "ERROR_CONNECT": "Could not connect to Discord channel.",
       "ERROR_LINK": "Could not connect to Discord.",
       "NEEDS_DISCORD_LINK": "You need to link your Discord account before connecting a server.",
-      "LINK_DISCORD": "Link Discord Account"
+      "LINK_DISCORD": "Link Discord Account",
+      "SELECT_SERVER": "Bot is in multiple servers — select which one to use:",
+      "SELECT_SERVER_PLACEHOLDER": "Select a server...",
+      "CONNECT_SERVER": "Connect"
     },
     "ERRORS": {
       "NO_PROJECT_URL": "No project URL provided.",

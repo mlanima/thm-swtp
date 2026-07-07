@@ -107,6 +107,30 @@
         </button>
         <p class="mt-2 text-xs text-slate-400">{{ 'PROJECTSETTINGS.DISCORD.ADD_BOT_HINT' | translate }}</p>
       </div>
+
+      @if (showGuildPicker()) {
+        <div class="mb-4 rounded-lg border border-slate-200 bg-slate-50 p-4">
+          <p class="mb-2 text-sm font-medium text-slate-700">{{ 'PROJECTSETTINGS.DISCORD.SELECT_SERVER' | translate }}</p>
+          <div class="flex gap-2">
+            <select
+              [(ngModel)]="selectedGuildId"
+              class="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+            >
+              <option value="" disabled>{{ 'PROJECTSETTINGS.DISCORD.SELECT_SERVER_PLACEHOLDER' | translate }}</option>
+              @for (g of availableGuilds(); track g.id) {
+                <option [value]="g.id">{{ g.name }}</option>
+              }
+            </select>
+            <button
+              (click)="connectWithSelectedGuild()"
+              [disabled]="!selectedGuildId() || isConnectingGuild()"
+              class="cursor-pointer rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:opacity-50"
+            >
+              {{ 'PROJECTSETTINGS.DISCORD.CONNECT_SERVER' | translate }}
+            </button>
+          </div>
+        </div>
+      }
     }
   }
 </div>
