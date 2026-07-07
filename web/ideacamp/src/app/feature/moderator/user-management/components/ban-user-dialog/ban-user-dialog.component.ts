@@ -24,6 +24,8 @@ export class BanUserDialogComponent {
   readonly banReason = signal('');
   readonly maxBanReasonLength = 1000;
 
+  readonly errorMessage = input<string | null>(null);
+
   getInitials(username: string): string {
     return username
       .split(/[.\s_-]+/)

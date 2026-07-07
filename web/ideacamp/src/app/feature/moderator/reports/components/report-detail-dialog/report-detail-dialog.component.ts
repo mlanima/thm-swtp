@@ -19,6 +19,7 @@ export class ReportDetailDialogComponent {
   readonly updateStatus = output<{ status: ReportStatus; moderatorMessage?: string }>();
 
   moderatorMessage = '';
+  private lastReportId: string | null = null;
 
   readonly targetActionConfirmed = output<{
     report: ManagedReport;
@@ -27,7 +28,11 @@ export class ReportDetailDialogComponent {
 
   constructor() {
     effect(() => {
-      this.moderatorMessage = this.report().moderatorMessage ?? '';
+      const report = this.report();
+      if (this.lastReportId !== report.id) {
+        this.moderatorMessage = report.moderatorMessage ?? '';
+        this.lastReportId = report.id;
+      }
     });
   }
 

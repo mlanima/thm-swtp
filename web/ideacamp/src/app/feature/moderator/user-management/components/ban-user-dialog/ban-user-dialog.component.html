@@ -43,6 +43,12 @@
       {{ banReason().length }}/1000
     </p>
 
+    @if (errorMessage()){
+      <p class="mt-4 rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-sm text-red-700">
+        {{ errorMessage()! | translate }}
+      </p>
+    }
+
     <div class="mt-6 flex justify-end gap-3">
       <button
         type="button"

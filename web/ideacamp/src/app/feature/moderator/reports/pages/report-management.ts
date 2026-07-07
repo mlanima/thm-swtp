@@ -70,6 +70,8 @@ export class ReportManagement implements OnInit {
   isTargetActionRunning = signal(false);
   targetActionError = signal<string | null>(null);
 
+  private queryDebounceTimeout: ReturnType<typeof setTimeout> | null = null;
+
   readonly statusOptions: (ReportStatus | null)[] = [
     null,
     'OPEN',
@@ -129,36 +131,16 @@ export class ReportManagement implements OnInit {
       });
   }
 
-  updateReportStatus(status: ReportStatus, moderatorMessage?: string): void {
-    const report = this.selectedReport();
-
-    if (!report) {
-      return;
-    }
-
-    this.isUpdating.set(true);
-
-    this.reportService
-      .updateReportStatus(report.id, {
-        status,
-        moderatorMessage,
-      })
-      .subscribe({
-        next: (updatedReport) => {
-          this.selectedReport.set(updatedReport);
-          this.loadReports(this.currentPage());
-          this.isUpdating.set(false);
-        },
-        error: () => {
-          this.errorMessage.set('MODERATOR.REPORTS.ERROR_UPDATE');
-          this.isUpdating.set(false);
-        },
-      });
-  }
-
   onQueryChange(value: string): void {
     this.query.set(value);
-    this.loadReports(0);
+
+    if (this.queryDebounceTimeout) {
+      clearTimeout(this.queryDebounceTimeout);
+    }
+
+    this.queryDebounceTimeout = setTimeout(() => {
+      this.loadReports(0);
+    }, 300);
   }
 
   setStatusFilter(status: ReportStatus | null): void {
@@ -204,8 +186,17 @@ export class ReportManagement implements OnInit {
   }
 
   updateReportStatusFromTable(event: { report: ManagedReport; status: ReportStatus }): void {
-    this.selectedReport.set(event.report);
-    this.updateReportStatus(event.status);
+    this.updateStatusOfReport(event.report, event.status);
+  }
+
+  updateReportStatus(status: ReportStatus, moderatorMessage?: string): void {
+    const report = this.selectedReport();
+
+    if (!report) {
+      return;
+    }
+
+    this.updateStatusOfReport(report, status, moderatorMessage);
   }
 
   /** Opens the matching confirmation dialog for the selected report target action.*/
@@ -354,7 +345,8 @@ export class ReportManagement implements OnInit {
       return;
     }
 
-    this.reportService.resolveActiveReportsForTarget(report.target, report.targetId, moderatorMessage)
+    this.reportService
+      .resolveActiveReportsForTarget(report.target, report.targetId, moderatorMessage)
       .subscribe({
         next: () => {
           this.selectedReport.set(null);
@@ -367,5 +359,33 @@ export class ReportManagement implements OnInit {
           this.isTargetActionRunning.set(false);
         },
       });
+  }
+
+  private updateStatusOfReport(
+    report: ManagedReport,
+    status: ReportStatus,
+    moderatorMessage?: string,
+  ): void {
+    this.isUpdating.set(true);
+    this.errorMessage.set(null);
+
+    this.reportService.updateReportStatus(report.id, { status, moderatorMessage }).subscribe({
+      next: (updatedReport) => {
+        this.reports.update((reports) =>
+          reports.map((currentReport) =>
+            currentReport.id === updatedReport.id ? updatedReport : currentReport,
+          ),
+        );
+
+        if (this.selectedReport()?.id === updatedReport.id) {
+          this.selectedReport.set(updatedReport);
+        }
+        this.isUpdating.set(false);
+      },
+      error: () => {
+        this.errorMessage.set('MODERATOR.REPORTS.ERROR_UPDATE');
+        this.isUpdating.set(false);
+      },
+    });
   }
 }

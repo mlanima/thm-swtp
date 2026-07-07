@@ -1,5 +1,6 @@
 package de.thm.swtp.api.reports.service;
 
+import de.thm.swtp.api.common.LogSafe;
 import de.thm.swtp.api.common.TxLogger;
 import de.thm.swtp.api.exceptionhandling.exceptions.*;
 import de.thm.swtp.api.project.ProjectRepository;
@@ -77,8 +78,18 @@ public class ReportService {
     public Page<Report> getReports(ReportStatus status, ReportTarget target, ReportReason reason, String query, Pageable pageable) {
         validateReportSort(pageable);
        String normalizedQuery = normalizeQuery(query);
-       return reportRepository.searchReports(status, target, reason, normalizedQuery, pageable)
+       Page<Report> reports =  reportRepository.searchReports(status, target, reason, normalizedQuery, pageable)
                .map(this::toDomainWithTargetSummary);
+
+        log.debug("Reports searched: status={}, target={}, reason={}, query={}, results={}",
+                status,
+                target,
+                reason,
+                LogSafe.clean(query),
+                reports.getTotalElements()
+        );
+
+       return reports;
     }
 
     /** Updates the moderation status of a report.*/

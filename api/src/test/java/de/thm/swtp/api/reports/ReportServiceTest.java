@@ -161,7 +161,14 @@ public class ReportServiceTest {
 
         when(userProfileRepository.findById(reporterId)).thenReturn(Optional.of(reporter));
         when(projectPostRepository.existsById(targetId)).thenReturn(true);
-        when(reportRepository.save(any(ReportEntity.class))).thenReturn(reportEntity);
+        when(reportRepository.save(any(ReportEntity.class)))
+                .thenAnswer(invocation -> {
+                    ReportEntity saved = invocation.getArgument(0);
+                    saved.setId(reportId);
+                    saved.setCreatedAt(LocalDateTime.now());
+                    saved.setUpdatedAt(LocalDateTime.now());
+                    return saved;
+                });
 
         Report result = reportService.createReport(
                 reporterId,
@@ -172,7 +179,7 @@ public class ReportServiceTest {
         );
 
         assertThat(result.getTarget()).isEqualTo(ReportTarget.PROJECT_POST);
-        assertThat(result.getReason()).isEqualTo(ReportReason.SPAM);
+        assertThat(result.getReason()).isEqualTo(ReportReason.HATE_SPEECH);
 
         verify(projectPostRepository).existsById(targetId);
         verify(reportRepository).save(any(ReportEntity.class));

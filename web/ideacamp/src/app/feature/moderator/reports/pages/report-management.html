@@ -165,6 +165,7 @@
   <app-ban-user-dialog
     [user]="user"
     [isSubmitting]="isTargetActionRunning()"
+    [errorMessage]="targetActionError()"
     (closeDialog)="closeBanUserDialog()"
     (confirmBan)="confirmBanUserFromReport($event)"
   />
