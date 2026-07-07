@@ -14,8 +14,8 @@
       <button
         type="button"
         class="rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
-        (click)="skip()"
-        [attr.aria-label]="'COMMON.CLOSE' | translate"
+        (click)="remindLaterClicked()"
+        [attr.aria-label]="'ONBOARDING.REMIND_LATER' | translate"
       >
         <i class="pi pi-times"></i>
       </button>
@@ -53,9 +53,9 @@
       <button
         type="button"
         class="text-sm font-medium text-slate-500 transition hover:text-slate-700"
-        (click)="skip()"
+        (click)="remindLaterClicked()"
       >
-        {{ 'ONBOARDING.SKIP' | translate }}
+        {{ 'ONBOARDING.REMIND_LATER' | translate }}
       </button>
 
       <div class="flex gap-3">

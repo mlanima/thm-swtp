@@ -666,26 +666,34 @@
   "ONBOARDING": {
     "LABEL": "Kurze Einführung",
     "TITLE": "Willkommen bei IdeaCamp",
-    "SKIP": "Überspringen",
+    "REMIND_LATER": "Später erinnern",
     "BACK": "Zurück",
     "NEXT": "Weiter",
     "FINISH": "Fertig",
     "STEPS": {
+      "DASHBOARD": {
+        "TITLE": "Dein Dashboard",
+        "TEXT": "Auf dem Dashboard bekommst du einen Überblick über Projekteinladungen, aktuelle Beiträge aus deinen Projekten und zuletzt angesehene Projekte."
+      },
+      "SIDEBAR": {
+        "TITLE": "Navigation über die Sidebar",
+        "TEXT": "Über das Menü oben links öffnest du die Sidebar. Dort findest du die wichtigsten Bereiche wie Dashboard, Suche, meine Projekte, Favoriten, Profil und Einstellungen."
+      },
       "SEARCH": {
         "TITLE": "Projekte entdecken",
-        "TEXT": "Über die Suche findest du Projekte, Themen und Ideen, die zu deinen Interessen passen."
+        "TEXT": "Über die Suche findest du Projekte und Nutzer. So kannst du passende Projekte entdecken und dich beteiligen."
       },
-      "PROJECTS": {
-        "TITLE": "Eigene Projekte verwalten",
-        "TEXT": "Unter „Meine Projekte“ findest du deine Projekte, Einladungen und alles, woran du beteiligt bist."
+      "MY_PROJECTS": {
+        "TITLE": "Meine Projekte",
+        "TEXT": "Unter „Meine Projekte“ findest du deine eigenen Projekte, Beteiligungen und Projekteinladungen."
       },
-      "PROFILE": {
-        "TITLE": "Dein Profil pflegen",
-        "TEXT": "In deinem Profil kannst du Informationen zu dir, deinen Interessen und deiner Erfahrung ergänzen."
+      "FAVORITES": {
+        "TITLE": "Favoriten",
+        "TEXT": "Interessante Projekte kannst du als Favorit markieren und später gesammelt wiederfinden."
       },
-      "SETTINGS": {
-        "TITLE": "Einstellungen nutzen",
-        "TEXT": "In den Einstellungen findest du weitere Optionen, Kontaktinformationen und zusätzliche Funktionen."
+      "PROFILE_SETTINGS": {
+        "TITLE": "Profil und Einstellungen",
+        "TEXT": "In deinem Profil kannst du Informationen zu dir ergänzen. In den Einstellungen findest du weitere Optionen und zusätzliche Funktionen."
       }
     }
   },

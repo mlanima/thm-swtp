@@ -68,6 +68,11 @@ export class SuccessComponent implements OnInit {
     });
   }
 
+  closeOnboardingForNow(): void {
+    this.showOnboarding.set(false);
+    this.navigateAfterSuccess();
+  }
+
   private navigateAfterSuccess(): void {
     void this.router.navigateByUrl('/dashboard');
   }
