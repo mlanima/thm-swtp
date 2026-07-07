@@ -1,12 +1,11 @@
 import { Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { TranslatePipe } from '@ngx-translate/core';
 import { UserSearchResult } from '../../models/user-search-result.model';
 
 @Component({
   selector: 'app-user-result-card',
   standalone: true,
-  imports: [RouterLink, TranslatePipe],
+  imports: [RouterLink],
   templateUrl: './user-result-card.html',
 })
 export class UserResultCard {

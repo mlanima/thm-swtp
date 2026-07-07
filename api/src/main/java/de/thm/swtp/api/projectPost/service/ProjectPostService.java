@@ -3,6 +3,7 @@ package de.thm.swtp.api.projectPost.service;
 import de.thm.swtp.api.common.TxLogger;
 import de.thm.swtp.api.exceptionhandling.exceptions.InvalidProjectPostException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectPostNotFoundException;
+import de.thm.swtp.api.moderation.ContentModerationService;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
 import de.thm.swtp.api.project.exception.ProjectNotFoundException;
@@ -15,17 +16,10 @@ import de.thm.swtp.api.projectPost.repository.ProjectPostRepository;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
-import de.thm.swtp.api.projectFiles.service.ProjectFileService;
-import de.thm.swtp.api.projectFiles.domain.ProjectFile;
-import de.thm.swtp.api.projectFiles.domain.ProjectFileDownload;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.core.io.Resource;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.MediaType;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -38,8 +32,9 @@ public class ProjectPostService {
     private final ProjectPostRepository projectPostRepository;
     private final ProjectRepository projectRepository;
     private final UserProfileRepository userProfileRepository;
+    private final ContentModerationService contentModerationService;
 
-    private final ProjectFileService projectFileService;
+
 
     @Transactional(readOnly = true)
     public List<ProjectPost> getPublishedPostsForProject(UUID projectId) {
@@ -60,6 +55,9 @@ public class ProjectPostService {
         ProjectEntity projectEntity = getProjectOrThrowError(projectId);
         UserProfile author = getUserOrThrowError(authorId);
 
+        contentModerationService.assertAppropriate(title, "postTitle");
+        contentModerationService.assertAppropriate(content, "postContent");
+
         ProjectPostEntity projectPostEntity = ProjectPostEntity.builder()
                 .project(projectEntity)
                 .author(author)
@@ -73,53 +71,6 @@ public class ProjectPostService {
         ProjectPost post = ProjectPostMapper.toDomain(projectPostRepository.saveAndFlush(projectPostEntity));
         TxLogger.afterCommit(log, "Post created: project={}, post={}, author={}", projectId, post.getId(), authorId);
         return post;
-    }
-
-    @Transactional
-    public ProjectPost uploadPostImage(UUID projectId, UUID postId, MultipartFile image) {
-        ProjectPostEntity postEntity = getPostOrThrowError(postId);
-        assertPostBelongsToProject(postEntity, projectId);
-
-        UUID oldImageFileId = postEntity.getImageFileId();
-
-        ProjectFile uploadedImage = projectFileService.uploadImageFile(projectId, image);
-
-        try {
-            postEntity.setImageFileId(uploadedImage.getId());
-            postEntity.setImageUrl("/api/v1/projects/" + projectId + "/posts/" + postId + "/image");
-
-            ProjectPost post = ProjectPostMapper.toDomain(projectPostRepository.saveAndFlush(postEntity));
-
-            if (oldImageFileId != null) {
-                projectFileService.deleteFile(projectId, oldImageFileId);
-            }
-
-            TxLogger.afterCommit(log, "Image uploaded for post: project={}, post={}", projectId, postId);
-
-            return post;
-        } catch (Exception e) {
-            projectFileService.deleteFile(projectId, uploadedImage.getId());
-            throw e;
-        }
-    }
-
-    @Transactional(readOnly = true)
-    public ResponseEntity<Resource> getPostImage(UUID projectId, UUID postId) {
-        ProjectPostEntity postEntity = getPostOrThrowError(postId);
-        assertPostBelongsToProject(postEntity, projectId);
-
-        UUID imageFileId = postEntity.getImageFileId();
-
-        if (imageFileId == null) {
-            throw new ProjectPostNotFoundException(postId);
-        }
-
-        ProjectFileDownload download = projectFileService.prepareDownload(projectId, imageFileId);
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(download.file().getMimeType()))
-                .contentLength(download.file().getSizeBytes())
-                .body(download.resource());
     }
 
     @Transactional
@@ -167,14 +118,7 @@ public class ProjectPostService {
         ProjectPostEntity postEntity = getPostOrThrowError(postId);
         assertPostBelongsToProject(postEntity, projectId);
 
-        UUID imageFileId = postEntity.getImageFileId();
-
         projectPostRepository.delete(postEntity);
-
-        if (imageFileId != null) {
-            projectFileService.deleteFile(projectId, imageFileId);
-        }
-
         TxLogger.afterCommit(log, "Post deleted: project={}, post={}", projectId, postId);
     }
 
@@ -217,4 +161,6 @@ public class ProjectPostService {
             throw new ProjectPostNotFoundException(postEntity.getId());
         }
     }
+
+
 }

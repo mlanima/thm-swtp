@@ -25,7 +25,6 @@ public class UserSearchMapper {
                 .title(user.getTitle())
                 .location(user.getLocation())
                 .tags(user.getTags().stream().map(TagEntity::getName).toList())
-                .isProfessor(user.isProfessor())
                 .build();
     }
 }
