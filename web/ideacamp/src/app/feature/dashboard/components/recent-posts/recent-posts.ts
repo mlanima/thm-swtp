@@ -21,6 +21,16 @@ const MAX_POSTS = 15;
   imports: [TranslatePipe, MarkdownPipe],
   templateUrl: './recent-posts.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  styles: [`
+    .collapsible-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .collapsible-content.expanded {
+      max-height: 5000px;
+    }
+  `],
 })
 export class RecentPosts {
   readonly projects = input.required<ProjectResponse[]>();
@@ -31,6 +41,11 @@ export class RecentPosts {
   readonly posts = signal<FeedPost[]>([]);
   readonly isLoading = signal(false);
   readonly errorMessage = signal('');
+  readonly expanded = signal(true);
+
+  toggle(): void {
+    this.expanded.update((v) => !v);
+  }
 
   constructor() {
     effect(() => {
