@@ -7,6 +7,13 @@ import { UserSearchResult } from '../../models/user-search-result.model';
 import { ProjectResultCard } from '../../components/project-result-card/project-result-card';
 import { UserResultCard } from '../../components/user-result-card/user-result-card';
 import { SearchInputComponent } from '../../components/search-input/search-input';
+import { SearchFilterPanel, SearchFilters } from '../../components/search-filter-panel/search-filter-panel';
+import {
+  ProjectSearchFilters,
+  UserSearchFilters,
+  EMPTY_PROJECT_FILTERS,
+  EMPTY_USER_FILTERS,
+} from '../../models/search-filters.model';
 
 type Tab = 'all' | 'projects' | 'users';
 
@@ -16,7 +23,7 @@ const PREVIEW_SIZE = 5;
 @Component({
   selector: 'app-search-page',
   standalone: true,
-  imports: [ProjectResultCard, UserResultCard, SearchInputComponent, TranslatePipe],
+  imports: [ProjectResultCard, UserResultCard, SearchInputComponent, SearchFilterPanel, TranslatePipe],
   templateUrl: './search-page.html',
 })
 export class SearchPage implements OnInit, OnDestroy {
@@ -36,6 +43,22 @@ export class SearchPage implements OnInit, OnDestroy {
 
   readonly isLoading = signal(false);
   readonly currentQueriesCount = signal(0);
+
+  readonly filtersOpen = signal(false);
+  readonly projectFilters = signal<ProjectSearchFilters>(EMPTY_PROJECT_FILTERS);
+  readonly userFilters = signal<UserSearchFilters>(EMPTY_USER_FILTERS);
+  readonly activeFilterCount = computed(() => {
+    const tab = this.activeTab();
+    if (tab === 'projects') {
+      const f = this.projectFilters();
+      return (f.hasOpenPositions ? 1 : 0) + (f.allowJoinRequests ? 1 : 0) + (f.createdAfter ? 1 : 0);
+    }
+    if (tab === 'users') {
+      const f = this.userFilters();
+      return (f.isProfessor ? 1 : 0) + (f.location ? 1 : 0) + (f.createdAfter ? 1 : 0);
+    }
+    return 0;
+  });
 
   // Preview shown on the "Alle" tab (first few results of each type)
   readonly previewProjects = signal<ProjectSearchResult[]>([]);
@@ -81,15 +104,7 @@ export class SearchPage implements OnInit, OnDestroy {
              return of(null);
           }
           this.isLoading.set(true);
-          return forkJoin({
-            projects: this.searchService.searchProjectsPaged(queries, 0, PREVIEW_SIZE),
-            users: this.searchService.searchUsersPaged(queries, 0, PREVIEW_SIZE),
-          }).pipe(
-            catchError(() => {
-              this.errorMessage.set('SEARCH.ERROR_FAILED');
-              return of(null);
-            })
-          );
+          return this.fetchPreviews(queries);
         }),
         takeUntil(this.destroy$)
       )
@@ -133,6 +148,46 @@ export class SearchPage implements OnInit, OnDestroy {
     this.loadTabPage(tab, page);
   }
 
+  toggleFilters(): void {
+    this.filtersOpen.update(open => !open);
+  }
+
+  onFiltersChange(filters: SearchFilters): void {
+    const tab = this.activeTab();
+    if (tab === 'projects') {
+      this.projectFilters.set(filters as ProjectSearchFilters);
+    } else if (tab === 'users') {
+      this.userFilters.set(filters as UserSearchFilters);
+    } else {
+      return;
+    }
+
+    if (this.currentQueries.length === 0) {
+      return;
+    }
+
+    this.fetchPreviews(this.currentQueries)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(result => {
+        if (result) {
+          this.previewProjects.set(result.projects.content);
+          this.previewUsers.set(result.users.content);
+          this.projectsTotalCount.set(result.projects.totalElements);
+          this.usersTotalCount.set(result.users.totalElements);
+        }
+      });
+    this.loadTabPage(tab, 0);
+  }
+
+  clearFilters(): void {
+    const tab = this.activeTab();
+    if (tab === 'projects') {
+      this.onFiltersChange(EMPTY_PROJECT_FILTERS);
+    } else if (tab === 'users') {
+      this.onFiltersChange(EMPTY_USER_FILTERS);
+    }
+  }
+
   onQueriesChange(queries: string[]): void {
     this.errorMessage.set('');
     this.currentQueriesCount.set(queries.length);
@@ -157,11 +212,23 @@ export class SearchPage implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  private fetchPreviews(queries: string[]) {
+    return forkJoin({
+      projects: this.searchService.searchProjectsPaged(queries, 0, PREVIEW_SIZE, this.projectFilters()),
+      users: this.searchService.searchUsersPaged(queries, 0, PREVIEW_SIZE, this.userFilters()),
+    }).pipe(
+      catchError(() => {
+        this.errorMessage.set('SEARCH.ERROR_FAILED');
+        return of(null);
+      })
+    );
+  }
+
   private loadTabPage(tab: 'projects' | 'users', page: number): void {
     this.isLoading.set(true);
 
     if (tab === 'projects') {
-      this.searchService.searchProjectsPaged(this.currentQueries, page, PAGE_SIZE)
+      this.searchService.searchProjectsPaged(this.currentQueries, page, PAGE_SIZE, this.projectFilters())
         .pipe(
           catchError(() => {
             this.errorMessage.set('SEARCH.ERROR_FAILED');
@@ -180,7 +247,7 @@ export class SearchPage implements OnInit, OnDestroy {
       return;
     }
 
-    this.searchService.searchUsersPaged(this.currentQueries, page, PAGE_SIZE)
+    this.searchService.searchUsersPaged(this.currentQueries, page, PAGE_SIZE, this.userFilters())
       .pipe(
         catchError(() => {
           this.errorMessage.set('SEARCH.ERROR_FAILED');
