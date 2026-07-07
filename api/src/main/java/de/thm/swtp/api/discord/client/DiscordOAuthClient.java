@@ -18,13 +18,13 @@ public class DiscordOAuthClient {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    @Value("${DISCORD_CLIENT_ID}")
+    @Value("${DISCORD_CLIENT_ID:}")
     private String clientId;
 
-    @Value("${DISCORD_CLIENT_SECRET}")
+    @Value("${DISCORD_CLIENT_SECRET:}")
     private String clientSecret;
 
-    @Value("${DISCORD_REDIRECT_URI}")
+    @Value("${DISCORD_REDIRECT_URI:}")
     private String redirectUri;
 
     private static final String TOKEN_URL = "https://discord.com/api/oauth2/token";

@@ -28,8 +28,8 @@ public class DiscordAuthService {
 
     public DiscordAuthService(DiscordOAuthClient discordOAuthClient,
                               UserProfileRepository userProfileRepository,
-                              @Value("${DISCORD_CLIENT_ID}") String clientId,
-                              @Value("${DISCORD_REDIRECT_URI}") String redirectUri,
+                              @Value("${DISCORD_CLIENT_ID:}") String clientId,
+                              @Value("${DISCORD_REDIRECT_URI:}") String redirectUri,
                               @Value("${app.frontend-url}") String frontendUrl) {
         this.discordOAuthClient = discordOAuthClient;
         this.userProfileRepository = userProfileRepository;

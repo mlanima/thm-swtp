@@ -29,7 +29,7 @@ public class DiscordChannelService {
     private final BotInternalClient botInternalClient;
     private final DiscordProperties discordProperties;
 
-    @Value("${DISCORD_CLIENT_ID}")
+    @Value("${DISCORD_CLIENT_ID:}")
     private String clientId;
 
     @Transactional

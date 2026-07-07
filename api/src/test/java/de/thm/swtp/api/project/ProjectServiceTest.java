@@ -3,6 +3,8 @@ package de.thm.swtp.api.project;
 import de.thm.swtp.api.project.dto.response.ProjectResponse;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
+import de.thm.swtp.api.discord.repository.LinkedChannelRepository;
+import de.thm.swtp.api.discord.service.DiscordNotificationService;
 import de.thm.swtp.api.projectFavorite.repository.ProjectFavoriteRepository;
 import de.thm.swtp.api.projectView.repository.ProjectViewRepository;
 import de.thm.swtp.api.projectView.entity.ProjectViewEntity;
@@ -35,6 +37,12 @@ class ProjectServiceTest {
 
     @Mock
     private ProjectViewRepository projectViewRepository;
+
+    @Mock
+    private LinkedChannelRepository linkedChannelRepository;
+
+    @Mock
+    private DiscordNotificationService discordNotificationService;
 
     @InjectMocks
     private ProjectService projectService;
