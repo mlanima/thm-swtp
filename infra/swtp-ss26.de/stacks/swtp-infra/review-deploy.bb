@@ -254,7 +254,10 @@
                         "--env-file" "/opt/stacks/swtp-infra/review.env"
                         "-v"         (str upload-dir ":/app/uploads")
                         "-e"         (str "SPRING_DATASOURCE_URL=jdbc:mysql://swtp-db:3306/" db-name)
-                        "-e"         (str "APP_FRONTEND_URL=https://" (subdomain *pr-num* nil))]})
+                        "-e"         (str "APP_FRONTEND_URL=https://" (subdomain *pr-num* nil))
+                        ;; GitHub OAuth: client id/secret + token encryption key come from
+                        ;; review.env (shared across PRs); only the redirect URI is per-PR.
+                        "-e"         (str "GITHUB_OAUTH_REDIRECT_URI=https://" (subdomain *pr-num* nil) "/github/callback")]})
     (log (str "Backend live -> https://" host))))
 
 (defn- deploy-dozzle
