@@ -3,7 +3,6 @@ package de.thm.swtp.api.search.service;
 import de.thm.swtp.api.common.LogSafe;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.projectFavorite.repository.ProjectFavoriteRepository;
-import de.thm.swtp.api.search.dto.ProjectSearchFilter;
 import de.thm.swtp.api.search.repository.ProjectSearchRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +11,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -49,7 +47,7 @@ public class ProjectSearchService {
     public List<ProjectEntity> searchProjects(List<String> queries) {
         List<ProjectEntity> result = searchService.search(
                 queries,
-                idSearchFunction(ProjectSearchFilter.EMPTY),
+                projectSearchRepository::searchIdsByQuery,
                 projectSearchRepository::findAllWithTagsById
         );
         log.debug("Project search: queries={}, hits={}", queries.stream().map(LogSafe::clean).toList(), result.size());
@@ -71,28 +69,9 @@ public class ProjectSearchService {
      */
     @Transactional(readOnly = true)
     public Page<ProjectEntity> searchProjects(List<String> queries, Pageable pageable) {
-        return searchProjects(queries, ProjectSearchFilter.EMPTY, pageable);
-    }
-
-    /**
-     * Searches for projects matching all of the given query terms and filter criteria,
-     * with pagination support.
-     * <p>
-     * Each term is matched case-insensitively against the project name
-     * and its tags. Only non-deleted projects are considered.
-     * Multiple terms are combined with AND logic; the filter is applied on top of
-     * every term's query. Results are ordered by favorite count, most favorited first.
-     *
-     * @param queries  one or more search terms
-     * @param filter   optional filter criteria; use {@link ProjectSearchFilter#EMPTY} for none
-     * @param pageable pagination and sorting information
-     * @return a {@link Page} of matching {@link ProjectEntity} instances
-     */
-    @Transactional(readOnly = true)
-    public Page<ProjectEntity> searchProjects(List<String> queries, ProjectSearchFilter filter, Pageable pageable) {
         Page<ProjectEntity> page = searchService.search(
                 queries,
-                idSearchFunction(filter),
+                projectSearchRepository::searchIdsByQuery,
                 projectSearchRepository::findAllWithTagsById,
                 pageable,
                 this::favoriteCountsByProjectId,
@@ -101,19 +80,6 @@ public class ProjectSearchService {
         log.debug("Project search (paged): queries={}, hits={}, page={}/{}",
                 queries.stream().map(LogSafe::clean).toList(), page.getNumberOfElements(), pageable.getPageNumber(), page.getTotalPages());
         return page;
-    }
-
-    private Function<String, List<UUID>> idSearchFunction(ProjectSearchFilter filter) {
-        List<String> tags = filter.tags() == null ? List.of() : filter.tags();
-        return term -> projectSearchRepository.searchIdsByQuery(
-                term,
-                filter.hasOpenPositions(),
-                filter.allowJoinRequests(),
-                tags,
-                tags.size(),
-                filter.createdAfter(),
-                filter.createdBefore()
-        );
     }
 
     private Map<UUID, Long> favoriteCountsByProjectId(Collection<UUID> projectIds) {
