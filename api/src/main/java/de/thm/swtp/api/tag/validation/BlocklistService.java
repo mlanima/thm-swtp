@@ -12,9 +12,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -22,8 +20,6 @@ import java.util.regex.Pattern;
 public class BlocklistService {
 
     private final ResourcePatternResolver resourceLoader;
-
-    private static final Pattern WORD = Pattern.compile("\\p{L}+");
 
     private Set<String> blockedWords = new HashSet<>();
 
@@ -51,7 +47,7 @@ public class BlocklistService {
             String line;
             var count = 0;
             while ((line = reader.readLine()) != null) {
-                var trimmed = line.trim().toLowerCase(Locale.ROOT);
+                var trimmed = line.trim().toLowerCase();
                 if (!trimmed.isEmpty() && !trimmed.startsWith("#")) {
                     words.add(trimmed);
                     count++;
@@ -64,19 +60,6 @@ public class BlocklistService {
     }
 
     public boolean contains(final String word) {
-        return blockedWords.contains(word.toLowerCase(Locale.ROOT).trim());
-    }
-
-    public boolean containsAny(final String text) {
-        if (text == null || text.isBlank()) {
-            return false;
-        }
-        var matcher = WORD.matcher(text.toLowerCase(Locale.ROOT));
-        while (matcher.find()) {
-            if (blockedWords.contains(matcher.group())) {
-                return true;
-            }
-        }
-        return false;
+        return blockedWords.contains(word.toLowerCase().trim());
     }
 }

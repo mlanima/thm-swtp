@@ -13,7 +13,7 @@ public class TagValidationService {
 
     private final TagSource tagSource;
 
-    @Cacheable(value = "tag-rejected", key = "#tagName.toLowerCase()", unless = "#result")
+    @Cacheable(value = "tag-exists", key = "#tagName.toLowerCase()", unless = "#result")
     public boolean isValidTag(final String tagName) {
         log.debug("Cache miss for tag '{}' \u2014 querying source", LogSafe.clean(tagName));
         return tagSource.tagExists(tagName);

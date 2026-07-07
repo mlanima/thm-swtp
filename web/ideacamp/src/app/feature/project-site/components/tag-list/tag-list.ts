@@ -2,7 +2,6 @@ import { Component, Input, OnChanges, OnInit, SimpleChanges, inject, signal } fr
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ProjectTagService, TagResponse } from '../../services/project-tag.service';
 import { EditableTagListComponent } from '../../../../shared/tags/tag-list/editable-tag-list.component';
-import { ToastService } from '../../../../shared/toast/toast.service';
 
 @Component({
   selector: 'app-tag-list',
@@ -14,15 +13,16 @@ export class TagList implements OnInit, OnChanges {
   private readonly projectTagService = inject(ProjectTagService);
   private static readonly TAG_PATTERN = /^[a-zA-Z0-9äöüÄÖÜß \-.]+$/;
   private readonly translateService = inject(TranslateService);
-  private readonly toastService = inject(ToastService);
 
   @Input({ required: true }) projectId?: string;
   @Input() isOwner = false;
+
 
   tags = signal<TagResponse[]>([]);
   isLoading = signal(false);
   isSaving = signal(false);
   isDeleting = signal(false);
+  errorMessage = signal<string | null>(null);
 
   ngOnInit(): void {
     this.loadTags();
@@ -34,6 +34,8 @@ export class TagList implements OnInit, OnChanges {
     }
   }
 
+
+
   saveTag(name: string): void {
     const projectId = this.projectId;
     const cleanedName = name.trim();
@@ -43,11 +45,12 @@ export class TagList implements OnInit, OnChanges {
     }
 
     if (!TagList.TAG_PATTERN.test(name)) {
-      this.toastService.warning(this.translateService.instant('PROJECTSITE.TAGS.ERROR_INVALID_CHARS'));
+      this.errorMessage.set(this.translateService.instant('PROJECTSITE.TAGS.ERROR_INVALID_CHARS'));
       return;
     }
 
     this.isSaving.set(true);
+    this.errorMessage.set(null);
 
     this.projectTagService.addTag(projectId, { name: cleanedName }).subscribe({
       next: (tag) => {
@@ -55,7 +58,7 @@ export class TagList implements OnInit, OnChanges {
         const existing = this.tags().some((item) => item.name.toLowerCase() === lower);
 
         if (existing) {
-          this.toastService.warning(this.translateService.instant('PROJECTSITE.TAGS.ERROR_DUPLICATE'));
+          this.errorMessage.set(this.translateService.instant('PROJECTSITE.TAGS.ERROR_DUPLICATE'));
         }
 
         if (!existing) {
@@ -66,13 +69,13 @@ export class TagList implements OnInit, OnChanges {
       error: (err) => {
         const apiError = err.error as { errorCode?: string };
         if (err.status === 400 && apiError?.errorCode === 'TAG_NOT_VALID') {
-          this.toastService.error(
+          this.errorMessage.set(
             this.translateService.instant('PROJECTSITE.TAGS.ERROR_NOT_VALID', { name: cleanedName })
           );
         } else if (err.status === 502) {
-          this.toastService.error(this.translateService.instant('PROJECTSITE.TAGS.ERROR_VALIDATION'));
+          this.errorMessage.set(this.translateService.instant('PROJECTSITE.TAGS.ERROR_VALIDATION'));
         } else {
-          this.toastService.error(this.translateService.instant('PROJECTSITE.TAGS.ERROR_TOO_LONG'));
+          this.errorMessage.set(this.translateService.instant('PROJECTSITE.TAGS.ERROR_TOO_LONG'));
         }
         this.isSaving.set(false);
       },
@@ -84,6 +87,7 @@ export class TagList implements OnInit, OnChanges {
     if (!projectId || !this.isOwner) return;
 
     this.isDeleting.set(true);
+    this.errorMessage.set(null);
 
     this.projectTagService.deleteTag(projectId, tagName).subscribe({
       next: () => {
@@ -92,7 +96,7 @@ export class TagList implements OnInit, OnChanges {
         this.isDeleting.set(false);
       },
       error: () => {
-        this.toastService.error(this.translateService.instant('PROJECTSITE.TAGS.ERROR_DELETE'));
+        this.errorMessage.set(this.translateService.instant('PROJECTSITE.TAGS.ERROR_DELETE'));
         this.isDeleting.set(false);
       },
     });
@@ -101,6 +105,7 @@ export class TagList implements OnInit, OnChanges {
   private loadTags(): void {
     if (!this.projectId) return;
     this.isLoading.set(true);
+    this.errorMessage.set(null);
 
     this.projectTagService.getProjectTags(this.projectId).subscribe({
       next: (tags) => {
@@ -108,7 +113,7 @@ export class TagList implements OnInit, OnChanges {
         this.isLoading.set(false);
       },
       error: () => {
-        this.toastService.error(this.translateService.instant('PROJECTSITE.TAGS.ERROR_LOAD'));
+        this.errorMessage.set(this.translateService.instant('PROJECTSITE.TAGS.ERROR_LOAD'));
         this.isLoading.set(false);
       },
     });
