@@ -1,10 +1,17 @@
 import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { environment } from '../../../../enviroments/enviroment.dev';
 import { ProjectSettingsStore } from '../../project-settings.store';
 import { UserProfileService } from '../../../../services/user-profile.service';
+
+interface ChannelResponse {
+  id: string;
+  discordChannelId: string;
+  isActive: boolean;
+  discordInviteUrl?: string | null;
+}
 
 interface ChannelStatus {
   isActive: boolean;
@@ -120,11 +127,11 @@ export class DiscordTab implements OnInit, OnDestroy {
     this.isConnecting.set(true);
     this.connectError.set(null);
 
-    this.http.post<{ id: string; discordChannelId: string; isActive: boolean }>(
+    this.http.post<ChannelResponse>(
       `${environment.apiUrl}/v1/projects/${projectId}/discord/connect`,
       { channelId: this.channelId().trim() },
     ).subscribe({
-      next: (res: any) => {
+      next: (res) => {
         this.connectionStatus.set({ isActive: res.isActive, channelId: res.discordChannelId, discordInviteUrl: res.discordInviteUrl, syncedToday: 0 });
         this.inviteUrl.set(res.discordInviteUrl ?? '');
         this.isConnecting.set(false);
@@ -178,7 +185,7 @@ export class DiscordTab implements OnInit, OnDestroy {
     this.isAutoConnecting.set(true);
     this.connectError.set(null);
 
-    this.http.post<{ id: string; discordChannelId: string; isActive: boolean; discordInviteUrl?: string }>(
+    this.http.post<ChannelResponse>(
       `${environment.apiUrl}/v1/projects/${projectId}/discord/auto-connect`,
       {},
     ).subscribe({
@@ -198,7 +205,7 @@ export class DiscordTab implements OnInit, OnDestroy {
     const projectId = this.store.project()?.id;
     if (!projectId) return;
 
-    this.http.get<any>(`${environment.apiUrl}/v1/projects/${projectId}/discord/connect`).subscribe({
+    this.http.get<ChannelResponse>(`${environment.apiUrl}/v1/projects/${projectId}/discord/connect`).subscribe({
       next: (status) => {
         localStorage.removeItem('discord-pending-setup');
         this.connectionStatus.set({ isActive: status.isActive, channelId: status.discordChannelId, discordInviteUrl: status.discordInviteUrl, syncedToday: 0 });
@@ -219,7 +226,7 @@ export class DiscordTab implements OnInit, OnDestroy {
     });
   }
 
-  private errorKey(err: any): string {
+  private errorKey(err: HttpErrorResponse): string {
     const msg = err.error?.message;
     if (msg && msg.includes('link your Discord account')) {
       return 'PROJECTSETTINGS.DISCORD.NEEDS_DISCORD_LINK';

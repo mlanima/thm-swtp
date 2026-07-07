@@ -37,9 +37,10 @@
       </p>
 
       <div class="mb-4">
-        <label class="mb-1 block text-sm font-medium text-slate-600">{{ 'PROJECTSETTINGS.DISCORD.INVITE_URL_LABEL' | translate }}</label>
+        <label for="inviteUrlInput" class="mb-1 block text-sm font-medium text-slate-600">{{ 'PROJECTSETTINGS.DISCORD.INVITE_URL_LABEL' | translate }}</label>
         <div class="flex gap-2">
           <input
+            id="inviteUrlInput"
             [(ngModel)]="inviteUrl"
             type="text"
             placeholder="https://discord.gg/example"
@@ -61,9 +62,10 @@
       </div>
 
       <div class="mb-4">
-        <label class="mb-1 block text-sm font-medium text-slate-600">{{ 'PROJECTSETTINGS.DISCORD.CHANNEL_ID_LABEL' | translate }}</label>
+        <label for="channelIdInput" class="mb-1 block text-sm font-medium text-slate-600">{{ 'PROJECTSETTINGS.DISCORD.CHANNEL_ID_LABEL' | translate }}</label>
         <div class="flex gap-2">
           <input
+            id="channelIdInput"
             [(ngModel)]="channelId"
             type="text"
             placeholder="123456789012345678"
