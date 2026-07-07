@@ -132,6 +132,7 @@ public class UserProfileService {
 
         userProfile.setOnboardingCompleted(onboardingCompleted);
         userProfileRepository.save(userProfile);
+        TxLogger.afterCommit(log, "User completed onboarding: username={}, userId={}", userProfile.getUsername(), currentUserId);
     }
 
 

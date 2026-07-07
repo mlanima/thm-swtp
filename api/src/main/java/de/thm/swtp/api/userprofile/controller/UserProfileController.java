@@ -86,7 +86,7 @@ public class UserProfileController {
                 .orElseGet(userStatusMapper::toNotBannedResponse);
     }
 
-    @PatchMapping("/me/onboarding")
+    @PatchMapping("api/v1/users/me/onboarding")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateOnboardingCompleted(@Valid @RequestBody UpdateOnboardingRequest request, @AuthenticationPrincipal Jwt jwt) {
         UUID currentUserId = UUID.fromString(jwt.getSubject());
