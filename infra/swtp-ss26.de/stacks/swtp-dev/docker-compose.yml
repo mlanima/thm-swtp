@@ -13,6 +13,11 @@ services:
       SPRING_MAIL_PORT: "1025"
       APP_FRONTEND_URL: https://dev.swtp-ss26.de
       OPENAI_API_KEY: ${OPENAI_API_KEY}
+      DISCORD_BOT_BASEURL: http://discord.ser.mlanima.org:3001
+      DISCORD_BOT_API_SECRET: ${DISCORD_BOT_API_SECRET}
+      DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID}
+      DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET}
+      DISCORD_REDIRECT_URI: https://api.dev.swtp-ss26.de/api/v1/auth/discord/callback
     volumes:
       - ./uploads:/app/uploads
     labels:

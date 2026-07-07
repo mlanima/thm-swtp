@@ -9,7 +9,7 @@
             ● {{ project.isPrivateProject ? ('COMMON.PRIVATE' | translate) : ('COMMON.PUBLIC' | translate) }}
           </span>
 
-          @if (project.discordInviteUrl) {
+          @if (project.discordInviteUrl && isMember) {
             <a
               [href]="project.discordInviteUrl"
               target="_blank"

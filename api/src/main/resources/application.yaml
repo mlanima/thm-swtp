@@ -101,3 +101,27 @@ stackoverflow:
   api:
     base-url: https://api.stackexchange.com/2.3
     key: ${STACKOVERFLOW_API_KEY:}
+
+discord:
+  streams:
+    outbound: stream:discord:sync
+    inbound: stream:platform:sync
+    consumer-group: spring-platform
+    batch-size: 10
+    block-ms: 5000
+    pending-timeout-ms: 30000
+  bot:
+    base-url: ${DISCORD_BOT_BASEURL:http://localhost:3001}
+    api-secret: ${DISCORD_BOT_API_SECRET}
+
+DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID}
+DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET}
+DISCORD_REDIRECT_URI: ${DISCORD_REDIRECT_URI}
+
+# --- local overrides (uncomment and fill in for local dev) ---
+# spring.data.redis.host: localhost
+# discord.bot.base-url: http://localhost:3001
+# discord.bot.api-secret: test-secret
+# DISCORD_CLIENT_ID: 1523616273949523978
+# DISCORD_CLIENT_SECRET: 96bhgekjErcP6giz9zW1Pgywsg3cbZt5
+# DISCORD_REDIRECT_URI: http://localhost:8080/api/v1/auth/discord/callback

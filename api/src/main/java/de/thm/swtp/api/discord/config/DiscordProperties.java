@@ -13,6 +13,7 @@ public class DiscordProperties {
 
     private Streams streams = new Streams();
     private Bot bot = new Bot();
+    private OAuth oauth = new OAuth();
 
     @Getter
     @Setter
@@ -31,5 +32,13 @@ public class DiscordProperties {
         private String baseUrl = "http://discord.ser.mlanima.org:3001";
         private String apiSecret;
         private int invitePermissions = 76817;
+    }
+
+    @Getter
+    @Setter
+    public static class OAuth {
+        private String clientId;
+        private String clientSecret;
+        private String redirectUri;
     }
 }

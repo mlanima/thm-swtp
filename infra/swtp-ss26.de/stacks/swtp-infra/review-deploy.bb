@@ -250,11 +250,12 @@
        :host           host
        :image          (str "ghcr.io/" org "/swtp-api:pr-" *pr-num*)
        :port           8080
-       :extra-opts     ["--network"  "review_net"
-                        "--env-file" "/opt/stacks/swtp-infra/review.env"
-                        "-v"         (str upload-dir ":/app/uploads")
-                        "-e"         (str "SPRING_DATASOURCE_URL=jdbc:mysql://swtp-db:3306/" db-name)
-                        "-e"         (str "APP_FRONTEND_URL=https://" (subdomain *pr-num* nil))]})
+        :extra-opts     ["--network"  "review_net"
+                         "--env-file" "/opt/stacks/swtp-infra/review.env"
+                         "-v"         (str upload-dir ":/app/uploads")
+                         "-e"         (str "SPRING_DATASOURCE_URL=jdbc:mysql://swtp-db:3306/" db-name)
+                         "-e"         (str "APP_FRONTEND_URL=https://" (subdomain *pr-num* nil))
+                         "-e"         (str "DISCORD_REDIRECT_URI=https://" (subdomain *pr-num* "api") "/api/v1/auth/discord/callback")]})
     (log (str "Backend live -> https://" host))))
 
 (defn- deploy-dozzle

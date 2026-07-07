@@ -29,6 +29,8 @@ import java.time.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,6 +64,15 @@ public class ProjectService {
 
         LinkedChannelEntity channel = linkedChannelRepository.findByProjectId(project.getId()).orElse(null);
 
+        boolean isContributor = false;
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+            UUID currentUserId = UUID.fromString(auth.getName());
+            boolean isOwner = project.getOwner() != null && project.getOwner().getKeycloakId().equals(currentUserId);
+            boolean isMember = memberIds.contains(currentUserId);
+            isContributor = isOwner || isMember;
+        }
+
         return ProjectResponse.builder()
                 .id(project.getId())
                 .name(project.getName())
@@ -76,7 +87,7 @@ public class ProjectService {
                 .ownerDiscordUsername(project.getOwner().getDiscordUsername())
                 .discordChannelId(channel != null && channel.isActive() ? channel.getDiscordChannelId() : null)
                 .discordGuildId(channel != null ? channel.getDiscordGuildId() : null)
-                .discordInviteUrl(channel != null && channel.isActive() ? channel.getDiscordInviteUrl() : null)
+                .discordInviteUrl(channel != null && channel.isActive() && isContributor ? channel.getDiscordInviteUrl() : null)
                 .memberIds(project.getMembers().stream()
                         .map(UserProfile::getKeycloakId)
                         .collect(java.util.stream.Collectors.toSet()))
