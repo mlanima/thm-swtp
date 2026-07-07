@@ -13,5 +13,6 @@ public record UserProfileResponse(
         int followers,
         String about,
         String experience,
-        boolean isProfessor
+        boolean isProfessor,
+        boolean onboardingCompleted
 ) {}

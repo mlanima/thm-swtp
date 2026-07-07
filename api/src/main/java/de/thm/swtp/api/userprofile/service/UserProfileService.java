@@ -125,6 +125,15 @@ public class UserProfileService {
         return userProfileRepository.findByKeycloakId(keycloakId);
     }
 
+    @Transactional
+    public void updateOnboardingCompleted(UUID currentUserId, boolean onboardingCompleted) {
+        UserProfile userProfile = userProfileRepository.findById(currentUserId)
+                .orElseThrow(() -> new UserProfileNotFoundException(currentUserId.toString()));
+
+        userProfile.setOnboardingCompleted(onboardingCompleted);
+        userProfileRepository.save(userProfile);
+    }
+
 
     private void validateManagedUserSort(Sort sort){
        sort.forEach((sortField) -> {

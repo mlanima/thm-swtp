@@ -68,4 +68,7 @@ public class UserProfile {
     private String banReason;
 
     private LocalDateTime bannedAt;
+
+    @Column(nullable = false)
+    private boolean onboardingCompleted = false;
 }
