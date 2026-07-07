@@ -34,8 +34,7 @@ public class CacheConfig implements CachingConfigurer {
                 log.info("Redis available \u2014 using RedisCacheManager");
                 return RedisCacheManager.builder(factory)
                         .cacheDefaults(defaultCacheConfig())
-                        .withCacheConfiguration("tag-rejected", tagRejectedCacheConfig())
-                        .withCacheConfiguration("content-moderation", contentModerationCacheConfig())
+                        .withCacheConfiguration("tag-exists", tagExistsCacheConfig())
                         .build();
             } catch (Exception e) {
                 log.warn("Redis unreachable \u2014 caching disabled: {}", e.getMessage());
@@ -57,16 +56,10 @@ public class CacheConfig implements CachingConfigurer {
                                 RedisSerializer.json()));
     }
 
-    private RedisCacheConfiguration tagRejectedCacheConfig() {
+    private RedisCacheConfiguration tagExistsCacheConfig() {
         return defaultCacheConfig()
                 .entryTtl(Duration.ofHours(1))
                 .prefixCacheNameWith("tags:");
-    }
-
-    private RedisCacheConfiguration contentModerationCacheConfig() {
-        return defaultCacheConfig()
-                .entryTtl(Duration.ofMinutes(10))
-                .prefixCacheNameWith("content:");
     }
 
     @Override

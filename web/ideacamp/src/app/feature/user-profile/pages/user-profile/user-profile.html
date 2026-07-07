@@ -9,7 +9,7 @@
             {{ 'USERPROFILE.LOADING' | translate }}
           </p>
         </section>
-      } @else if (!state.profile && state.errorMessage) {
+      } @else if (state.errorMessage) {
         <section class="rounded-xl border border-red-200 bg-red-50 p-6 shadow-lg">
           <h2 class="text-lg font-bold text-red-700">
             {{ 'COMMON.ERROR' | translate }}

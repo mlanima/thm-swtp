@@ -9,8 +9,16 @@
     </div>
 
     <div>
-      <h3 class="text-lg font-semibold text-slate-700">
+      <h3 class="flex items-center gap-2 text-lg font-semibold text-slate-700">
         {{ user().username }}
+        @if (user().isProfessor) {
+          <span
+            class="inline-flex h-6 w-6 shrink-0 items-center justify-center bg-primary text-white [clip-path:polygon(50%_0%,61%_10%,75%_6%,80%_19%,94%_21%,92%_35%,100%_50%,92%_65%,94%_79%,80%_81%,75%_94%,61%_90%,50%_100%,39%_90%,25%_94%,20%_81%,6%_79%,8%_65%,0%_50%,8%_35%,6%_21%,20%_19%,25%_6%,39%_10%)]"
+            [attr.aria-label]="'SEARCH.FILTERS.PROFESSOR_BADGE' | translate"
+            [title]="'SEARCH.FILTERS.PROFESSOR_BADGE' | translate">
+            <i class="pi pi-graduation-cap text-xs"></i>
+          </span>
+        }
       </h3>
 
       @if (user().title) {

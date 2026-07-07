@@ -88,8 +88,6 @@ jobs:
           push: true
           build-args: |
             API_URL=https://pr-${{ github.event.pull_request.number }}-api.review.swtp-ss26.de/api
-          secrets: |
-            google-maps-api-key=${{ secrets.GOOGLE_MAPS_API_KEY }}
           tags: ghcr.io/${{ needs.namespace.outputs.namespace }}/swtp-web:pr-${{ github.event.pull_request.number }}
 
   # ── Deploy review environment ──────────────────────────────────────────────

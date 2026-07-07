@@ -1,8 +1,7 @@
 package de.thm.swtp.api.tag.validation;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import de.thm.swtp.api.common.LogSafe;
-import de.thm.swtp.api.tag.exception.TagSourceApiException;
+import de.thm.swtp.api.common   .LogSafe;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -50,13 +49,13 @@ public class StackOverflowTagSource implements TagSource {
                         (request, res) -> {
                             log.debug("StackOverflow API returned {} for tag: {}",
                                     res.getStatusCode(), LogSafe.clean(tagName));
-                            throw new TagSourceApiException("Tag validation service temporarily unavailable");
+                            throw new TagValidationException("Tag validation service temporarily unavailable");
                         })
                 .body(StackOverflowResponse.class);
 
         if (response == null) {
             log.debug("StackOverflow API returned null response for tag: {}", LogSafe.clean(tagName));
-            throw new TagSourceApiException("Tag validation service temporarily unavailable");
+            throw new TagValidationException("StackOverflow API returned empty response");
         }
 
         if (response.backoff() != null && response.backoff() > 0) {

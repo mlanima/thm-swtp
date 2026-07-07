@@ -1,14 +1,12 @@
-package de.thm.swtp.api.moderation;
+package de.thm.swtp.api.tag.validation;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import de.thm.swtp.api.common.LogSafe;
-import de.thm.swtp.api.moderation.exception.ModerationApiException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
@@ -18,7 +16,7 @@ import java.util.Optional;
 
 @Slf4j
 @Component
-public class ModerationClient {
+public class OpenAIModerationClient {
 
     private static final String MODERATION_URL = "/v1/moderations";
 
@@ -28,7 +26,7 @@ public class ModerationClient {
     private final boolean enabled;
 
     @Autowired
-    public ModerationClient(
+    public OpenAIModerationClient(
             @Value("${openai.api.base-url:https://api.openai.com}") final String baseUrl,
             @Value("${openai.moderation.model:omni-moderation-latest}") final String model,
             @Value("${openai.moderation.threshold:0.1}") final double threshold,
@@ -36,7 +34,7 @@ public class ModerationClient {
         this(buildClient(baseUrl, apiKey), model, threshold, !apiKey.isBlank());
     }
 
-    ModerationClient(
+    OpenAIModerationClient(
             final RestClient restClient,
             final String model,
             final double threshold,
@@ -48,12 +46,8 @@ public class ModerationClient {
     }
 
     private static RestClient buildClient(final String baseUrl, final String apiKey) {
-        var factory = new SimpleClientHttpRequestFactory();
-        factory.setConnectTimeout(3000);
-        factory.setReadTimeout(5000);
         return RestClient.builder()
                 .baseUrl(baseUrl)
-                .requestFactory(factory)
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .requestInterceptor((request, body, execution) -> {
@@ -66,7 +60,7 @@ public class ModerationClient {
     public boolean isFlagged(final String text) {
         if (!enabled) {
             log.warn("OpenAI moderation disabled \u2014 no API key configured");
-            throw new ModerationApiException("Moderation service temporarily unavailable");
+            throw new TagValidationException("Tag validation service temporarily unavailable");
         }
 
         var response = restClient.post()
@@ -77,13 +71,13 @@ public class ModerationClient {
                         (request, res) -> {
                             log.debug("OpenAI Moderation API returned {} for input: {}",
                                     res.getStatusCode(), LogSafe.clean(text));
-                            throw new ModerationApiException("Moderation service temporarily unavailable");
+                            throw new TagValidationException("Tag validation service temporarily unavailable");
                         })
                 .body(ModerationResponse.class);
 
         if (response == null || response.results() == null || response.results().isEmpty()) {
             log.debug("OpenAI Moderation API returned empty response for input: {}", LogSafe.clean(text));
-            throw new ModerationApiException("Moderation service temporarily unavailable");
+            throw new TagValidationException("Tag validation service temporarily unavailable");
         }
 
         var result = response.results().getFirst();

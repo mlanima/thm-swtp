@@ -111,12 +111,11 @@
     "ERROR_EDIT_FORBIDDEN": "You are not authorized to edit this profile.",
     "FOLLOWERS": "Followers",
     "ERROR_UPDATE_PROFILE": "The profile could not be updated. Please try again later.",
-    "ERROR_INVALID_PLACE": "This is not a real city. Please select a place from the suggestions.",
-    "ERROR_CONTENT_NOT_VALID": "This input contains content that is not allowed.",
     "FOLLOW": "Follow",
     "FOLLOWING": "Following",
     "UNFOLLOW": "Unfollow",
-    "INVITE": "Invite"
+    "INVITE": "Invite",
+    "PROFESSOR_BADGE": "Professor"
   },
   "CONTACT-REQUESTS": {
     "CONTACT": "Contact Requests",
@@ -312,7 +311,6 @@
     "SUCCESS_CREATED": "Project created successfully!",
     "SUCCESS_CREATED_WITH_INVITES": "Project created successfully and invitations sent!",
     "ERROR_CREATE_PROJECT": "Project could not be created. Please try again.",
-    "ERROR_MODERATION": "Project could not be created because some content was flagged as inappropriate. Please review your entries.",
     "VALIDATION": {
       "NAME_MIN": "Project name must be at least 3 characters long.",
       "NAME_MAX": "Project name must not be longer than 20 characters.",
@@ -344,7 +342,25 @@
     "SHOW_ALL_USERS": "Show all {{ count }} users",
     "PREVIOUS": "Previous",
     "NEXT": "Next",
-    "ERROR_FAILED": "The search failed. Please try again."
+    "ERROR_FAILED": "The search failed. Please try again.",
+    "FILTERS": {
+      "TITLE": "Filters",
+      "CLEAR_ALL": "Clear all",
+      "HAS_OPEN_POSITIONS": "Has open positions",
+      "ALLOW_JOIN_REQUESTS": "Accepts join requests",
+      "IS_PROFESSOR": "Verified professors only",
+      "LOCATION": "Location",
+      "LOCATION_PLACEHOLDER": "Filter by location...",
+      "DATE_RANGE": {
+        "LABEL": "Created",
+        "ANY_TIME": "Any time",
+        "LAST_7_DAYS": "Last 7 days",
+        "LAST_30_DAYS": "Last 30 days",
+        "LAST_YEAR": "Last year"
+      },
+      "PROFESSOR_BADGE": "Professor",
+      "OPEN_POSITIONS_BADGE": "{{ count }} open position(s)"
+    }
   },
   "IMPRESSUM": {
     "BADGE": "Legal information",
@@ -457,8 +473,7 @@
     "ERRORS": {
       "NO_PROJECT_URL": "No project URL provided.",
       "LOAD_PROJECT": "Project data could not be loaded.",
-      "SAVE_PROJECT": "Project could not be saved.",
-      "CONTENT_NOT_VALID": "This input contains content that is not allowed."
+      "SAVE_PROJECT": "Project could not be saved."
     },
     "INFO": {
       "VISIBILITY": "Visibility",
@@ -539,7 +554,10 @@
       "LOAD": "Posts could not be loaded.",
       "EMPTY_FIELDS": "Title and content must not be empty.",
       "CREATE": "Post could not be created.",
-      "DELETE": "Post could not be deleted."
+      "DELETE": "Post could not be deleted.",
+      "IMAGE_TYPE": "Please select an image in JPG, PNG or WEBP format.",
+      "IMAGE_SIZE": "The image must not be larger than 5 MB.",
+      "IMAGE_UPLOAD": "The post was created, but the image could not be uploaded."
     },
     "PLAIN_TEXT": "Plain text",
     "MARKDOWN_HINT": "You can use Markdown, e.g. headings, lists, links and emphasis.",
@@ -553,7 +571,11 @@
     },
     "DELETE_POST": "Delete post",
     "DELETING": "Deleting…",
-    "DELETE_SUCCESS": "Post deleted successfully."
+    "DELETE_SUCCESS": "Post deleted successfully.",
+    "SELECT_IMAGE": "Select image",
+    "IMAGE_LABEL": "Add image",
+    "IMAGE_HINT": "Allowed formats are JPG, PNG and WEBP up to 5 MB.",
+    "REMOVE_IMAGE": "Remove image"
   },
   "USER_SETTINGS": {
     "TITLE": "Settings",
