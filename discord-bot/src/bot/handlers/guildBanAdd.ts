@@ -1,9 +1,10 @@
 import { Events, type Client, type GuildBan } from 'discord.js';
 import { streamProducer } from '../../streams/producer.js';
 import { logger } from '../../config/logger.js';
+import { wrapAsync } from '../wrapAsync.js';
 
 export function registerGuildBanAddHandler(client: Client): void {
-  client.on(Events.GuildBanAdd, async (ban: GuildBan) => {
+  client.on(Events.GuildBanAdd, wrapAsync(async (ban: GuildBan) => {
     if (ban.client.user && ban.user.id === ban.client.user.id) {
       const channels = ban.guild.channels.cache.filter((c) => c.isTextBased());
       for (const [, channel] of channels) {
@@ -14,5 +15,5 @@ export function registerGuildBanAddHandler(client: Client): void {
       }
       logger.warn({ guildId: ban.guild.id }, 'bot was banned from guild, disconnected all linked channels');
     }
-  });
+  }, 'guildBanAdd'));
 }

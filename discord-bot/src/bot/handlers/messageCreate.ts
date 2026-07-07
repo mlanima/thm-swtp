@@ -2,11 +2,12 @@ import { Events, type Client, type Message } from 'discord.js';
 import { streamProducer } from '../../streams/producer.js';
 import { redis } from '../../config/redis.js';
 import { logger } from '../../config/logger.js';
+import { wrapAsync } from '../wrapAsync.js';
 
 const DEDUP_TTL = 86400;
 
 export function registerMessageCreateHandler(client: Client): void {
-  client.on(Events.MessageCreate, async (message: Message) => {
+  client.on(Events.MessageCreate, wrapAsync(async (message: Message) => {
     if (message.author.bot) return;
     if (message.webhookId) return;
 
@@ -29,5 +30,5 @@ export function registerMessageCreateHandler(client: Client): void {
     });
 
     logger.debug({ messageId: message.id, channelId: message.channelId }, 'discord message created event produced');
-  });
+  }, 'messageCreate'));
 }
