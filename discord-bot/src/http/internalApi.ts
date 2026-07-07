@@ -35,6 +35,11 @@ async function resolveGuildChannel(channelId: string): Promise<{
   return { channel: channel as GuildBasedChannel & NonThreadGuildBasedChannel, error: null };
 }
 
+internalApi.get('/internal/guilds', validateSecret, async (_req, res) => {
+  const guilds = discordClient.guilds.cache.map(g => ({ id: g.id, name: g.name }));
+  res.json({ guilds });
+});
+
 internalApi.get('/health', async (_req, res) => {
   const redis = await pingRedis();
   const discord = getDiscordStatus();
