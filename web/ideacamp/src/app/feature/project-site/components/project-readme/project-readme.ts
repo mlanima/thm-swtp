@@ -1,5 +1,6 @@
 import { Component, OnInit, PLATFORM_ID, ViewEncapsulation, inject, input, signal } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { Location, isPlatformBrowser } from '@angular/common';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ProjectGithubRepoService } from '../../services/project-github-repo.service';
 import { renderGithubReadme } from '../../../../shared/utils/github-readme-renderer';
 
@@ -17,10 +18,12 @@ import { renderGithubReadme } from '../../../../shared/utils/github-readme-rende
 export class ProjectReadme implements OnInit {
   private readonly projectGithubRepoService = inject(ProjectGithubRepoService);
   private readonly platformId = inject(PLATFORM_ID);
+  private readonly sanitizer = inject(DomSanitizer);
+  private readonly location = inject(Location);
 
   projectId = input.required<string>();
 
-  readonly html = signal<string | null>(null);
+  readonly html = signal<SafeHtml | null>(null);
 
   ngOnInit(): void {
     if (!isPlatformBrowser(this.platformId)) {
@@ -32,9 +35,14 @@ export class ProjectReadme implements OnInit {
         if (!readme?.available || !readme.markdown) {
           return;
         }
-        this.html.set(
-          renderGithubReadme(readme.markdown, readme.repoOwner, readme.repoName, readme.defaultBranch),
+        const rendered = renderGithubReadme(
+          readme.markdown, readme.repoOwner, readme.repoName, readme.defaultBranch, this.location.path(),
         );
+        // DOMPurify (in renderGithubReadme) is the actual trust boundary for this
+        // repo-owner-controlled content. Angular's own [innerHTML] sanitizer is more
+        // restrictive than necessary on top of that and was observed stripping legitimate
+        // markup (e.g. `<a name="...">` anchors, common for README "back to top" links).
+        this.html.set(this.sanitizer.bypassSecurityTrustHtml(rendered));
       },
       error: () => {
         // README section is an opt-in nicety — stay hidden rather than showing an error.
