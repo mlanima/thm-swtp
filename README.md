@@ -22,14 +22,28 @@ IdeaCamp ermöglicht es Studierenden und Mitarbeitenden, Projektideen einzureich
 
 ## Tech-Stack
 
-| Ebene | Technologie |
-|---|---|
-| Backend | Java 25, Spring Boot (Web, Data JPA, Security), Maven |
-| Frontend | Angular 21 (SSR), TypeScript, Tailwind CSS, Zod, ngx-translate |
-| Auth | Keycloak (OAuth2 / OIDC) |
-| Datenbank | MySQL 9 (Produktion), SQLite (lokal) |
-| Infrastruktur | Docker Compose, Traefik, Babashka-Deploy-Skripte |
-| CI/CD | GitHub Actions — Build, Lint, Tests, Auto-Deploy, Review-Apps |
+<div align="center">
+
+[![Java][Java-badge]][Java-url]
+[![Spring Boot][SpringBoot-badge]][SpringBoot-url]
+[![Maven][Maven-badge]][Maven-url]
+
+[![Angular][Angular-badge]][Angular-url]
+[![TypeScript][TypeScript-badge]][TypeScript-url]
+[![Tailwind CSS][Tailwind-badge]][Tailwind-url]
+[![Zod][Zod-badge]][Zod-url]
+
+[![Keycloak][Keycloak-badge]][Keycloak-url]
+[![MySQL][MySQL-badge]][MySQL-url]
+[![SQLite][SQLite-badge]][SQLite-url]
+
+[![Docker][Docker-badge]][Docker-url]
+[![Traefik][Traefik-badge]][Traefik-url]
+[![GitHub Actions][Actions-badge]][Actions-url]
+
+</div>
+
+MySQL 9 in Produktion, SQLite für die lokale Entwicklung. Deployment über Docker Compose hinter Traefik; GitHub Actions übernimmt Build, Lint, Tests und Auto-Deploy inklusive Review-Apps.
 
 ## Erste Schritte
 
@@ -115,3 +129,31 @@ Feature-Branch von `developer` erstellen, Pull Request gegen `developer` öffnen
 <sub>THM · Software Engineering: Realisierung · Gruppe 3 · SS26</sub>
 
 </div>
+
+<!-- BADGES -->
+[Java-badge]: https://img.shields.io/badge/Java_25-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white
+[Java-url]: https://openjdk.org/
+[SpringBoot-badge]: https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white
+[SpringBoot-url]: https://spring.io/projects/spring-boot
+[Maven-badge]: https://img.shields.io/badge/Maven-C71A36?style=for-the-badge&logo=apachemaven&logoColor=white
+[Maven-url]: https://maven.apache.org/
+[Angular-badge]: https://img.shields.io/badge/Angular_21-DD0031?style=for-the-badge&logo=angular&logoColor=white
+[Angular-url]: https://angular.dev/
+[TypeScript-badge]: https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white
+[TypeScript-url]: https://www.typescriptlang.org/
+[Tailwind-badge]: https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white
+[Tailwind-url]: https://tailwindcss.com/
+[Zod-badge]: https://img.shields.io/badge/Zod-3E67B1?style=for-the-badge&logo=zod&logoColor=white
+[Zod-url]: https://zod.dev/
+[Keycloak-badge]: https://img.shields.io/badge/Keycloak-4D4D4D?style=for-the-badge&logo=keycloak&logoColor=white
+[Keycloak-url]: https://www.keycloak.org/
+[MySQL-badge]: https://img.shields.io/badge/MySQL_9-4479A1?style=for-the-badge&logo=mysql&logoColor=white
+[MySQL-url]: https://www.mysql.com/
+[SQLite-badge]: https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white
+[SQLite-url]: https://sqlite.org/
+[Docker-badge]: https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white
+[Docker-url]: https://www.docker.com/
+[Traefik-badge]: https://img.shields.io/badge/Traefik-24A1C1?style=for-the-badge&logo=traefikproxy&logoColor=white
+[Traefik-url]: https://traefik.io/
+[Actions-badge]: https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white
+[Actions-url]: https://github.com/features/actions
