@@ -4,6 +4,7 @@ import de.thm.swtp.api.discord.client.BotInternalClient.GuildInfo;
 import de.thm.swtp.api.discord.client.BotInternalClient;
 import de.thm.swtp.api.discord.config.DiscordProperties;
 import de.thm.swtp.api.discord.entity.DiscordChannelSettingsEntity;
+import de.thm.swtp.api.discord.dto.DiscordChannelResponse;
 import de.thm.swtp.api.discord.entity.LinkedChannelEntity;
 import de.thm.swtp.api.discord.exception.DiscordConnectionFailedException;
 import de.thm.swtp.api.discord.repository.DiscordChannelSettingsRepository;
@@ -181,12 +182,12 @@ public class DiscordChannelService {
     }
 
     @Transactional
-    public LinkedChannelEntity autoConnectChannel(UUID projectId) {
+    public DiscordChannelResponse autoConnectChannel(UUID projectId) {
         return autoConnectChannel(projectId, null);
     }
 
     @Transactional
-    public LinkedChannelEntity autoConnectChannel(UUID projectId, String guildId) {
+    public DiscordChannelResponse autoConnectChannel(UUID projectId, String guildId) {
         ProjectEntity project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException(projectId));
 
@@ -211,7 +212,10 @@ public class DiscordChannelService {
                     "Bot cannot access auto-created channel: " + (test.reason() != null ? test.reason() : "unknown reason"));
         }
 
-        return connectChannel(projectId, autoResp.channelId(), autoResp.guildId());
+        LinkedChannelEntity link = connectChannel(projectId, autoResp.channelId(), autoResp.guildId());
+
+        String warning = !autoResp.canWrite() ? "PROJECTSETTINGS.DISCORD.BOT_NO_WRITE_PERMISSION" : null;
+        return DiscordChannelResponse.from(link, warning);
     }
 
     @Transactional(readOnly = true)

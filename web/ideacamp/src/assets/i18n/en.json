@@ -420,7 +420,8 @@
       "LINK_DISCORD": "Link Discord Account",
       "SELECT_SERVER": "Bot is in multiple servers — select which one to use:",
       "SELECT_SERVER_PLACEHOLDER": "Select a server...",
-      "CONNECT_SERVER": "Connect"
+      "CONNECT_SERVER": "Connect",
+      "BOT_NO_WRITE_PERMISSION": "The bot cannot send messages in the existing #posts channel. Grant the \"Send Messages\" permission to the bot in Discord, or connect a different channel manually."
     },
     "ERRORS": {
       "NO_PROJECT_URL": "No project URL provided.",

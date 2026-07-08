@@ -420,7 +420,8 @@
       "LINK_DISCORD": "Discord-Konto verknüpfen",
       "SELECT_SERVER": "Bot ist in mehreren Servern — wähle einen aus:",
       "SELECT_SERVER_PLACEHOLDER": "Server auswählen...",
-      "CONNECT_SERVER": "Verbinden"
+      "CONNECT_SERVER": "Verbinden",
+      "BOT_NO_WRITE_PERMISSION": "Der Bot kann im vorhandenen #posts-Kanal keine Nachrichten senden. Erteile dem Bot die \"Nachrichten senden\"-Berechtigung in Discord oder verbinde manuell einen anderen Kanal."
     },
     "ERRORS": {
       "NO_PROJECT_URL": "Keine Projekt-URL gegeben.",

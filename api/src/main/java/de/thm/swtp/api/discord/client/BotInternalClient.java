@@ -118,7 +118,7 @@ public class BotInternalClient {
                     .body(AutoSetupResponse.class);
         } catch (Exception e) {
             log.error("Bot auto-setup failed: {}", e.getMessage());
-            return new AutoSetupResponse(false, null, null, null, "bot unreachable");
+            return new AutoSetupResponse(false, null, null, null, "bot unreachable", true);
         }
     }
 
@@ -151,7 +151,7 @@ public class BotInternalClient {
     public record CreateInviteResponse(boolean success, String inviteUrl, String reason) {}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record AutoSetupResponse(boolean success, String guildId, String channelId, String channelName, String reason) {}
+    public record AutoSetupResponse(boolean success, String guildId, String channelId, String channelName, String reason, boolean canWrite) {}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record LeaveGuildResponse(boolean success, String reason) {}

@@ -12,6 +12,7 @@ interface ChannelResponse {
   discordGuildId?: string | null;
   isActive: boolean;
   discordInviteUrl?: string | null;
+  warning?: string | null;
 }
 
 interface ChannelStatus {
@@ -37,6 +38,7 @@ export class DiscordTab implements OnInit, OnDestroy {
   readonly isDisconnecting = signal(false);
   readonly isLoading = signal(true);
   readonly connectError = signal<string | null>(null);
+  readonly connectWarning = signal<string | null>(null);
 
   readonly connectionStatus = signal<ChannelStatus | null>(null);
   readonly inviteUrl = signal('');
@@ -189,6 +191,7 @@ export class DiscordTab implements OnInit, OnDestroy {
 
     this.isAutoConnecting.set(true);
     this.connectError.set(null);
+    this.connectWarning.set(null);
 
     const body = guildId ? { guildId } : {};
 
@@ -200,6 +203,7 @@ export class DiscordTab implements OnInit, OnDestroy {
         this.showGuildPicker.set(false);
         this.connectionStatus.set({ isActive: res.isActive, channelId: res.discordChannelId, discordInviteUrl: res.discordInviteUrl, syncedToday: 0 });
         this.inviteUrl.set(res.discordInviteUrl ?? '');
+        this.connectWarning.set(res.warning ?? null);
         this.isAutoConnecting.set(false);
       },
       error: (err) => {

@@ -57,8 +57,7 @@ public class DiscordChannelController {
             @PathVariable UUID projectId,
             @RequestBody(required = false) Map<String, String> body) {
         String guildId = body != null ? body.get("guildId") : null;
-        LinkedChannelEntity link = discordChannelService.autoConnectChannel(projectId, guildId);
-        return ResponseEntity.ok(DiscordChannelResponse.from(link));
+        return ResponseEntity.ok(discordChannelService.autoConnectChannel(projectId, guildId));
     }
 
     @PatchMapping("/invite")

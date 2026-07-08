@@ -173,8 +173,12 @@ internalApi.post('/internal/auto-setup', validateSecret, async (req, res) => {
       c => c.name === channelName && c.isTextBased()
     );
     if (existing) {
-      logger.info({ guildId: guild.id, channelId: existing.id }, 'auto-setup: found existing #posts');
-      res.json({ success: true, guildId: guild.id, channelId: existing.id, channelName: existing.name });
+      const botMember = guild.members.me;
+      const canWrite = botMember
+        ? existing.permissionsFor(botMember)?.has(PermissionFlagsBits.SendMessages) ?? false
+        : false;
+      logger.info({ guildId: guild.id, channelId: existing.id, canWrite }, 'auto-setup: found existing #posts');
+      res.json({ success: true, guildId: guild.id, channelId: existing.id, channelName: existing.name, canWrite });
       return;
     }
     if (!ownerDiscordId) {
@@ -197,7 +201,7 @@ internalApi.post('/internal/auto-setup', validateSecret, async (req, res) => {
       ],
     });
     logger.info({ guildId: guild.id, channelId: created.id }, 'auto-setup: created restricted #posts');
-    res.json({ success: true, guildId: guild.id, channelId: created.id, channelName: created.name });
+    res.json({ success: true, guildId: guild.id, channelId: created.id, channelName: created.name, canWrite: true });
   } catch (err: unknown) {
     logger.error({ err }, 'auto-setup failed');
     const code = err instanceof Error ? (err as unknown as { code: unknown }).code : undefined;
