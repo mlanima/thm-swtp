@@ -1,5 +1,5 @@
 <header class="flex justify-center border-b border-gray-300 py-2">
-  <div class="flex justify-between container items-center px-[15px]">
+  <div class="flex justify-between container items-center px-3.75">
 
     <div class="flex flex-1 gap-4 items-center">
       @if (isAuthenticated()) {
@@ -28,18 +28,25 @@
       </nav>
     }
 
-    <div class="flex justify-end flex-1 items-center gap-2">
+    <div class="flex flex-1 items-center justify-end gap-2">
       @if (isAuthenticated()) {
         @if (isModerator()) {
-          <div class="flex items-center gap-3">
-            <div class="flex flex-col items-end text-sm">
-              <div class="font-semibold">{{ auth.username() }}</div>
-              <span class="inline-flex items-center rounded-md bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700 leading-none">{{ 'SIDEBAR.MODERATOR' | translate }}</span>
+          <div class="flex items-center gap-2">
+            <div class="hidden flex-col items-end text-sm sm:flex">
+              <div class="max-w-32 truncate font-semibold">
+                {{ auth.username() }}
+              </div>
+              <span class="inline-flex items-center rounded-md bg-amber-100 px-2 py-0.5 text-[10px] font-semibold leading-none text-amber-700">
+            {{ 'SIDEBAR.MODERATOR' | translate }}
+          </span>
             </div>
+
             <button
               type="button"
               (click)="auth.logout()"
-              class="rounded-full p-2 text-slate-900 transition hover:bg-gray-100">
+              class="rounded-full p-2 text-slate-900 transition hover:bg-gray-100"
+              aria-label="Logout"
+            >
               <i class="pi pi-sign-out text-md"></i>
             </button>
           </div>
@@ -49,8 +56,11 @@
           </a>
         }
       } @else {
-        <div class="flex gap-1 items-center">
-          <button (click)="auth.login()" class="group flex gap-2 items-center border border-slate-900 px-4 py-2 rounded-xl text-sm font-medium text-slate-900 transition-all duration-300 ease-out hover:bg-primary hover:border-primary hover:shadow-lg hover:shadow-primary/25 hover:text-white">
+        <div class="flex items-center gap-1">
+          <button
+            (click)="auth.login()"
+            class="group flex items-center gap-2 rounded-xl border border-slate-900 px-4 py-2 text-sm font-medium text-slate-900 transition-all duration-300 ease-out hover:border-primary hover:bg-primary hover:text-white hover:shadow-lg hover:shadow-primary/25"
+          >
             {{ 'NAV.LOGIN' | translate }}
             <i class="pi pi-sign-in text-xs transition-transform duration-300 ease-out group-hover:translate-x-1"></i>
           </button>
@@ -59,8 +69,9 @@
 
       <button
         type="button"
-        class="rounded-lg border border-slate-300 px-3 py-1 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
-        (click)="changeLanguage(currentLanguage() === 'en' ? 'de' : 'en')">
+        class="h-10 rounded-lg border border-slate-300 px-3 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+        (click)="changeLanguage(currentLanguage() === 'en' ? 'de' : 'en')"
+      >
         {{ currentLanguage() === 'en' ? 'EN' : 'DE' }}
       </button>
     </div>

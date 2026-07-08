@@ -1,5 +1,17 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnChanges, OnDestroy, SimpleChanges, inject, signal, ElementRef, ViewChild } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnChanges,
+  OnDestroy,
+  SimpleChanges,
+  inject,
+  signal,
+  ElementRef,
+  ViewChild,
+  Output,
+  EventEmitter,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { catchError, finalize, of, switchMap } from 'rxjs';
 import { ProjectPostResponse, ProjectResponse } from '../../../../models/project.model';
@@ -21,6 +33,12 @@ type ProjectPostContentFormat = 'PLAIN_TEXT' | 'MARKDOWN';
 export class ProjectPosts implements OnChanges, OnDestroy {
   @Input({ required: true }) project!: ProjectResponse;
   @Input() canCreatePosts = false;
+  @Input() canReportPosts = false;
+
+  @Output() reportPost = new EventEmitter<{
+    id: string;
+    title: string;
+  }>();
 
   private readonly projectService = inject(ProjectService);
   private readonly translateService = inject(TranslateService);
@@ -175,12 +193,7 @@ export class ProjectPosts implements OnChanges, OnDestroy {
 
     const selectedText = value.slice(start, end) || placeholder;
 
-    const nextValue =
-      value.slice(0, start) +
-      prefix +
-      selectedText +
-      suffix +
-      value.slice(end);
+    const nextValue = value.slice(0, start) + prefix + selectedText + suffix + value.slice(end);
 
     this.content.set(nextValue);
 

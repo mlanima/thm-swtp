@@ -138,7 +138,11 @@ export class RecentPosts {
   }
 
   private clearPostImageUrls(): void {
-    Object.values(this.postImageUrls()).forEach((url) => URL.revokeObjectURL(url));
+    const urls = this.postImageUrls();
+    if (Object.keys(urls).length === 0) {
+      return;
+    }
+    Object.values(urls).forEach((url) => URL.revokeObjectURL(url));
     this.postImageUrls.set({});
   }
 }

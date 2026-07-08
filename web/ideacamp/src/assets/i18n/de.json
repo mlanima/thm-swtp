@@ -11,6 +11,7 @@
   "COMMON": {
     "SAVE": "Speichern",
     "CANCEL": "Abbrechen",
+    "CONFIRM": "Bestätigen",
     "EDIT": "Bearbeiten",
     "DELETE": "Löschen",
     "LOADING": "Wird geladen...",
@@ -124,6 +125,24 @@
     "DISCORD_SHOW": "Nutzername",
     "DISCORD_COPIED": "Kopiert!"
   },
+  "REPORT_DIALOG": {
+    "REPORT": "Melden",
+    "TITLE": "Inhalt melden",
+    "DESCRIPTION": "Wählen Sie einen Grund aus und ergänzen Sie optional eine Nachricht.",
+    "REPORTED_CONTENT": "Gemeldeter Inhalt",
+    "REASON_LABEL": "Grund",
+    "REASON_PLACEHOLDER": "Grund auswählen",
+    "MESSAGE_LABEL": "Kommentar (optional)",
+    "MESSAGE_PLACEHOLDER": "Beschreiben Sie kurz, warum Sie diesen Inhalt melden...",
+    "SUBMIT": "Meldung senden",
+    "ERROR_SEND": "Die Meldung konnte nicht gesendet werden.",
+    "ERROR_DUPLICATE": "Du hast diesen Inhalt bereits mit diesem Grund gemeldet.",
+    "SUCCESS": "Die Meldung wurde gesendet.",
+    "VALIDATION": {
+      "TARGET_INVALID": "Der gemeldete Inhalt ist ungültig.",
+      "MESSAGE_MAX": "Die Nachricht darf maximal 1000 Zeichen lang sein."
+    }
+  },
   "CONTACT-REQUESTS": {
     "CONTACT": "Kontaktanfragen",
     "CONTACT-PROJECT": "Kontaktanfragen für mein Projekt verwalten",
@@ -152,6 +171,8 @@
     "USERS_LINK_DESCRIPTION": "Aktive und gebannte Nutzer einsehen und verwalten.",
     "PROFESSOR_REQUESTS_LINK_TITLE": "Professorverwaltung",
     "PROFESSOR_REQUESTS_LINK_DESCRIPTION": "Professor-Anfragen prüfen, annehmen oder ablehnen.",
+    "REPORTS_LINK_TITLE": "Reportverwaltung",
+    "REPORTS_LINK_DESCRIPTION": "Gemeldete Inhalte prüfen und bearbeiten.",
     "PROJECTS": {
       "TITLE": "Projektverwaltung",
       "SUBTITLE": "Alle Projekte einsehen, suchen und bei Bedarf löschen.",
@@ -205,7 +226,8 @@
       "SORT": {
         "ASC": "Aufsteigend sortiert",
         "DESC": "Absteigend sortiert",
-        "NOT_SORTED": "Nicht sortiert"
+        "NOT_SORTED": "Nicht sortiert",
+        "LABEL": "Sortieren"
       },
       "ROLES": {
         "PROFESSOR": "Professor",
@@ -261,6 +283,132 @@
       "CONFIRM": "Bestätigen",
       "SHOWING_OF": "von",
       "TOTAL_REQUESTS": "Anfragen angezeigt"
+    },
+    "REPORTS": {
+      "TITLE": "Reportverwaltung",
+      "SUBTITLE": "Gemeldete Inhalte prüfen, priorisieren und bearbeiten.",
+      "BADGE": "Moderator",
+
+      "SEARCH_PLACEHOLDER": "Suche nach Nutzer, Meldung, Notiz oder ID...",
+
+      "FILTER": {
+        "STATUS": "Status",
+        "CONTENT_TYPE": "Inhaltstyp",
+        "REASON": "Grund",
+        "PRIORITY": "Priorität",
+        "ALL": "Alle",
+        "ALL_REASONS": "Alle Gründe"
+      },
+
+      "COLUMN": {
+        "MESSAGE": "Meldung",
+        "REASON": "Grund",
+        "REPORTED_CONTENT": "Gemeldeter Inhalt",
+        "REPORTED_BY": "Gemeldet von",
+        "STATUS": "Status",
+        "CREATED_AT": "Erstellt am",
+        "ACTIONS": "Aktionen"
+      },
+
+      "STATUS": {
+        "OPEN": "Offen",
+        "IN_REVIEW": "In Bearbeitung",
+        "RESOLVED": "Gelöst",
+        "DISMISSED": "Verworfen"
+      },
+
+      "TARGET": {
+        "USER": "Nutzer",
+        "PROJECT": "Projekt",
+        "PROJECT_POST": "Projektpost"
+      },
+
+      "REASON": {
+        "SPAM": "Spam",
+        "HARASSMENT": "Belästigung",
+        "HATE_SPEECH": "Hassrede",
+        "INAPPROPRIATE_CONTENT": "Unpassender Inhalt",
+        "VIOLENCE_OR_THREATS": "Gewalt / Drohungen",
+        "SELF_HARM_OR_SUICIDE": "Selbstverletzung",
+        "PERSONAL_DATA": "Persönliche Daten",
+        "COPYRIGHT": "Urheberrecht",
+        "MISINFORMATION": "Fehlinformation",
+        "FRAUD_OR_IMPERSONATION": "Betrug / Imitation",
+        "OTHER": "Sonstiges"
+      },
+
+      "PRIORITY": {
+        "CRITICAL": "Kritisch",
+        "MEDIUM": "Mittel",
+        "LOW": "Niedrig"
+      },
+
+      "ACTIONS": {
+        "VIEW": "Ansehen",
+        "OPEN_MENU": "Weitere Aktionen",
+        "SET_IN_REVIEW": "In Bearbeitung setzen",
+        "RESOLVE": "Als gelöst markieren",
+        "DISMISS": "Verwerfen",
+        "CLOSE": "Schließen",
+        "SAVE": "Speichern",
+        "BAN_USER": "Nutzer bannen",
+        "DELETE_PROJECT": "Projekt löschen",
+        "DELETE_PROJECT_POST": "Projektpost löschen"
+      },
+
+      "DETAIL": {
+        "TITLE": "Meldung",
+        "REPORT_ID": "Report-ID",
+        "REASON": "Grund",
+        "PRIORITY": "Priorität",
+        "CONTENT_TYPE": "Inhaltstyp",
+        "REPORTED_CONTENT": "Gemeldeter Inhalt",
+        "REPORTED_BY": "Gemeldet von",
+        "COMMENT": "Kommentar",
+        "MODERATOR_NOTE": "Moderator-Notiz",
+        "MODERATOR_NOTE_PLACEHOLDER": "z. B. „Post wurde geprüft.“ oder „Kein Verstoß erkennbar.“",
+        "NO_MODERATOR_NOTE": "Keine Moderator-Notiz vorhanden.",
+        "CREATED_AT": "Erstellt am",
+        "UPDATED_AT": "Aktualisiert am",
+        "REVIEWED_BY": "Bearbeitet von",
+        "REVIEWED_AT": "Bearbeitet am",
+        "SIMILAR_REPORTS": "Ähnliche Meldungen",
+        "SIMILAR_REPORTS_TEXT": "Zu diesem Inhalt liegen {{count}} aktive Meldungen vor.",
+        "TARGET_ACTIONS": "Zielaktionen"
+      },
+
+      "EMPTY": {
+        "TITLE": "Keine Reports gefunden.",
+        "DESCRIPTION": "Passe die Filter oder Suche an, um andere Meldungen zu finden."
+      },
+
+      "PAGINATION": {
+        "SHOWING": "{{ shown }} von {{ total }} Reports",
+        "PAGE": "Seite {{ current }} von {{ total }}"
+      },
+
+      "SORT": {
+        "SORT_BY": "Nach dieser Spalte sortieren",
+        "ASC": "Aufsteigend sortiert",
+        "DESC": "Absteigend sortiert"
+      },
+
+      "ERROR_LOAD": "Reports konnten nicht geladen werden.",
+      "ERROR_UPDATE": "Report konnte nicht aktualisiert werden.",
+      "LOADING": "Reports werden geladen...",
+      "EMPTY_MESSAGE": "Keine Nachricht angegeben.",
+
+      "SIMILAR_REPORTS": "{{count}} Meldungen",
+
+      "CONFIRM": {
+        "BAN_USER_TITLE": "Nutzer wirklich bannen?",
+        "BAN_USER_DESCRIPTION": "Der Nutzer kann danach keine normalen Plattformfunktionen mehr nutzen.",
+        "DELETE_PROJECT_TITLE": "Projekt wirklich löschen?",
+        "DELETE_PROJECT_DESCRIPTION": "Das Projekt wird dauerhaft entfernt. Diese Aktion kann nicht rückgängig gemacht werden.",
+        "DELETE_PROJECT_POST_TITLE": "Projektpost wirklich löschen?",
+        "DELETE_PROJECT_POST_DESCRIPTION": "Der Projektpost wird dauerhaft entfernt. Diese Aktion kann nicht rückgängig gemacht werden."
+      },
+      "ERROR_TARGET_ACTION": "Die Zielaktion konnte nicht ausgeführt werden."
     }
   },
   "SIDEBAR": {
@@ -271,6 +419,7 @@
     "MODERATOR": "Moderator",
     "MODERATOR_PROJECTS": "Projektverwaltung",
     "USER_MANAGEMENT": "Nutzerverwaltung",
+    "REPORTS": "Reportverwaltung",
     "PROFESSOR_REQUESTS": "Professorverwaltung",
     "IMPRESSUM": "Impressum",
     "MENU": "Menü"

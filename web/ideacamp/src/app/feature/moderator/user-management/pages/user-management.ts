@@ -4,6 +4,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { ManagedUser, ManagedUserSortField, SortDirection } from '../models/managed-user.model';
 import { UserManagementService } from '../service/user-management.service';
 import { Pagination } from '../../shared/pagination/pagination';
+import { BanUserDialogComponent } from '../components/ban-user-dialog/ban-user-dialog.component';
 
 type ModTab = 'active' | 'banned';
 const PAGE_SIZE = 10;
@@ -12,14 +13,13 @@ const PAGE_SIZE = 10;
 @Component({
   selector: 'app-user-management',
   standalone: true,
-  imports: [DatePipe, TranslatePipe, Pagination],
+  imports: [DatePipe, TranslatePipe, Pagination, BanUserDialogComponent],
   templateUrl: './user-management.html',
 })
 export class UserManagement implements OnInit {
   private readonly userManagementService = inject(UserManagementService);
   private readonly platformId = inject(PLATFORM_ID);
 
-  private readonly maxBanReasonLength = 1000;
   private readonly banReasonPreviewLength = 50;
 
   activeTab = signal<ModTab>('active');
@@ -40,10 +40,12 @@ export class UserManagement implements OnInit {
   errorMessage = signal<string | null>(null);
 
   selectedUser = signal<ManagedUser | null>(null);
-  banReason = signal('');
 
   activeUserCount = signal(0);
   bannedUserCount = signal(0);
+
+  readonly isBanSubmitting = signal(false);
+  readonly banErrorMessage = signal<string | null>(null);
 
   ngOnInit() {
     if (!isPlatformBrowser(this.platformId)) {
@@ -68,7 +70,7 @@ export class UserManagement implements OnInit {
         next: (response) => {
           this.activeUsers.set(response.content);
           this.activeUserCount.set(response.totalElements);
-          this.activeCurrentPage.set(response.number);
+          this.activeCurrentPage.set(response.page);
           this.activeTotalPages.set(response.totalPages);
           this.isLoading.set(false);
         },
@@ -89,7 +91,7 @@ export class UserManagement implements OnInit {
         next: (response) => {
           this.bannedUsers.set(response.content);
           this.bannedUserCount.set(response.totalElements);
-          this.bannedCurrentPage.set(response.number);
+          this.bannedCurrentPage.set(response.page);
           this.bannedTotalPages.set(response.totalPages);
           this.isLoading.set(false);
         },
@@ -175,25 +177,25 @@ export class UserManagement implements OnInit {
 
   openBanDialog(user: ManagedUser): void {
     this.selectedUser.set(user);
-    this.banReason.set('');
+    this.banErrorMessage.set(null);
   }
 
   closeBanDialog(): void {
     this.selectedUser.set(null);
-    this.banReason.set('');
   }
 
-  banUser(): void {
+  banUser(reason?: string): void {
     const user = this.selectedUser();
+    this.isBanSubmitting.set(true);
+    this.banErrorMessage.set(null);
 
     if (!user) {
       return;
     }
 
-    const trimmedReason = this.banReason().trim().slice(0, this.maxBanReasonLength);
-
-    this.userManagementService.banUser(user.keycloakId, trimmedReason || undefined).subscribe({
+    this.userManagementService.banUser(user.keycloakId, reason).subscribe({
       next: () => {
+        this.isBanSubmitting.set(false);
         this.closeBanDialog();
         this.activeTab.set('banned');
         this.loadActiveUsers(this.activeCurrentPage());
@@ -201,6 +203,7 @@ export class UserManagement implements OnInit {
       },
       error: () => {
         this.errorMessage.set('MODERATOR.USER_MANAGEMENT.ERROR_BAN');
+        this.isBanSubmitting.set(false);
       },
     });
   }

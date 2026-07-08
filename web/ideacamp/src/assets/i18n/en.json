@@ -11,6 +11,7 @@
   "COMMON": {
     "SAVE": "Save",
     "CANCEL": "Cancel",
+    "CONFIRM": "Confirm",
     "EDIT": "Edit",
     "DELETE": "Delete",
     "LOADING": "Loading...",
@@ -124,6 +125,24 @@
     "DISCORD_SHOW": "Username",
     "DISCORD_COPIED": "Copied!"
   },
+  "REPORT_DIALOG": {
+    "REPORT": "Report",
+    "TITLE": "Report content",
+    "DESCRIPTION": "Choose a reason and optionally add a comment.",
+    "REPORTED_CONTENT": "Reported content",
+    "REASON_LABEL": "Reason",
+    "REASON_PLACEHOLDER": "Select a reason",
+    "MESSAGE_LABEL": "Comment (optional)",
+    "MESSAGE_PLACEHOLDER": "Briefly describe why you are reporting this content...",
+    "SUBMIT": "Submit report",
+    "ERROR_SEND": "The report could not be submitted.",
+    "ERROR_DUPLICATE": "You have already reported this content for this reason.",
+    "SUCCESS": "The report has been submitted.",
+    "VALIDATION": {
+      "TARGET_INVALID": "The reported content is invalid.",
+      "MESSAGE_MAX": "The message must not exceed 1000 characters."
+    }
+  },
   "CONTACT-REQUESTS": {
     "CONTACT": "Contact Requests",
     "CONTACT-PROJECT": "Manage contact requests for my project",
@@ -152,6 +171,8 @@
     "USERS_LINK_DESCRIPTION": "View and manage active and banned users.",
     "PROFESSOR_REQUESTS_LINK_TITLE": "Professor Management",
     "PROFESSOR_REQUESTS_LINK_DESCRIPTION": "Review, accept, or reject professor requests.",
+    "REPORTS_LINK_TITLE": "Report Management",
+    "REPORTS_LINK_DESCRIPTION": "Review and process reported content.",
     "PROJECTS": {
       "TITLE": "Project Management",
       "SUBTITLE": "View, search, and delete projects as needed.",
@@ -205,7 +226,8 @@
       "SORT": {
         "ASC": "Sorted ascending",
         "DESC": "Sorted descending",
-        "NOT_SORTED": "Not sorted"
+        "NOT_SORTED": "Not sorted",
+        "LABEL": "Sort"
       },
       "ROLES": {
         "PROFESSOR": "Professor",
@@ -261,6 +283,132 @@
       "CONFIRM": "Confirm",
       "SHOWING_OF": "From",
       "TOTAL_REQUESTS": "Requests shown"
+    },
+    "REPORTS": {
+      "TITLE": "Report Management",
+      "SUBTITLE": "Review, prioritize, and process reported content.",
+      "BADGE": "Moderator",
+
+      "SEARCH_PLACEHOLDER": "Search by user, report, note, or ID...",
+
+      "FILTER": {
+        "STATUS": "Status",
+        "CONTENT_TYPE": "Content type",
+        "REASON": "Reason",
+        "PRIORITY": "Priority",
+        "ALL": "All",
+        "ALL_REASONS": "All reasons"
+      },
+
+      "COLUMN": {
+        "MESSAGE": "Report",
+        "REASON": "Reason",
+        "REPORTED_CONTENT": "Reported content",
+        "REPORTED_BY": "Reported by",
+        "STATUS": "Status",
+        "CREATED_AT": "Created at",
+        "ACTIONS": "Actions"
+      },
+
+      "STATUS": {
+        "OPEN": "Open",
+        "IN_REVIEW": "In review",
+        "RESOLVED": "Resolved",
+        "DISMISSED": "Dismissed"
+      },
+
+      "TARGET": {
+        "USER": "User",
+        "PROJECT": "Project",
+        "PROJECT_POST": "Project post"
+      },
+
+      "REASON": {
+        "SPAM": "Spam",
+        "HARASSMENT": "Harassment",
+        "HATE_SPEECH": "Hate speech",
+        "INAPPROPRIATE_CONTENT": "Inappropriate content",
+        "VIOLENCE_OR_THREATS": "Violence / threats",
+        "SELF_HARM_OR_SUICIDE": "Self-harm",
+        "PERSONAL_DATA": "Personal data",
+        "COPYRIGHT": "Copyright",
+        "MISINFORMATION": "Misinformation",
+        "FRAUD_OR_IMPERSONATION": "Fraud / impersonation",
+        "OTHER": "Other"
+      },
+
+      "PRIORITY": {
+        "CRITICAL": "Critical",
+        "MEDIUM": "Medium",
+        "LOW": "Low"
+      },
+
+      "ACTIONS": {
+        "VIEW": "View",
+        "OPEN_MENU": "More actions",
+        "SET_IN_REVIEW": "Set in review",
+        "RESOLVE": "Mark as resolved",
+        "DISMISS": "Dismiss",
+        "CLOSE": "Close",
+        "SAVE": "Save",
+        "BAN_USER": "Ban user",
+        "DELETE_PROJECT": "Delete project",
+        "DELETE_PROJECT_POST": "Delete project post"
+      },
+
+      "DETAIL": {
+        "TITLE": "Report",
+        "REPORT_ID": "Report ID",
+        "REASON": "Reason",
+        "PRIORITY": "Priority",
+        "CONTENT_TYPE": "Content type",
+        "REPORTED_CONTENT": "Reported content",
+        "REPORTED_BY": "Reported by",
+        "COMMENT": "Comment",
+        "MODERATOR_NOTE": "Moderator note",
+        "MODERATOR_NOTE_PLACEHOLDER": "e.g. “Post was reviewed.” or “No violation found.”",
+        "NO_MODERATOR_NOTE": "No moderator note available.",
+        "CREATED_AT": "Created at",
+        "UPDATED_AT": "Updated at",
+        "REVIEWED_BY": "Reviewed by",
+        "REVIEWED_AT": "Reviewed at",
+        "SIMILAR_REPORTS": "Similar reports",
+        "SIMILAR_REPORTS_TEXT": "{{count}} active report(s) exist for this content.",
+        "TARGET_ACTIONS": "Target actions"
+      },
+
+      "EMPTY": {
+        "TITLE": "No reports found.",
+        "DESCRIPTION": "Adjust the filters or search query to find other reports."
+      },
+
+      "PAGINATION": {
+        "SHOWING": "{{ shown }} of {{ total }} reports",
+        "PAGE": "Page {{ current }} of {{ total }}"
+      },
+
+      "SORT": {
+        "SORT_BY": "Sort by this column",
+        "ASC": "Sorted ascending",
+        "DESC": "Sorted descending"
+      },
+
+      "ERROR_LOAD": "Reports could not be loaded.",
+      "ERROR_UPDATE": "Report could not be updated.",
+      "LOADING": "Loading reports...",
+      "EMPTY_MESSAGE": "No message provided.",
+
+      "SIMILAR_REPORTS": "{{count}} reports",
+
+      "CONFIRM": {
+        "BAN_USER_TITLE": "Ban this user?",
+        "BAN_USER_DESCRIPTION": "The user will no longer be able to use regular platform features.",
+        "DELETE_PROJECT_TITLE": "Delete this project?",
+        "DELETE_PROJECT_DESCRIPTION": "The project will be permanently removed. This action cannot be undone.",
+        "DELETE_PROJECT_POST_TITLE": "Delete this project post?",
+        "DELETE_PROJECT_POST_DESCRIPTION": "The project post will be permanently removed. This action cannot be undone."
+      },
+      "ERROR_TARGET_ACTION": "The target action could not be completed."
     }
   },
   "SIDEBAR": {
@@ -271,6 +419,7 @@
     "MODERATOR": "Moderator",
     "MODERATOR_PROJECTS": "Project Management",
     "USER_MANAGEMENT": "User management",
+    "REPORTS": "Report management",
     "PROFESSOR_REQUESTS": "Professor management",
     "IMPRESSUM": "Legal notice",
     "MENU": "Menu"

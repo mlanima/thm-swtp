@@ -3,7 +3,8 @@ import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { UserProfileService } from '../../../services/user-profile.service';
 import { TranslatePipe } from '@ngx-translate/core';
-import { Onboarding} from '../../../shared/onboarding/onboarding';
+import { isModeratorReadableRoute } from '../moderator-readable-routes';
+import { Onboarding } from '../../../shared/onboarding/onboarding';
 
 @Component({
   selector: 'app-success',
@@ -29,14 +30,27 @@ export class SuccessComponent implements OnInit {
       return;
     }
 
+    const redirectUrl = sessionStorage.getItem('postLoginRedirectUrl');
+
     if (this.authService.isModerator()) {
+      if (redirectUrl && isModeratorReadableRoute(redirectUrl)) {
+        sessionStorage.removeItem('postLoginRedirectUrl');
+        await this.router.navigateByUrl(redirectUrl);
+        return;
+      }
+
+      sessionStorage.removeItem('postLoginRedirectUrl');
       await this.router.navigateByUrl('/moderator');
       return;
     }
 
     this.redirectUrl = sessionStorage.getItem('postLoginRedirectUrl');
     sessionStorage.removeItem('postLoginRedirectUrl');
-    
+
+    if (this.redirectUrl) {
+      await this.router.navigateByUrl(this.redirectUrl);
+      return;
+    }
 
     this.userProfileService.getMyProfile().subscribe({
       next: (profile) => {
@@ -73,5 +87,6 @@ export class SuccessComponent implements OnInit {
 
   private navigateAfterSuccess(): void {
     void this.router.navigateByUrl(this.redirectUrl ?? this.defaultRedirectUrl);
+    this.userProfileService.getMyProfile().subscribe();
   }
 }

@@ -130,7 +130,7 @@ export class ProjectsComponent implements OnInit {
     this.moderatorProjectsService.getAllProjects(params).subscribe({
       next: (pageResponse) => {
         this.projects.set(pageResponse.content.map((p) => this.toProjectView(p)));
-        this.currentPage.set(pageResponse.number);
+        this.currentPage.set(pageResponse.page);
         this.totalPages.set(pageResponse.totalPages);
         this.totalElements.set(pageResponse.totalElements);
         this.isLoading.set(false);
