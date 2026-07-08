@@ -1,9 +1,7 @@
-export type ReportTarget = 'USER'| 'PROJECT' | 'PROJECT_POST';
+import type { ReportReason, ReportTarget } from '../../../reports/models/report-shared.model';
+export type { ReportReason, ReportTarget } from '../../../reports/models/report-shared.model';
 
 export type ReportStatus = 'OPEN' | 'IN_REVIEW' | 'RESOLVED' | 'DISMISSED';
-
-export type ReportReason = | 'SPAM' | 'HARASSMENT' | 'HATE_SPEECH' | 'INAPPROPRIATE_CONTENT' | 'VIOLENCE_OR_THREATS'
-  | 'SELF_HARM_OR_SUICIDE' | 'PERSONAL_DATA' | 'COPYRIGHT' | 'MISINFORMATION' | 'FRAUD_OR_IMPERSONATION' | 'OTHER';
 
 export interface ManagedReport {
   id: string;
@@ -24,7 +22,15 @@ export interface ManagedReport {
   similarReportsCount: number;
 }
 
-export type ReportSortField = 'reason' | 'target' | 'status' | 'reporter.username' | 'reviewerUsername' | 'reviewedAt' | 'createdAt' | 'updatedAt';
+export type ReportSortField =
+  | 'reason'
+  | 'target'
+  | 'status'
+  | 'reporter.username'
+  | 'reviewerUsername'
+  | 'reviewedAt'
+  | 'createdAt'
+  | 'updatedAt';
 
 export type SortDirection = 'asc' | 'desc';
 
@@ -44,7 +50,7 @@ export interface ReportSearchParams {
   sortDirection?: SortDirection;
 }
 
-export interface ReportTargetSummary{
+export interface ReportTargetSummary {
   title: string;
   subtitle: string;
   link: string | null;
@@ -52,6 +58,4 @@ export interface ReportTargetSummary{
 }
 
 export type ReportPriority = 'CRITICAL' | 'MEDIUM' | 'LOW';
-
-
 export type TargetAction = 'BAN_USER' | 'DELETE_PROJECT' | 'DELETE_PROJECT_POST';

@@ -129,7 +129,11 @@
     "MESSAGE_PLACEHOLDER": "Briefly describe why you are reporting this content...",
     "SUBMIT": "Submit report",
     "ERROR_SEND": "The report could not be submitted.",
-    "SUCCESS": "The report has been submitted."
+    "SUCCESS": "The report has been submitted.",
+    "VALIDATION": {
+      "TARGET_INVALID": "The reported content is invalid.",
+      "MESSAGE_MAX": "The message must not exceed 1000 characters."
+    }
   },
   "CONTACT-REQUESTS": {
     "CONTACT": "Contact Requests",

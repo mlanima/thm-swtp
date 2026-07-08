@@ -129,7 +129,11 @@
     "MESSAGE_PLACEHOLDER": "Beschreiben Sie kurz, warum Sie diesen Inhalt melden...",
     "SUBMIT": "Meldung senden",
     "ERROR_SEND": "Die Meldung konnte nicht gesendet werden.",
-    "SUCCESS": "Die Meldung wurde gesendet."
+    "SUCCESS": "Die Meldung wurde gesendet.",
+    "VALIDATION": {
+      "TARGET_INVALID": "Der gemeldete Inhalt ist ungültig.",
+      "MESSAGE_MAX": "Die Nachricht darf maximal 1000 Zeichen lang sein."
+    }
   },
   "CONTACT-REQUESTS": {
     "CONTACT": "Kontaktanfragen",

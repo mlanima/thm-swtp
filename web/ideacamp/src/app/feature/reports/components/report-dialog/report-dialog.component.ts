@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, input, output, signal } from '@angu
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { REPORT_REASONS, ReportReason, ReportTarget } from '../../models/report-create.model';
+import { createReportSchema } from '../../schemas/report-create.schema';
 
 @Component({
   selector: 'app-report-dialog',
@@ -27,17 +28,20 @@ export class ReportDialogComponent {
   readonly maxMessageLength = 1000;
 
   submit(): void {
-    const reason = this.selectedReason();
+    const result = createReportSchema.safeParse({
+      target: this.target(),
+      targetId: this.targetId(),
+      reason: this.selectedReason(),
+      message: this.message(),
+    });
 
-    if (!reason) {
+    if (!result.success) {
       return;
     }
 
-    const trimmedMessage = this.message().trim().slice(0, 1000);
-
     this.submitReport.emit({
-      reason,
-      message: trimmedMessage || undefined,
+      reason: result.data.reason,
+      message: result.data.message?.trim() || undefined,
     });
   }
 }

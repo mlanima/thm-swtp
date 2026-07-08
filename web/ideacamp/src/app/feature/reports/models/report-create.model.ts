@@ -1,17 +1,6 @@
-export type ReportTarget = 'USER' | 'PROJECT' | 'PROJECT_POST';
-
-export type ReportReason =
-  | 'SPAM'
-  | 'HARASSMENT'
-  | 'HATE_SPEECH'
-  | 'INAPPROPRIATE_CONTENT'
-  | 'VIOLENCE_OR_THREATS'
-  | 'SELF_HARM_OR_SUICIDE'
-  | 'PERSONAL_DATA'
-  | 'COPYRIGHT'
-  | 'MISINFORMATION'
-  | 'FRAUD_OR_IMPERSONATION'
-  | 'OTHER';
+import { ReportReason, ReportTarget} from './report-shared.model';
+export { REPORT_REASONS } from './report-shared.model';
+export type { ReportReason, ReportTarget } from './report-shared.model';
 
 export interface CreateReportRequest {
   target: ReportTarget;
@@ -19,17 +8,3 @@ export interface CreateReportRequest {
   reason: ReportReason;
   message?: string | null;
 }
-
-  export const REPORT_REASONS: ReportReason[] = [
-    'SPAM',
-    'HARASSMENT',
-    'HATE_SPEECH',
-    'INAPPROPRIATE_CONTENT',
-    'VIOLENCE_OR_THREATS',
-    'SELF_HARM_OR_SUICIDE',
-    'PERSONAL_DATA',
-    'COPYRIGHT',
-    'MISINFORMATION',
-    'FRAUD_OR_IMPERSONATION',
-    'OTHER',
-  ];
