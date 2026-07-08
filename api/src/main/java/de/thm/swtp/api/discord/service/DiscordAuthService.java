@@ -111,7 +111,9 @@ public class DiscordAuthService {
     }
 
     public String parseNonceFromState(String state) {
-        if (state == null) return null;
+        if (state == null) {
+            return null;
+        }
         if (state.startsWith(BOT_PREFIX.prefix())) {
             return state.substring(BOT_PREFIX.prefix().length());
         }
