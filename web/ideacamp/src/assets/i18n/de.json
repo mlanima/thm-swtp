@@ -59,7 +59,8 @@
   "AUTH": {
     "P1": "Erfolgreich!",
     "H1": "Willkommen bei IdeaCamp",
-    "P2": "Was hast du heute vor? Erstelle dein erstes Projekt, entdecke spannende Ideen oder verbinde dich mit anderen kreativen Köpfen. Dein Abenteuer beginnt hier!"
+    "P2": "Was hast du heute vor? Erstelle dein erstes Projekt, entdecke spannende Ideen oder verbinde dich mit anderen kreativen Köpfen. Dein Abenteuer beginnt hier!",
+    "REDIRECTING": "Du wirst weitergeleitet…"
   },
   "MYPROJECTS": {
     "TITLE": "Meine Projekte",
