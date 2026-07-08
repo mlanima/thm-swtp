@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.UUID;
 
+import de.thm.swtp.api.projectInvitation.domain.ProjectInvite;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -47,6 +48,18 @@ class ProjectInviteServiceTest {
         userProfileRepository = mock(UserProfileRepository.class);
         eventPublisher = mock(ApplicationEventPublisher.class);
         projectInviteMapper = mock(ProjectInviteMapper.class);
+        when(projectInviteMapper.toDomain(any(ProjectInviteEntity.class))).thenAnswer(inv -> {
+            ProjectInviteEntity entity = inv.getArgument(0);
+            return ProjectInvite.builder()
+                    .id(entity.getId())
+                    .projectId(entity.getProject().getId())
+                    .projectName(entity.getProject().getName())
+                    .projectUrl(entity.getProject().getProjectUrl())
+                    .invitedUserId(entity.getInvitedUser().getKeycloakId())
+                    .status(entity.getStatus())
+                    .createdAt(entity.getCreatedAt())
+                    .build();
+        });
 
         service = new ProjectInviteService(
                 projectInviteRepository, projectRepository, userProfileRepository, eventPublisher, projectInviteMapper);
