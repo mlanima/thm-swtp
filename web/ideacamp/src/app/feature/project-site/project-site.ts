@@ -13,18 +13,33 @@ import {AuthService} from '../auth/auth.service';
 import {ToastService} from '../../shared/toast/toast.service';
 import { SuccessModal } from '../../shared/success-modal/success-modal';
 import { ProjectPosts } from './components/project-posts/project-posts';
+import { ReportDialogComponent } from '../reports/components/report-dialog/report-dialog.component';
+import { ReportService } from '../reports/service/report-service';
+import { ReportReason, ReportTarget } from '../reports/models/report-create.model';
 import { ProjectReadme } from './components/project-readme/project-readme';
 
 @Component({
   selector: 'app-project-site',
   standalone: true,
-  imports: [ProjectHeader, InfoCard, ProjectSidebar, FormsModule, CommonModule, SuccessModal, TranslatePipe, ProjectPosts, ProjectReadme],
+  imports: [
+    ProjectHeader,
+    InfoCard,
+    ProjectSidebar,
+    FormsModule,
+    CommonModule,
+    SuccessModal,
+    TranslatePipe,
+    ProjectPosts,
+    ReportDialogComponent,
+    ProjectReadme
+  ],
   templateUrl: './project-site.html',
 })
-export class ProjectSite  implements OnInit {
+export class ProjectSite implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly projectService = inject(ProjectService);
   private readonly authService = inject(AuthService);
+  private readonly reportService = inject(ReportService);
   private readonly toastService = inject(ToastService);
   private readonly translateService = inject(TranslateService);
 
@@ -38,6 +53,16 @@ export class ProjectSite  implements OnInit {
   editName = signal('');
   editShortDescription = signal('');
   editDescription = signal('');
+
+  readonly reportDialog = signal<{
+    target: ReportTarget;
+    targetId: string;
+    targetTitle: string;
+  } | null>(null);
+
+  readonly isReportSubmitting = signal(false);
+  readonly reportErrorMessage = signal<string | null>(null);
+  readonly showReportSuccess = signal(false);
 
   get isOwner(): boolean {
     const user = this.authService.user();
@@ -131,5 +156,79 @@ export class ProjectSite  implements OnInit {
 
   closeSuccessModal(): void {
     this.showSuccessModal.set(false);
+  }
+
+  canReportProject(): boolean {
+    const user = this.authService.user();
+
+    return !!user && !this.authService.isModerator() && !this.isOwner;
+  }
+
+  openProjectReport(): void {
+    const project = this.project();
+
+    if (!project) {
+      return;
+    }
+
+    this.reportDialog.set({
+      target: 'PROJECT',
+      targetId: project.id,
+      targetTitle: project.name,
+    });
+    this.reportErrorMessage.set(null);
+  }
+
+  openPostReport(post: { id: string; title: string }): void {
+    this.reportDialog.set({
+      target: 'PROJECT_POST',
+      targetId: post.id,
+      targetTitle: post.title,
+    });
+    this.reportErrorMessage.set(null);
+  }
+
+  closeReportDialog(): void {
+    if (this.isReportSubmitting()) {
+      return;
+    }
+
+    this.reportDialog.set(null);
+    this.reportErrorMessage.set(null);
+  }
+
+  submitReport(data: { reason: ReportReason; message?: string }): void {
+    const dialog = this.reportDialog();
+
+    if (!dialog) {
+      return;
+    }
+
+    this.isReportSubmitting.set(true);
+    this.reportErrorMessage.set(null);
+
+    this.reportService
+      .createReport({
+        target: dialog.target,
+        targetId: dialog.targetId,
+        reason: data.reason,
+        message: data.message,
+      })
+      .subscribe({
+        next: () => {
+          this.isReportSubmitting.set(false);
+          this.closeReportDialog();
+          this.showReportSuccess.set(true);
+        },
+        error: (error) => {
+          this.reportErrorMessage.set(
+            error.status === 409 ? 'REPORT_DIALOG.ERROR_DUPLICATE' : 'REPORT_DIALOG.ERROR_SEND',
+          );
+          this.isReportSubmitting.set(false);
+        },
+      });
+  }
+  closeReportSuccess(): void {
+    this.showReportSuccess.set(false);
   }
 }

@@ -42,6 +42,8 @@ export class ProfileBanner implements OnChanges {
     placeId: string;
   };
 
+  @Input() canFollow = true;
+
   onPlaceChange(result: { placeId: string; location: string }): void {
     this.editForm.location = result.location;
     this.editForm.placeId = result.placeId;
@@ -56,6 +58,10 @@ export class ProfileBanner implements OnChanges {
 
   readonly followerCount = signal(0);
   readonly discordState = signal<'initial' | 'revealed' | 'copied'>('initial');
+
+  @Input() canReport = false;
+
+  @Output() report = new EventEmitter<void>();
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['profile']) {

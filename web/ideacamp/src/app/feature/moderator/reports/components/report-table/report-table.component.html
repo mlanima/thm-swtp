@@ -1,0 +1,326 @@
+<div class="hidden overflow-x-auto lg:block">
+  <table class="w-full text-left text-sm">
+    <thead>
+    <tr class="border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase tracking-wider text-slate-500">
+      <th class="px-5 py-3">
+        {{ 'MODERATOR.REPORTS.COLUMN.MESSAGE' | translate }}
+      </th>
+
+      <th class="px-5 py-3">
+        <button
+          type="button"
+          (click)="sortChange.emit('reason')"
+          class="inline-flex items-center gap-1 hover:text-slate-700"
+        >
+          {{ 'MODERATOR.REPORTS.COLUMN.REASON' | translate }}
+          <span>{{ getSortIndicator('reason') }}</span>
+        </button>
+      </th>
+
+      <th class="px-5 py-3">
+        <button
+          type="button"
+          (click)="sortChange.emit('target')"
+          class="inline-flex items-center gap-1 hover:text-slate-700"
+        >
+          {{ 'MODERATOR.REPORTS.COLUMN.REPORTED_CONTENT' | translate }}
+          <span>{{ getSortIndicator('target') }}</span>
+        </button>
+      </th>
+
+      <th class="px-5 py-3">
+        <button
+          type="button"
+          (click)="sortChange.emit('reporter.username')"
+          class="inline-flex items-center gap-1 hover:text-slate-700"
+        >
+          {{ 'MODERATOR.REPORTS.COLUMN.REPORTED_BY' | translate }}
+          <span>{{ getSortIndicator('reporter.username') }}</span>
+        </button>
+      </th>
+
+      <th class="px-5 py-3">
+        <button
+          type="button"
+          (click)="sortChange.emit('status')"
+          class="inline-flex items-center gap-1 hover:text-slate-700"
+        >
+          {{ 'MODERATOR.REPORTS.COLUMN.STATUS' | translate }}
+          <span>{{ getSortIndicator('status') }}</span>
+        </button>
+      </th>
+
+      <th class="px-5 py-3">
+        <button
+          type="button"
+          (click)="sortChange.emit('createdAt')"
+          class="inline-flex items-center gap-1 hover:text-slate-700"
+        >
+          {{ 'MODERATOR.REPORTS.COLUMN.CREATED_AT' | translate }}
+          <span>{{ getSortIndicator('createdAt') }}</span>
+        </button>
+      </th>
+
+      <th class="w-40 px-5 py-3 text-right">
+        {{ 'MODERATOR.REPORTS.COLUMN.ACTIONS' | translate }}
+      </th>
+    </tr>
+    </thead>
+
+    <tbody>
+      @for (report of reports(); track report.id) {
+        <tr
+          class="border-l-4 border-b border-slate-100 transition hover:bg-slate-50"
+          [ngClass]="getPriorityBorderClass(report)"
+        >
+          <td class="max-w-xs px-5 py-4">
+            <button
+              type="button"
+              (click)="openReport.emit(report)"
+              class="block max-w-xs truncate text-left font-semibold text-slate-700 hover:text-slate-900"
+            >
+              <span class="block max-w-xs truncate">
+                {{ report.message || ('MODERATOR.REPORTS.EMPTY_MESSAGE' | translate) }}
+              </span>
+            </button>
+
+            <div class="mt-1 text-xs text-slate-400">
+              {{ 'MODERATOR.REPORTS.DETAIL.REPORT_ID' | translate }}:
+              {{ report.id }}
+            </div>
+          </td>
+
+          <td class="px-5 py-4">
+            <span class="inline-flex rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-600">
+              {{ getReasonTranslationKey(report.reason) | translate }}
+            </span>
+          </td>
+
+          <td class="px-5 py-4">
+            <span
+              class="inline-flex min-w-28 items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold shadow-sm"
+              [ngClass]="getTargetBadgeClasses(report.target)"
+            >
+            <i class="pi text-[10px]" [ngClass]="getTargetIcon(report.target)"></i>
+                        {{ getTargetTranslationKey(report.target) | translate }}
+            </span>
+
+            @if (report.targetSummary) {
+              @if (report.targetSummary.link) {
+                <a
+                  [routerLink]="report.targetSummary.link"
+                  class="mt-1 block max-w-44 truncate text-xs font-medium text-slate-600 hover:text-slate-900 hover:underline"
+                >
+                  {{ report.targetSummary.title }}
+                </a>
+              } @else {
+                <div class="mt-1 max-w-44 truncate text-xs font-medium text-slate-600">
+                  {{ report.targetSummary.title }}
+                </div>
+              }
+
+              @if (report.targetSummary.subtitle) {
+                <div class="max-w-44 truncate text-xs text-slate-400">
+                  {{ report.targetSummary.subtitle }}
+                </div>
+              }
+
+              @if (shouldShowSimilarReports(report)) {
+                <div class="mt-1 max-w-44 truncate text-xs font-medium text-amber-600">
+                  {{ 'MODERATOR.REPORTS.SIMILAR_REPORTS' | translate: { count: report.similarReportsCount } }}
+                </div>
+              }
+
+            } @else {
+              <div class="mt-1 max-w-40 truncate text-xs text-slate-400">
+                ID: {{ getShortId(report.targetId) }}
+              </div>
+            }
+          </td>
+
+          <td class="px-5 py-4">
+            <div class="flex items-center gap-2">
+              <div class="flex h-7 w-7 items-center justify-center rounded-full bg-slate-700 text-xs font-semibold text-white">
+                {{ report.reporterUsername.slice(0, 2).toUpperCase() }}
+              </div>
+
+              <span class="max-w-32 truncate font-medium text-slate-700">
+                {{ report.reporterUsername }}
+              </span>
+            </div>
+          </td>
+
+          <td class="px-5 py-4">
+            <span
+              class="inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold"
+              [class.border-blue-200]="report.status === 'OPEN'"
+              [class.bg-blue-50]="report.status === 'OPEN'"
+              [class.text-blue-700]="report.status === 'OPEN'"
+              [class.border-amber-200]="report.status === 'IN_REVIEW'"
+              [class.bg-amber-50]="report.status === 'IN_REVIEW'"
+              [class.text-amber-700]="report.status === 'IN_REVIEW'"
+              [class.border-green-200]="report.status === 'RESOLVED'"
+              [class.bg-green-50]="report.status === 'RESOLVED'"
+              [class.text-green-700]="report.status === 'RESOLVED'"
+              [class.border-slate-200]="report.status === 'DISMISSED'"
+              [class.bg-slate-50]="report.status === 'DISMISSED'"
+              [class.text-slate-600]="report.status === 'DISMISSED'"
+            >
+              {{ getStatusTranslationKey(report.status) | translate }}
+            </span>
+          </td>
+
+          <td class="px-5 py-4 text-slate-500">
+            {{ report.createdAt | date: 'dd.MM.yyyy, HH:mm' }}
+          </td>
+
+          <td class="w-40 px-5 py-4 text-right">
+            <div class="flex justify-end gap-2">
+              <button
+                type="button"
+                (click)="openReport.emit(report)"
+                class="rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-200"
+              >
+                {{ 'MODERATOR.REPORTS.ACTIONS.VIEW' | translate }}
+              </button>
+
+              <app-report-action-menu
+                [report]="report"
+                (viewReport)="openReport.emit($event)"
+                (updateStatus)="updateStatus.emit($event)"
+              />
+
+            </div>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="7" class="px-6 py-14 text-center">
+            <p class="font-semibold text-slate-600">
+              {{ 'MODERATOR.REPORTS.EMPTY.TITLE' | translate }}
+            </p>
+            <p class="mt-1 text-sm text-slate-400">
+              {{ 'MODERATOR.REPORTS.EMPTY.DESCRIPTION' | translate }}
+            </p>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+<div class="space-y-3 lg:hidden">
+  @for (report of reports(); track report.id) {
+    <article
+      class="rounded-xl border-l-4 border border-slate-200 bg-white p-4 shadow-sm"
+      [ngClass]="getPriorityBorderClass(report)"
+    >
+      <div class="flex items-start justify-between gap-3">
+        <div class="min-w-0 flex-1">
+          <p class="line-clamp-2 text-sm font-semibold text-slate-800">
+            {{ report.message || ('MODERATOR.REPORTS.EMPTY_MESSAGE' | translate) }}
+          </p>
+
+          <p class="mt-1 truncate text-xs text-slate-400">
+            {{ 'MODERATOR.REPORTS.DETAIL.REPORT_ID' | translate }}:
+            {{ getShortId(report.id) }}
+          </p>
+        </div>
+
+        <span
+          class="shrink-0 rounded-full border px-2.5 py-1 text-xs font-semibold"
+          [class.border-blue-200]="report.status === 'OPEN'"
+          [class.bg-blue-50]="report.status === 'OPEN'"
+          [class.text-blue-700]="report.status === 'OPEN'"
+          [class.border-amber-200]="report.status === 'IN_REVIEW'"
+          [class.bg-amber-50]="report.status === 'IN_REVIEW'"
+          [class.text-amber-700]="report.status === 'IN_REVIEW'"
+          [class.border-green-200]="report.status === 'RESOLVED'"
+          [class.bg-green-50]="report.status === 'RESOLVED'"
+          [class.text-green-700]="report.status === 'RESOLVED'"
+          [class.border-slate-200]="report.status === 'DISMISSED'"
+          [class.bg-slate-50]="report.status === 'DISMISSED'"
+          [class.text-slate-600]="report.status === 'DISMISSED'"
+        >
+          {{ getStatusTranslationKey(report.status) | translate }}
+        </span>
+      </div>
+
+      <div class="mt-3 flex flex-wrap items-center gap-2">
+        <span class="inline-flex rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-600">
+          {{ getReasonTranslationKey(report.reason) | translate }}
+        </span>
+
+        <span
+          class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold shadow-sm"
+          [class]="getTargetBadgeClasses(report.target)"
+        >
+        <i class="text-[10px]" [ngClass]="getTargetIcon(report.target)"></i>
+                {{ getTargetTranslationKey(report.target) | translate }}
+        </span>
+      </div>
+
+      @if (report.targetSummary) {
+        <div class="mt-3 min-w-0">
+          @if (report.targetSummary.link) {
+            <a
+              [routerLink]="report.targetSummary.link"
+              class="block truncate text-sm font-medium text-slate-700 hover:text-slate-900 hover:underline"
+            >
+              {{ report.targetSummary.title }}
+            </a>
+          } @else {
+            <p class="truncate text-sm font-medium text-slate-700">
+              {{ report.targetSummary.title }}
+            </p>
+          }
+
+          @if (report.targetSummary.subtitle) {
+            <p class="truncate text-xs text-slate-400">
+              {{ report.targetSummary.subtitle }}
+            </p>
+          }
+
+          @if (shouldShowSimilarReports(report)) {
+            <p class="mt-1 text-xs font-medium text-amber-600">
+              {{ 'MODERATOR.REPORTS.SIMILAR_REPORTS' | translate: { count: report.similarReportsCount } }}
+            </p>
+          }
+
+        </div>
+      }
+
+      <div class="mt-3 flex items-center justify-between border-t border-slate-100 pt-3">
+        <div class="min-w-0 text-xs text-slate-500">
+          <span class="font-medium">{{ report.reporterUsername }}</span>
+          <span class="mx-1">·</span>
+          <span>{{ report.createdAt | date: 'dd.MM.yyyy, HH:mm' }}</span>
+        </div>
+
+        <div class="ml-3 flex shrink-0 items-center gap-2">
+          <button
+            type="button"
+            (click)="openReport.emit(report)"
+            class="rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-200"
+          >
+            {{ 'MODERATOR.REPORTS.ACTIONS.VIEW' | translate }}
+          </button>
+
+          <app-report-action-menu
+            [report]="report"
+            (viewReport)="openReport.emit($event)"
+            (updateStatus)="updateStatus.emit($event)"
+          />
+        </div>
+      </div>
+    </article>
+  } @empty {
+    <div class="rounded-xl border border-slate-200 bg-white px-6 py-10 text-center shadow-sm">
+      <p class="font-semibold text-slate-600">
+        {{ 'MODERATOR.REPORTS.EMPTY.TITLE' | translate }}
+      </p>
+      <p class="mt-1 text-sm text-slate-400">
+        {{ 'MODERATOR.REPORTS.EMPTY.DESCRIPTION' | translate }}
+      </p>
+    </div>
+  }
+</div>
