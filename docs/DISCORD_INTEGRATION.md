@@ -161,6 +161,15 @@ identity via OAuth2 for a profile badge and ownership verification.
 3. Bot's BullMQ worker picks up the job (queue `sendPost` / `deletePost`)
 4. Bot sends or deletes an embed message in the linked channel via Discord API
 
+#### Deletion direction (one-way)
+
+- **App → Discord**: ✅ when a post is deleted on the platform, the bot
+  removes the corresponding embed from the Discord channel
+- **Discord → App**: ❌ deleting a bot message in Discord does **not**
+  delete the post in the app. This prevents a sync loop: app deletes post
+  → bot deletes embed → Discord fires `MessageDelete` → bot would
+  re-trigger the deletion. Bot-authored messages are skipped intentionally.
+
 ### Disconnect
 
 1. User clicks "Disconnect" in Project Settings
