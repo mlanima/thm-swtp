@@ -180,7 +180,7 @@ public class DiscordAuthService {
                     "You must link your Discord account in profile settings before connecting a Discord server");
         }
 
-        if (!guildOwnerId.equals(ownerDiscordId)) {
+        if (guildOwnerId == null || !guildOwnerId.equals(ownerDiscordId)) {
             log.warn("Guild owner mismatch: guildOwnerId={}, expected project owner discordId={}",
                     guildOwnerId, ownerDiscordId);
             throw new DiscordConnectionFailedException(

@@ -1,6 +1,7 @@
 package de.thm.swtp.api.discord.client;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -40,7 +41,7 @@ public class DiscordOAuthClient {
             Guild guild
     ) {
         @JsonIgnoreProperties(ignoreUnknown = true)
-        public record Guild(String id, String name, String ownerId) {}
+        public record Guild(String id, String name, @JsonProperty("owner_id") String ownerId) {}
     }
 
     public BotTokenResponse exchangeBotCode(String code) {
