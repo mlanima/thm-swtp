@@ -34,7 +34,7 @@ export class ProjectPosts implements OnChanges, OnDestroy {
   isLoading = signal(false);
   isCreating = signal(false);
   errorMessage = signal<string | null>(null);
-  
+
   visibleCount = signal(3);
 
   title = signal('');

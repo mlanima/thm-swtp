@@ -258,6 +258,9 @@ private final DiscordEventPublisher discordEventPublisher;
     ) {
         validateUpdatePost(status, contentFormat);
 
+        contentModerationService.assertAppropriate(title, "postTitle");
+        contentModerationService.assertAppropriate(content, "postContent");
+        
         ProjectPostEntity postEntity = getPostOrThrowError(postId);
         assertPostBelongsToProject(postEntity, projectId);
 
