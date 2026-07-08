@@ -10,7 +10,7 @@ export class MarkdownPipe implements PipeTransform {
       return '';
     }
 
-    const lines = this.escapeHtml(value).split(/\r?\n/);
+    const lines = value.split(/\r?\n/);
     let html = '';
     let isListOpen = false;
     let isFirstBlock = true;
@@ -77,7 +77,7 @@ export class MarkdownPipe implements PipeTransform {
   }
 
   private renderInline(value: string): string {
-    return value
+    return this.escapeHtml(value)
       .replace(/\*\*(.+?)\*\*/g, '<strong class="font-semibold text-slate-700">$1</strong>')
       .replace(/\*(.+?)\*/g, '<em class="italic">$1</em>')
       .replace(
