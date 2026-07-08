@@ -14,6 +14,13 @@ export class MarkdownPipe implements PipeTransform {
     let html = '';
     let isListOpen = false;
     let isFirstBlock = true;
+    let paragraphLines: string[] = [];
+
+    const topMargin = (base: string) => {
+      const cls = isFirstBlock ? '' : `${base} `;
+      isFirstBlock = false;
+      return cls;
+    };
 
     const closeList = () => {
       if (isListOpen) {
@@ -22,21 +29,28 @@ export class MarkdownPipe implements PipeTransform {
       }
     };
 
-    const topMargin = (base: string) => {
-      const cls = isFirstBlock ? '' : `${base} `;
-      isFirstBlock = false;
-      return cls;
+    const flushParagraph = () => {
+      if (paragraphLines.length === 0) {
+        return;
+      }
+
+      const content = paragraphLines.map((paragraphLine) => this.renderInline(paragraphLine)).join('<br>');
+      html += `<p class="${topMargin('mt-3')}text-sm leading-6 text-slate-500">${content}</p>`;
+      paragraphLines = [];
     };
 
     for (const line of lines) {
       const trimmed = line.trim();
 
       if (!trimmed) {
+        flushParagraph();
         closeList();
         continue;
       }
 
       if (trimmed.startsWith('- ')) {
+        flushParagraph();
+
         if (!isListOpen) {
           html += `<ul class="${topMargin('mt-3')}list-disc space-y-1 pl-5">`;
           isListOpen = true;
@@ -49,28 +63,33 @@ export class MarkdownPipe implements PipeTransform {
       closeList();
 
       if (trimmed.startsWith('### ')) {
+        flushParagraph();
         html += `<h4 class="${topMargin('mt-4')}text-sm font-semibold text-slate-700">${this.renderInline(trimmed.slice(4))}</h4>`;
         continue;
       }
 
       if (trimmed.startsWith('## ')) {
+        flushParagraph();
         html += `<h3 class="${topMargin('mt-4')}text-base font-semibold text-slate-700">${this.renderInline(trimmed.slice(3))}</h3>`;
         continue;
       }
 
       if (trimmed.startsWith('# ')) {
+        flushParagraph();
         html += `<h2 class="${topMargin('mt-4')}text-lg font-semibold text-slate-700">${this.renderInline(trimmed.slice(2))}</h2>`;
         continue;
       }
 
       if (trimmed.startsWith('> ')) {
+        flushParagraph();
         html += `<blockquote class="${topMargin('mt-3')}border-l-4 border-slate-300 pl-3 text-slate-500 italic">${this.renderInline(trimmed.slice(2))}</blockquote>`;
         continue;
       }
 
-      html += `<p class="${topMargin('mt-3')}text-sm leading-6 text-slate-500">${this.renderInline(trimmed)}</p>`;
+      paragraphLines.push(trimmed);
     }
 
+    flushParagraph();
     closeList();
 
     return html;
