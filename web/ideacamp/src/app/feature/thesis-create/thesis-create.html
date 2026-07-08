@@ -1,0 +1,58 @@
+@if (errorMessage) {
+  <div class="mx-auto max-w-4xl px-6 pt-6">
+    <div class="rounded-xl bg-red-50 border border-red-200 p-4 text-red-700 text-sm">
+      {{ errorMessage }}
+    </div>
+  </div>
+}
+
+@if (successMessage) {
+  <div class="mx-auto max-w-4xl px-6 pt-6">
+    <div class="rounded-xl bg-green-50 border border-green-200 p-4 text-green-700 text-sm">
+      {{ successMessage }}
+    </div>
+  </div>
+}
+
+@if (isLoading) {
+  <div class="flex items-center justify-center py-6">
+    <p class="text-slate-500 text-sm">{{ 'THESISCREATE.CREATING' | translate }}</p>
+  </div>
+}
+<app-wizard-layout titleKey="THESISCREATE.PAGE_TITLE">
+
+  <div sidebar>
+    <app-stepper [currentStep]="currentStep" [steps]="steps"></app-stepper>
+  </div>
+
+  @if (currentStep === 0) {
+    <app-thesis-general-form
+      [initialFormData]="thesisData"
+      (next)="saveGeneralFormAndContinue($event)">
+    </app-thesis-general-form>
+  }
+  @if (currentStep === 1){
+    <app-thesis-settings-form
+      [initialFormData]="thesisData"
+      (back)="saveSettingsFormAndBack($event)"
+      (next)="saveSettingsFormAndContinue($event)">
+    </app-thesis-settings-form>
+  }
+
+  @if (currentStep === 2){
+    <app-thesis-students-form
+      [initialStudents]="invitedStudents"
+      (back)="saveStudentsAndBack($event)"
+      (next)="saveStudentsAndContinue($event)">
+    </app-thesis-students-form>
+  }
+
+  @if (currentStep === 3) {
+    <app-thesis-finish-form
+      [thesisData]="thesisData"
+      [students]="invitedStudents"
+      (back)="previousStep()"
+      (finished)="finishThesisCreation()">
+    </app-thesis-finish-form>
+  }
+</app-wizard-layout>

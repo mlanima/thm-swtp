@@ -7,9 +7,10 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { ProfileInformation } from '../../components/profile-information/profile-information';
 import { ProfileBanner } from '../../components/profile-banner/profile-banner';
-import { UserProfileService } from '../../../../services/user-profile.service';
+import { UserProfileService, UpdateUserProfileRequest } from '../../../../services/user-profile.service';
 import { AuthService } from '../../../auth/auth.service';
 import { UserProfileModel } from '../../../../models/user-profile.model';
+import { ToastService } from '../../../../shared/toast/toast.service';
 import { ProfileTagListComponent } from '../../components/profile-tag-list/profile-tag-list.component'
 import { SuccessModal } from '../../../../shared/success-modal/success-modal';
 
@@ -23,17 +24,11 @@ import { ReportService } from '../../../reports/service/report-service';
 import { ReportReason, ReportTarget } from '../../../reports/models/report-create.model';
 
 interface ProfileViewState {
-  /** Indicates whether the profile request is currently running. */
   isLoading: boolean;
-
-  /** Contains the loaded user profile or null if no profile is available. */
   profile: UserProfileModel | null;
-
-  /** Contains an error message if loading or saving the profile failed. */
   errorMessage: string;
 }
 
-/** Displays a user profile. Shows edit controls only when the viewer is the profile owner. */
 @Component({
   selector: 'app-user-profile',
   standalone: true,
@@ -50,25 +45,22 @@ interface ProfileViewState {
   templateUrl: './user-profile.html',
 })
 export class UserProfile implements OnInit, OnDestroy {
-  /** Platform identifier used to check whether the component runs in the browser. */
   private readonly platformId = inject(PLATFORM_ID);
 
-  /** Route used to read the :username parameter. */
   private readonly route = inject(ActivatedRoute);
 
-  /** Service used to load and update user profile data from the backend. */
   private readonly userProfileService = inject(UserProfileService);
 
-  /** Service used to load / update / delete link data from the backend. */
   private readonly userProfileLinkService = inject(UserProfileLinkService);
 
-  /** Data source for profile links. Initialized after the profile has been loaded. */
+  private readonly toastService = inject(ToastService);
+
   profileLinkDataSource: LinkManagerDataSource<UserProfileLinkModel> | null = null;
 
-  /** Auth service used to determine whether the viewer is the profile owner. */
   private readonly authService = inject(AuthService);
 
   private readonly translateService = inject(TranslateService);
+
 
   private readonly reportService = inject(ReportService);
 
@@ -77,7 +69,6 @@ export class UserProfile implements OnInit, OnDestroy {
 
   private paramSub: Subscription | null = null;
 
-  /** Reactive view state used by the template for loading, success and error states */
   readonly profileState = signal<ProfileViewState>({
     isLoading: true,
     profile: null,
@@ -106,26 +97,26 @@ export class UserProfile implements OnInit, OnDestroy {
   /** Currently edited inline profile section */
   editingSection: 'banner' | 'about' | 'experience' | null = null;
 
-  /** Indicates whether a save request is currently running */
   isSaving = false;
 
-  /** Controls the visibility of the success modal */
   showSuccessModal = false;
 
-  /** Form state containing all editable profile fields */
-  editForm = {
+  editForm: {
+    title: string;
+    location: string;
+    about: string;
+    experience: string;
+    placeId: string;
+  } = {
     title: '',
     location: '',
     about: '',
     experience: '',
+    placeId: '',
   };
 
-  /**
-   * Initializes profile loading when the component runs in the browser.
-   * Waits for auth to be ready so the isOwner check is reliable before fetching.
-   *
-   * Server-side rendering does not send an authenticated profile request
-   */
+  private initialEditValues: typeof this.editForm | null = null;
+
   async ngOnInit(): Promise<void> {
     if (!isPlatformBrowser(this.platformId)) {
       this.profileState.set({
@@ -159,11 +150,6 @@ export class UserProfile implements OnInit, OnDestroy {
     this.paramSub?.unsubscribe();
   }
 
-  /**
-   * Loads the profile by username from the route parameter.
-   *
-   * Updates the reactive profile state with loading, success or error data
-   */
   private loadProfile(): void {
     this.profileState.set({
       isLoading: true,
@@ -197,44 +183,47 @@ export class UserProfile implements OnInit, OnDestroy {
     });
   }
 
-  /**
-   * Starts inline editing for the selected profile section
-   *
-   * @param profile Profile data used to prefill the edit form
-   * @param section Profile section that should be edited
-   */
   startEditing(profile: UserProfileModel, section: 'banner' | 'about' | 'experience'): void {
     this.editForm = {
       title: profile.title ?? '',
       location: profile.location ?? '',
       about: profile.about ?? '',
       experience: profile.experience ?? '',
+      placeId: profile.placeId ?? '',
     };
 
+    this.initialEditValues = { ...this.editForm };
     this.editingSection = section;
   }
 
-  /** Cancels inline editing and returns to the normal profile view */
   cancelEditing(): void {
     this.editingSection = null;
   }
 
-  /**
-   * Saves the current edit form through the backend update endpoint
-   * On success the local profile state is replaced with the updated profile
-   *
-   * @param profile Existing profile used for username and error fallback state
-   */
   saveProfile(profile: UserProfileModel): void {
     this.isSaving = true;
 
+    const body: UpdateUserProfileRequest = {};
+    const initial = this.initialEditValues;
+
+    if (initial) {
+      if (this.editForm.title !== initial.title) {
+        body.title = this.editForm.title;
+      }
+      if (this.editForm.about !== initial.about) {
+        body.about = this.editForm.about;
+      }
+      if (this.editForm.experience !== initial.experience) {
+        body.experience = this.editForm.experience;
+      }
+      if (this.editForm.location !== initial.location || this.editForm.placeId !== initial.placeId) {
+        body.location = this.editForm.location;
+        body.placeId = this.editForm.placeId;
+      }
+    }
+
     this.userProfileService
-      .updateProfile(profile.username, {
-        title: this.editForm.title,
-        location: this.editForm.location,
-        about: this.editForm.about,
-        experience: this.editForm.experience,
-      })
+      .updateProfile(profile.username, body)
       .subscribe({
         next: (updatedProfile) => {
           this.profileState.set({
@@ -248,23 +237,22 @@ export class UserProfile implements OnInit, OnDestroy {
           this.showSuccessModal = true;
         },
         error: (error) => {
+          const errorCode = error.error?.errorCode;
           const errorMessage =
             error.status === 401 || error.status === 403
               ? this.translateService.instant('USERPROFILE.ERROR_EDIT_FORBIDDEN')
-              : this.translateService.instant('USERPROFILE.ERROR_UPDATE_PROFILE');
+              : errorCode === 'INVALID_PLACE'
+                ? this.translateService.instant('USERPROFILE.ERROR_INVALID_PLACE')
+                : errorCode === 'CONTENT_NOT_VALID'
+                  ? this.translateService.instant('USERPROFILE.ERROR_CONTENT_NOT_VALID')
+                  : this.translateService.instant('USERPROFILE.ERROR_UPDATE_PROFILE');
 
-          this.profileState.set({
-            isLoading: false,
-            profile,
-            errorMessage,
-          });
-
+          this.toastService.error(errorMessage);
           this.isSaving = false;
         },
       });
   }
 
-  /** Closes the success modal after a successful profile update */
   closeSuccessModal(): void {
     this.showSuccessModal = false;
   }

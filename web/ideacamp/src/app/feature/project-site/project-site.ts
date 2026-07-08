@@ -1,19 +1,22 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import{CommonModule} from '@angular/common';
 import{FormsModule} from '@angular/forms';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {ProjectService} from './project.service';
 import {ProjectResponse } from '../../models/project.model';
 import { ProjectHeader } from './components/project-header/project-header';
 import { InfoCard } from './components/info-card/info-card';
 import { ProjectSidebar } from './components/project-sidebar/project-sidebar';
 import {AuthService} from '../auth/auth.service';
+import {ToastService} from '../../shared/toast/toast.service';
 import { SuccessModal } from '../../shared/success-modal/success-modal';
 import { ProjectPosts } from './components/project-posts/project-posts';
 import { ReportDialogComponent } from '../reports/components/report-dialog/report-dialog.component';
 import { ReportService } from '../reports/service/report-service';
 import { ReportReason, ReportTarget } from '../reports/models/report-create.model';
+import { ProjectReadme } from './components/project-readme/project-readme';
 
 @Component({
   selector: 'app-project-site',
@@ -28,6 +31,7 @@ import { ReportReason, ReportTarget } from '../reports/models/report-create.mode
     TranslatePipe,
     ProjectPosts,
     ReportDialogComponent,
+    ProjectReadme
   ],
   templateUrl: './project-site.html',
 })
@@ -36,6 +40,8 @@ export class ProjectSite implements OnInit {
   private readonly projectService = inject(ProjectService);
   private readonly authService = inject(AuthService);
   private readonly reportService = inject(ReportService);
+  private readonly toastService = inject(ToastService);
+  private readonly translateService = inject(TranslateService);
 
   project = signal<ProjectResponse | null>(null);
   errorMessage = signal<string | null>(null);
@@ -137,8 +143,12 @@ export class ProjectSite implements OnInit {
           this.isSaving.set(false);
           this.showSuccessModal.set(true);
         },
-        error: () => {
-          this.errorMessage.set('PROJECTSITE.ERRORS.SAVE_PROJECT');
+        error: (err: HttpErrorResponse) => {
+          if (err.error?.errorCode === 'CONTENT_NOT_VALID') {
+            this.toastService.error(this.translateService.instant('PROJECTSITE.ERRORS.CONTENT_NOT_VALID'));
+          } else {
+            this.toastService.error(this.translateService.instant('PROJECTSITE.ERRORS.SAVE_PROJECT'));
+          }
           this.isSaving.set(false);
         },
       });

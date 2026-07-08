@@ -164,6 +164,18 @@ export class LinkManagerComponent implements OnChanges {
     return url.replace(/^https?:\/\//, '').replace(/\/$/, '');
   }
 
+  linkIcon(url: string): string {
+    try {
+      const hostname = new URL(url).hostname.replace(/^www\./, '');
+      if (hostname === 'github.com') {
+        return 'pi-github';
+      }
+    } catch {
+      // not a parseable absolute URL — fall through to the generic icon
+    }
+    return 'pi-link';
+  }
+
   private validateCreateLinkRequest(): CreateLinkRequest | null {
     const request = {
       label: this.newLabel,

@@ -23,7 +23,8 @@
       (reportProject)="openProjectReport()"
     />
 
-    <main class="mx-auto grid max-w-6xl grid-cols-1 gap-6 px-6 py-10 lg:grid-cols-[1fr_320px] lg:grid-rows-[auto_auto] lg:items-start">
+    <main class="mx-auto grid max-w-6xl grid-cols-1 gap-6 px-6 py-10 lg:grid-cols-[1fr_320px] lg:items-start">
+      <div class="space-y-6">
       <section class="space-y-6">
 
         <div class="rounded-2xl bg-white p-6 shadow-sm">
@@ -107,17 +108,18 @@
         </div>
 <!--        TODO: not implemented yet-->
 <!--        <app-open-position-card />-->
+        <app-project-readme [projectId]="project()!.id" />
       </section>
 
-      <app-sidebar class="lg:col-start-2 lg:row-start-1 lg:row-span-2" [projectId]="project()!.id" [isOwner]="isOwner" [ownerId]="project()!.ownerId" [ownerUsername]="project()!.ownerUsername" />
-
       <app-project-posts
-        class="lg:col-start-1 lg:row-start-2"
         [project]="project()!"
         [canCreatePosts]="isOwner"
         [canReportPosts]="canReportProject()"
         (reportPost)="openPostReport($event)">
       </app-project-posts>
+      </div>
+
+      <app-sidebar [projectId]="project()!.id" [isOwner]="isOwner" [ownerId]="project()!.ownerId" [ownerUsername]="project()!.ownerUsername" />
 
     </main>
   }

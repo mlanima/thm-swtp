@@ -65,6 +65,7 @@
   "MYPROJECTS": {
     "TITLE": "Meine Projekte",
     "CREATE_PROJECT": "Projekt erstellen",
+    "CREATE_THESIS": "Abschlussarbeit erstellen",
     "PROJECTS": "Projekte",
     "PROJECTS_COUNT_LABEL": "Projekte",
     "OWNED_PROJECTS_COUNT_LABEL": "Projekte im Besitz",
@@ -112,6 +113,8 @@
     "ERROR_EDIT_FORBIDDEN": "Du bist nicht berechtigt, dieses Profil zu bearbeiten.",
     "FOLLOWERS": "Follower",
     "ERROR_UPDATE_PROFILE": "Das Profil konnte nicht aktualisiert werden. Bitte versuche es später erneut.",
+    "ERROR_INVALID_PLACE": "Dies ist keine reale Stadt. Bitte wähle einen Ort aus den Vorschlägen aus.",
+    "ERROR_CONTENT_NOT_VALID": "Diese Eingabe enthält nicht erlaubten Inhalt.",
     "FOLLOW": "Folgen",
     "FOLLOWING": "Folge ich",
     "UNFOLLOW": "Entfolgen",
@@ -189,7 +192,7 @@
       "ERROR_DELETE": "Projekt konnte nicht gelöscht werden.",
       "CONFIRM_DELETE_TITLE": "Projekt löschen",
       "CONFIRM_DELETE_SUBTITLE": "Diese Aktion kann nicht rückgängig gemacht werden.",
-      "CONFIRM_DELETE_TEXT": "Das Projekt \"{{ projectName }}\" wird dauerhaft gel\u00F6scht. Alle zugeh\u00F6rigen Daten gehen dabei verloren.",
+      "CONFIRM_DELETE_TEXT": "Das Projekt \"{{ projectName }}\" wird dauerhaft gelöscht. Alle zugehörigen Daten gehen dabei verloren.",
       "CONFIRM_DELETE_LABEL": "Gib zur Bestätigung den Projektnamen ein",
       "CONFIRM_DELETE_PLACEHOLDER": "Gib zur Bestätigung den Projektnamen ein",
       "CONFIRM_DELETE_HINT_FILLED": "Der Projektname muss eingegeben werden",
@@ -459,6 +462,7 @@
     "SUCCESS_CREATED": "Projekt erfolgreich erstellt!",
     "SUCCESS_CREATED_WITH_INVITES": "Projekt erfolgreich erstellt und Einladungen gesendet!",
     "ERROR_CREATE_PROJECT": "Projekt konnte nicht erstellt werden. Bitte versuche es erneut.",
+    "ERROR_MODERATION": "Projekt konnte nicht erstellt werden, da einige Inhalte als unangemessen eingestuft wurden. Bitte überprüfe deine Eingaben.",
     "VALIDATION": {
       "NAME_MIN": "Projektname muss mindestens 3 Zeichen lang sein.",
       "NAME_MAX": "Projektname darf höchstens 20 Zeichen lang sein.",
@@ -470,6 +474,61 @@
       "PROJECT_URL_MIN": "Projekt URL muss mindestens 3 Zeichen lang sein.",
       "PROJECT_URL_MAX": "Projekt URL darf höchstens 30 Zeichen lang sein.",
       "PROJECT_URL_FORMAT": "Verwende ausschließlich Kleinbuchstaben, Zahlen und Bindestriche. Bindestriche sind am Anfang und am Ende nicht zulässig."
+    }
+  },
+  "THESISCREATE": {
+    "PAGE_TITLE": "Erstelle eine neue Abschlussarbeit",
+    "CREATING": "Abschlussarbeit wird erstellt…",
+    "THESIS_TITLE": "Titel der Abschlussarbeit",
+    "THESIS_TITLE_PLACEHOLDER": "Gib den Titel der Abschlussarbeit ein",
+    "NO_THESIS_TITLE": "Kein Titel",
+    "SHORT_DESCRIPTION": "Kurzbeschreibung",
+    "SHORT_DESCRIPTION_PLACEHOLDER": "Beschreibe die Abschlussarbeit in ein bis zwei Sätzen",
+    "NO_SHORT_DESCRIPTION": "Keine Kurzbeschreibung",
+    "DESCRIPTION": "Beschreibung",
+    "DESCRIPTION_PLACEHOLDER": "Beschreibe die Abschlussarbeit ausführlich",
+    "NO_DESCRIPTION": "Keine Beschreibung",
+    "THESIS_URL": "Abschlussarbeit-URL",
+    "THESIS_URL_LABEL": "Abschlussarbeit-URL (Deine Abschlussarbeit wird unter /thesis/dein-input verfügbar sein)",
+    "THESIS_URL_PLACEHOLDER": "z.B. meine-abschlussarbeit",
+    "NO_THESIS_URL": "Keine Abschlussarbeit-URL",
+    "CHECKING_THESIS_URL": "Abschlussarbeit-URL wird geprüft...",
+    "THESIS_URL_EXISTS": "Diese Abschlussarbeit-URL ist bereits vergeben.",
+    "THESIS_URL_AVAILABLE": "Diese Abschlussarbeit-URL ist verfügbar.",
+    "STUDENTS": "Studierende",
+    "ADD_STUDENT": "Studierende:n hinzufügen",
+    "ADD": "Hinzufügen",
+    "INVITED_STUDENTS": "Eingeladene Studierende",
+    "NO_STUDENTS_INVITED": "Keine Studierenden eingeladen",
+    "STUDENT_DIALOG_TITLE": "Füge Studierende zu deiner Abschlussarbeit hinzu",
+    "STUDENT_DIALOG_SUBTITLE": "Suche nach Nutzername",
+    "USER_SEARCH_PLACEHOLDER": "Nutzer finden",
+    "USER_SEARCH_EMPTY_PREFIX": "Keine passenden User gefunden",
+    "FINISH_TITLE": "Fertigstellen",
+    "FINISH_DESCRIPTION": "Prüfe alle Eingaben, um deine Abschlussarbeit fertigzustellen.",
+    "STEPS": {
+      "GENERAL": "Allgemeines",
+      "SETTINGS": "Einstellungen",
+      "STUDENTS": "Studierende",
+      "FINISH": "Fertigstellen"
+    },
+    "THESIS_URL_CHECK_ERROR": "Abschlussarbeit-URL konnte nicht geprüft werden.",
+    "SUCCESS_CREATED": "Abschlussarbeit erfolgreich erstellt!",
+    "SUCCESS_CREATED_WITH_STUDENTS": "Abschlussarbeit erfolgreich erstellt und Studierende hinzugefügt!",
+    "SUCCESS_CREATED_STUDENTS_PARTIAL": "Abschlussarbeit erfolgreich erstellt. Einige Studierende konnten nicht hinzugefügt werden.",
+    "SUCCESS_CREATED_STUDENTS_FAILED": "Abschlussarbeit erfolgreich erstellt. Die Studierenden konnten nicht hinzugefügt werden.",
+    "ERROR_CREATE_THESIS": "Abschlussarbeit konnte nicht erstellt werden. Bitte versuche es erneut.",
+    "VALIDATION": {
+      "TITLE_MIN": "Titel muss mindestens 3 Zeichen lang sein.",
+      "TITLE_MAX": "Titel darf höchstens 100 Zeichen lang sein.",
+      "TITLE_NO_QUOTES": "Titel darf keine Anführungszeichen beinhalten.",
+      "SHORT_DESCRIPTION_MAX": "Kurzbeschreibung darf höchstens 300 Zeichen lang sein.",
+      "SHORT_DESCRIPTION_NO_QUOTES": "Kurzbeschreibung darf keine Anführungszeichen beinhalten.",
+      "DESCRIPTION_MAX": "Beschreibung darf höchstens 2000 Zeichen lang sein.",
+      "DESCRIPTION_NO_QUOTES": "Beschreibung darf keine Anführungszeichen beinhalten.",
+      "THESIS_URL_MIN": "Abschlussarbeit-URL muss mindestens 3 Zeichen lang sein.",
+      "THESIS_URL_MAX": "Abschlussarbeit-URL darf höchstens 30 Zeichen lang sein.",
+      "THESIS_URL_FORMAT": "Verwende ausschließlich Kleinbuchstaben, Zahlen und Bindestriche. Bindestriche sind am Anfang und am Ende nicht zulässig."
     }
   },
   "SEARCH": {
@@ -542,6 +601,7 @@
       "JOIN_REQUESTS": "Beitrittsanfragen",
       "MEMBERS": "Mitglieder",
       "PRIVACY": "Privatsphäre",
+      "GITHUB": "GitHub",
       "DANGER_ZONE": "Gefahrenzone"
     },
     "ERRORS": {
@@ -621,7 +681,8 @@
     "ERRORS": {
       "NO_PROJECT_URL": "Keine Projekt-URL angegeben.",
       "LOAD_PROJECT": "Projektdaten konnten nicht abgerufen werden.",
-      "SAVE_PROJECT": "Projekt konnte nicht gespeichert werden."
+      "SAVE_PROJECT": "Projekt konnte nicht gespeichert werden.",
+      "CONTENT_NOT_VALID": "Dieser Inhalt ist nicht erlaubt."
     },
     "INFO": {
       "VISIBILITY": "Sichtbarkeit",
@@ -663,12 +724,16 @@
       "DROP_HINT": "Datei hierher ziehen",
       "DOWNLOAD_FILE": "Datei herunterladen",
       "DELETE_FILE": "Datei löschen",
+      "TOGGLE_VISIBILITY": "Sichtbarkeit ändern",
+      "PUBLIC": "Öffentlich",
+      "PRIVATE": "Privat",
       "ERROR_TYPE_NOT_ALLOWED": "Dateityp nicht erlaubt. Erlaubt: PDF, PNG, JPG, DOCX, TXT, MD",
       "ERROR_FILE_TOO_LARGE": "Datei ist zu groß. Maximale Dateigröße: 10 MB.",
       "ERROR_LOAD": "Dateien konnten nicht geladen werden.",
       "ERROR_UPLOAD": "Datei konnte nicht hochgeladen werden.",
       "ERROR_DELETE": "Datei konnte nicht gelöscht werden.",
-      "ERROR_DOWNLOAD": "Datei konnte nicht heruntergeladen werden."
+      "ERROR_DOWNLOAD": "Datei konnte nicht heruntergeladen werden.",
+      "ERROR_UPDATE_VISIBILITY": "Sichtbarkeit konnte nicht aktualisiert werden."
     }
   },
   "JOIN_REQUEST": {
@@ -729,6 +794,7 @@
     "TITLE": "Einstellungen",
     "TABS": {
       "PROFESSOR_REQUEST": "Professor:in werden",
+      "INTEGRATIONS": "GitHub",
       "CONTACT": "Kontakt",
       "IMPRESSUM": "Impressum"
     },
@@ -738,6 +804,52 @@
       "SEND_EMAIL": "E-Mail senden",
       "COPIED": "Email kopiert",
       "COPY": "Email kopieren"
+    }
+  },
+  "GITHUB": {
+    "LOADING": "GitHub-Verbindung wird geladen",
+    "ERROR_LOAD": "Der Status der GitHub-Verbindung konnte nicht geladen werden.",
+    "ERROR_CONNECT": "Die GitHub-Verbindung konnte nicht gestartet werden. Bitte versuche es erneut.",
+    "ERROR_DISCONNECT": "Das GitHub-Konto konnte nicht getrennt werden. Bitte versuche es erneut.",
+    "CARD_TITLE": "GitHub",
+    "CARD_DESCRIPTION": "Verbinde dein GitHub-Konto, um Repositories mit deinen Projekten zu verknüpfen.",
+    "DISABLED": "Die GitHub-Integration ist derzeit nicht verfügbar.",
+    "CONNECT": "GitHub-Konto verbinden",
+    "RECONNECT": "Erneut verbinden",
+    "DISCONNECT": "Trennen",
+    "STATUS_CONNECTED": "Verbunden",
+    "STATUS_RECONNECT_REQUIRED": "Erneute Verbindung erforderlich",
+    "DISCONNECT_CONFIRM_TITLE": "GitHub-Konto trennen?",
+    "DISCONNECT_CONFIRM_DESCRIPTION": "Bereits mit Projekten verknüpfte Repositories bleiben verknüpft, aber du musst dich erneut verbinden, um neue zu verknüpfen.",
+    "CANCEL": "Abbrechen",
+    "CALLBACK": {
+      "LOADING": "Dein GitHub-Konto wird verbunden...",
+      "SUCCESS": "GitHub-Konto erfolgreich verbunden.",
+      "DENIED_TITLE": "Verbindung abgebrochen",
+      "DENIED_DESCRIPTION": "Du hast die GitHub-Autorisierung abgebrochen. Es wurden keine Änderungen vorgenommen.",
+      "ERROR_TITLE": "Verbindung fehlgeschlagen",
+      "ERROR_DESCRIPTION": "Dein GitHub-Konto konnte nicht verbunden werden. Bitte versuche es erneut.",
+      "BACK_TO_SETTINGS": "Zurück zu den Einstellungen"
+    },
+    "REPO": {
+      "ERROR_LOAD": "Das verknüpfte GitHub-Repository konnte nicht geladen werden.",
+      "ERROR_LINK": "Das Repository konnte nicht verknüpft werden. Bitte versuche es erneut.",
+      "ERROR_UNLINK": "Die Verknüpfung des Repositorys konnte nicht aufgehoben werden. Bitte versuche es erneut.",
+      "INVALID_INPUT": "Gib ein GitHub-Repository als owner/name oder als github.com-URL ein.",
+      "CONNECTION_REQUIRED": "Verbinde dein GitHub-Konto, bevor du ein Repository verknüpfst.",
+      "ACCESS_DENIED": "Du hast keinen Schreibzugriff auf dieses Repository auf GitHub.",
+      "NOT_FOUND": "Dieses Repository konnte auf GitHub nicht gefunden werden.",
+      "GO_TO_SETTINGS": "Zu den Einstellungen",
+      "LINK_TITLE": "GitHub-Repository verknüpfen",
+      "LINK_DESCRIPTION": "Zeige Beschreibung, Stars, Forks und Sprachen des Repositorys auf der Projektseite an.",
+      "LINK_PLACEHOLDER": "owner/repository oder https://github.com/owner/repository",
+      "LINK": "Repository verknüpfen",
+      "UNLINK": "Verknüpfung aufheben",
+      "UNAVAILABLE": "Repository-Daten sind vorübergehend nicht verfügbar.",
+      "SHOW_README": "README auf der Projektseite anzeigen",
+      "ERROR_README_TOGGLE": "Die Sichtbarkeit der README konnte nicht aktualisiert werden. Bitte versuche es erneut.",
+      "AUTO_INVITE_COLLABORATORS": "Neue Mitglieder automatisch als GitHub-Mitarbeiter einladen",
+      "ERROR_AUTO_INVITE_TOGGLE": "Die Einstellung für automatische Einladungen konnte nicht aktualisiert werden. Bitte versuche es erneut."
     }
   },
   "PROFESSOR_REQUEST": {
@@ -809,5 +921,77 @@
     "NO_REASON": "Kein Grund angegeben",
     "BANNED_AT": "Gesperrt am:",
     "CONTACT_HINT": "Wenn du Fragen hast, wende dich bitte an das Projektteam."
+  },
+  "THESISSITE": {
+    "LOADING": "Abschlussarbeit wird geladen…",
+    "INFORMATION": "Informationen zur Abschlussarbeit",
+    "THESIS_UPDATED": "Abschlussarbeit erfolgreich geändert.",
+    "ERRORS": {
+      "NO_THESIS_URL": "Keine URL für die Abschlussarbeit angegeben.",
+      "LOAD_THESIS": "Daten der Abschlussarbeit konnten nicht abgerufen werden.",
+      "SAVE_THESIS": "Abschlussarbeit konnte nicht gespeichert werden."
+    },
+    "HEADER": {
+      "BADGE": "Abschlussarbeit",
+      "SETTINGS": "Einstellungen"
+    },
+    "FORM": {
+      "TITLE": "Titel der Abschlussarbeit"
+    },
+    "TAGS": {
+      "TITLE": "Tags",
+      "EMPTY": "Keine Tags vorhanden.",
+      "ERROR_DUPLICATE": "Tag ist bereits in dieser Abschlussarbeit enthalten.",
+      "ERROR_SAVE": "Tag konnte nicht gespeichert werden. Bitte versuche es erneut."
+    },
+    "PEOPLE": {
+      "TITLE": "Betreuer & Studierende",
+      "EMPTY": "Noch kein Betreuer oder Studierende.",
+      "SUPERVISOR": "Betreuer"
+    }
+  },
+  "THESISSETTINGS": {
+    "TITLE": "Einstellungen der Abschlussarbeit",
+    "BACK_TO_THESIS": "Zurück zur Abschlussarbeit",
+    "UNEXPECTED_ERROR": "Ein unerwarteter Fehler ist aufgetreten",
+    "TABS": {
+      "STUDENTS": "Studierende",
+      "DANGER_ZONE": "Gefahrenzone"
+    },
+    "ERRORS": {
+      "NO_THESIS_URL": "Keine URL für die Abschlussarbeit angegeben.",
+      "LOAD_THESIS": "Abschlussarbeit konnte nicht geladen werden."
+    },
+    "STUDENTS": {
+      "SUBTITLE": "Verwalte, welche Studierende an dieser Abschlussarbeit beteiligt sind.",
+      "ADD_STUDENT": "Studierende hinzufügen",
+      "ADD_SUBTITLE": "Suche nach einem Nutzer",
+      "EMPTY": "Diese Abschlussarbeit hat noch keine Studierenden.",
+      "TABLE_STUDENT": "Studierende:r",
+      "REMOVE_STUDENT": "Studierende:n entfernen",
+      "REMOVE_SUBTITLE": "Zugriff auf die Abschlussarbeit wird entfernt",
+      "REMOVE_CONFIRM_START": "Bist du sicher, dass du",
+      "REMOVE_CONFIRM_END": "von dieser Abschlussarbeit entfernen möchtest?",
+      "USER_SEARCH_PLACEHOLDER": "Nutzer suchen",
+      "ERROR_ADD_STUDENT": "Studierende:r konnte nicht hinzugefügt werden. Bitte versuche es erneut.",
+      "ERROR_REMOVE_STUDENT": "Studierende:r konnte nicht entfernt werden. Bitte versuche es gleich nochmal.",
+      "LOADING": "Lade Studierende...",
+      "ERROR_LOAD_STUDENTS": "Studierende konnten nicht geladen werden. Bitte versuche es später nochmal.",
+      "ERROR_ADD_INVALID": "Dieser Nutzer kann nicht als Studierende:r hinzugefügt werden: er/sie ist Professor:in oder bereits Betreuer:in dieser Abschlussarbeit.",
+      "ERROR_ADD_DUPLICATE": "Dieser Nutzer ist bereits Studierende:r dieser Abschlussarbeit.",
+      "ERROR_REMOVE_NOT_FOUND": "Dieser Nutzer ist kein:e Studierende:r dieser Abschlussarbeit (evtl. bereits entfernt)."
+    },
+    "DANGER": {
+      "TITLE": "Abschlussarbeit löschen",
+      "SUBTITLE": "Diese Aktion kann nicht rückgängig gemacht werden.",
+      "DESCRIPTION": "Diese Abschlussarbeit und alle zugehörigen Daten werden unwiderruflich gelöscht!",
+      "MODAL_SUBTITLE": "Das ist eine unwiderrufliche Aktion",
+      "DELETE_TEXT_START": "Wenn du",
+      "DELETE_TEXT_END": "endgültig löschst, werden alle Studierenden, Tags und Einstellungen gelöscht. Die Daten können nicht wiederhergestellt werden.",
+      "CONFIRM_TYPE_START": "Um diese Aktion zu bestätigen, tippe bitte",
+      "CONFIRM_TYPE_END": "ein.",
+      "DELETING": "Wird gelöscht…",
+      "ERROR_DELETE_THESIS": "Abschlussarbeit konnte nicht gelöscht werden."
+    }
   }
 }

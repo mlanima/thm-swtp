@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, signa
 import { FormsModule } from '@angular/forms';
 import { LocationIcon } from '../../../../shared/icons/location-icon/location-icon';
 import { FollowersIcon } from '../../../../shared/icons/followers-icon/followers-icon';
+import { PlaceAutocomplete } from '../../../../shared/place-autocomplete/place-autocomplete';
 import { UserProfileModel } from '../../../../models/user-profile.model';
 import { EditButton } from '../../../../shared/edit-button/edit-button';
 import { FollowButton } from '../../../../shared/follow-button/follow-button';
@@ -15,7 +16,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 @Component({
   selector: 'app-profile-banner',
   standalone: true,
-  imports: [LocationIcon, FollowersIcon, EditButton, FollowButton, FormsModule, TranslatePipe],
+  imports: [LocationIcon, FollowersIcon, PlaceAutocomplete, EditButton, FollowButton, FormsModule, TranslatePipe],
   templateUrl: './profile-banner.html',
 })
 export class ProfileBanner implements OnChanges {
@@ -38,9 +39,15 @@ export class ProfileBanner implements OnChanges {
     location: string;
     about: string;
     experience: string;
+    placeId: string;
   };
 
   @Input() canFollow = true;
+
+  onPlaceChange(result: { placeId: string; location: string }): void {
+    this.editForm.location = result.location;
+    this.editForm.placeId = result.placeId;
+  }
 
   /** Emits when the edit button inside the banner is clicked */
   @Output() edit = new EventEmitter<void>();
