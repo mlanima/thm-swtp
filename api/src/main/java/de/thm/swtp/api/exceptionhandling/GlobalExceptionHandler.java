@@ -2,7 +2,26 @@ package de.thm.swtp.api.exceptionhandling;
 
 import de.thm.swtp.api.common.LogSafe;
 import de.thm.swtp.api.exceptionhandling.exceptions.*;
+import de.thm.swtp.api.github.exception.GithubApiException;
+import de.thm.swtp.api.github.exception.GithubConnectionRequiredException;
+import de.thm.swtp.api.github.exception.GithubIntegrationDisabledException;
+import de.thm.swtp.api.github.exception.GithubOAuthException;
+import de.thm.swtp.api.github.exception.GithubReadmeNotEnabledException;
+import de.thm.swtp.api.github.exception.GithubRepoAccessDeniedException;
+import de.thm.swtp.api.github.exception.GithubRepoNotFoundException;
+import de.thm.swtp.api.github.exception.GithubRepoNotLinkedException;
+import de.thm.swtp.api.github.exception.GithubTokenInvalidException;
+import de.thm.swtp.api.github.exception.InvalidGithubStateException;
 import de.thm.swtp.api.professorRequest.exception.ProfessorRequestAlreadyExistsException;
+import de.thm.swtp.api.thesis.exception.ThesisInvalidUrlException;
+import de.thm.swtp.api.thesis.exception.ThesisUrlGenerationFailedException;
+import de.thm.swtp.api.thesis.exception.ThesisNotFoundException;
+import de.thm.swtp.api.thesis.exception.ThesisStudentAlreadyAssignedException;
+import de.thm.swtp.api.thesis.exception.ThesisStudentNotFoundException;
+import de.thm.swtp.api.thesis.exception.ThesisTitleAlreadyExistsException;
+import de.thm.swtp.api.thesis.exception.ThesisUrlAlreadyExistsException;
+import de.thm.swtp.api.thesis.exception.ThesisInvalidStudentAssignmentException;
+import de.thm.swtp.api.thesis.exception.ThesisNotFoundByIdException;
 import de.thm.swtp.api.professorRequest.exception.ProfessorRequestInvalidStatusException;
 import de.thm.swtp.api.professorRequest.exception.ProfessorRequestNotFoundException;
 import de.thm.swtp.api.projectFavorite.exception.ProjectAlreadyFavoritedException;
@@ -26,6 +45,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.client.ResourceAccessException;
@@ -420,11 +440,46 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
     }
 
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        log.debug("Bad Request (400): {}", LogSafe.clean(ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(400, "Bad Request", "Invalid value for parameter '" + ex.getName() + "'."));
+    }
+
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<ErrorResponse> handleMethodNotSupported(HttpRequestMethodNotSupportedException ex) {
         log.debug("Method Not Allowed (405): {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
                 .body(ErrorResponse.of(405, "Method Not Allowed", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ThesisNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleThesisNotFound(ThesisNotFoundException ex) {
+        log.debug("Not Found (404): {}", LogSafe.clean(ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ThesisTitleAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleThesisTitleAlreadyExists(ThesisTitleAlreadyExistsException ex) {
+        log.debug("Conflict (409): {}", LogSafe.clean(ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ThesisUrlAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleThesisUrlAlreadyExists(ThesisUrlAlreadyExistsException ex) {
+        log.debug("Conflict (409): {}", LogSafe.clean(ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ThesisInvalidUrlException.class)
+    public ResponseEntity<ErrorResponse> handleThesisInvalidUrl(ThesisInvalidUrlException ex) {
+        log.debug("Bad Request (400): {}", LogSafe.clean(ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
     }
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
@@ -439,6 +494,41 @@ public class GlobalExceptionHandler {
         log.warn("Payload Too Large (413): {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.valueOf(413))
                 .body(ErrorResponse.of(413, "Payload Too Large", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ThesisUrlGenerationFailedException.class)
+    public ResponseEntity<ErrorResponse> handleThesisUrlGenerationFailed(ThesisUrlGenerationFailedException ex) {
+        log.error("Thesis URL generation failed: {}", ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ErrorResponse.of(500, "Internal Server Error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ThesisStudentAlreadyAssignedException.class)
+    public ResponseEntity<ErrorResponse> handleThesisStudentAlreadyAssigned(ThesisStudentAlreadyAssignedException ex) {
+        log.debug("Conflict (409): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ThesisStudentNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleThesisStudentNotFound(ThesisStudentNotFoundException ex) {
+        log.debug("Not Found (404): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ThesisNotFoundByIdException.class)
+    public ResponseEntity<ErrorResponse> handleThesisNotFoundById(ThesisNotFoundByIdException ex) {
+        log.debug("Not Found (404): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ThesisInvalidStudentAssignmentException.class)
+    public ResponseEntity<ErrorResponse> handleThesisInvalidStudentAssignment(ThesisInvalidStudentAssignmentException ex) {
+        log.warn("Unprocessable Entity (422): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(ErrorResponse.of(422, "Unprocessable Entity", ex.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)
@@ -474,5 +564,76 @@ public class GlobalExceptionHandler {
         log.debug("Bad Request (400): {}", LogSafe.clean(ex.getMessage()));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
+    }
+
+    @ExceptionHandler(GithubIntegrationDisabledException.class)
+    public ResponseEntity<ErrorResponse> handleGithubIntegrationDisabled(GithubIntegrationDisabledException ex) {
+        log.warn("Service Unavailable (503): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(ErrorResponse.of(503, "Service Unavailable", ex.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidGithubStateException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidGithubState(InvalidGithubStateException ex) {
+        log.debug("Bad Request (400): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
+    }
+
+    @ExceptionHandler(GithubOAuthException.class)
+    public ResponseEntity<ErrorResponse> handleGithubOAuthError(GithubOAuthException ex) {
+        log.debug("Bad Request (400): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
+    }
+
+    @ExceptionHandler(GithubTokenInvalidException.class)
+    public ResponseEntity<ErrorResponse> handleGithubTokenInvalid(GithubTokenInvalidException ex) {
+        log.debug("Conflict (409): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
+    }
+
+    @ExceptionHandler(GithubApiException.class)
+    public ResponseEntity<ErrorResponse> handleGithubApiError(GithubApiException ex) {
+        log.error("GitHub API error: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                .body(ErrorResponse.of(502, "Bad Gateway", "GitHub service temporarily unavailable."));
+    }
+
+    @ExceptionHandler(GithubConnectionRequiredException.class)
+    public ResponseEntity<ErrorResponse> handleGithubConnectionRequired(GithubConnectionRequiredException ex) {
+        log.debug("Conflict (409): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
+    }
+
+
+    @ExceptionHandler(GithubRepoNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleGithubRepoNotFound(GithubRepoNotFoundException ex) {
+        log.debug("Not Found (404): {}", LogSafe.clean(ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
+    }
+
+    @ExceptionHandler(GithubRepoNotLinkedException.class)
+    public ResponseEntity<ErrorResponse> handleGithubRepoNotLinked(GithubRepoNotLinkedException ex) {
+        log.debug("Not Found (404): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
+    }
+
+    @ExceptionHandler(GithubRepoAccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleGithubRepoAccessDenied(GithubRepoAccessDeniedException ex) {
+        log.warn("Forbidden (403): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ErrorResponse.of(403, "Forbidden", ex.getMessage()));
+    }
+
+    @ExceptionHandler(GithubReadmeNotEnabledException.class)
+    public ResponseEntity<ErrorResponse> handleGithubReadmeNotEnabled(GithubReadmeNotEnabledException ex) {
+        log.debug("Not Found (404): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
     }
 }

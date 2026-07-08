@@ -1,0 +1,19 @@
+<div class="flex flex-col gap-6">
+
+  <app-editable-tag-list
+    [title]="'THESISSITE.TAGS.TITLE' | translate"
+    [tags]="tagModels()"
+    [isOwner]="isSupervisor()"
+    [isSaving]="isSavingTags()"
+    [errorMessage]="tagsErrorMessage()"
+    (addTag)="addTag.emit($event)"
+    (deleteTag)="deleteTag.emit($event)">
+  </app-editable-tag-list>
+
+  <app-student-list
+    [thesisId]="thesisId()"
+    [supervisorId]="supervisorKeycloakId()"
+    [supervisorUsername]="supervisorUsername()">
+  </app-student-list>
+
+</div>
