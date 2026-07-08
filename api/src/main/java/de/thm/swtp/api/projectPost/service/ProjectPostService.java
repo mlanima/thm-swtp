@@ -260,7 +260,7 @@ public class ProjectPostService {
 
         contentModerationService.assertAppropriate(title, "postTitle");
         contentModerationService.assertAppropriate(content, "postContent");
-        
+
         ProjectPostEntity postEntity = getPostOrThrowError(postId);
         assertPostBelongsToProject(postEntity, projectId);
 
