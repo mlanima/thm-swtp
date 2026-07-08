@@ -46,6 +46,9 @@ class ProjectPostServiceTest {
     @Mock
     private ContentModerationService contentModerationService;
 
+    @Mock
+    private de.thm.swtp.api.projectFiles.service.ProjectFileService projectFileService;
+
     private ProjectPostService service;
 
     private UUID projectId;
@@ -56,7 +59,7 @@ class ProjectPostServiceTest {
     @BeforeEach
     void setUp() {
         service = new ProjectPostService(projectPostRepository, projectRepository,
-                userProfileRepository, contentModerationService);
+                userProfileRepository, contentModerationService, projectFileService);
 
         projectId = UUID.randomUUID();
         authorId = UUID.randomUUID();

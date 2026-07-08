@@ -72,6 +72,12 @@ public class CacheConfig implements CachingConfigurer {
                 .prefixCacheNameWith("content:");
     }
 
+    private RedisCacheConfiguration tagExistsCacheConfig() {
+        return defaultCacheConfig()
+                .entryTtl(Duration.ofMinutes(30))
+                .prefixCacheNameWith("tags:");
+    }
+
     private RedisCacheConfiguration githubRepoCardCacheConfig() {
         return defaultCacheConfig()
                 .entryTtl(Duration.ofMinutes(10))
