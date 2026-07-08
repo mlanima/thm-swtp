@@ -11,8 +11,8 @@ Gruppe 3 · *Software Engineering: Realisierung* · THM
 
 [Dokumentation](#dokumentation) · [Umgebungen](#umgebungen) · [Mitwirkende](#mitwirkende)
 
-[![CI Backend][CI-Backend-badge]][CI-Backend-url]
-[![CI Frontend][CI-Frontend-badge]][CI-Frontend-url]
+[![CI Backend](https://github.com/mlanima/thm-swtp/actions/workflows/ci-backend.yml/badge.svg)](https://github.com/mlanima/thm-swtp/actions/workflows/ci-backend.yml)
+[![CI Frontend](https://github.com/mlanima/thm-swtp/actions/workflows/ci-frontend.yml/badge.svg)](https://github.com/mlanima/thm-swtp/actions/workflows/ci-frontend.yml)
 
 </div>
 
@@ -127,10 +127,6 @@ thm-swtp/
 </div>
 
 <!-- BADGES -->
-[CI-Backend-badge]: https://img.shields.io/github/actions/workflow/status/mlanima/thm-swtp/ci-backend.yml?style=for-the-badge&label=CI%20Backend&logo=springboot&logoColor=white
-[CI-Backend-url]: https://github.com/mlanima/thm-swtp/actions/workflows/ci-backend.yml
-[CI-Frontend-badge]: https://img.shields.io/github/actions/workflow/status/mlanima/thm-swtp/ci-frontend.yml?style=for-the-badge&label=CI%20Frontend&logo=angular&logoColor=white
-[CI-Frontend-url]: https://github.com/mlanima/thm-swtp/actions/workflows/ci-frontend.yml
 [Java-badge]: https://img.shields.io/badge/Java_25-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white
 [Java-url]: https://openjdk.org/
 [SpringBoot-badge]: https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white
