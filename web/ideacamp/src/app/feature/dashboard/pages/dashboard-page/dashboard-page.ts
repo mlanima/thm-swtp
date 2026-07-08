@@ -37,7 +37,7 @@ export class DashboardPage implements OnInit {
       return;
     }
 
-    this.myProjectsService.getRecentProjects(username).subscribe({
+
     const sub = this.myProjectsService.getRecentProjects(username).subscribe({
       next: (projects) => {
         this.projects.set(projects);

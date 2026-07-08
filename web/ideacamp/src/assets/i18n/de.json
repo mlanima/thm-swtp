@@ -861,7 +861,7 @@
     },
     "PROJECTS": {
       "TITLE": "Zuletzt",
-      "EMPTY": "Du bist noch in keinem Projekt Mitglied."
+      "EMPTY": "Du bist noch in keinem Projekt Mitglied.",
       "LOADING": "Projekte werden geladen…",
       "EMPTY": "Du bist noch in keinem Projekt Mitglied."
     }

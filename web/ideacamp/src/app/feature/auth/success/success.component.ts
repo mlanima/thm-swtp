@@ -36,11 +36,7 @@ export class SuccessComponent implements OnInit {
 
     this.redirectUrl = sessionStorage.getItem('postLoginRedirectUrl');
     sessionStorage.removeItem('postLoginRedirectUrl');
-
-    if (this.redirectUrl) {
-      await this.router.navigateByUrl(this.redirectUrl);
-      return;
-    }
+    
 
     this.userProfileService.getMyProfile().subscribe({
       next: (profile) => {
@@ -77,7 +73,5 @@ export class SuccessComponent implements OnInit {
 
   private navigateAfterSuccess(): void {
     void this.router.navigateByUrl(this.redirectUrl ?? this.defaultRedirectUrl);
-    this.userProfileService.getMyProfile().subscribe();
-    await this.router.navigateByUrl('/dashboard');
   }
 }

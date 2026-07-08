@@ -58,7 +58,6 @@ export class RecentPosts {
       if (projects.length === 0) {
         this.posts.set([]);
         this.postsSubscription?.unsubscribe();
-        this.posts.set([]);
         this.clearPostImageUrls();
         return;
       }
@@ -92,8 +91,8 @@ export class RecentPosts {
         catchError(() => of<ProjectPostResponse[]>([])),
       ),
     );
-    
-    forkJoin(requests).subscribe({
+
+
     this.postsSubscription = forkJoin(requests).subscribe({
       next: (results) => {
         const merged: FeedPost[] = results.flatMap((posts, index) =>
@@ -108,10 +107,10 @@ export class RecentPosts {
           const bTime = new Date(b.publishedAt ?? b.createdAt).getTime();
           return bTime - aTime;
         });
-        
+
         this.posts.set(merged.slice(0, MAX_POSTS));
         this.isLoading.set(false);
-        
+
         const visiblePosts = merged.slice(0, MAX_POSTS);
         this.posts.set(visiblePosts);
         this.isLoading.set(false);
