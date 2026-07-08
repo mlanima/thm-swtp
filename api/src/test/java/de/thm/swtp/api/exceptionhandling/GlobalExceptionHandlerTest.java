@@ -20,7 +20,12 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
-import de.thm.swtp.api.tag.validation.TagValidationException;
+import de.thm.swtp.api.location.exception.GooglePlacesApiException;
+import de.thm.swtp.api.location.exception.InvalidPlaceException;
+import de.thm.swtp.api.moderation.exception.ContentModerationException;
+import de.thm.swtp.api.moderation.exception.ContentNotValidException;
+import de.thm.swtp.api.moderation.exception.ModerationApiException;
+import de.thm.swtp.api.tag.exception.TagSourceApiException;
 import org.springframework.web.client.ResourceAccessException;
 
 import java.util.UUID;
@@ -150,12 +155,12 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void tagValidationErrorReturns502() {
-        ResponseEntity<ErrorResponse> r = handler.handleTagValidationError(
-                new TagValidationException("Tag validation service temporarily unavailable"));
+    void moderationApiErrorReturns502() {
+        ResponseEntity<ErrorResponse> r = handler.handleModerationApiError(
+                new ModerationApiException("Moderation service temporarily unavailable"));
         assertStatus(r, HttpStatus.BAD_GATEWAY);
         assertThat(r.getBody().getError()).isEqualTo("Bad Gateway");
-        assertThat(r.getBody().getMessage()).isEqualTo("Tag validation service temporarily unavailable.");
+        assertThat(r.getBody().getMessage()).isEqualTo("Moderation service temporarily unavailable.");
     }
 
     @Test
@@ -164,7 +169,52 @@ class GlobalExceptionHandlerTest {
                 new ResourceAccessException("I/O error: Timeout"));
         assertStatus(r, HttpStatus.BAD_GATEWAY);
         assertThat(r.getBody().getError()).isEqualTo("Bad Gateway");
+        assertThat(r.getBody().getMessage()).isEqualTo("External service temporarily unreachable.");
+    }
+
+    @Test
+    void tagSourceApiErrorReturns502() {
+        ResponseEntity<ErrorResponse> r = handler.handleTagSourceApiError(
+                new TagSourceApiException("GitHub down"));
+        assertStatus(r, HttpStatus.BAD_GATEWAY);
+        assertThat(r.getBody().getError()).isEqualTo("Bad Gateway");
         assertThat(r.getBody().getMessage()).isEqualTo("Tag validation service temporarily unavailable.");
+    }
+
+    @Test
+    void contentNotValidReturns400WithCode() {
+        ResponseEntity<ErrorResponse> r = handler.handleContentNotValid(
+                new ContentNotValidException("about"));
+        assertStatus(r, HttpStatus.BAD_REQUEST);
+        assertThat(r.getBody().getError()).isEqualTo("Bad Request");
+        assertThat(r.getBody().getErrorCode()).isEqualTo("CONTENT_NOT_VALID");
+    }
+
+    @Test
+    void contentModerationErrorReturns502() {
+        ResponseEntity<ErrorResponse> r = handler.handleContentModerationError(
+                new ContentModerationException("OpenAI down"));
+        assertStatus(r, HttpStatus.BAD_GATEWAY);
+        assertThat(r.getBody().getError()).isEqualTo("Bad Gateway");
+        assertThat(r.getBody().getMessage()).isEqualTo("Content moderation service temporarily unavailable.");
+    }
+
+    @Test
+    void invalidPlaceReturns400WithCode() {
+        ResponseEntity<ErrorResponse> r = handler.handleInvalidPlace(
+                new InvalidPlaceException("ChIJ..."));
+        assertStatus(r, HttpStatus.BAD_REQUEST);
+        assertThat(r.getBody().getError()).isEqualTo("Bad Request");
+        assertThat(r.getBody().getErrorCode()).isEqualTo("INVALID_PLACE");
+    }
+
+    @Test
+    void googlePlacesApiErrorReturns502() {
+        ResponseEntity<ErrorResponse> r = handler.handleGooglePlacesApiError(
+                new GooglePlacesApiException("Places API down"));
+        assertStatus(r, HttpStatus.BAD_GATEWAY);
+        assertThat(r.getBody().getError()).isEqualTo("Bad Gateway");
+        assertThat(r.getBody().getMessage()).isEqualTo("Places service temporarily unavailable.");
     }
 
     // ── catch-all: 500 with a generic body, never the raw exception message ──

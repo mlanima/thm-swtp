@@ -2,6 +2,7 @@ package de.thm.swtp.api.projectInvitation.service;
 
 import de.thm.swtp.api.common.TxLogger;
 import de.thm.swtp.api.notification.event.ProjectInviteCreatedEvent;
+import de.thm.swtp.api.notification.event.ProjectMemberAddedEvent;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
 import de.thm.swtp.api.project.exception.ProjectNotFoundException;
@@ -164,6 +165,7 @@ public class ProjectInviteService {
         }
         projectEntity.getMembers().add(invitedUserEntity);
         projectRepository.save(projectEntity);
+        eventPublisher.publishEvent(new ProjectMemberAddedEvent(projectEntity.getId(), invitedUserEntity.getKeycloakId()));
     }
 
     private boolean alreadyMember(ProjectEntity projectEntity, UserProfile invitedUserEntity){

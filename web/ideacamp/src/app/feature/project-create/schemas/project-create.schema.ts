@@ -3,7 +3,7 @@ import {z} from 'zod';
  * The schemas are used to validate the user input in all wizard steps before submitting.
  */
 
-const containsNoQuotes = (value:string) => !value.includes('"') && !value.includes("'");
+export const containsNoQuotes = (value:string) => !value.includes('"') && !value.includes("'");
 
 /**
  * Validation of general project information.

@@ -5,6 +5,8 @@ import de.thm.swtp.api.discord.stream.DiscordEventPublisher;
 import de.thm.swtp.api.projectFiles.service.ProjectFileService;
 import de.thm.swtp.api.exceptionhandling.exceptions.InvalidProjectPostException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectPostNotFoundException;
+import de.thm.swtp.api.moderation.ContentModerationService;
+import de.thm.swtp.api.moderation.exception.ContentNotValidException;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
 import de.thm.swtp.api.project.exception.ProjectNotFoundException;
@@ -51,6 +53,9 @@ class ProjectPostServiceTest {
     private DiscordPostSyncService discordPostSyncService;
 
     @Mock
+    private ContentModerationService contentModerationService;
+
+    @Mock
     private ProjectFileService projectFileService;
 
     private ProjectPostService service;
@@ -64,7 +69,7 @@ class ProjectPostServiceTest {
     void setUp() {
         service = new ProjectPostService(projectPostRepository, projectRepository,
                 userProfileRepository, discordEventPublisher, discordPostSyncService,
-                projectFileService);
+                contentModerationService, projectFileService);
 
         lenient().when(discordPostSyncService.getDiscordMessageId(any())).thenReturn(Optional.empty());
 
@@ -105,6 +110,37 @@ class ProjectPostServiceTest {
                 PostContentFormat.MARKDOWN, ProjectPostStatus.DRAFT);
 
         assertThat(result).isNotNull();
+        verify(contentModerationService).assertAppropriate("post title", "postTitle");
+        verify(contentModerationService).assertAppropriate("post content", "postContent");
+    }
+
+    @Test
+    void shouldThrowWhenTitleFlagged() {
+        doThrow(new ContentNotValidException("postTitle"))
+                .when(contentModerationService).assertAppropriate("bad title", "postTitle");
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(userProfileRepository.findById(authorId)).thenReturn(Optional.of(author));
+
+        assertThatThrownBy(() -> service.createProjectPost(projectId, authorId,
+                "bad title", "content",
+                PostContentFormat.PLAIN_TEXT, ProjectPostStatus.DRAFT))
+                .isInstanceOf(ContentNotValidException.class);
+    }
+
+    @Test
+    void shouldThrowWhenContentFlagged() {
+        doNothing().when(contentModerationService).assertAppropriate("good title", "postTitle");
+        doThrow(new ContentNotValidException("postContent"))
+                .when(contentModerationService).assertAppropriate("bad content", "postContent");
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(userProfileRepository.findById(authorId)).thenReturn(Optional.of(author));
+
+        assertThatThrownBy(() -> service.createProjectPost(projectId, authorId,
+                "good title", "bad content",
+                PostContentFormat.PLAIN_TEXT, ProjectPostStatus.DRAFT))
+                .isInstanceOf(ContentNotValidException.class);
     }
 
     @Test
@@ -115,6 +151,7 @@ class ProjectPostServiceTest {
                 .isInstanceOf(InvalidProjectPostException.class)
                 .hasMessage("Post status must not be null.");
         verifyNoInteractions(projectRepository);
+        verifyNoInteractions(contentModerationService);
     }
 
     @Test
@@ -143,6 +180,7 @@ class ProjectPostServiceTest {
                 "title", "content",
                 PostContentFormat.PLAIN_TEXT, ProjectPostStatus.DRAFT))
                 .isInstanceOf(ProjectNotFoundException.class);
+        verifyNoInteractions(contentModerationService);
     }
 
     @Test
@@ -154,6 +192,7 @@ class ProjectPostServiceTest {
                 "title", "content",
                 PostContentFormat.PLAIN_TEXT, ProjectPostStatus.DRAFT))
                 .isInstanceOf(UserProfileNotFoundException.class);
+        verifyNoInteractions(contentModerationService);
     }
 
     // ── publishProjectPost ──

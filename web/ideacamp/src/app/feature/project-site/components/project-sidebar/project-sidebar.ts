@@ -6,11 +6,12 @@ import { LinkManagerDataSource } from '../../../../shared/link-manager/link-mana
 import { ProjectLinkModel } from '../../../../models/project-link.model';
 import { ProjectLinkService } from '../../services/project-link.service';
 import { ProjectFiles } from '../project-files/project-files';
+import { GithubRepoCard } from '../github-repo-card/github-repo-card';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [TagList, LinkManagerComponent, MemberList, ProjectFiles],
+  imports: [TagList, LinkManagerComponent, MemberList, ProjectFiles, GithubRepoCard],
   templateUrl: './project-sidebar.html',
 })
 export class ProjectSidebar {

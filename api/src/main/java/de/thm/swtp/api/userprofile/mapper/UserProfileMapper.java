@@ -14,6 +14,7 @@ public class UserProfileMapper {
                 .email(profile.getEmail())
                 .title(profile.getTitle())
                 .location(profile.getLocation())
+                .placeId(profile.getPlaceId())
                 .followers(profile.getFollowers())
                 .about(profile.getAbout())
                 .experience(profile.getExperience())

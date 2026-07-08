@@ -5,6 +5,7 @@ import de.thm.swtp.api.discord.service.DiscordPostSyncService;
 import de.thm.swtp.api.discord.stream.DiscordEventPublisher;
 import de.thm.swtp.api.exceptionhandling.exceptions.InvalidProjectPostException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectPostNotFoundException;
+import de.thm.swtp.api.moderation.ContentModerationService;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
 import de.thm.swtp.api.project.exception.ProjectNotFoundException;
@@ -40,8 +41,9 @@ public class ProjectPostService {
     private final ProjectPostRepository projectPostRepository;
     private final ProjectRepository projectRepository;
     private final UserProfileRepository userProfileRepository;
-    private final DiscordEventPublisher discordEventPublisher;
+private final DiscordEventPublisher discordEventPublisher;
     private final DiscordPostSyncService discordPostSyncService;
+    private final ContentModerationService contentModerationService;
     private final ProjectFileService projectFileService;
     @Transactional(readOnly = true)
     public List<ProjectPost> getPublishedPostsForProject(UUID projectId) {
@@ -61,6 +63,9 @@ public class ProjectPostService {
 
         ProjectEntity projectEntity = getProjectOrThrowError(projectId);
         UserProfile author = getUserOrThrowError(authorId);
+
+        contentModerationService.assertAppropriate(title, "postTitle");
+        contentModerationService.assertAppropriate(content, "postContent");
 
         ProjectPostEntity projectPostEntity = ProjectPostEntity.builder()
                 .project(projectEntity)

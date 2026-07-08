@@ -7,6 +7,7 @@ import de.thm.swtp.api.discord.repository.LinkedChannelRepository;
 import de.thm.swtp.api.discord.service.DiscordNotificationService;
 import de.thm.swtp.api.exceptionhandling.exceptions.InvalidProjectManagementSortFieldException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectMemberNotFoundException;
+import de.thm.swtp.api.moderation.ContentModerationService;
 import de.thm.swtp.api.project.dto.request.*;
 import de.thm.swtp.api.project.dto.response.*;
 import de.thm.swtp.api.project.exception.*;
@@ -14,6 +15,7 @@ import de.thm.swtp.api.projectInvitation.domain.ProjectInviteStatus;
 import de.thm.swtp.api.projectInvitation.repository.ProjectInviteRepository;
 import de.thm.swtp.api.projectInvitation.service.ProjectInviteService;
 import de.thm.swtp.api.projectFavorite.repository.ProjectFavoriteRepository;
+import de.thm.swtp.api.projectGithubRepo.repository.ProjectGithubRepoRepository;
 import de.thm.swtp.api.projectJoinRequest.repository.ProjectJoinRequestRepository;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.projectView.entity.ProjectViewEntity;
@@ -41,14 +43,16 @@ public class ProjectService {
 
     private final ProjectRepository projectRepository;
     private final UserProfileRepository userProfileRepository;
+    private final ContentModerationService contentModerationService;
     private final ProjectInviteService projectInviteService;
     private final ProjectInviteRepository projectInviteRepository;
     private final ProjectJoinRequestRepository projectJoinRequestRepository;
     private static final String PROJECT_CREATION_INVITE_MESSAGE = "You have been invited to join this project.";
     private final ProjectFavoriteRepository projectFavoriteRepository;
     private final ProjectViewRepository projectViewRepository;
-    private final LinkedChannelRepository linkedChannelRepository;
+private final LinkedChannelRepository linkedChannelRepository;
     private final DiscordNotificationService discordNotificationService;
+    private final ProjectGithubRepoRepository projectGithubRepoRepository;
     private static final Set<String> MANAGED_PROJECT_SORT_FIELDS = Set.of("name", "owner.username", "createdAt", "updatedAt", "isPrivateProject");
 
     private ProjectResponse toResponse(ProjectEntity project) {
@@ -106,10 +110,13 @@ public class ProjectService {
 
     @Transactional
     public ProjectResponse createProject(CreateProjectRequest request, UUID currentUserId) {
-
         if (projectRepository.existsByName(request.name())) {
             throw new ExceptionProjectResponse(request.name());
         }
+
+        contentModerationService.assertAppropriate(request.name(), "name");
+        contentModerationService.assertAppropriate(request.description(), "description");
+        contentModerationService.assertAppropriate(request.shortDescription(), "shortDescription");
 
         UserProfile owner = userProfileRepository.findById(currentUserId)
                 .orElseThrow(() -> new UserProfileNotFoundException(currentUserId.toString()));
@@ -124,6 +131,7 @@ public class ProjectService {
             if (projectRepository.existsByProjectUrl(request.projectUrl())) {
                 throw new ExceptionProjectUrlAlreadyExists(request.projectUrl());
             }
+            contentModerationService.assertAppropriate(request.projectUrl(), "projectUrl");
             projectUrl = request.projectUrl();
         }
 
@@ -254,12 +262,15 @@ public class ProjectService {
         }
 
         if (request.getName() != null) {
+            contentModerationService.assertAppropriate(request.getName(), "name");
             project.setName(request.getName());
         }
         if (request.getDescription() != null) {
+            contentModerationService.assertAppropriate(request.getDescription(), "description");
             project.setDescription(request.getDescription());
         }
         if (request.getShortDescription() != null) {
+            contentModerationService.assertAppropriate(request.getShortDescription(), "shortDescription");
             project.setShortDescription(request.getShortDescription());
         }
         if (request.getProjectUrl() != null) {
@@ -270,6 +281,7 @@ public class ProjectService {
                     projectRepository.existsByProjectUrl(request.getProjectUrl())) {
                 throw new ExceptionProjectUrlAlreadyExists(request.getProjectUrl());
             }
+            contentModerationService.assertAppropriate(request.getProjectUrl(), "projectUrl");
             project.setProjectUrl(request.getProjectUrl());
         }
         project.setPrivateProject(request.isPrivateProject());
@@ -375,6 +387,11 @@ public class ProjectService {
                 .orElseThrow(() -> new ProjectOwnerTransferToNonMemberException(newOwnerId, projectId));
 
         projectInviteRepository.deleteByProjectIdAndStatus(projectId, ProjectInviteStatus.PENDING);
+
+        // The linked repo's GitHub API calls run on the linker's token, not the project
+        // owner's — unlinking forces the new owner to explicitly re-link with their own
+        // account rather than silently inheriting a former owner's GitHub credentials.
+        projectGithubRepoRepository.deleteByProjectId(projectId);
 
         project.getMembers().add(project.getOwner());
         project.getMembers().remove(newOwnerProfile);
