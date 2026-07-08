@@ -85,7 +85,8 @@ public class ProjectFileService {
         boolean allowedToSeePrivateFiles = isProjectOwner(project, currentUserId) || isProjectMember(project, currentUserId);
 
         if (allowedToSeePrivateFiles) {
-            return projectFileRepository.findByProjectIdOrderByCreatedAtAsc(projectId)
+            return projectFileRepository
+                    .findByProjectIdAndVisibilityNotOrderByCreatedAtAsc(projectId, FileVisibility.INTERNAL)
                     .stream()
                     .map(ProjectFileMapper::toDomain)
                     .toList();
@@ -105,7 +106,7 @@ public class ProjectFileService {
 
     @Transactional
     public ProjectFile uploadImageFile(UUID projectId, MultipartFile file) {
-        return uploadFile(projectId, file, ALLOWED_IMAGE_MIME_TYPES, FileVisibility.PUBLIC);
+        return uploadFile(projectId, file, ALLOWED_IMAGE_MIME_TYPES, FileVisibility.INTERNAL);
     }
 
     private ProjectFile uploadFile(UUID projectId, MultipartFile file, Set<String> allowedMimeTypes, FileVisibility visibility) {
