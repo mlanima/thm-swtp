@@ -262,9 +262,15 @@ public class ProjectPostService {
     }
 
     private void validateUpdatePost(ProjectPostStatus status, PostContentFormat contentFormat) {
-        if (status == null) { throw new InvalidProjectPostException("Post status must not be null."); }
-        if (status == ProjectPostStatus.ARCHIVED) { throw new InvalidProjectPostException("Post cannot be updated as archived."); }
-        if (contentFormat == null) { throw new InvalidProjectPostException("Post content format must not be null."); }
+        if (status == null) {
+            throw new InvalidProjectPostException("Post status must not be null.");
+        }
+        if (status == ProjectPostStatus.ARCHIVED) {
+            throw new InvalidProjectPostException("Post cannot be updated as archived.");
+        }
+        if (contentFormat == null) {
+            throw new InvalidProjectPostException("Post content format must not be null.");
+        }
     }
 
     private void assertPostBelongsToProject(ProjectPostEntity postEntity, UUID projectId){
