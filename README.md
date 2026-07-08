@@ -104,13 +104,14 @@ Feature-Branch von `developer` erstellen, Pull Request gegen `developer` öffnen
 
 ## Mitwirkende
 
-<a href="https://github.com/mlanima"><img src="https://github.com/mlanima.png" width="56" alt="mlanima"/></a>
-<a href="https://github.com/chrishnz"><img src="https://github.com/chrishnz.png" width="56" alt="chrishnz"/></a>
-<a href="https://github.com/T0SCH"><img src="https://github.com/T0SCH.png" width="56" alt="T0SCH"/></a>
-<a href="https://github.com/dsmk-cpu"><img src="https://github.com/dsmk-cpu.png" width="56" alt="dsmk-cpu"/></a>
-<a href="https://github.com/KSMEHMET42"><img src="https://github.com/KSMEHMET42.png" width="56" alt="KSMEHMET42"/></a>
-<a href="https://github.com/halitcinar"><img src="https://github.com/halitcinar.png" width="56" alt="halitcinar"/></a>
-
 <div align="center">
+
+<a href="https://github.com/mlanima/thm-swtp/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=mlanima/thm-swtp" alt="Mitwirkende" />
+</a>
+
+<br/><br/>
+
 <sub>THM · Software Engineering: Realisierung · Gruppe 3 · SS26</sub>
+
 </div>
