@@ -18,7 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -166,7 +168,16 @@ public class DiscordChannelService {
             throw new DiscordConnectionFailedException(
                     "Failed to fetch guilds: " + (resp.reason() != null ? resp.reason() : "unknown error"));
         }
-        return resp.guilds();
+
+        var linkedGuildIds = linkedChannelRepository.findAll().stream()
+                .filter(LinkedChannelEntity::isActive)
+                .map(LinkedChannelEntity::getDiscordGuildId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        return resp.guilds().stream()
+                .filter(g -> !linkedGuildIds.contains(g.id()))
+                .toList();
     }
 
     @Transactional
