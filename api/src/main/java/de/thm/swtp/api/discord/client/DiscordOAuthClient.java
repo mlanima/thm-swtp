@@ -64,8 +64,6 @@ public class DiscordOAuthClient {
             throw new RuntimeException("Failed to exchange Discord OAuth2 code for bot");
         }
 
-        log.info("Raw Discord token response: {}", rawResponse.getBody());
-
         try {
             ObjectMapper mapper = new ObjectMapper();
             BotTokenResponse tokenResp = mapper.readValue(rawResponse.getBody(), BotTokenResponse.class);

@@ -27,8 +27,9 @@ public class DiscordStatusService {
         }
 
         LinkedChannelEntity link = linkOpt.get();
-        long syncedToday = messageSyncRepository.countBySyncedAtAfter(
-                LocalDateTime.now().withHour(0).withMinute(0).withSecond(0));
+        LocalDateTime todayStart = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0);
+        long syncedToday = messageSyncRepository.countByDiscordChannelIdAndSyncedAtAfter(
+                link.getDiscordChannelId(), todayStart);
 
         return new DiscordStatusResponse(
                 link.isActive(),

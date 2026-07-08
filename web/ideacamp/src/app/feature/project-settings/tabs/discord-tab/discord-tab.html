@@ -46,7 +46,8 @@
         <div class="flex gap-2">
           <input
             id="inviteUrlInput"
-            [(ngModel)]="inviteUrl"
+            [ngModel]="inviteUrl()"
+            (ngModelChange)="inviteUrl.set($event)"
             type="text"
             placeholder="https://discord.gg/example"
             class="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
@@ -71,7 +72,8 @@
         <div class="flex gap-2">
           <input
             id="channelIdInput"
-            [(ngModel)]="channelId"
+            [ngModel]="channelId()"
+            (ngModelChange)="channelId.set($event)"
             type="text"
             placeholder="123456789012345678"
             class="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
@@ -118,7 +120,8 @@
           <p class="mb-2 text-sm font-medium text-slate-700">{{ 'PROJECTSETTINGS.DISCORD.SELECT_SERVER' | translate }}</p>
           <div class="flex gap-2">
             <select
-              [(ngModel)]="selectedGuildId"
+              [ngModel]="selectedGuildId()"
+              (ngModelChange)="selectedGuildId.set($event)"
               class="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
             >
               <option value="" disabled>{{ 'PROJECTSETTINGS.DISCORD.SELECT_SERVER_PLACEHOLDER' | translate }}</option>

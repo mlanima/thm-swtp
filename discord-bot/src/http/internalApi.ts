@@ -11,7 +11,8 @@ internalApi.use(express.json());
 
 function validateSecret(req: express.Request, res: express.Response, next: express.NextFunction) {
   const secret = req.headers['x-internal-secret'] as string | undefined;
-  if (secret !== process.env.PLATFORM_API_SECRET) {
+  const expected = process.env.PLATFORM_API_SECRET;
+  if (!secret || !expected || secret !== expected) {
     res.status(401).json({ error: 'unauthorized' });
     return;
   }

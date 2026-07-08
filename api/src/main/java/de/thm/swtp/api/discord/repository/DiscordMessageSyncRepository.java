@@ -16,4 +16,6 @@ public interface DiscordMessageSyncRepository extends JpaRepository<DiscordMessa
     Optional<DiscordMessageSyncEntity> findByDiscordMessageId(String discordMessageId);
 
     long countBySyncedAtAfter(LocalDateTime since);
+
+    long countByDiscordChannelIdAndSyncedAtAfter(String discordChannelId, LocalDateTime since);
 }

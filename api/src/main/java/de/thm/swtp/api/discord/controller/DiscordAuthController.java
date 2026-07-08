@@ -47,11 +47,24 @@ public class DiscordAuthController {
                 log.warn("Discord bot authorization denied: {}", error);
                 return closePopupResponse();
             }
-            if (code == null || nonce == null) {
-                log.warn("Bot callback missing code or nonce");
+            if (nonce == null) {
+                log.warn("Bot callback missing nonce");
                 return closePopupResponse();
             }
-            return handleBotTokenExchange(nonce, code);
+            if (code != null) {
+                return handleBotTokenExchange(nonce, code);
+            }
+            if (guildId != null) {
+                try {
+                    discordAuthService.handleBotGuildOnly(nonce, guildId);
+                    log.info("Bot guild stored via guild-only callback: guildId={}", guildId);
+                } catch (Exception e) {
+                    log.warn("Bot guild-only callback failed: {}", e.getMessage());
+                }
+                return closePopupResponse();
+            }
+            log.warn("Bot callback missing code and guildId");
+            return closePopupResponse();
         }
 
         if (state != null && state.startsWith("user:")) {
@@ -71,8 +84,15 @@ public class DiscordAuthController {
 
         if (guildId != null && state != null) {
             try {
-                discordAuthService.storeBotGuild(UUID.fromString(state), guildId);
+                UUID projectId = UUID.fromString(state);
+                if (!discordAuthService.isPendingBotAuth(projectId)) {
+                    log.warn("Legacy bot callback with no pending auth: state={}", state);
+                    return closePopupResponse();
+                }
+                discordAuthService.storeBotGuild(projectId, guildId);
                 log.info("Bot guild stored via legacy redirect: guildId={}", guildId);
+            } catch (IllegalArgumentException e) {
+                log.warn("Legacy bot callback with invalid state UUID: {}", state);
             } catch (Exception e) {
                 log.warn("Legacy bot callback failed: {}", e.getMessage());
             }

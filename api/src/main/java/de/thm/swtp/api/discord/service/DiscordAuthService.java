@@ -143,6 +143,19 @@ public class DiscordAuthService {
         return redirectUri;
     }
 
+    public boolean isPendingBotAuth(UUID projectId) {
+        return pendingBotNonces.values().stream()
+                .anyMatch(n -> n.projectId().equals(projectId));
+    }
+
+    public void handleBotGuildOnly(String nonce, String guildId) {
+        BotNonce botNonce = consumeBotNonce(nonce);
+        if (botNonce == null) {
+            throw new IllegalArgumentException("Invalid or expired bot nonce");
+        }
+        storeBotGuild(botNonce.projectId(), guildId);
+    }
+
     public void storeBotGuild(UUID projectId, String guildId) {
         pendingBotGuilds.put(projectId, new PendingBotGuild(guildId));
         log.info("Bot guild stored for project {}: guildId={}", projectId, guildId);
