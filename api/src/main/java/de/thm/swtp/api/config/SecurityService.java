@@ -213,6 +213,15 @@ public class SecurityService {
                 .orElse(false);
     }
 
+    /** Allowed to edit a post on a project. */
+    public boolean canEditProjectPost(UUID projectId, UUID postId, Authentication authentication) {
+        if (!hasAuthenticationContext(projectId, authentication) || postId == null || !isRegularUser(authentication)) {
+            return false;
+        }
+
+        return isProjectOwner(projectId, authentication) || isProjectPostAuthor(projectId, postId, authentication);
+    }
+
     /** Allowed to delete a post on a  project.*/
     public boolean canDeleteProjectPost(UUID projectId, UUID postId, Authentication authentication) {
         if (!hasAuthenticationContext(projectId, authentication) || postId == null || !isRegularUser(authentication)) {

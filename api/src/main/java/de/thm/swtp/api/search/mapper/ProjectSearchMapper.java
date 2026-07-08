@@ -26,6 +26,8 @@ public class ProjectSearchMapper {
                 .description(project.getDescription())
                 .projectUrl(project.getProjectUrl())
                 .tags(project.getTags().stream().map(TagEntity::getName).toList())
+                .openPositionsCount(project.getOpenPositionsCount())
+                .allowJoinRequests(project.isAllowJoinRequests())
                 .build();
     }
 }
