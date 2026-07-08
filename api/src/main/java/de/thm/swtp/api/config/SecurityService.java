@@ -262,9 +262,18 @@ public class SecurityService {
 
     /** Allowed to delete a post on a  project.*/
     public boolean canDeleteProjectPost(UUID projectId, UUID postId, Authentication authentication) {
-        if (!hasAuthenticationContext(projectId, authentication) || postId == null || !isRegularUser(authentication)) {
+        if (!hasAuthenticationContext(projectId, authentication) || postId == null) {
             return false;
         }
+
+        if (hasModeratorRole(authentication)) {
+            return true;
+        }
+
+        if (!isRegularUser(authentication)) {
+            return false;
+        }
+
         return isProjectOwner(projectId, authentication) || isProjectPostAuthor(projectId, postId, authentication);
     }
 
@@ -390,6 +399,34 @@ public class SecurityService {
 
         return userProfileRepository.existsByKeycloakIdAndStatus(userId, UserStatus.BANNED);
     }
+
+    // Reporting permissions
+
+    /** Allowed to create reports.*/
+    public boolean canCreateReport(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return false;
+        }
+        return isRegularUser(authentication);
+    }
+
+    /** Allowed to see submitted reports.*/
+    public boolean canViewReports(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return false;
+        }
+        return hasModeratorRole(authentication);
+    }
+
+    /** Allowed to update report status.*/
+    public boolean canManageReports(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return false;
+        }
+        return hasModeratorRole(authentication);
+    }
+
+
 
     // GitHub integration permissions
 

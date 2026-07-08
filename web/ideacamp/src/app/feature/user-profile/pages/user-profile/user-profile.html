@@ -23,12 +23,15 @@
         <app-profile-banner
           [profile]="state.profile"
           [isOwnProfile]="isOwner"
+          [canReport]="canReportProfile(state.profile)"
+          [canFollow]="!isModerator"
           [isEditing]="editingSection === 'banner'"
           [isSaving]="isSaving"
           [editForm]="editForm"
           (edit)="isOwner && startEditing(state.profile, 'banner')"
           (save)="saveProfile(state.profile)"
-          (cancelEdit)="cancelEditing()">
+          (cancelEdit)="cancelEditing()"
+          (report)="openReportDialog(state.profile)">
         </app-profile-banner>
 
         <div class="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_320px]">
@@ -143,5 +146,25 @@
       [buttonText]="'COMMON.CONTINUE' | translate"
       (closeModal)="closeSuccessModal()">
     </app-success-modal>
+  }
+
+  @if (showReportSuccess()) {
+    <app-success-modal
+      [message]="'REPORT_DIALOG.SUCCESS' | translate"
+      [buttonText]="'COMMON.CONTINUE' | translate"
+      (closeModal)="closeReportSuccess()">
+    </app-success-modal>
+  }
+
+  @if (reportDialog(); as dialog) {
+    <app-report-dialog
+      [target]="dialog.target"
+      [targetId]="dialog.targetId"
+      [targetTitle]="dialog.targetTitle"
+      [isSubmitting]="isReportSubmitting()"
+      [errorMessage]="reportErrorMessage()"
+      (closeDialog)="closeReportDialog()"
+      (submitReport)="submitReport($event)"
+    />
   }
 </div>
