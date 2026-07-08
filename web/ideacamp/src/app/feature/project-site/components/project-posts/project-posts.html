@@ -330,6 +330,14 @@
                   } @else {
                     <i class="pi pi-undo"></i>
                   }
+              @if (canReportPosts) {
+                <button
+                  type="button"
+                  class="rounded-md p-1 text-slate-400 transition hover:bg-red-50 hover:text-red-600"
+                  [attr.aria-label]="'REPORT_DIALOG.REPORT' | translate"
+                  [title]="'REPORT_DIALOG.REPORT' | translate"
+                  (click)="reportPost.emit({ id: post.id, title: post.title })">
+                  <i class="pi pi-flag"></i>
                 </button>
               }
 

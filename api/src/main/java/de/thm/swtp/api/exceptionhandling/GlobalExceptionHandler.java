@@ -436,6 +436,71 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(422, "Unprocessable Entity", ex.getMessage()));
     }
 
+    @ExceptionHandler(InvalidProfessorEmailDomainException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidProfessorEmailDomain(InvalidProfessorEmailDomainException ex) {
+        log.debug("Bad Request (400): {}", LogSafe.clean(ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ReportTargetNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleReportTargetNotFound(ReportTargetNotFoundException ex) {
+        log.debug("Not Found (404): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidReportSortFieldException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidReportSortField(InvalidReportSortFieldException ex) {
+        log.debug("Bad Request (400): {}", LogSafe.clean(ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidReportStatusException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidReportStatus(InvalidReportStatusException ex) {
+        log.debug("Bad Request (400): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ReportNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleReportNotFound(ReportNotFoundException ex) {
+        log.debug("Not Found (404): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidReportTargetException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidReportTarget(InvalidReportTargetException ex) {
+        log.debug("Bad Request (400): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidUserManagementSortFieldException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidUserManagementSortField(InvalidUserManagementSortFieldException ex) {
+        log.debug("Bad Request (400): {}", LogSafe.clean(ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
+    }
+
+
+    @ExceptionHandler(InvalidProjectManagementSortFieldException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidProjectManagementSortField(InvalidProjectManagementSortFieldException ex) {
+        log.debug("Bad Request (400): {}", LogSafe.clean(ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ReportAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleReportAlreadyExists(ReportAlreadyExistsException ex) {
+        log.debug("Conflict (409): {}", LogSafe.clean(ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
+    }
+
+
     // ── Framework exceptions: explicit handlers so the catch-all doesn't shadow them ─
 
     @ExceptionHandler(AccessDeniedException.class)
@@ -581,26 +646,6 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(502, "Bad Gateway", "Places service temporarily unavailable."));
     }
 
-    @ExceptionHandler(InvalidUserManagementSortFieldException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidUserManagementSortField(InvalidUserManagementSortFieldException ex) {
-        log.debug("Bad Request (400): {}", LogSafe.clean(ex.getMessage()));
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
-    }
-
-    @ExceptionHandler(InvalidProfessorEmailDomainException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidProfessorEmailDomain(InvalidProfessorEmailDomainException ex) {
-        log.debug("Bad Request (400): {}", LogSafe.clean(ex.getMessage()));
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
-    }
-
-    @ExceptionHandler(InvalidProjectManagementSortFieldException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidProjectManagementSortField(InvalidProjectManagementSortFieldException ex) {
-        log.debug("Bad Request (400): {}", LogSafe.clean(ex.getMessage()));
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
-    }
 
 @ExceptionHandler(DiscordAccountAlreadyLinkedException.class)
     public ResponseEntity<ErrorResponse> handleDiscordAccountAlreadyLinked(DiscordAccountAlreadyLinkedException ex) {

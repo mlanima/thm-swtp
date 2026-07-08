@@ -1,0 +1,59 @@
+<button
+  #menuButton
+  type="button"
+  (click)="toggleMenu()"
+  class="rounded-lg bg-slate-100 px-2.5 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-200"
+  [title]="'MODERATOR.REPORTS.ACTIONS.OPEN_MENU' | translate"
+>
+  ...
+</button>
+
+@if (isOpen()) {
+  <div
+    class="fixed inset-0 z-40 cursor-default bg-transparent"
+    aria-hidden="true"
+    (click)="closeMenu()"
+  ></div>
+
+  <div
+    class="fixed z-50 w-48 rounded-xl border border-slate-200 bg-white p-1 shadow-lg"
+    [style.top.px]="menuTop()"
+    [style.left.px]="menuLeft()"
+  >
+    <button
+      type="button"
+      (click)="emitView()"
+      class="block w-full rounded-lg px-3 py-2 text-left text-xs font-semibold text-slate-700 hover:bg-slate-50"
+    >
+      {{ 'MODERATOR.REPORTS.ACTIONS.VIEW' | translate }}
+    </button>
+
+    @if (canSetInReview()) {
+      <button
+        type="button"
+        (click)="emitStatus('IN_REVIEW')"
+        class="block w-full rounded-lg px-3 py-2 text-left text-xs font-semibold text-amber-700 hover:bg-amber-50"
+      >
+        {{ 'MODERATOR.REPORTS.ACTIONS.SET_IN_REVIEW' | translate }}
+      </button>
+    }
+
+    @if (canCloseReport()) {
+      <button
+        type="button"
+        (click)="emitStatus('RESOLVED')"
+        class="block w-full rounded-lg px-3 py-2 text-left text-xs font-semibold text-green-700 hover:bg-green-50"
+      >
+        {{ 'MODERATOR.REPORTS.ACTIONS.RESOLVE' | translate }}
+      </button>
+
+      <button
+        type="button"
+        (click)="emitStatus('DISMISSED')"
+        class="block w-full rounded-lg px-3 py-2 text-left text-xs font-semibold text-slate-600 hover:bg-slate-50"
+      >
+        {{ 'MODERATOR.REPORTS.ACTIONS.DISMISS' | translate }}
+      </button>
+    }
+  </div>
+}
