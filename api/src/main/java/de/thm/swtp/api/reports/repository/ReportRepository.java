@@ -49,7 +49,7 @@ public interface ReportRepository extends JpaRepository<ReportEntity, UUID> {
     List<ReportEntity> findAllByTargetAndTargetIdAndStatusIn(ReportTarget target, UUID targetId, Collection<ReportStatus> statuses);
 
     /** Checks whether the reporter already has an active report for the same target and reason.*/
-    boolean existsByReporter_KeycloakIdAndTargetAndTargetIdAndReasonAndStatusIn(
+    boolean existsByReporterKeycloakIdAndTargetAndTargetIdAndReasonAndStatusIn(
             UUID reporterId,
             ReportTarget target,
             UUID targetId,
