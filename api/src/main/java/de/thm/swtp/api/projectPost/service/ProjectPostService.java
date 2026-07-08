@@ -51,7 +51,27 @@ public class ProjectPostService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<ProjectPost> getDraftPostsForProject(UUID projectId) {
+        getProjectOrThrowError(projectId);
 
+        return projectPostRepository
+                .findAllByProjectIdAndStatusOrderByCreatedAtDesc(projectId, ProjectPostStatus.DRAFT)
+                .stream()
+                .map(ProjectPostMapper::toDomain)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProjectPost> getArchivedPostsForProject(UUID projectId) {
+        getProjectOrThrowError(projectId);
+
+        return projectPostRepository
+                .findAllByProjectIdAndStatusOrderByArchivedAtDesc(projectId, ProjectPostStatus.ARCHIVED)
+                .stream()
+                .map(ProjectPostMapper::toDomain)
+                .toList();
+    }
 
     @Transactional
     public ProjectPost createProjectPost(UUID projectId, UUID authorId, String title, String content, PostContentFormat contentFormat, ProjectPostStatus status) {
@@ -178,10 +198,6 @@ public class ProjectPostService {
         TxLogger.afterCommit(log, "Post deleted: project={}, post={}", projectId, postId);
     }
 
-
-
-
-
     private ProjectEntity getProjectOrThrowError(UUID projectId) {
         return projectRepository.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException(projectId));
@@ -210,6 +226,45 @@ public class ProjectPostService {
         if (contentFormat == null) {
             throw new InvalidProjectPostException("Post content format must not be null.");
         }
+    }
+
+    @Transactional
+    public ProjectPost updateProjectPost(
+            UUID projectId,
+            UUID postId,
+            String title,
+            String content,
+            PostContentFormat contentFormat,
+            ProjectPostStatus status
+    ) {
+        validateUpdatePost(status, contentFormat);
+
+        ProjectPostEntity postEntity = getPostOrThrowError(postId);
+        assertPostBelongsToProject(postEntity, projectId);
+
+        postEntity.setTitle(title);
+        postEntity.setContent(content);
+        postEntity.setContentFormat(contentFormat);
+
+        if (status == ProjectPostStatus.PUBLISHED && postEntity.getPublishedAt() == null) {
+            postEntity.setPublishedAt(LocalDateTime.now());
+        }
+
+        if (status == ProjectPostStatus.PUBLISHED) {
+            postEntity.setArchivedAt(null);
+        }
+
+        postEntity.setStatus(status);
+
+        ProjectPost post = ProjectPostMapper.toDomain(projectPostRepository.save(postEntity));
+        TxLogger.afterCommit(log, "Post updated: project={}, post={}", projectId, postId);
+        return post;
+    }
+
+    private void validateUpdatePost(ProjectPostStatus status, PostContentFormat contentFormat) {
+        if (status == null) { throw new InvalidProjectPostException("Post status must not be null."); }
+        if (status == ProjectPostStatus.ARCHIVED) { throw new InvalidProjectPostException("Post cannot be updated as archived."); }
+        if (contentFormat == null) { throw new InvalidProjectPostException("Post content format must not be null."); }
     }
 
     private void assertPostBelongsToProject(ProjectPostEntity postEntity, UUID projectId){
