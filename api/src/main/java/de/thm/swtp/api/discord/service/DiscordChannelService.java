@@ -50,14 +50,6 @@ public class DiscordChannelService {
                     "You must link your Discord account in profile settings before connecting a Discord server");
         }
 
-        linkedChannelRepository.findByDiscordChannelIdAndIsActiveTrue(discordChannelId)
-                .ifPresent(link -> {
-                    if (!link.getProject().getId().equals(projectId)) {
-                        throw new DiscordConnectionFailedException(
-                                "This Discord channel is already linked to another project");
-                    }
-                });
-
         linkedChannelRepository.findByProjectId(projectId)
                 .filter(LinkedChannelEntity::isActive)
                 .ifPresent(link -> {
@@ -65,6 +57,26 @@ public class DiscordChannelService {
                     linkedChannelRepository.save(link);
                     log.info("Discord channel deactivated for reconnect: project={}, oldChannelId={}",
                             projectId, link.getDiscordChannelId());
+                });
+
+        if (discordGuildId != null) {
+            linkedChannelRepository.findAllByDiscordGuildIdAndIsActiveTrue(discordGuildId)
+                    .stream()
+                    .filter(link -> !link.getProject().getId().equals(projectId))
+                    .forEach(link -> {
+                        link.setActive(false);
+                        linkedChannelRepository.save(link);
+                        log.info("Guild re-bound: deactivated old link for project={}, new project={}",
+                                link.getProject().getId(), projectId);
+                    });
+        }
+
+        linkedChannelRepository.findByDiscordChannelIdAndIsActiveTrue(discordChannelId)
+                .ifPresent(link -> {
+                    if (!link.getProject().getId().equals(projectId)) {
+                        throw new DiscordConnectionFailedException(
+                                "This Discord channel is already linked to another project");
+                    }
                 });
 
         BotInternalClient.TestConnectionResponse test = botInternalClient.testConnection(discordChannelId, discordGuildId);
