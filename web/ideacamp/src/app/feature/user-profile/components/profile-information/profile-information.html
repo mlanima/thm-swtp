@@ -5,9 +5,7 @@
     </h2>
   </div>
 
-  <p class="whitespace-pre-line break-words text-sm leading-6 text-slate-600">
-    {{ text }}
-  </p>
+  <div class="break-words text-sm leading-6 text-slate-600" [innerHTML]="text | markdown"></div>
 
   @if (isOwnProfile) {
     <div class="absolute bottom-4 right-4">

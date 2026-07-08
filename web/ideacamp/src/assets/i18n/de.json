@@ -115,7 +115,8 @@
     "FOLLOWING": "Folge ich",
     "UNFOLLOW": "Entfolgen",
     "INVITE": "Einladen",
-    "PROFESSOR_BADGE": "Professor"
+    "PROFESSOR_BADGE": "Professor",
+    "MARKDOWN_HINT": "Du kannst Markdown verwenden, z.B. Überschriften, Listen, Links und Hervorhebungen."
   },
   "CONTACT-REQUESTS": {
     "CONTACT": "Kontaktanfragen",
@@ -279,6 +280,7 @@
     "DESCRIPTION": "Beschreibung",
     "DESCRIPTION_PLACEHOLDER": "Beschreibe dein Projekt ausführlich",
     "NO_DESCRIPTION": "Keine Projektbeschreibung",
+    "MARKDOWN_HINT": "Du kannst Markdown verwenden, z.B. Überschriften, Listen, Links und Hervorhebungen.",
     "PROJECT_URL": "Projekt-URL",
     "PROJECT_URL_LABEL": "Projekt-URL (Dein Projekt wird unter /project/dein-input verfügbar sein)",
     "PROJECT_URL_PLACEHOLDER": "z.B. mein-projekt",
