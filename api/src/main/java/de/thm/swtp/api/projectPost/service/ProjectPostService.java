@@ -258,11 +258,17 @@ public class ProjectPostService {
     ) {
         validateUpdatePost(status, contentFormat);
 
+        ProjectPostEntity postEntity = getPostOrThrowError(postId);
+        assertPostBelongsToProject(postEntity, projectId);
+
+        if (postEntity.getStatus() == ProjectPostStatus.ARCHIVED) {
+            throw new InvalidProjectPostException("Archived posts cannot be updated.");
+        }
+
         contentModerationService.assertAppropriate(title, "postTitle");
         contentModerationService.assertAppropriate(content, "postContent");
 
-        ProjectPostEntity postEntity = getPostOrThrowError(postId);
-        assertPostBelongsToProject(postEntity, projectId);
+        ProjectPostStatus previousStatus = postEntity.getStatus();
 
         postEntity.setTitle(title);
         postEntity.setContent(content);
@@ -275,8 +281,6 @@ public class ProjectPostService {
         if (status == ProjectPostStatus.PUBLISHED) {
             postEntity.setArchivedAt(null);
         }
-
-        ProjectPostStatus previousStatus = postEntity.getStatus();
 
         postEntity.setStatus(status);
 

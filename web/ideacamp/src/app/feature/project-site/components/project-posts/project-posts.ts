@@ -406,7 +406,7 @@ export class ProjectPosts implements OnChanges, OnDestroy {
         this.publishingPostId.set(null);
       },
       error: () => {
-        this.toastService.error(this.translateService.instant('PROJECTPOSTS.ERRORS.ARCHIVE'));
+        this.toastService.error(this.translateService.instant('PROJECTPOSTS.ERRORS.PUBLISH'));
         this.publishingPostId.set(null);
       },
     });
