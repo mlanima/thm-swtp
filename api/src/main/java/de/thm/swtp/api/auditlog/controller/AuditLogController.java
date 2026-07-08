@@ -19,7 +19,7 @@ public class AuditLogController {
     private final AuditLogService auditLogService;
 
     @GetMapping
-    @PreAuthorize("@security.hasModeratorRole(authentication)")
+    @PreAuthorize("@security.canViewAuditLogs(authentication)")
     public PageResponse<AuditLogResponse> getAuditLogs(
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {

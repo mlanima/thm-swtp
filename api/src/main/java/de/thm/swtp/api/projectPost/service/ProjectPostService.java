@@ -130,10 +130,6 @@ public class ProjectPostService {
         TxLogger.afterCommit(log, "Post deleted: project={}, post={}, actor={}", projectId, postId, actor.userId());
     }
 
-
-
-
-
     private ProjectEntity getProjectOrThrowError(UUID projectId) {
         return projectRepository.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException(projectId));

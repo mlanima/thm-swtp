@@ -368,6 +368,11 @@ public class SecurityService {
         return hasAuthority(authentication, "ROLE_MODERATOR");
     }
 
+    /** Allowed to view audit logs. */
+    public boolean canViewAuditLogs(Authentication authentication) {
+        return hasModeratorRole(authentication);
+    }
+
     private boolean hasUserRole(Authentication authentication) {
         return hasAuthority(authentication, "ROLE_USER");
     }
