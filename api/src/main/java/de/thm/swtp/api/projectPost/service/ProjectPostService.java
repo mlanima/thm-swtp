@@ -192,7 +192,10 @@ public class ProjectPostService {
 
         ProjectPostEntity saved = projectPostRepository.save(postEntity);
         discordPostSyncService.getDiscordMessageId(postId).ifPresent(
-                discordMsgId -> discordEventPublisher.publishPostUpdated(saved, discordMsgId));
+                discordMsgId -> {
+                    discordEventPublisher.publishPostDeleted(postId, discordMsgId);
+                    discordPostSyncService.removeSync(postId);
+                });
         ProjectPost post = ProjectPostMapper.toDomain(saved);
         TxLogger.afterCommit(log, "Post archived: project={}, post={}", projectId, postId);
         return post;
