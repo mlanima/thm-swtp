@@ -51,7 +51,6 @@ server:
 logging:
   level:
     de.thm.swtp: ${BE_LOG_LEVEL:INFO}
-    org.springframework.security: DEBUG
 
 app:
   uploads:
