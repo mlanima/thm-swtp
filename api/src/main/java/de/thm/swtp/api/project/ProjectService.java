@@ -2,6 +2,9 @@ package de.thm.swtp.api.project;
 
 
 import de.thm.swtp.api.common.TxLogger;
+import de.thm.swtp.api.discord.entity.LinkedChannelEntity;
+import de.thm.swtp.api.discord.repository.LinkedChannelRepository;
+import de.thm.swtp.api.discord.service.DiscordNotificationService;
 import de.thm.swtp.api.exceptionhandling.exceptions.InvalidProjectManagementSortFieldException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectMemberNotFoundException;
 import de.thm.swtp.api.moderation.ContentModerationService;
@@ -28,6 +31,8 @@ import java.time.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,6 +50,8 @@ public class ProjectService {
     private static final String PROJECT_CREATION_INVITE_MESSAGE = "You have been invited to join this project.";
     private final ProjectFavoriteRepository projectFavoriteRepository;
     private final ProjectViewRepository projectViewRepository;
+private final LinkedChannelRepository linkedChannelRepository;
+    private final DiscordNotificationService discordNotificationService;
     private final ProjectGithubRepoRepository projectGithubRepoRepository;
     private static final Set<String> MANAGED_PROJECT_SORT_FIELDS = Set.of("name", "owner.username", "createdAt", "updatedAt", "isPrivateProject");
 
@@ -59,6 +66,17 @@ public class ProjectService {
             contributors++;
         }
 
+        LinkedChannelEntity channel = linkedChannelRepository.findByProjectId(project.getId()).orElse(null);
+
+        boolean isContributor = false;
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+            UUID currentUserId = UUID.fromString(auth.getName());
+            boolean isOwner = project.getOwner() != null && project.getOwner().getKeycloakId().equals(currentUserId);
+            boolean isMember = memberIds.contains(currentUserId);
+            isContributor = isOwner || isMember;
+        }
+
         return ProjectResponse.builder()
                 .id(project.getId())
                 .name(project.getName())
@@ -69,6 +87,11 @@ public class ProjectService {
                 .allowJoinRequests(project.isAllowJoinRequests())
                 .ownerId(project.getOwner().getKeycloakId())
                 .ownerUsername(project.getOwner().getUsername())
+                .ownerDiscordId(project.getOwner().getDiscordId())
+                .ownerDiscordUsername(project.getOwner().getDiscordUsername())
+                .discordChannelId(channel != null && channel.isActive() ? channel.getDiscordChannelId() : null)
+                .discordGuildId(channel != null ? channel.getDiscordGuildId() : null)
+                .discordInviteUrl(channel != null && channel.isActive() && isContributor ? channel.getDiscordInviteUrl() : null)
                 .memberIds(project.getMembers().stream()
                         .map(UserProfile::getKeycloakId)
                         .collect(java.util.stream.Collectors.toSet()))
@@ -369,6 +392,7 @@ public class ProjectService {
 
         projectEntity.getMembers().remove(member);
         projectRepository.save(projectEntity);
+        discordNotificationService.notifyMemberLeft(projectId, projectEntity.getName(), member.getUsername());
         TxLogger.afterCommit(log, "Project member removed: project={}, member={}", projectId, memberId);
     }
 

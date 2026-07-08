@@ -34,6 +34,7 @@ public class ProjectInviteService {
     private final ProjectRepository projectRepository;
     private final UserProfileRepository userProfileRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final ProjectInviteMapper projectInviteMapper;
 
     /** Creates a new project invitation. Only the project owner is allowed to send an invitation.*/
     @Transactional
@@ -53,7 +54,7 @@ public class ProjectInviteService {
         ProjectInviteEntity saved = projectInviteRepository.save(projectInviteEntity);
         TxLogger.afterCommit(log, "Invite created: invite={}, project={}, from={}, to={}",
                 saved.getId(), projectId, projectEntity.getOwner().getKeycloakId(), invitedUserId);
-        ProjectInvite invite = ProjectInviteMapper.toDomain(saved);
+        ProjectInvite invite = projectInviteMapper.toDomain(saved);
 
         if (invitedUserEntity.getEmail() != null) {
             eventPublisher.publishEvent(new ProjectInviteCreatedEvent(invite, invitedUserEntity.getEmail()));
@@ -70,7 +71,7 @@ public class ProjectInviteService {
     public List<ProjectInvite> getInvitesForUser(UUID userId){
         return projectInviteRepository.findByInvitedUserKeycloakId(userId)
                 .stream()
-                .map(ProjectInviteMapper::toDomain)
+                .map(projectInviteMapper::toDomain)
                 .toList();
     }
 
@@ -82,7 +83,7 @@ public class ProjectInviteService {
 
         return projectInviteRepository.findByProjectId(projectId)
                 .stream()
-                .map(ProjectInviteMapper::toDomain)
+                .map(projectInviteMapper::toDomain)
                 .toList();
 
     }
@@ -92,7 +93,7 @@ public class ProjectInviteService {
     public ProjectInvite updateInviteStatus(UUID inviteId, ProjectInviteStatus newStatus) {
         ProjectInviteEntity inviteEntity = projectInviteRepository.findById(inviteId)
                 .orElseThrow(() -> new ProjectInviteNotFoundException(inviteId));
-        ProjectInvite invite = ProjectInviteMapper.toDomain(inviteEntity);
+        ProjectInvite invite = projectInviteMapper.toDomain(inviteEntity);
 
         checkInviteStatus(invite, newStatus);
         TxLogger.afterCommit(log, "Invite status: invite={}, {}->{}", inviteId, invite.getStatus(), newStatus);
@@ -104,7 +105,7 @@ public class ProjectInviteService {
         }
 
         ProjectInviteEntity saved = projectInviteRepository.save(inviteEntity);
-        return ProjectInviteMapper.toDomain(saved);
+        return projectInviteMapper.toDomain(saved);
     }
 
 

@@ -55,10 +55,23 @@ export class ProfileBanner implements OnChanges {
   @Output() cancelEdit = new EventEmitter<void>();
 
   readonly followerCount = signal(0);
+  readonly discordState = signal<'initial' | 'revealed' | 'copied'>('initial');
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['profile']) {
       this.followerCount.set(this.profile.followers);
+    }
+  }
+
+  toggleDiscord(): void {
+    const state = this.discordState();
+    if (state === 'initial') {
+      this.discordState.set('revealed');
+    } else if (state === 'revealed') {
+      navigator.clipboard.writeText(this.profile.discordUsername!).then(() => {
+        this.discordState.set('copied');
+        setTimeout(() => this.discordState.set('initial'), 2000);
+      });
     }
   }
 

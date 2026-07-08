@@ -1,0 +1,24 @@
+package de.thm.swtp.api.discord.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.web.client.RestTemplate;
+
+@Configuration
+public class DiscordStreamConfig {
+
+    @Bean
+    public ThreadPoolTaskScheduler discordSyncTaskScheduler() {
+        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+        scheduler.setPoolSize(4);
+        scheduler.setThreadNamePrefix("discord-sync-");
+        scheduler.setDaemon(true);
+        return scheduler;
+    }
+
+    @Bean
+    public RestTemplate discordRestTemplate() {
+        return new RestTemplate();
+    }
+}

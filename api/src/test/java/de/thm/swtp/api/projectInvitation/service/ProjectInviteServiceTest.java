@@ -5,6 +5,7 @@ import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
 import de.thm.swtp.api.projectInvitation.domain.ProjectInviteStatus;
 import de.thm.swtp.api.projectInvitation.entity.ProjectInviteEntity;
+import de.thm.swtp.api.projectInvitation.mapper.ProjectInviteMapper;
 import de.thm.swtp.api.projectInvitation.repository.ProjectInviteRepository;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
@@ -17,6 +18,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.UUID;
 
+import de.thm.swtp.api.projectInvitation.domain.ProjectInvite;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -27,6 +29,7 @@ class ProjectInviteServiceTest {
     private ProjectRepository projectRepository;
     private UserProfileRepository userProfileRepository;
     private ApplicationEventPublisher eventPublisher;
+    private ProjectInviteMapper projectInviteMapper;
     private ProjectInviteService service;
 
     private UUID projectId;
@@ -44,9 +47,22 @@ class ProjectInviteServiceTest {
         projectRepository = mock(ProjectRepository.class);
         userProfileRepository = mock(UserProfileRepository.class);
         eventPublisher = mock(ApplicationEventPublisher.class);
+        projectInviteMapper = mock(ProjectInviteMapper.class);
+        when(projectInviteMapper.toDomain(any(ProjectInviteEntity.class))).thenAnswer(inv -> {
+            ProjectInviteEntity entity = inv.getArgument(0);
+            return ProjectInvite.builder()
+                    .id(entity.getId())
+                    .projectId(entity.getProject().getId())
+                    .projectName(entity.getProject().getName())
+                    .projectUrl(entity.getProject().getProjectUrl())
+                    .invitedUserId(entity.getInvitedUser().getKeycloakId())
+                    .status(entity.getStatus())
+                    .createdAt(entity.getCreatedAt())
+                    .build();
+        });
 
         service = new ProjectInviteService(
-                projectInviteRepository, projectRepository, userProfileRepository, eventPublisher);
+                projectInviteRepository, projectRepository, userProfileRepository, eventPublisher, projectInviteMapper);
 
         projectId = UUID.randomUUID();
         ownerId = UUID.randomUUID();

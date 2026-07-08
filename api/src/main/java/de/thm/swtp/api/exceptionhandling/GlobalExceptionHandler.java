@@ -1,6 +1,8 @@
 package de.thm.swtp.api.exceptionhandling;
 
 import de.thm.swtp.api.common.LogSafe;
+import de.thm.swtp.api.discord.exception.DiscordAccountAlreadyLinkedException;
+import de.thm.swtp.api.discord.exception.DiscordConnectionFailedException;
 import de.thm.swtp.api.exceptionhandling.exceptions.*;
 import de.thm.swtp.api.github.exception.GithubApiException;
 import de.thm.swtp.api.github.exception.GithubConnectionRequiredException;
@@ -600,6 +602,20 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
     }
 
+@ExceptionHandler(DiscordAccountAlreadyLinkedException.class)
+    public ResponseEntity<ErrorResponse> handleDiscordAccountAlreadyLinked(DiscordAccountAlreadyLinkedException ex) {
+        log.warn("Conflict (409): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
+    }
+
+    @ExceptionHandler(DiscordConnectionFailedException.class)
+    public ResponseEntity<ErrorResponse> handleDiscordConnectionFailed(DiscordConnectionFailedException ex) {
+        log.warn("Bad Request (400): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
+    }
+
     @ExceptionHandler(GithubIntegrationDisabledException.class)
     public ResponseEntity<ErrorResponse> handleGithubIntegrationDisabled(GithubIntegrationDisabledException ex) {
         log.warn("Service Unavailable (503): {}", ex.getMessage());
@@ -641,7 +657,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
     }
-
 
     @ExceptionHandler(GithubRepoNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleGithubRepoNotFound(GithubRepoNotFoundException ex) {

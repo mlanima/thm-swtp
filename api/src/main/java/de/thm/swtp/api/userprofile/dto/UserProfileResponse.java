@@ -14,5 +14,8 @@ public record UserProfileResponse(
         int followers,
         String about,
         String experience,
-        boolean isProfessor
+        boolean isProfessor,
+        String discordId,
+        String discordUsername,
+        String discordAvatar
 ) {}

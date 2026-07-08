@@ -1,0 +1,39 @@
+<div class="rounded-xl border border-slate-200 bg-white p-6">
+  <h3 class="mb-4 text-lg font-semibold text-slate-700">{{ 'USER_SETTINGS.DISCORD.TITLE' | translate }}</h3>
+
+  @if (isLoading()) {
+    <p class="text-sm text-slate-400">{{ 'COMMON.LOADING' | translate }}</p>
+  }
+
+  @if (errorMessage(); as msg) {
+    <p class="mb-3 text-sm text-red-500">{{ msg | translate }}</p>
+  }
+
+  @if (!isLoading()) {
+    @if (discordUsername()) {
+      <div class="mb-4 flex items-center gap-3">
+        <i class="pi pi-comments text-2xl text-indigo-500"></i>
+        <div>
+          <p class="font-medium text-slate-700">{{ discordUsername() }}</p>
+          <p class="text-xs text-slate-400">ID: {{ discordId() }}</p>
+        </div>
+      </div>
+      <button
+        (click)="disconnect()"
+        [disabled]="isDisconnecting()"
+        class="cursor-pointer rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-600 disabled:opacity-50"
+      >
+        {{ 'USER_SETTINGS.DISCORD.DISCONNECT' | translate }}
+      </button>
+    } @else {
+      <p class="mb-4 text-sm text-slate-500">{{ 'USER_SETTINGS.DISCORD.NOT_CONNECTED' | translate }}</p>
+      <button
+        (click)="connect()"
+        class="cursor-pointer rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700"
+      >
+        <i class="pi pi-comments mr-2"></i>
+        {{ 'USER_SETTINGS.DISCORD.CONNECT' | translate }}
+      </button>
+    }
+  }
+</div>

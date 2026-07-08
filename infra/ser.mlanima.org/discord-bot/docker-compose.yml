@@ -1,0 +1,22 @@
+services:
+  discord-bot-main:
+    image: ghcr.io/${GHCR_NAMESPACE:-mlanima}/swtp-bot:latest
+    ports:
+      - "3001:3001"
+    env_file: .env.main
+    networks:
+      - bot_internal
+    restart: unless-stopped
+
+  discord-bot-dev:
+    image: ghcr.io/${GHCR_NAMESPACE:-mlanima}/swtp-bot:dev
+    ports:
+      - "3002:3001"
+    env_file: .env.dev
+    networks:
+      - bot_internal
+    restart: unless-stopped
+
+networks:
+  bot_internal:
+    driver: bridge

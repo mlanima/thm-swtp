@@ -1,5 +1,8 @@
 package de.thm.swtp.api.projectPost;
 
+import de.thm.swtp.api.discord.service.DiscordPostSyncService;
+import de.thm.swtp.api.discord.stream.DiscordEventPublisher;
+import de.thm.swtp.api.projectFiles.service.ProjectFileService;
 import de.thm.swtp.api.exceptionhandling.exceptions.InvalidProjectPostException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectPostNotFoundException;
 import de.thm.swtp.api.moderation.ContentModerationService;
@@ -44,10 +47,16 @@ class ProjectPostServiceTest {
     private UserProfileRepository userProfileRepository;
 
     @Mock
+    private DiscordEventPublisher discordEventPublisher;
+
+    @Mock
+    private DiscordPostSyncService discordPostSyncService;
+
+    @Mock
     private ContentModerationService contentModerationService;
 
     @Mock
-    private de.thm.swtp.api.projectFiles.service.ProjectFileService projectFileService;
+    private ProjectFileService projectFileService;
 
     private ProjectPostService service;
 
@@ -59,7 +68,10 @@ class ProjectPostServiceTest {
     @BeforeEach
     void setUp() {
         service = new ProjectPostService(projectPostRepository, projectRepository,
-                userProfileRepository, contentModerationService, projectFileService);
+                userProfileRepository, discordEventPublisher, discordPostSyncService,
+                contentModerationService, projectFileService);
+
+        lenient().when(discordPostSyncService.getDiscordMessageId(any())).thenReturn(Optional.empty());
 
         projectId = UUID.randomUUID();
         authorId = UUID.randomUUID();

@@ -1,4 +1,6 @@
 spring:
+  config:
+    import: optional:file:.env
   application:
     name: api
 
@@ -118,3 +120,23 @@ stackoverflow:
   api:
     base-url: https://api.stackexchange.com/2.3
     key: ${STACKOVERFLOW_API_KEY:}
+
+discord:
+  streams:
+    outbound: stream:discord:sync
+    inbound: stream:platform:sync
+    consumer-group: spring-platform
+    batch-size: 10
+    block-ms: 1500
+    pending-timeout-ms: 30000
+  bot:
+    base-url: ${DISCORD_BOT_BASEURL:http://discord.ser.mlanima.org:3001}
+    api-secret: ${DISCORD_BOT_API_SECRET:}
+
+# --- local overrides (uncomment and fill in for local dev) ---
+# spring.data.redis.host: localhost
+# discord.bot.base-url: http://localhost:3001
+# discord.bot.api-secret: YOUR_SECRET
+# DISCORD_CLIENT_ID: YOUR_CLIENT_ID
+# DISCORD_CLIENT_SECRET: YOUR_CLIENT_SECRET
+# DISCORD_REDIRECT_URI: http://localhost:8080/api/v1/auth/discord/callback
