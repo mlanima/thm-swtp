@@ -187,13 +187,13 @@ public class DiscordAuthService {
                     "You must be the owner of the Discord server to bind it");
         }
 
-        linkedChannelRepository.findByDiscordGuildIdAndIsActiveTrue(guildId)
-                .ifPresent(link -> {
-                    if (!link.getProject().getId().equals(projectId)) {
-                        throw new DiscordConnectionFailedException(
-                                "This Discord server is already linked to another project");
-                    }
-                });
+        var linksWithGuild = linkedChannelRepository.findAllByDiscordGuildIdAndIsActiveTrue(guildId);
+        for (var link : linksWithGuild) {
+            if (!link.getProject().getId().equals(projectId)) {
+                throw new DiscordConnectionFailedException(
+                        "This Discord server is already linked to another project");
+            }
+        }
 
         storeBotGuild(projectId, guildId);
         log.info("Bot guild captured via token exchange: project={}, guildId={}, guildName={}",

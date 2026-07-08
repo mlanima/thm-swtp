@@ -3,6 +3,7 @@ package de.thm.swtp.api.discord.repository;
 import de.thm.swtp.api.discord.entity.LinkedChannelEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -14,5 +15,5 @@ public interface LinkedChannelRepository extends JpaRepository<LinkedChannelEnti
 
     Optional<LinkedChannelEntity> findByDiscordChannelIdAndIsActiveTrue(String discordChannelId);
 
-    Optional<LinkedChannelEntity> findByDiscordGuildIdAndIsActiveTrue(String discordGuildId);
+    List<LinkedChannelEntity> findAllByDiscordGuildIdAndIsActiveTrue(String discordGuildId);
 }
