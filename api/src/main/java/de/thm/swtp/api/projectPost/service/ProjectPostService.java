@@ -41,7 +41,7 @@ public class ProjectPostService {
     private final ProjectPostRepository projectPostRepository;
     private final ProjectRepository projectRepository;
     private final UserProfileRepository userProfileRepository;
-private final DiscordEventPublisher discordEventPublisher;
+    private final DiscordEventPublisher discordEventPublisher;
     private final DiscordPostSyncService discordPostSyncService;
     private final ContentModerationService contentModerationService;
     private final ProjectFileService projectFileService;
@@ -154,7 +154,7 @@ private final DiscordEventPublisher discordEventPublisher;
     }
 
     @Transactional
-    public ProjectPost publishProjectPost(UUID projectId, UUID postId){
+    public ProjectPost publishProjectPost(UUID projectId, UUID postId) {
         ProjectPostEntity postEntity = getPostOrThrowError(postId);
 
         assertPostBelongsToProject(postEntity, projectId);
@@ -276,9 +276,20 @@ private final DiscordEventPublisher discordEventPublisher;
             postEntity.setArchivedAt(null);
         }
 
+        ProjectPostStatus previousStatus = postEntity.getStatus();
+
         postEntity.setStatus(status);
 
-        ProjectPost post = ProjectPostMapper.toDomain(projectPostRepository.save(postEntity));
+        ProjectPostEntity saved = projectPostRepository.save(postEntity);
+
+        if (previousStatus != ProjectPostStatus.PUBLISHED && status == ProjectPostStatus.PUBLISHED) {
+            discordEventPublisher.publishPostCreated(saved);
+        } else if (status == ProjectPostStatus.PUBLISHED) {
+            discordPostSyncService.getDiscordMessageId(postId).ifPresent(
+                    discordMsgId -> discordEventPublisher.publishPostUpdated(saved, discordMsgId));
+        }
+
+        ProjectPost post = ProjectPostMapper.toDomain(saved);
         TxLogger.afterCommit(log, "Post updated: project={}, post={}", projectId, postId);
         return post;
     }
@@ -295,7 +306,7 @@ private final DiscordEventPublisher discordEventPublisher;
         }
     }
 
-    private void assertPostBelongsToProject(ProjectPostEntity postEntity, UUID projectId){
+    private void assertPostBelongsToProject(ProjectPostEntity postEntity, UUID projectId) {
         if (!postEntity.getProject().getId().equals(projectId)) {
             throw new ProjectPostNotFoundException(postEntity.getId());
         }

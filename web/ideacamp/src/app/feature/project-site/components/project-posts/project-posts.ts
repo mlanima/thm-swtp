@@ -371,7 +371,6 @@ export class ProjectPosts implements OnChanges, OnDestroy {
     }
 
     this.archivingPostId.set(postId);
-    this.errorMessage.set(null);
 
     this.projectService.archiveProjectPost(this.project.id, postId).subscribe({
       next: () => {
@@ -379,9 +378,7 @@ export class ProjectPosts implements OnChanges, OnDestroy {
         this.archivingPostId.set(null);
       },
       error: () => {
-        this.errorMessage.set(
-          this.translateService.instant('PROJECTPOSTS.ERRORS.ARCHIVE')
-        );
+        this.toastService.error(this.translateService.instant('PROJECTPOSTS.ERRORS.ARCHIVE'));
         this.archivingPostId.set(null);
       },
     });
@@ -402,7 +399,6 @@ export class ProjectPosts implements OnChanges, OnDestroy {
     }
 
     this.publishingPostId.set(postId);
-    this.errorMessage.set(null);
 
     this.projectService.publishProjectPost(this.project.id, postId).subscribe({
       next: () => {
@@ -410,9 +406,7 @@ export class ProjectPosts implements OnChanges, OnDestroy {
         this.publishingPostId.set(null);
       },
       error: () => {
-        this.errorMessage.set(
-          this.translateService.instant('PROJECTPOSTS.ERRORS.PUBLISH')
-        );
+        this.toastService.error(this.translateService.instant('PROJECTPOSTS.ERRORS.ARCHIVE'));
         this.publishingPostId.set(null);
       },
     });
