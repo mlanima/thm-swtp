@@ -112,6 +112,8 @@
     "ERROR_EDIT_FORBIDDEN": "You are not authorized to edit this profile.",
     "FOLLOWERS": "Followers",
     "ERROR_UPDATE_PROFILE": "The profile could not be updated. Please try again later.",
+    "ERROR_INVALID_PLACE": "This is not a real city. Please select a place from the suggestions.",
+    "ERROR_CONTENT_NOT_VALID": "This input contains content that is not allowed.",
     "FOLLOW": "Follow",
     "FOLLOWING": "Following",
     "UNFOLLOW": "Unfollow",
@@ -312,6 +314,7 @@
     "SUCCESS_CREATED": "Project created successfully!",
     "SUCCESS_CREATED_WITH_INVITES": "Project created successfully and invitations sent!",
     "ERROR_CREATE_PROJECT": "Project could not be created. Please try again.",
+    "ERROR_MODERATION": "Project could not be created because some content was flagged as inappropriate. Please review your entries.",
     "VALIDATION": {
       "NAME_MIN": "Project name must be at least 3 characters long.",
       "NAME_MAX": "Project name must not be longer than 20 characters.",
@@ -530,7 +533,8 @@
     "ERRORS": {
       "NO_PROJECT_URL": "No project URL provided.",
       "LOAD_PROJECT": "Project data could not be loaded.",
-      "SAVE_PROJECT": "Project could not be saved."
+      "SAVE_PROJECT": "Project could not be saved.",
+      "CONTENT_NOT_VALID": "This input contains content that is not allowed."
     },
     "INFO": {
       "VISIBILITY": "Visibility",

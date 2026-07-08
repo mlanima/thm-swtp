@@ -112,6 +112,8 @@
     "ERROR_EDIT_FORBIDDEN": "Du bist nicht berechtigt, dieses Profil zu bearbeiten.",
     "FOLLOWERS": "Follower",
     "ERROR_UPDATE_PROFILE": "Das Profil konnte nicht aktualisiert werden. Bitte versuche es später erneut.",
+    "ERROR_INVALID_PLACE": "Dies ist keine reale Stadt. Bitte wähle einen Ort aus den Vorschlägen aus.",
+    "ERROR_CONTENT_NOT_VALID": "Diese Eingabe enthält nicht erlaubten Inhalt.",
     "FOLLOW": "Folgen",
     "FOLLOWING": "Folge ich",
     "UNFOLLOW": "Entfolgen",
@@ -312,6 +314,7 @@
     "SUCCESS_CREATED": "Projekt erfolgreich erstellt!",
     "SUCCESS_CREATED_WITH_INVITES": "Projekt erfolgreich erstellt und Einladungen gesendet!",
     "ERROR_CREATE_PROJECT": "Projekt konnte nicht erstellt werden. Bitte versuche es erneut.",
+    "ERROR_MODERATION": "Projekt konnte nicht erstellt werden, da einige Inhalte als unangemessen eingestuft wurden. Bitte überprüfe deine Eingaben.",
     "VALIDATION": {
       "NAME_MIN": "Projektname muss mindestens 3 Zeichen lang sein.",
       "NAME_MAX": "Projektname darf höchstens 20 Zeichen lang sein.",
@@ -530,7 +533,8 @@
     "ERRORS": {
       "NO_PROJECT_URL": "Keine Projekt-URL angegeben.",
       "LOAD_PROJECT": "Projektdaten konnten nicht abgerufen werden.",
-      "SAVE_PROJECT": "Projekt konnte nicht gespeichert werden."
+      "SAVE_PROJECT": "Projekt konnte nicht gespeichert werden.",
+      "CONTENT_NOT_VALID": "Dieser Inhalt ist nicht erlaubt."
     },
     "INFO": {
       "VISIBILITY": "Sichtbarkeit",
