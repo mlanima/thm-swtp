@@ -91,11 +91,14 @@ class ProjectServiceTest {
                 .updatedAt(LocalDateTime.now())
                 .build();
 
+        UUID viewerId = UUID.randomUUID();
+
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
         when(projectFavoriteRepository.countByProjectId(projectId)).thenReturn(12L);
         when(projectViewRepository.countByProjectId(projectId)).thenReturn(247L);
+        when(userProfileRepository.findById(viewerId)).thenReturn(Optional.empty());
 
-        ProjectResponse response = projectService.getProject(projectId);
+        ProjectResponse response = projectService.getProject(projectId, viewerId);
 
         assertThat(response.getId()).isEqualTo(projectId);
         assertThat(response.getStats()).isNotNull();
@@ -131,11 +134,14 @@ class ProjectServiceTest {
                 .updatedAt(LocalDateTime.now())
                 .build();
 
+        UUID viewerId = UUID.randomUUID();
+
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
         when(projectFavoriteRepository.countByProjectId(projectId)).thenReturn(0L);
         when(projectViewRepository.countByProjectId(projectId)).thenReturn(6L);
+        when(userProfileRepository.findById(viewerId)).thenReturn(Optional.empty());
 
-        ProjectResponse response = projectService.getProject(projectId);
+        ProjectResponse response = projectService.getProject(projectId, viewerId);
 
         assertThat(response.getStats().getViews()).isEqualTo(6);
 
@@ -166,11 +172,14 @@ class ProjectServiceTest {
                 .updatedAt(LocalDateTime.now())
                 .build();
 
+        UUID viewerId = UUID.randomUUID();
+
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
         when(projectFavoriteRepository.countByProjectId(projectId)).thenReturn(0L);
         when(projectViewRepository.countByProjectId(projectId)).thenReturn(0L);
+        when(userProfileRepository.findById(viewerId)).thenReturn(Optional.empty());
 
-        ProjectResponse response = projectService.getProject(projectId);
+        ProjectResponse response = projectService.getProject(projectId, viewerId);
 
         assertThat(response.getStats().getContributors()).isEqualTo(1);
     }
