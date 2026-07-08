@@ -1,0 +1,88 @@
+<form class="space-y-5" (submit)="$event.preventDefault(); submit()">
+
+  <div>
+    <label for="thesis-title" class="mb-1 block text-sm font-medium text-gray-700">
+      {{ 'THESISCREATE.THESIS_TITLE' | translate }}
+    </label>
+
+    <input
+      id="thesis-title"
+      type="text"
+      name = "title"
+      [(ngModel)]="formData.title"
+      [placeholder]="'THESISCREATE.THESIS_TITLE_PLACEHOLDER' | translate"
+      (keydown.enter)="$event.preventDefault(); focusShortDescriptionIfTitleIsValid(shortDescriptionInput)"
+      class="w-full rounded-lg border px-3 py-2 outline-none"
+      [class.border-red-500]="errors.title"
+      [class.border-gray-300]="!errors.title"
+      [class.focus:border-lime-500]="!errors.title"
+    >
+
+    @if(errors.title){
+      <p class="mt-1 text-sm text-red-600">
+        {{errors.title | translate }}
+      </p>
+    }
+  </div>
+
+  <div>
+    <label for="thesis-short-description" class="mb-1 block text-sm font-medium text-gray-700">
+      {{ 'THESISCREATE.SHORT_DESCRIPTION' | translate }}
+    </label>
+
+    <input
+      #shortDescriptionInput
+      id="thesis-short-description"
+      type="text"
+      name="shortDescription"
+      [(ngModel)]="formData.shortDescription"
+      [placeholder]="'THESISCREATE.SHORT_DESCRIPTION_PLACEHOLDER' | translate"
+      maxlength="300"
+      (keydown.enter)="$event.preventDefault(); descriptionTextarea.focus()"
+      class="w-full rounded-lg border px-3 py-2 outline-none"
+      [class.border-red-500]="errors.shortDescription"
+      [class.border-gray-300]="!errors.shortDescription"
+      [class.focus:border-lime-500]="!errors.shortDescription"
+    >
+
+    @if(errors.shortDescription){
+      <p class="mt-1 text-sm text-red-600">
+        {{errors.shortDescription | translate }}
+      </p>
+    }
+  </div>
+
+  <div>
+    <label for="thesis-description" class="mb-1 block text-sm font-medium text-gray-700">
+      {{ 'THESISCREATE.DESCRIPTION' | translate }}
+    </label>
+
+    <textarea
+      #descriptionTextarea
+      id="thesis-description"
+      rows="4"
+      name="description"
+      [(ngModel)]="formData.description"
+      [placeholder]="'THESISCREATE.DESCRIPTION_PLACEHOLDER' | translate"
+      class="w-full rounded-lg border px-3 py-2 outline-none"
+      [class.border-red-500]="errors.description"
+      [class.border-gray-300]="!errors.description"
+      [class.focus:border-lime-500]="!errors.description"
+    ></textarea>
+
+    @if(errors.description){
+      <p class="mt-1 text-sm text-red-600">
+        {{errors.description | translate }}
+      </p>
+    }
+  </div>
+
+  <div class="flex justify-end pt-4">
+    <button
+      type="submit"
+      class="rounded-lg bg-lime-500 px-5 py-2 text-sm font-medium text-white hover:bg-lime-600">
+      {{ 'COMMON.CONTINUE' | translate }}
+    </button>
+  </div>
+
+</form>

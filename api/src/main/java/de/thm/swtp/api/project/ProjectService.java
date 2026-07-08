@@ -11,6 +11,7 @@ import de.thm.swtp.api.projectInvitation.domain.ProjectInviteStatus;
 import de.thm.swtp.api.projectInvitation.repository.ProjectInviteRepository;
 import de.thm.swtp.api.projectInvitation.service.ProjectInviteService;
 import de.thm.swtp.api.projectFavorite.repository.ProjectFavoriteRepository;
+import de.thm.swtp.api.projectGithubRepo.repository.ProjectGithubRepoRepository;
 import de.thm.swtp.api.projectJoinRequest.repository.ProjectJoinRequestRepository;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.projectView.entity.ProjectViewEntity;
@@ -42,6 +43,7 @@ public class ProjectService {
     private static final String PROJECT_CREATION_INVITE_MESSAGE = "You have been invited to join this project.";
     private final ProjectFavoriteRepository projectFavoriteRepository;
     private final ProjectViewRepository projectViewRepository;
+    private final ProjectGithubRepoRepository projectGithubRepoRepository;
     private static final Set<String> MANAGED_PROJECT_SORT_FIELDS = Set.of("name", "owner.username", "createdAt", "updatedAt", "isPrivateProject");
 
     private ProjectResponse toResponse(ProjectEntity project) {
@@ -382,6 +384,11 @@ public class ProjectService {
                 .orElseThrow(() -> new ProjectOwnerTransferToNonMemberException(newOwnerId, projectId));
 
         projectInviteRepository.deleteByProjectIdAndStatus(projectId, ProjectInviteStatus.PENDING);
+
+        // The linked repo's GitHub API calls run on the linker's token, not the project
+        // owner's — unlinking forces the new owner to explicitly re-link with their own
+        // account rather than silently inheriting a former owner's GitHub credentials.
+        projectGithubRepoRepository.deleteByProjectId(projectId);
 
         project.getMembers().add(project.getOwner());
         project.getMembers().remove(newOwnerProfile);
