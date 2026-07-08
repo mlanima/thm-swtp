@@ -394,6 +394,7 @@
       "JOIN_REQUESTS": "Beitrittsanfragen",
       "MEMBERS": "Mitglieder",
       "PRIVACY": "Privatsphäre",
+      "GITHUB": "GitHub",
       "DANGER_ZONE": "Gefahrenzone"
     },
     "ERRORS": {
@@ -581,6 +582,7 @@
     "TITLE": "Einstellungen",
     "TABS": {
       "PROFESSOR_REQUEST": "Professor:in werden",
+      "INTEGRATIONS": "GitHub",
       "CONTACT": "Kontakt",
       "IMPRESSUM": "Impressum"
     },
@@ -590,6 +592,52 @@
       "SEND_EMAIL": "E-Mail senden",
       "COPIED": "Email kopiert",
       "COPY": "Email kopieren"
+    }
+  },
+  "GITHUB": {
+    "LOADING": "GitHub-Verbindung wird geladen",
+    "ERROR_LOAD": "Der Status der GitHub-Verbindung konnte nicht geladen werden.",
+    "ERROR_CONNECT": "Die GitHub-Verbindung konnte nicht gestartet werden. Bitte versuche es erneut.",
+    "ERROR_DISCONNECT": "Das GitHub-Konto konnte nicht getrennt werden. Bitte versuche es erneut.",
+    "CARD_TITLE": "GitHub",
+    "CARD_DESCRIPTION": "Verbinde dein GitHub-Konto, um Repositories mit deinen Projekten zu verknüpfen.",
+    "DISABLED": "Die GitHub-Integration ist derzeit nicht verfügbar.",
+    "CONNECT": "GitHub-Konto verbinden",
+    "RECONNECT": "Erneut verbinden",
+    "DISCONNECT": "Trennen",
+    "STATUS_CONNECTED": "Verbunden",
+    "STATUS_RECONNECT_REQUIRED": "Erneute Verbindung erforderlich",
+    "DISCONNECT_CONFIRM_TITLE": "GitHub-Konto trennen?",
+    "DISCONNECT_CONFIRM_DESCRIPTION": "Bereits mit Projekten verknüpfte Repositories bleiben verknüpft, aber du musst dich erneut verbinden, um neue zu verknüpfen.",
+    "CANCEL": "Abbrechen",
+    "CALLBACK": {
+      "LOADING": "Dein GitHub-Konto wird verbunden...",
+      "SUCCESS": "GitHub-Konto erfolgreich verbunden.",
+      "DENIED_TITLE": "Verbindung abgebrochen",
+      "DENIED_DESCRIPTION": "Du hast die GitHub-Autorisierung abgebrochen. Es wurden keine Änderungen vorgenommen.",
+      "ERROR_TITLE": "Verbindung fehlgeschlagen",
+      "ERROR_DESCRIPTION": "Dein GitHub-Konto konnte nicht verbunden werden. Bitte versuche es erneut.",
+      "BACK_TO_SETTINGS": "Zurück zu den Einstellungen"
+    },
+    "REPO": {
+      "ERROR_LOAD": "Das verknüpfte GitHub-Repository konnte nicht geladen werden.",
+      "ERROR_LINK": "Das Repository konnte nicht verknüpft werden. Bitte versuche es erneut.",
+      "ERROR_UNLINK": "Die Verknüpfung des Repositorys konnte nicht aufgehoben werden. Bitte versuche es erneut.",
+      "INVALID_INPUT": "Gib ein GitHub-Repository als owner/name oder als github.com-URL ein.",
+      "CONNECTION_REQUIRED": "Verbinde dein GitHub-Konto, bevor du ein Repository verknüpfst.",
+      "ACCESS_DENIED": "Du hast keinen Schreibzugriff auf dieses Repository auf GitHub.",
+      "NOT_FOUND": "Dieses Repository konnte auf GitHub nicht gefunden werden.",
+      "GO_TO_SETTINGS": "Zu den Einstellungen",
+      "LINK_TITLE": "GitHub-Repository verknüpfen",
+      "LINK_DESCRIPTION": "Zeige Beschreibung, Stars, Forks und Sprachen des Repositorys auf der Projektseite an.",
+      "LINK_PLACEHOLDER": "owner/repository oder https://github.com/owner/repository",
+      "LINK": "Repository verknüpfen",
+      "UNLINK": "Verknüpfung aufheben",
+      "UNAVAILABLE": "Repository-Daten sind vorübergehend nicht verfügbar.",
+      "SHOW_README": "README auf der Projektseite anzeigen",
+      "ERROR_README_TOGGLE": "Die Sichtbarkeit der README konnte nicht aktualisiert werden. Bitte versuche es erneut.",
+      "AUTO_INVITE_COLLABORATORS": "Neue Mitglieder automatisch als GitHub-Mitarbeiter einladen",
+      "ERROR_AUTO_INVITE_TOGGLE": "Die Einstellung für automatische Einladungen konnte nicht aktualisiert werden. Bitte versuche es erneut."
     }
   },
   "PROFESSOR_REQUEST": {

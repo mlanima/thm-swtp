@@ -13,6 +13,10 @@ services:
       SPRING_MAIL_PORT: "1025"
       APP_FRONTEND_URL: https://dev.swtp-ss26.de
       OPENAI_API_KEY: ${OPENAI_API_KEY}
+      GITHUB_OAUTH_CLIENT_ID: ${GITHUB_OAUTH_CLIENT_ID}
+      GITHUB_OAUTH_CLIENT_SECRET: ${GITHUB_OAUTH_CLIENT_SECRET}
+      GITHUB_OAUTH_REDIRECT_URI: https://dev.swtp-ss26.de/github/callback
+      GITHUB_TOKEN_ENCRYPTION_KEY: ${GITHUB_TOKEN_ENCRYPTION_KEY}
     volumes:
       - ./uploads:/app/uploads
     labels:

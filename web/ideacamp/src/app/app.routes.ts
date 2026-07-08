@@ -19,6 +19,7 @@ import { ProjectsComponent } from './feature/moderator/projects/projects.compone
 import { UserManagement } from './feature/moderator/user-management/pages/user-management';
 import { BannedAccount } from './feature/banned-account/pages/banned-account';
 import { ProfessorRequestComponent } from './feature/moderator/professor-request/professor-request.component';
+import { GithubCallback } from './feature/github/pages/github-callback/github-callback';
 
 export const routes: Routes = [
   {path: '', redirectTo: 'landing', pathMatch: 'full' },
@@ -36,6 +37,7 @@ export const routes: Routes = [
   {path: 'my-projects', component: MyProjectsPage, canActivate: [authGuard]},
   {path: 'favorites', component: FavoritesPage, canActivate: [authGuard]},
   {path: 'settings', component: UserSettings, canActivate: [authGuard]},
+  {path: 'github/callback', component: GithubCallback, canActivate: [authGuard]},
   {path: 'professor-request', redirectTo: 'settings', pathMatch: 'full'},
   {path: 'moderator/users', component: UserManagement, canActivate: [moderatorGuard]},
   {path: 'account-banned', component: BannedAccount, canActivate: [bannedAccountGuard]},

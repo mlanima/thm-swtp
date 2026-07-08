@@ -353,6 +353,23 @@ public class SecurityService {
         return userProfileRepository.existsByKeycloakIdAndStatus(userId, UserStatus.BANNED);
     }
 
+    // GitHub integration permissions
+
+    /** Allowed to view/manage your own GitHub account connection.*/
+    public boolean canManageGithubConnection(Authentication authentication) {
+        return isRegularUser(authentication);
+    }
+
+    /** Allowed to view the GitHub repo linked to a project.*/
+    public boolean canViewProjectGithubRepo(UUID projectId, Authentication authentication) {
+        return canViewProject(projectId, authentication);
+    }
+
+    /** Allowed to link/unlink the GitHub repo on a project.*/
+    public boolean canManageProjectGithubRepo(UUID projectId, Authentication authentication) {
+        return canEditProject(projectId, authentication);
+    }
+
 
 
     // Authorization checks

@@ -394,6 +394,7 @@
       "JOIN_REQUESTS": "Join requests",
       "MEMBERS": "Members",
       "PRIVACY": "Privacy",
+      "GITHUB": "GitHub",
       "DANGER_ZONE": "Danger zone"
     },
     "ERRORS": {
@@ -581,6 +582,7 @@
     "TITLE": "Settings",
     "TABS": {
       "PROFESSOR_REQUEST": "Become a professor",
+      "INTEGRATIONS": "GitHub",
       "CONTACT": "Contact",
       "IMPRESSUM": "Legal notice"
     },
@@ -590,6 +592,52 @@
       "SEND_EMAIL": "Send email",
       "COPIED": "Email copied",
       "COPY": "Copy email"
+    }
+  },
+  "GITHUB": {
+    "LOADING": "Loading GitHub connection",
+    "ERROR_LOAD": "The GitHub connection status could not be loaded.",
+    "ERROR_CONNECT": "Could not start the GitHub connection. Please try again.",
+    "ERROR_DISCONNECT": "The GitHub account could not be disconnected. Please try again.",
+    "CARD_TITLE": "GitHub",
+    "CARD_DESCRIPTION": "Connect your GitHub account to link repositories to your projects.",
+    "DISABLED": "GitHub integration is currently not available.",
+    "CONNECT": "Connect GitHub account",
+    "RECONNECT": "Reconnect",
+    "DISCONNECT": "Disconnect",
+    "STATUS_CONNECTED": "Connected",
+    "STATUS_RECONNECT_REQUIRED": "Reconnect required",
+    "DISCONNECT_CONFIRM_TITLE": "Disconnect GitHub account?",
+    "DISCONNECT_CONFIRM_DESCRIPTION": "Repositories already linked to your projects stay linked, but you'll need to reconnect to link new ones.",
+    "CANCEL": "Cancel",
+    "CALLBACK": {
+      "LOADING": "Connecting your GitHub account...",
+      "SUCCESS": "GitHub account connected successfully.",
+      "DENIED_TITLE": "Connection cancelled",
+      "DENIED_DESCRIPTION": "You cancelled the GitHub authorization. No changes were made.",
+      "ERROR_TITLE": "Connection failed",
+      "ERROR_DESCRIPTION": "Your GitHub account could not be connected. Please try again.",
+      "BACK_TO_SETTINGS": "Back to settings"
+    },
+    "REPO": {
+      "ERROR_LOAD": "The linked GitHub repository could not be loaded.",
+      "ERROR_LINK": "The repository could not be linked. Please try again.",
+      "ERROR_UNLINK": "The repository could not be unlinked. Please try again.",
+      "INVALID_INPUT": "Enter a GitHub repository as owner/name or a github.com URL.",
+      "CONNECTION_REQUIRED": "Connect your GitHub account before linking a repository.",
+      "ACCESS_DENIED": "You don't have write access to this repository on GitHub.",
+      "NOT_FOUND": "That repository could not be found on GitHub.",
+      "GO_TO_SETTINGS": "Go to settings",
+      "LINK_TITLE": "Link a GitHub repository",
+      "LINK_DESCRIPTION": "Show the repository's description, stars, forks and languages on the project page.",
+      "LINK_PLACEHOLDER": "owner/repository or https://github.com/owner/repository",
+      "LINK": "Link repository",
+      "UNLINK": "Unlink repository",
+      "UNAVAILABLE": "Repository data is temporarily unavailable.",
+      "SHOW_README": "Show README on project page",
+      "ERROR_README_TOGGLE": "Could not update the README visibility. Please try again.",
+      "AUTO_INVITE_COLLABORATORS": "Automatically invite new members as GitHub collaborators",
+      "ERROR_AUTO_INVITE_TOGGLE": "Could not update the auto-invite setting. Please try again."
     }
   },
   "PROFESSOR_REQUEST": {
