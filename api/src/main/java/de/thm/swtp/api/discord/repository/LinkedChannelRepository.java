@@ -13,4 +13,6 @@ public interface LinkedChannelRepository extends JpaRepository<LinkedChannelEnti
     Optional<LinkedChannelEntity> findByDiscordChannelId(String discordChannelId);
 
     Optional<LinkedChannelEntity> findByDiscordChannelIdAndIsActiveTrue(String discordChannelId);
+
+    Optional<LinkedChannelEntity> findByDiscordGuildIdAndIsActiveTrue(String discordGuildId);
 }

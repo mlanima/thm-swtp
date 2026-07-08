@@ -40,45 +40,81 @@ public class DiscordAuthController {
             @RequestParam(required = false) String state,
             @RequestParam(required = false) String error) {
 
+        String nonce = discordAuthService.parseNonceFromState(state);
+
+        if (state != null && state.startsWith("bot:")) {
+            if (error != null) {
+                log.warn("Discord bot authorization denied: {}", error);
+                return closePopupResponse();
+            }
+            if (code == null || nonce == null) {
+                log.warn("Bot callback missing code or nonce");
+                return closePopupResponse();
+            }
+            return handleBotTokenExchange(nonce, code);
+        }
+
+        if (state != null && state.startsWith("user:")) {
+            if (error != null) {
+                log.warn("Discord OAuth error: {}", error);
+                return ResponseEntity.status(HttpStatus.FOUND)
+                        .location(URI.create(discordAuthService.getFrontendUrl() + "/settings?discord=error"))
+                        .build();
+            }
+            if (code == null || nonce == null) {
+                return ResponseEntity.status(HttpStatus.FOUND)
+                        .location(URI.create(discordAuthService.getFrontendUrl() + "/settings?discord=error"))
+                        .build();
+            }
+            return handleUserCallback(code, nonce);
+        }
+
         if (guildId != null && state != null) {
-            return handleBotCallback(UUID.fromString(state), guildId);
+            try {
+                discordAuthService.storeBotGuild(UUID.fromString(state), guildId);
+                log.info("Bot guild stored via legacy redirect: guildId={}", guildId);
+            } catch (Exception e) {
+                log.warn("Legacy bot callback failed: {}", e.getMessage());
+            }
+            return closePopupResponse();
         }
 
-        if (error != null) {
-            log.warn("Discord OAuth error: {}", error);
-            return ResponseEntity.status(HttpStatus.FOUND)
-                    .location(URI.create(discordAuthService.getFrontendUrl() + "/settings?discord=error"))
-                    .build();
-        }
-
-        return handleUserCallback(code, state);
+        log.warn("Discord callback with unrecognised state: state={}", state);
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .location(URI.create(discordAuthService.getFrontendUrl() + "/settings?discord=error"))
+                .build();
     }
 
-    private ResponseEntity<?> handleBotCallback(UUID projectId, String guildId) {
-        discordAuthService.storeBotGuild(projectId, guildId);
-        String html = "<!DOCTYPE html><html><body><script>window.close()</script></body></html>";
-        return ResponseEntity.ok()
-                .contentType(MediaType.TEXT_HTML)
-                .body(html);
-    }
-
-    private ResponseEntity<?> handleUserCallback(String code, String state) {
+    private ResponseEntity<?> handleBotTokenExchange(String nonce, String code) {
         try {
-            UserProfile profile = discordAuthService.handleCallback(code, state);
+            discordAuthService.handleBotCallback(nonce, code);
+            log.info("Bot guild captured via token exchange");
+        } catch (Exception e) {
+            log.warn("Bot token exchange callback failed: {}", e.getMessage());
+        }
+        return closePopupResponse();
+    }
+
+    private ResponseEntity<?> handleUserCallback(String code, String nonce) {
+        try {
+            UserProfile profile = discordAuthService.handleCallback(code, nonce);
             log.info("Discord account linked successfully: discordId={}", profile.getDiscordId());
             return ResponseEntity.status(HttpStatus.FOUND)
                     .location(URI.create(discordAuthService.getFrontendUrl() + "/settings?discord=connected"))
                     .build();
-        } catch (IllegalArgumentException e) {
-            log.info("State not recognised, likely a bot callback without guild_id — closing popup");
-            String html = "<!DOCTYPE html><html><body><script>window.close()</script></body></html>";
-            return ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body(html);
         } catch (Exception e) {
-            log.warn("Discord callback failed: {}", e.getMessage());
+            log.warn("Discord user callback failed: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.FOUND)
                     .location(URI.create(discordAuthService.getFrontendUrl() + "/settings?discord=error"))
                     .build();
         }
+    }
+
+    private ResponseEntity<?> closePopupResponse() {
+        String html = "<!DOCTYPE html><html><body><script>window.close()</script></body></html>";
+        return ResponseEntity.ok()
+                .contentType(MediaType.TEXT_HTML)
+                .body(html);
     }
 
     @DeleteMapping("/disconnect")

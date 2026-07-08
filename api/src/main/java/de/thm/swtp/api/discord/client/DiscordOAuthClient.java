@@ -1,5 +1,6 @@
 package de.thm.swtp.api.discord.client;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -31,6 +32,47 @@ public class DiscordOAuthClient {
 
     private static final String TOKEN_URL = "https://discord.com/api/oauth2/token";
     private static final String USER_URL = "https://discord.com/api/users/@me";
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record BotTokenResponse(
+            String accessToken,
+            String scope,
+            Guild guild
+    ) {
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public record Guild(String id, String name, String ownerId) {}
+    }
+
+    public BotTokenResponse exchangeBotCode(String code) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("client_id", clientId);
+        body.add("client_secret", clientSecret);
+        body.add("grant_type", "authorization_code");
+        body.add("code", code);
+        body.add("redirect_uri", redirectUri);
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
+        ResponseEntity<BotTokenResponse> response = restTemplate.postForEntity(
+                TOKEN_URL, request, BotTokenResponse.class);
+
+        if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
+            log.warn("Discord bot OAuth2 token exchange failed: {}", response.getStatusCode());
+            throw new RuntimeException("Failed to exchange Discord OAuth2 code for bot");
+        }
+
+        BotTokenResponse tokenResp = response.getBody();
+        if (tokenResp.guild() == null || tokenResp.guild().id() == null) {
+            log.warn("Discord token response missing guild object: {}", tokenResp);
+            throw new RuntimeException("Discord token exchange did not return guild info");
+        }
+
+        log.info("Bot code exchanged successfully: guildId={}, guildName={}",
+                tokenResp.guild().id(), tokenResp.guild().name());
+        return tokenResp;
+    }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     public Map<String, Object> exchangeCode(String code) {

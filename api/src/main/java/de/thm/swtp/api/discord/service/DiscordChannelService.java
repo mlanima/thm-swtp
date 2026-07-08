@@ -130,13 +130,11 @@ public class DiscordChannelService {
                 .orElseThrow(() -> new DiscordConnectionFailedException("No Discord channel linked to this project"));
     }
 
-    public String getBotInviteUrl(UUID projectId) {
-        return "https://discord.com/api/oauth2/authorize"
-                + "?client_id=" + clientId
-                + "&permissions=" + discordProperties.getBot().getInvitePermissions()
-                + "&scope=bot"
-                + "&redirect_uri=" + discordAuthService.getRedirectUri()
-                + "&state=" + projectId.toString();
+    public String getBotInviteUrl(UUID projectId, UUID userId) {
+        return discordAuthService.createBotAuthUrl(
+                projectId, userId,
+                String.valueOf(discordProperties.getBot().getInvitePermissions()),
+                discordAuthService.getRedirectUri());
     }
 
     @Transactional

@@ -7,6 +7,8 @@ import de.thm.swtp.api.discord.service.DiscordChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,8 +38,11 @@ public class DiscordChannelController {
 
     @GetMapping("/bot-invite")
     @PreAuthorize("@security.canEditProject(#projectId, authentication)")
-    public ResponseEntity<Map<String, String>> getBotInviteUrl(@PathVariable UUID projectId) {
-        return ResponseEntity.ok(Map.of("url", discordChannelService.getBotInviteUrl(projectId)));
+    public ResponseEntity<Map<String, String>> getBotInviteUrl(
+            @PathVariable UUID projectId,
+            @AuthenticationPrincipal Jwt jwt) {
+        UUID userId = UUID.fromString(jwt.getSubject());
+        return ResponseEntity.ok(Map.of("url", discordChannelService.getBotInviteUrl(projectId, userId)));
     }
 
     @GetMapping("/guilds")
