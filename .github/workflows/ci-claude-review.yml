@@ -38,7 +38,8 @@ jobs:
             - Konsistenz mit dem bestehenden Code-Stil im Repo
 
             Der PR-Branch ist bereits ausgecheckt. Nutze `gh pr diff` / `gh pr view`,
-            um ihn zu inspizieren.
+            lesende git-Befehle (`git diff`, `git log`, `git show`) sowie die
+            Read/Glob/Grep-Tools, um ihn zu inspizieren.
 
             WICHTIG: Schreibe den gesamten Review auf Deutsch (Überschriften,
             Beschreibungen, Anmerkungen). Code-Bezeichner bleiben natürlich englisch.
@@ -76,11 +77,17 @@ jobs:
             Der volle Pfad gehört ausschließlich in die URL.
             Füge KEINE eigene Top-Überschrift hinzu — Titel und Zeitstempel werden
             automatisch ergänzt. Beginne direkt mit dem Überblick.
-            Wenn du nichts findest, schreibe eine kurze `review.md`, die das festhält.
-            Schreibe nur die Datei — poste nichts.
+            Wenn du nichts findest, schreibe trotzdem eine kurze `review.md`, die das
+            festhält.
+
+            KRITISCH — Ergebnisformat: Dein einziges gültiges Ergebnis ist die Datei
+            `review.md` im Repository-Root, geschrieben mit dem Write-Tool. Gib den
+            Review NICHT als Chat-/Text-Antwort aus — eine Antwort, die nur als Text
+            existiert und nicht als Datei geschrieben wurde, zählt als
+            fehlgeschlagener Review. Schreibe die Datei IMMER; poste nichts.
 
           claude_args: |
-            --allowedTools "Write,Read,Glob,Grep,Bash(gh pr diff:*),Bash(gh pr view:*)"
+            --allowedTools "Write,Read,Glob,Grep,Bash"
 
       # Upsert a single sticky comment with the review: find the marker-tagged
       # comment and edit it in place, otherwise create it. No accumulation, no
@@ -110,3 +117,17 @@ jobs:
           else
             jq -n --arg b "$BODY" '{body:$b}' | gh api -X POST "repos/$REPO/issues/$PR/comments" --input -
           fi
+
+      # Grün darf nur heißen: es gibt tatsächlich einen Review. Fehlt review.md
+      # (Claude hat sie nicht geschrieben, Step abgebrochen o.ä.), färbt der Job
+      # ehrlich rot statt still mit dem Fallback-Kommentar durchzurutschen.
+      # !cancelled(): ein durch neuen Push gecancelter Lauf bleibt "cancelled",
+      # wird nicht fälschlich als Fehler markiert.
+      - name: Fail if no review was produced
+        if: ${{ !cancelled() }}
+        run: |
+          if [ ! -f review.md ]; then
+            echo "::error::Claude hat keine review.md erzeugt — Review gilt als fehlgeschlagen. Ursache im Step 'Run anthropics/claude-code-action' pruefen (z.B. permission_denials_count im claude-execution-output)."
+            exit 1
+          fi
+          echo "review.md vorhanden ($(wc -l < review.md) Zeilen)."
