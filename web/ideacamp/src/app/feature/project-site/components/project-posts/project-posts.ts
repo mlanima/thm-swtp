@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ProjectPostResponse, ProjectResponse } from '../../../../models/project.model';
 import { ProjectService } from '../../project.service';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { ToastService } from '../../../../shared/toast/toast.service';
 import { MarkdownPipe } from '../../../../shared/pipes/markdown.pipe';
 import { SuccessModal } from '../../../../shared/success-modal/success-modal';
 
@@ -22,11 +23,11 @@ export class ProjectPosts implements OnChanges {
 
   private readonly projectService = inject(ProjectService);
   private readonly translateService = inject(TranslateService);
+  private readonly toastService = inject(ToastService);
 
   posts = signal<ProjectPostResponse[]>([]);
   isLoading = signal(false);
   isCreating = signal(false);
-  errorMessage = signal<string | null>(null);
 
   visibleCount = signal(3);
 
@@ -57,7 +58,6 @@ export class ProjectPosts implements OnChanges {
 
   loadPosts(): void {
     this.isLoading.set(true);
-    this.errorMessage.set(null);
 
     this.projectService.getProjectPosts(this.project.id).subscribe({
       next: (posts) => {
@@ -66,7 +66,7 @@ export class ProjectPosts implements OnChanges {
         this.isLoading.set(false);
       },
       error: () => {
-        this.errorMessage.set(this.translateService.instant('PROJECTPOSTS.ERRORS.LOAD'));
+        this.toastService.error(this.translateService.instant('PROJECTPOSTS.ERRORS.LOAD'));
         this.isLoading.set(false);
       },
     });
@@ -78,7 +78,6 @@ export class ProjectPosts implements OnChanges {
 
   toggleCreateForm(): void {
     this.showCreateForm.update((value) => !value);
-    this.errorMessage.set(null);
   }
 
   createPost(): void {
@@ -86,12 +85,11 @@ export class ProjectPosts implements OnChanges {
     const content = this.content().trim();
 
     if (!title || !content) {
-      this.errorMessage.set(this.translateService.instant('PROJECTPOSTS.ERRORS.EMPTY_FIELDS'));
+      this.toastService.warning(this.translateService.instant('PROJECTPOSTS.ERRORS.EMPTY_FIELDS'));
       return;
     }
 
     this.isCreating.set(true);
-    this.errorMessage.set(null);
 
     this.projectService.createProjectPost(this.project.id, {
       title,
@@ -107,7 +105,7 @@ export class ProjectPosts implements OnChanges {
         this.isCreating.set(false);
       },
       error: () => {
-        this.errorMessage.set(this.translateService.instant('PROJECTPOSTS.ERRORS.CREATE'));
+        this.toastService.error(this.translateService.instant('PROJECTPOSTS.ERRORS.CREATE'));
         this.isCreating.set(false);
       },
     });
@@ -179,7 +177,6 @@ export class ProjectPosts implements OnChanges {
     }
 
     this.deletingPostId.set(postId);
-    this.errorMessage.set(null);
 
     this.projectService.deleteProjectPost(this.project.id, postId).subscribe({
       next: () => {
@@ -188,9 +185,7 @@ export class ProjectPosts implements OnChanges {
         this.showDeleteSuccessModal.set(true);
       },
       error: () => {
-        this.errorMessage.set(
-          this.translateService.instant('PROJECTPOSTS.ERRORS.DELETE')
-        );
+        this.toastService.error(this.translateService.instant('PROJECTPOSTS.ERRORS.DELETE'));
         this.deletingPostId.set(null);
       },
     });

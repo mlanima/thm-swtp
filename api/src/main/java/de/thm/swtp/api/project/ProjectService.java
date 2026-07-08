@@ -2,7 +2,9 @@ package de.thm.swtp.api.project;
 
 
 import de.thm.swtp.api.common.TxLogger;
+import de.thm.swtp.api.exceptionhandling.exceptions.InvalidProjectManagementSortFieldException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectMemberNotFoundException;
+import de.thm.swtp.api.moderation.ContentModerationService;
 import de.thm.swtp.api.project.dto.request.*;
 import de.thm.swtp.api.project.dto.response.*;
 import de.thm.swtp.api.project.exception.*;
@@ -24,6 +26,7 @@ import java.time.*;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,12 +37,14 @@ public class ProjectService {
 
     private final ProjectRepository projectRepository;
     private final UserProfileRepository userProfileRepository;
+    private final ContentModerationService contentModerationService;
     private final ProjectInviteService projectInviteService;
     private final ProjectInviteRepository projectInviteRepository;
     private final ProjectJoinRequestRepository projectJoinRequestRepository;
     private static final String PROJECT_CREATION_INVITE_MESSAGE = "You have been invited to join this project.";
     private final ProjectFavoriteRepository projectFavoriteRepository;
     private final ProjectViewRepository projectViewRepository;
+    private static final Set<String> MANAGED_PROJECT_SORT_FIELDS = Set.of("name", "owner.username", "createdAt", "updatedAt", "isPrivateProject");
 
     private ProjectResponse toResponse(ProjectEntity project) {
         Set<UUID> memberIds = project.getMembers().stream()
@@ -80,10 +85,13 @@ public class ProjectService {
 
     @Transactional
     public ProjectResponse createProject(CreateProjectRequest request, UUID currentUserId) {
-
         if (projectRepository.existsByName(request.name())) {
             throw new ExceptionProjectResponse(request.name());
         }
+
+        contentModerationService.assertAppropriate(request.name(), "name");
+        contentModerationService.assertAppropriate(request.description(), "description");
+        contentModerationService.assertAppropriate(request.shortDescription(), "shortDescription");
 
         UserProfile owner = userProfileRepository.findById(currentUserId)
                 .orElseThrow(() -> new UserProfileNotFoundException(currentUserId.toString()));
@@ -98,6 +106,7 @@ public class ProjectService {
             if (projectRepository.existsByProjectUrl(request.projectUrl())) {
                 throw new ExceptionProjectUrlAlreadyExists(request.projectUrl());
             }
+            contentModerationService.assertAppropriate(request.projectUrl(), "projectUrl");
             projectUrl = request.projectUrl();
         }
 
@@ -228,12 +237,15 @@ public class ProjectService {
         }
 
         if (request.getName() != null) {
+            contentModerationService.assertAppropriate(request.getName(), "name");
             project.setName(request.getName());
         }
         if (request.getDescription() != null) {
+            contentModerationService.assertAppropriate(request.getDescription(), "description");
             project.setDescription(request.getDescription());
         }
         if (request.getShortDescription() != null) {
+            contentModerationService.assertAppropriate(request.getShortDescription(), "shortDescription");
             project.setShortDescription(request.getShortDescription());
         }
         if (request.getProjectUrl() != null) {
@@ -244,6 +256,7 @@ public class ProjectService {
                     projectRepository.existsByProjectUrl(request.getProjectUrl())) {
                 throw new ExceptionProjectUrlAlreadyExists(request.getProjectUrl());
             }
+            contentModerationService.assertAppropriate(request.getProjectUrl(), "projectUrl");
             project.setProjectUrl(request.getProjectUrl());
         }
         project.setPrivateProject(request.isPrivateProject());
@@ -256,6 +269,7 @@ public class ProjectService {
 
     @Transactional
     public Page<ProjectResponse> getAllProjects(String name, Pageable pageable) {
+        validateManagedProjectSort(pageable.getSort());
         if (name != null && !name.isBlank()) {
             return projectRepository.findByNameContainingIgnoreCase(name, pageable).map(this::toResponse);
         }
@@ -370,5 +384,13 @@ public class ProjectService {
                         userId,
                         PROJECT_CREATION_INVITE_MESSAGE
                 ));
+    }
+
+    private void validateManagedProjectSort(Sort sort) {
+        sort.forEach(sortField -> {
+            if (!MANAGED_PROJECT_SORT_FIELDS.contains(sortField.getProperty())) {
+                throw new InvalidProjectManagementSortFieldException("Unsupported sort field: " + sortField.getProperty());
+            }
+        });
     }
 }

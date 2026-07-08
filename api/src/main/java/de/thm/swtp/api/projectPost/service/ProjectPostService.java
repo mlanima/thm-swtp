@@ -3,6 +3,7 @@ package de.thm.swtp.api.projectPost.service;
 import de.thm.swtp.api.common.TxLogger;
 import de.thm.swtp.api.exceptionhandling.exceptions.InvalidProjectPostException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectPostNotFoundException;
+import de.thm.swtp.api.moderation.ContentModerationService;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
 import de.thm.swtp.api.project.exception.ProjectNotFoundException;
@@ -31,6 +32,7 @@ public class ProjectPostService {
     private final ProjectPostRepository projectPostRepository;
     private final ProjectRepository projectRepository;
     private final UserProfileRepository userProfileRepository;
+    private final ContentModerationService contentModerationService;
 
 
 
@@ -52,6 +54,9 @@ public class ProjectPostService {
 
         ProjectEntity projectEntity = getProjectOrThrowError(projectId);
         UserProfile author = getUserOrThrowError(authorId);
+
+        contentModerationService.assertAppropriate(title, "postTitle");
+        contentModerationService.assertAppropriate(content, "postContent");
 
         ProjectPostEntity projectPostEntity = ProjectPostEntity.builder()
                 .project(projectEntity)

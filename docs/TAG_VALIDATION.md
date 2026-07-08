@@ -55,7 +55,7 @@ User submits "typescript"
   → ProjectTagService.addTagToProject()
     → tagRepository.findByNameIgnoreCase("typescript")
       → NOT FOUND → tagValidationService.isValidTag("typescript")
-        → @Cacheable(value = "tag-exists", unless = "#result")
+        → @Cacheable(value = "tag-rejected", unless = "#result")
           → REDIS MISS → OpenAIModeratedGithubTagSource.tagExists("typescript")
             → OpenAIModerationClient.isFlagged("typescript")?  no
             → GitHubTopicsClient.tagExists("typescript")
@@ -92,7 +92,7 @@ User submits "typescript"
       → tagRepository.findByNameIgnoreCase("typescript")
         → FOUND → return existing TagEntity (no API call)
         → NOT FOUND → tagValidationService.isValidTag("typescript")
-          → @Cacheable(value = "tag-exists", unless = "#result")
+          → @Cacheable(value = "tag-rejected", unless = "#result")
             → REDIS HIT → return cached false (invalid tag)
             → REDIS MISS → ModeratedTagSource.tagExists("typescript")
               → BlocklistService.contains("typescript")?  no
@@ -104,7 +104,7 @@ User submits "typescript"
 
 User submits "fuck"
   → ...tagValidationService.isValidTag("fuck")
-    → @Cacheable("tag-exists")
+    → @Cacheable("tag-rejected")
       → REDIS HIT → return false (cached from previous)
       → REDIS MISS → ModeratedTagSource.tagExists("fuck")
         → BlocklistService.contains("fuck")?  yes → return false
