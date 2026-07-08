@@ -37,5 +37,6 @@ export class SuccessComponent implements OnInit {
     }
 
     this.userProfileService.getMyProfile().subscribe();
+    await this.router.navigateByUrl('/dashboard');
   }
 }

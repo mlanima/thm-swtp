@@ -1,0 +1,71 @@
+<section class="rounded-2xl bg-white shadow-sm">
+  <button
+    (click)="toggle()"
+    class="flex w-full items-center justify-between gap-4 p-6 text-left"
+  >
+    <div>
+      <h2 class="text-lg font-semibold text-slate-700">{{ 'DASHBOARD.POSTS.TITLE' | translate }}</h2>
+      <p class="mt-1 text-sm text-slate-400">{{ 'DASHBOARD.POSTS.SUBTITLE' | translate }}</p>
+    </div>
+    <i
+      class="pi shrink-0 text-slate-400"
+      [class]="expanded() ? 'pi-chevron-up' : 'pi-chevron-down'"
+    ></i>
+  </button>
+
+  <div class="collapsible-content px-6" [class.expanded]="expanded()">
+    <div class="pb-6">
+      @if (isLoading()) {
+        <p class="text-sm text-slate-400">{{ 'DASHBOARD.POSTS.LOADING' | translate }}</p>
+      } @else if (errorMessage()) {
+        <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {{ errorMessage() }}
+        </div>
+      } @else if (posts().length === 0) {
+        <p class="rounded-xl border border-dashed border-slate-200 p-6 text-center text-sm text-slate-400">
+          {{ 'DASHBOARD.POSTS.EMPTY' | translate }}
+        </p>
+      } @else {
+        <div class="space-y-4">
+          @for (post of posts(); track post.id) {
+            <article class="rounded-xl border border-slate-200 p-5">
+              <div class="flex items-start gap-3">
+                <div
+                  class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
+                  [class]="getAvatarColor(post.authorName || post.projectName)"
+                >
+                  {{ getInitials(post.authorName || post.projectName) }}
+                </div>
+                <div class="flex-1">
+                  <p class="text-sm font-semibold text-slate-700">
+                    {{ post.authorName || ('DASHBOARD.POSTS.UNKNOWN_AUTHOR' | translate) }}
+                  </p>
+                  <p class="text-xs text-slate-400">
+                    {{ 'DASHBOARD.POSTS.POSTED_IN' | translate: { project: post.projectName } }}
+                    · {{ timeAgo(post.publishedAt ?? post.createdAt) }}
+                  </p>
+                </div>
+              </div>
+
+              <h3 class="mt-3 font-semibold text-slate-700">{{ post.title }}</h3>
+
+              @if (post.contentFormat === 'MARKDOWN') {
+                <div [innerHTML]="post.content | markdown"></div>
+              } @else {
+                <p class="mt-3 whitespace-pre-line text-sm leading-6 text-slate-500">{{ post.content }}</p>
+              }
+
+              @if (postImageUrls()[post.id]) {
+                <img
+                  [src]="postImageUrls()[post.id]"
+                  [alt]="post.title"
+                  class="mt-3 max-h-96 w-full rounded-xl object-contain"
+                />
+              }
+            </article>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</section>

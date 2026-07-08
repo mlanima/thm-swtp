@@ -1,0 +1,48 @@
+<section class="rounded-2xl bg-white shadow-sm">
+  <button
+    (click)="toggle()"
+    class="flex w-full items-center justify-between gap-3 p-6 text-left"
+  >
+    <div class="flex items-center gap-2">
+      <i class="pi pi-folder text-slate-400"></i>
+      <h2 class="text-lg font-semibold text-slate-700">{{ 'DASHBOARD.PROJECTS.TITLE' | translate }}</h2>
+    </div>
+    <i
+      class="pi shrink-0 text-slate-400"
+      [class]="expanded() ? 'pi-chevron-up' : 'pi-chevron-down'"
+    ></i>
+  </button>
+
+  <div class="collapsible-content px-6" [class.expanded]="expanded()">
+    <div class="pb-6">
+      @if (projects().length === 0) {
+        <p class="rounded-xl border border-dashed border-slate-200 p-6 text-center text-sm text-slate-400">
+          {{ 'DASHBOARD.PROJECTS.EMPTY' | translate }}
+        </p>
+      } @else {
+        <div class="space-y-3">
+          @for (project of projects(); track project.id) {
+            <a
+              [routerLink]="['/project', project.projectUrl]"
+              class="flex items-center gap-3 rounded-xl p-2 transition hover:bg-slate-50"
+            >
+              <div
+                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
+                [class]="getAvatarColor(project.name)"
+              >
+                {{ getInitials(project.name) }}
+              </div>
+              <div class="min-w-0 flex-1">
+                <p class="truncate text-sm font-semibold text-slate-700">{{ project.name }}</p>
+                <p class="truncate text-xs text-slate-400">
+                  {{ project.shortDescription || ('MYPROJECTS.NO_SHORT_DESCRIPTION' | translate) }}
+                </p>
+              </div>
+              <app-favorite-button [projectId]="project.id" [count]="project.favoriteCount" />
+            </a>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</section>
