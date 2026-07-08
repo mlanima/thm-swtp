@@ -1,0 +1,132 @@
+<form class="space-y-6" (submit)="$event.preventDefault(); submit()">
+
+  <div>
+    <h3 class="mb-3 block text-sm font-medium text-slate-700">
+      {{ 'THESISCREATE.STUDENTS' | translate }}
+    </h3>
+
+    @if (students.length > 0) {
+      <div class="mb-4 space-y-2">
+        @for (student of students; track student.keycloakId) {
+          <div class="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
+            <div>
+              <p class="text-sm font-semibold text-slate-800">
+                {{ student.username }}
+              </p>
+
+              @if (student.title) {
+                <p class="text-xs text-slate-500">
+                  {{ student.title }}
+                </p>
+              }
+            </div>
+            <button
+              type="button"
+              (click)="removeStudent(student.keycloakId)"
+              class="rounded-md px-2 py-1 text-sm text-slate-400 hover:bg-red-50 hover:text-red-600">
+              ×
+            </button>
+          </div>
+        }
+      </div>
+    }
+
+
+      <button
+        type="button"
+        (click)="openDialog()"
+        class="flex w-full items-center justify-center rounded-lg border border-dashed border-slate-700 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50">
+        + {{ 'THESISCREATE.ADD_STUDENT' | translate }}
+      </button>
+    </div>
+
+
+  <div class="flex items-center justify-between border-t border-slate-200 pt-6">
+
+    <button
+      type="button"
+      (click)="goBack()"
+      class="text-sm text-slate-500 hover:text-slate-800">
+      {{ 'COMMON.BACK' | translate }}
+    </button>
+
+    <button
+      type="submit"
+      class="rounded-lg bg-lime-500 px-5 py-2 text-sm font-semibold text-white hover:bg-lime-600">
+      {{ 'COMMON.CONTINUE' | translate }}
+    </button>
+  </div>
+</form>
+
+@if (isStudentDialogOpen) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 px-4">
+
+    <div class="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
+
+      <div class="mb-5 flex items-start justify-between">
+        <div>
+          <h2 class="text-sm font-bold text-slate-900">
+            {{ 'THESISCREATE.STUDENT_DIALOG_TITLE' | translate }}
+          </h2>
+
+          <p class="mt-1 text-xs text-slate-500">
+            {{ 'THESISCREATE.STUDENT_DIALOG_SUBTITLE' | translate }}
+          </p>
+        </div>
+
+        <button
+          type="button"
+          (click)="closeDialog()"
+          class="text-sm text-slate-400 hover:text-slate-700">
+          ×
+        </button>
+      </div>
+
+      @if (!selectedUser) {
+        <app-user-search-pick
+          #userSearchPick
+          [excludedUserIds]="excludedUserIds"
+          [placeholder]="'THESISCREATE.USER_SEARCH_PLACEHOLDER'"
+          emptyMessagePrefix="'THESISCREATE.USER_SEARCH_EMPTY_PREFIX'"
+          (userSelected)="selectUser($event)">
+        </app-user-search-pick>
+      }
+
+      @if (selectedUser) {
+        <div class="flex flex-col items-center text-center">
+
+          <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-700 text-xl font-semibold text-white">
+            {{ selectedUser.username.charAt(0).toUpperCase() }}
+          </div>
+
+          <p class="text-sm font-bold text-slate-900">
+            {{ selectedUser.username }}
+          </p>
+
+          @if (selectedUser.title) {
+            <p class="mt-1 text-xs text-slate-500">
+              {{ selectedUser.title }}
+            </p>
+          }
+
+          <div class="mt-8 flex items-center gap-3">
+            <button
+              type="button"
+              (click)="closeDialog()"
+              class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">
+              {{ 'COMMON.CANCEL' | translate }}
+            </button>
+
+            <button
+              type="button"
+              (click)="addSelectedUser()"
+              (keydown.enter)="addSelectedUser()"
+              class="rounded-lg bg-lime-500 px-4 py-2 text-sm font-semibold text-white hover:bg-lime-600">
+              {{ selectedUser.username }} {{ 'THESISCREATE.ADD' | translate }}
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}

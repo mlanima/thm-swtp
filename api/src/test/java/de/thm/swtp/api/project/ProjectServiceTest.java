@@ -1,6 +1,8 @@
 package de.thm.swtp.api.project;
 
 import de.thm.swtp.api.project.dto.response.ProjectResponse;
+import de.thm.swtp.api.projectGithubRepo.repository.ProjectGithubRepoRepository;
+import de.thm.swtp.api.projectInvitation.repository.ProjectInviteRepository;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import de.thm.swtp.api.projectFavorite.repository.ProjectFavoriteRepository;
@@ -14,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.Optional;
 import java.util.UUID;
@@ -35,6 +38,12 @@ class ProjectServiceTest {
 
     @Mock
     private ProjectViewRepository projectViewRepository;
+
+    @Mock
+    private ProjectGithubRepoRepository projectGithubRepoRepository;
+
+    @Mock
+    private ProjectInviteRepository projectInviteRepository;
 
     @InjectMocks
     private ProjectService projectService;
@@ -150,5 +159,43 @@ class ProjectServiceTest {
         ProjectResponse response = projectService.getProject(projectId);
 
         assertThat(response.getStats().getContributors()).isEqualTo(1);
+    }
+
+    @Test
+    void transferProjectOwnership_shouldUnlinkGithubRepo() {
+        UserProfile owner = UserProfile.builder()
+                .keycloakId(UUID.randomUUID())
+                .username("owner")
+                .email("owner@mni.thm.de")
+                .build();
+
+        UserProfile newOwner = UserProfile.builder()
+                .keycloakId(UUID.randomUUID())
+                .username("member")
+                .email("member@mni.thm.de")
+                .build();
+
+        UUID projectId = UUID.randomUUID();
+
+        ProjectEntity project = ProjectEntity.builder()
+                .id(projectId)
+                .name("Testprojekt")
+                .description("Beschreibung")
+                .projectUrl("testprojekt")
+                .isPrivateProject(false)
+                .owner(owner)
+                .members(new HashSet<>(Set.of(newOwner)))
+                .openPositionsCount(0)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(projectRepository.save(project)).thenReturn(project);
+
+        projectService.transferProjectOwnership(projectId, newOwner.getKeycloakId());
+
+        assertThat(project.getOwner()).isEqualTo(newOwner);
+        verify(projectGithubRepoRepository).deleteByProjectId(projectId);
     }
 }

@@ -2,7 +2,6 @@
   <app-tag-list [projectId]="projectId()" [isOwner]="isOwner()"> </app-tag-list>
   <app-link-manager [dataSource]="projectLinkDataSource()" [isOwner]="isOwner()" [allowVisibility]="true"> </app-link-manager>
   <app-project-files [projectId]="projectId()" [isOwner]="isOwner()"/>
-<!--  TODO: not imlemented yet-->
-<!--  <app-tech-stack />-->
+  <app-github-repo-card [projectId]="projectId()" />
   <app-member-list [projectId]="projectId()" [ownerId]="ownerId()" [ownerUsername]="ownerUsername()"> </app-member-list>
 </div>

@@ -28,6 +28,14 @@ export class SuccessComponent implements OnInit {
       return;
     }
 
+    const redirectUrl = sessionStorage.getItem('postLoginRedirectUrl');
+    sessionStorage.removeItem('postLoginRedirectUrl');
+
+    if (redirectUrl) {
+      await this.router.navigateByUrl(redirectUrl);
+      return;
+    }
+
     this.userProfileService.getMyProfile().subscribe();
   }
 }

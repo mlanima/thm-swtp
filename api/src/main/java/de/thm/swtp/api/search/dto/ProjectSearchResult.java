@@ -11,11 +11,13 @@ import java.util.UUID;
  * Contains the fields that are relevant for displaying a project
  * in search results, including its tag names as a flat string list.
  *
- * @param id          the project's unique identifier
- * @param name        the project name
- * @param description a short description of the project
- * @param projectUrl  the project's URL slug
- * @param tags        list of tag names assigned to the project
+ * @param id                 the project's unique identifier
+ * @param name               the project name
+ * @param description        a short description of the project
+ * @param projectUrl         the project's URL slug
+ * @param tags               list of tag names assigned to the project
+ * @param openPositionsCount number of open positions on the project
+ * @param allowJoinRequests  whether the project currently accepts join requests
  */
 @Builder
 public record ProjectSearchResult(
@@ -24,5 +26,7 @@ public record ProjectSearchResult(
         String shortDescription,
         String description,
         String projectUrl,
-        List<String> tags
+        List<String> tags,
+        int openPositionsCount,
+        boolean allowJoinRequests
 ) {}

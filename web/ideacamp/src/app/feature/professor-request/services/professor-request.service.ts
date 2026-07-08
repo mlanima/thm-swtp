@@ -7,16 +7,18 @@ export interface ProfessorRequestResponse {
   id: string;
   requestingUserId: string;
   requestingUsername: string;
-  name: string;
   email: string;
   text: string;
   createdAt: string;
   updatedAt: string;
-  status: 'PENDING' | 'ACCEPTED' | 'REJECTED';
+  verificationExpiresAt: string | null;
+  emailVerifiedAt: string | null;
+  status: ProfessorRequestStatus;
 }
 
+export type ProfessorRequestStatus = | 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'WAITING_EMAIL_VERIFICATION' | 'EXPIRED';
+
 export interface CreateProfessorRequest {
-  name: string;
   email: string;
   text: string;
 }
@@ -31,8 +33,7 @@ export class ProfessorRequestService {
       map((requests) => {
         if (requests.length === 0) return null;
         return requests.sort(
-          (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
         )[0];
       }),
     );
@@ -40,5 +41,9 @@ export class ProfessorRequestService {
 
   create(data: CreateProfessorRequest): Observable<ProfessorRequestResponse> {
     return this.http.post<ProfessorRequestResponse>(this.baseUrl, data);
+  }
+
+  verifyEmail(token: string): Observable<ProfessorRequestResponse> {
+    return this.http.post<ProfessorRequestResponse>(`${this.baseUrl}/verify`, { token });
   }
 }

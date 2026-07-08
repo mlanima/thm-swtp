@@ -1,0 +1,128 @@
+/* Styles the raw HTML rendered from a GitHub README (marked + DOMPurify output). See the
+   component's ViewEncapsulation.None comment — everything here is scoped under .readme-content. */
+
+.readme-content {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: #334155;
+}
+
+.readme-content h1,
+.readme-content h2,
+.readme-content h3,
+.readme-content h4,
+.readme-content h5,
+.readme-content h6 {
+  font-weight: 600;
+  color: #334155;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.readme-content h1 {
+  font-size: 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 0.3rem;
+}
+
+.readme-content h2 {
+  font-size: 1.25rem;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 0.3rem;
+}
+
+.readme-content h3 {
+  font-size: 1.1rem;
+}
+
+.readme-content p {
+  margin: 0.75rem 0;
+}
+
+.readme-content a {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.readme-content a:hover {
+  text-decoration: underline;
+}
+
+.readme-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+}
+
+.readme-content ul,
+.readme-content ol {
+  margin: 0.75rem 0;
+  padding-left: 1.5rem;
+}
+
+.readme-content li {
+  margin: 0.25rem 0;
+}
+
+.readme-content li input[type='checkbox'] {
+  margin-right: 0.4rem;
+}
+
+.readme-content blockquote {
+  border-left: 4px solid #cbd5e1;
+  padding-left: 1rem;
+  color: #64748b;
+  margin: 1rem 0;
+  font-style: italic;
+}
+
+.readme-content code {
+  background: #f1f5f9;
+  border-radius: 0.25rem;
+  padding: 0.15rem 0.35rem;
+  font-size: 0.85em;
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Consolas,
+    monospace;
+}
+
+.readme-content pre {
+  background: #f1f5f9;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+.readme-content pre code {
+  background: none;
+  padding: 0;
+}
+
+.readme-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1rem 0;
+  font-size: 0.85em;
+}
+
+.readme-content th,
+.readme-content td {
+  border: 1px solid #e2e8f0;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+
+.readme-content th {
+  background: #f8fafc;
+  font-weight: 600;
+}
+
+.readme-content hr {
+  border: none;
+  border-top: 1px solid #e2e8f0;
+  margin: 1.5rem 0;
+}

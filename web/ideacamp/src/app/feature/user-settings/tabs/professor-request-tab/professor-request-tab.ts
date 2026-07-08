@@ -8,13 +8,11 @@ import {
 } from '../../../professor-request/services/professor-request.service';
 import { AuthService } from '../../../auth/auth.service';
 import { FormErrors, mapZodErrors } from '../../../project-create/schemas/zod-error.helper';
+import { ActivatedRoute, Router } from '@angular/router';
+import { DatePipe } from '@angular/common';
+import { UserProfileService } from '../../../../services/user-profile.service'
 
 const professorRequestSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(1, 'PROFESSOR_REQUEST.VALIDATION.NAME_REQUIRED')
-    .max(100, 'PROFESSOR_REQUEST.VALIDATION.NAME_MAX'),
   email: z
     .string()
     .trim()
@@ -32,13 +30,20 @@ type FormFields = keyof z.infer<typeof professorRequestSchema>;
 @Component({
   selector: 'app-professor-request-tab',
   standalone: true,
-  imports: [FormsModule, TranslatePipe],
+  imports: [FormsModule, TranslatePipe, DatePipe],
   templateUrl: './professor-request-tab.html',
 })
 export class ProfessorRequestTab implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly requestService = inject(ProfessorRequestService);
   private readonly translate = inject(TranslateService);
+  private readonly userProfileService = inject(UserProfileService);
+
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+
+  readonly verificationToken = signal<string | null>(null);
+  readonly verificationSuccess = signal(false);
 
   readonly isLoading = signal(true);
   readonly isSubmitting = signal(false);
@@ -54,6 +59,8 @@ export class ProfessorRequestTab implements OnInit {
 
   readonly profTextRef = viewChild<ElementRef<HTMLTextAreaElement>>('profText');
 
+  readonly isProfessor = signal(false);
+
   autoResize(): void {
     const el = this.profTextRef()?.nativeElement;
     if (!el) return;
@@ -62,38 +69,24 @@ export class ProfessorRequestTab implements OnInit {
   }
 
   ngOnInit(): void {
+    this.route.queryParamMap.subscribe((params) => {
+      this.verificationToken.set(params.get('verifyToken'));
+    });
+
     this.authService.waitUntilAuthReady().then(() => {
       const user = this.authService.user();
+
       if (!user) {
-        this.errorMessage.set(this.translate.instant('PROFESSOR_REQUEST.ERROR_LOAD_USER'));
         this.isLoading.set(false);
         return;
       }
 
-      this.userName.set(user.username);
-
-      this.requestService.getMyRequest(user.id).subscribe({
-        next: (existing) => {
-          this.existingRequest.set(existing);
-
-          if (!existing) {
-            this.userName.set(user.username);
-            this.userEmail.set('');
-            this.userText.set('');
-          }
-
-          this.isLoading.set(false);
-        },
-        error: () => {
-          this.isLoading.set(false);
-        },
-      });
+      this.loadUserAndRequest(user.id, user.username);
     });
   }
 
   submitApplication(): void {
     const result = professorRequestSchema.safeParse({
-      name: this.userName(),
       email: this.userEmail(),
       text: this.userText(),
     });
@@ -109,7 +102,6 @@ export class ProfessorRequestTab implements OnInit {
 
     this.requestService
       .create({
-        name: result.data.name,
         email: result.data.email ?? '',
         text: result.data.text,
       })
@@ -119,8 +111,15 @@ export class ProfessorRequestTab implements OnInit {
           this.isSubmitting.set(false);
           this.showSuccess.set(true);
         },
-        error: () => {
-          this.errorMessage.set(this.translate.instant('PROFESSOR_REQUEST.ERROR_SEND'));
+        error: (error) => {
+          if (error.status === 400) {
+            this.formErrors.set({
+              email: 'PROFESSOR_REQUEST.VALIDATION.EMAIL_THM_REQUIRED',
+            });
+          } else {
+            this.errorMessage.set(this.translate.instant('PROFESSOR_REQUEST.ERROR_SEND'));
+          }
+
           this.isSubmitting.set(false);
         },
       });
@@ -128,5 +127,63 @@ export class ProfessorRequestTab implements OnInit {
 
   closeSuccess(): void {
     this.showSuccess.set(false);
+  }
+
+  verifyEmail(): void {
+    const token = this.verificationToken();
+
+    if (!token) {
+      return;
+    }
+
+    this.isSubmitting.set(true);
+    this.errorMessage.set('');
+
+    this.requestService.verifyEmail(token).subscribe({
+      next: (verifiedRequest) => {
+        this.existingRequest.set(verifiedRequest);
+        this.verificationSuccess.set(true);
+        this.verificationToken.set(null);
+        this.isSubmitting.set(false);
+
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: { verifyToken: null },
+          queryParamsHandling: 'merge',
+          replaceUrl: true,
+        });
+      },
+      error: () => {
+        this.errorMessage.set(this.translate.instant('PROFESSOR_REQUEST.ERROR_VERIFY_EMAIL'));
+        this.isSubmitting.set(false);
+      },
+    });
+  }
+
+  private loadUserAndRequest(userId: string, username: string): void {
+    this.userName.set(username);
+
+    this.userProfileService.getMyProfile().subscribe({
+      next: (profile) => {
+        this.isProfessor.set(profile.isProfessor);
+      },
+    });
+
+    this.requestService.getMyRequest(userId).subscribe({
+      next: (existing) => {
+        this.existingRequest.set(existing);
+
+        if (!existing) {
+          this.userEmail.set('');
+          this.userText.set('');
+        }
+
+        this.isLoading.set(false);
+      },
+      error: () => {
+        this.errorMessage.set(this.translate.instant('PROFESSOR_REQUEST.ERROR_LOAD'));
+        this.isLoading.set(false);
+      },
+    });
   }
 }

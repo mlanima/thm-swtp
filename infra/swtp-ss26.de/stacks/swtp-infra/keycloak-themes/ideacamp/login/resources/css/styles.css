@@ -1,0 +1,539 @@
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+  20%, 40%, 60%, 80%      { transform: translateX(2px); }
+}
+
+@keyframes card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --slate-50:  #f8fafc;
+  --slate-100: #f1f5f9;
+  --slate-200: #e2e8f0;
+  --slate-300: #cbd5e1;
+  --slate-500: #64748b;
+  --slate-700: #334155;
+  --slate-900: #0f172a;
+  --gray-300:  #d1d5db;
+  --red-50:    #fef2f2;
+  --red-200:   #fecaca;
+  --red-700:   #b91c1c;
+  --green-50:  #f0fdf4;
+  --green-200: #bbf7d0;
+  --green-700: #15803d;
+  --yellow-50: #fefce8;
+  --yellow-200:#fef08a;
+  --yellow-800:#854d0e;
+  --blue-50:   #eff6ff;
+  --blue-200:  #bfdbfe;
+  --blue-700:  #1d4ed8;
+}
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(160deg, #f0f4ff 0%, #f8fafc 50%, #f0fdf4 100%);
+  color: var(--slate-900);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* ── Page layout ─────────────────────────────────────────── */
+
+.auth-root {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px 16px;
+}
+
+/* ── Card ────────────────────────────────────────────────── */
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  animation: card-enter 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 2px 4px rgba(0,0,0,.08), 0 8px 24px rgba(0,0,0,.14), 0 24px 56px rgba(0,0,0,.10);
+  overflow: hidden;
+}
+
+/* ── Card header — mirrors the app's <header> bar ────────── */
+
+.auth-card-header {
+  border-bottom: 1px solid var(--gray-300);
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.locale-btn {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #334155;
+  text-decoration: none;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  padding: 4px 12px;
+  transition: background-color 0.15s ease;
+}
+
+.locale-btn:hover {
+  background-color: #f1f5f9;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-img {
+  height: 22px;
+  width: auto;
+  display: block;
+}
+
+.logo-divider {
+  width: 1px;
+  height: 20px;
+  background-color: var(--gray-300);
+  flex-shrink: 0;
+}
+
+.logo-name {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--slate-900);
+  letter-spacing: -0.01em;
+}
+
+/* ── Card body ───────────────────────────────────────────── */
+
+.auth-card-body {
+  padding: 28px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Card footer (registration / login link) ─────────────── */
+
+.auth-card-footer {
+  border-top: 1px solid var(--gray-300);
+  padding: 16px 24px;
+  background-color: var(--slate-50);
+}
+
+/* ── Headings ────────────────────────────────────────────── */
+
+.auth-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--slate-900);
+  letter-spacing: -0.02em;
+}
+
+/* ── Alert banners ───────────────────────────────────────── */
+
+.alert {
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  border: 1px solid transparent;
+  line-height: 1.5;
+}
+
+.alert-error {
+  background-color: var(--red-50);
+  border-color: var(--red-200);
+  color: var(--red-700);
+}
+
+.alert-success {
+  background-color: var(--green-50);
+  border-color: var(--green-200);
+  color: var(--green-700);
+}
+
+.alert-warning {
+  background-color: var(--yellow-50);
+  border-color: var(--yellow-200);
+  color: var(--yellow-800);
+}
+
+.alert-info {
+  background-color: var(--blue-50);
+  border-color: var(--blue-200);
+  color: var(--blue-700);
+}
+
+/* ── Form layout ─────────────────────────────────────────── */
+
+#kc-form-login,
+#kc-register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Form groups ─────────────────────────────────────────── */
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.form-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--slate-700);
+}
+
+.required-mark {
+  color: var(--red-700);
+  margin-left: 2px;
+}
+
+/* ── Inputs ──────────────────────────────────────────────── */
+
+.form-input {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--gray-300);
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  font-family: inherit;
+  color: var(--slate-900);
+  background-color: var(--slate-50);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  outline: none;
+  appearance: none;
+}
+
+.form-input::placeholder {
+  color: var(--slate-300);
+}
+
+.form-input:focus {
+  border-color: var(--slate-900);
+  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.08);
+  transform: translateY(-1px);
+}
+
+.form-input-error {
+  border-color: var(--red-700);
+  animation: shake 0.5s linear both;
+}
+
+.form-input-error:focus {
+  border-color: var(--red-700);
+  box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.1);
+}
+
+.field-error {
+  font-size: 0.8125rem;
+  color: var(--red-700);
+}
+
+/* ── Floating labels ─────────────────────────────────────── */
+
+.form-float {
+  position: relative;
+}
+
+.form-input-float {
+  padding: 14px 12px;
+}
+
+.form-label-float {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.9375rem;
+  font-weight: 400;
+  color: var(--slate-400);
+  pointer-events: none;
+  transition: top 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              font-size 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              color 0.2s ease;
+}
+
+.form-input-float:focus ~ .form-label-float,
+.form-input-float:not(:placeholder-shown) ~ .form-label-float {
+  top: 2px;
+  transform: none;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--slate-500);
+}
+
+.form-input-float:focus ~ .form-label-float {
+  color: var(--slate-400);
+}
+
+/* ── Remember-me checkbox ────────────────────────────────── */
+
+.form-group-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form-checkbox {
+  width: 15px;
+  height: 15px;
+  border: 1px solid var(--gray-300);
+  border-radius: 4px;
+  accent-color: var(--slate-900);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.form-label-inline {
+  font-size: 0.875rem;
+  color: var(--slate-700);
+  cursor: pointer;
+  user-select: none;
+}
+
+/* ── Buttons ─────────────────────────────────────────────── */
+
+.btn-primary {
+  width: 100%;
+  padding: 10px 16px;
+  background-color: #2c3e50;
+  color: #ffffff;
+  border: 1px solid #2c3e50;
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  display: block;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  outline: none;
+}
+
+.btn-primary:hover {
+  background-color: #3d5166;
+  box-shadow: 0 4px 12px rgba(44, 62, 80, 0.3);
+}
+
+.btn-primary:active {
+  transform: scale(0.99);
+}
+
+.btn-primary:focus-visible {
+  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.25);
+}
+
+.btn-secondary {
+  width: 100%;
+  padding: 10px 16px;
+  background-color: transparent;
+  color: var(--slate-900);
+  border: 1px solid var(--gray-300);
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  display: block;
+  transition: background-color 0.2s ease;
+  outline: none;
+}
+
+.btn-secondary:hover {
+  background-color: var(--slate-50);
+}
+
+/* ── Links ───────────────────────────────────────────────── */
+
+.form-link {
+  color: var(--slate-900);
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-color: var(--slate-300);
+  transition: text-decoration-color 0.15s ease;
+  font-size: 0.875rem;
+}
+
+.form-link:hover {
+  text-decoration-color: var(--slate-900);
+}
+
+.form-link-sm {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--slate-500);
+  text-decoration-color: var(--slate-300);
+}
+
+.form-link-sm:hover {
+  color: var(--slate-900);
+  text-decoration-color: var(--slate-500);
+}
+
+.forgot-password-link {
+  display: block;
+  text-align: right;
+  margin-top: -6px;
+}
+
+/* ── Footer info text ────────────────────────────────────── */
+
+.auth-info-text {
+  font-size: 0.875rem;
+  color: var(--slate-500);
+  text-align: center;
+}
+
+.auth-info-text .form-link {
+  margin-left: 4px;
+}
+
+/* ── Inline back link (used below form, no border) ──────── */
+
+.auth-card-footer-inline {
+  margin-top: 4px;
+  text-align: center;
+}
+
+/* ── Keycloak built-in template overrides (forgot password) ─ */
+/* Applied when Keycloak's JAR template is used instead of ours */
+
+[class*="col-xs-"], [class*="col-sm-"],
+[class*="col-md-"], [class*="col-lg-"] {
+  width: 100%;
+  display: block;
+  float: none;
+}
+
+.pf-c-form__label,
+.pf-c-form__label-text {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--slate-700);
+  display: block;
+}
+
+.pf-c-form-control {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--gray-300);
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  font-family: inherit;
+  color: var(--slate-900);
+  background-color: #ffffff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  box-sizing: border-box;
+  display: block;
+}
+
+.pf-c-form-control:focus {
+  border-color: var(--slate-900);
+  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.08);
+}
+
+input.pf-c-button.pf-m-primary,
+.pf-c-button.pf-m-primary {
+  width: 100%;
+  padding: 10px 16px;
+  background-color: var(--slate-900);
+  color: #ffffff;
+  border: 1px solid var(--slate-900);
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: center;
+  display: block;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  outline: none;
+  box-sizing: border-box;
+}
+
+input.pf-c-button.pf-m-primary:hover,
+.pf-c-button.pf-m-primary:hover {
+  background-color: var(--slate-700);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
+}
+
+.login-pf-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#kc-form-options {
+  text-align: center;
+}
+
+#kc-form-options a {
+  font-size: 0.8125rem;
+  color: var(--slate-500);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-color: var(--slate-300);
+}
+
+#kc-form-options a:hover {
+  color: var(--slate-900);
+  text-decoration-color: var(--slate-500);
+}
+
+.auth-card-footer {
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--slate-500);
+  line-height: 1.5;
+}
+
+/* ── Info page actions list ──────────────────────────────── */
+
+.info-actions-list {
+  list-style: disc;
+  padding-left: 20px;
+  font-size: 0.875rem;
+  color: var(--slate-700);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}

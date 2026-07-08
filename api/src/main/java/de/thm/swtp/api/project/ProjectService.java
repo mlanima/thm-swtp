@@ -2,13 +2,16 @@ package de.thm.swtp.api.project;
 
 
 import de.thm.swtp.api.common.TxLogger;
+import de.thm.swtp.api.exceptionhandling.exceptions.InvalidProjectManagementSortFieldException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectMemberNotFoundException;
 import de.thm.swtp.api.project.dto.request.*;
 import de.thm.swtp.api.project.dto.response.*;
 import de.thm.swtp.api.project.exception.*;
+import de.thm.swtp.api.projectInvitation.domain.ProjectInviteStatus;
 import de.thm.swtp.api.projectInvitation.repository.ProjectInviteRepository;
 import de.thm.swtp.api.projectInvitation.service.ProjectInviteService;
 import de.thm.swtp.api.projectFavorite.repository.ProjectFavoriteRepository;
+import de.thm.swtp.api.projectGithubRepo.repository.ProjectGithubRepoRepository;
 import de.thm.swtp.api.projectJoinRequest.repository.ProjectJoinRequestRepository;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.projectView.entity.ProjectViewEntity;
@@ -23,6 +26,7 @@ import java.time.*;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +43,8 @@ public class ProjectService {
     private static final String PROJECT_CREATION_INVITE_MESSAGE = "You have been invited to join this project.";
     private final ProjectFavoriteRepository projectFavoriteRepository;
     private final ProjectViewRepository projectViewRepository;
+    private final ProjectGithubRepoRepository projectGithubRepoRepository;
+    private static final Set<String> MANAGED_PROJECT_SORT_FIELDS = Set.of("name", "owner.username", "createdAt", "updatedAt", "isPrivateProject");
 
     private ProjectResponse toResponse(ProjectEntity project) {
         Set<UUID> memberIds = project.getMembers().stream()
@@ -255,6 +261,7 @@ public class ProjectService {
 
     @Transactional
     public Page<ProjectResponse> getAllProjects(String name, Pageable pageable) {
+        validateManagedProjectSort(pageable.getSort());
         if (name != null && !name.isBlank()) {
             return projectRepository.findByNameContainingIgnoreCase(name, pageable).map(this::toResponse);
         }
@@ -325,6 +332,42 @@ public class ProjectService {
     }
 
 
+    @Transactional
+    public ProjectResponse transferProjectOwnership(UUID projectId, UUID newOwnerId) {
+        ProjectEntity project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ExceptionProjectNotFound(projectId));
+
+        if (project.getDeletedAt() != null) {
+            throw new ExceptionProjectAlreadyDeleted(projectId);
+        }
+
+        UUID currentOwnerId = project.getOwner().getKeycloakId();
+
+        if (currentOwnerId.equals(newOwnerId)) {
+            throw new ProjectOwnerTransferToSelfException(projectId);
+        }
+
+        UserProfile newOwnerProfile = project.getMembers().stream()
+                .filter(m -> m.getKeycloakId().equals(newOwnerId))
+                .findFirst()
+                .orElseThrow(() -> new ProjectOwnerTransferToNonMemberException(newOwnerId, projectId));
+
+        projectInviteRepository.deleteByProjectIdAndStatus(projectId, ProjectInviteStatus.PENDING);
+
+        // The linked repo's GitHub API calls run on the linker's token, not the project
+        // owner's — unlinking forces the new owner to explicitly re-link with their own
+        // account rather than silently inheriting a former owner's GitHub credentials.
+        projectGithubRepoRepository.deleteByProjectId(projectId);
+
+        project.getMembers().add(project.getOwner());
+        project.getMembers().remove(newOwnerProfile);
+        project.setOwner(newOwnerProfile);
+
+        ProjectEntity saved = projectRepository.save(project);
+        TxLogger.afterCommit(log, "Project ownership transferred: project={}, newOwner={}", projectId, newOwnerId);
+        return toResponse(saved);
+    }
+
     private void createProjectInvites(ProjectEntity project, UserProfile owner, Set <UUID> invitedUserIds) {
         if (invitedUserIds == null || invitedUserIds.isEmpty()) {
             return;
@@ -338,5 +381,13 @@ public class ProjectService {
                         userId,
                         PROJECT_CREATION_INVITE_MESSAGE
                 ));
+    }
+
+    private void validateManagedProjectSort(Sort sort) {
+        sort.forEach(sortField -> {
+            if (!MANAGED_PROJECT_SORT_FIELDS.contains(sortField.getProperty())) {
+                throw new InvalidProjectManagementSortFieldException("Unsupported sort field: " + sortField.getProperty());
+            }
+        });
     }
 }

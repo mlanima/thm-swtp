@@ -6,6 +6,7 @@ import de.thm.swtp.api.projectFiles.repository.ProjectFileRepository;
 import de.thm.swtp.api.projectInvitation.repository.ProjectInviteRepository;
 import de.thm.swtp.api.projectJoinRequest.repository.ProjectJoinRequestRepository;
 import de.thm.swtp.api.projectPost.repository.ProjectPostRepository;
+import de.thm.swtp.api.thesis.ThesisRepository;
 import de.thm.swtp.api.userprofile.domain.UserStatus;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,6 @@ import java.util.UUID;
  *
  * <p>Authorization checks fail when permissions are missing.</p>
  */
-
 @Component("security")
 @RequiredArgsConstructor
 public class SecurityService {
@@ -32,6 +32,7 @@ public class SecurityService {
     private final ProjectJoinRequestRepository projectJoinRequestRepository;
     private final ProjectPostRepository projectPostRepository;
     private final ProjectFileRepository projectFileRepository;
+    private final ThesisRepository thesisRepository;
 
     // Project permissions
 
@@ -68,6 +69,11 @@ public class SecurityService {
     /** Allowed to edit project information (e.g. privacy settings, allow join-requests, description, ...).*/
     public boolean canEditProject(UUID projectId, Authentication authentication) {
         return isRegularUser(authentication) &&  isProjectOwner(projectId, authentication);
+    }
+
+    /** Allowed to transfer project ownership to a member.*/
+    public boolean canTransferProjectOwnership(UUID projectId, Authentication authentication) {
+        return isRegularUser(authentication) && isProjectOwner(projectId, authentication);
     }
 
     /** Allowed to delete a project.*/
@@ -245,6 +251,15 @@ public class SecurityService {
                 .orElse(false);
     }
 
+    /** Allowed to edit a post on a project. */
+    public boolean canEditProjectPost(UUID projectId, UUID postId, Authentication authentication) {
+        if (!hasAuthenticationContext(projectId, authentication) || postId == null || !isRegularUser(authentication)) {
+            return false;
+        }
+
+        return isProjectOwner(projectId, authentication) || isProjectPostAuthor(projectId, postId, authentication);
+    }
+
     /** Allowed to delete a post on a  project.*/
     public boolean canDeleteProjectPost(UUID projectId, UUID postId, Authentication authentication) {
         if (!hasAuthenticationContext(projectId, authentication) || postId == null || !isRegularUser(authentication)) {
@@ -296,7 +311,7 @@ public class SecurityService {
             return false;
         }
         UUID currentUserId = getCurrentUserId(authentication);
-        return !userProfileRepository.existsByKeycloakIdAndProfessorTrue(currentUserId);
+        return !userProfileRepository.existsByKeycloakIdAndIsProfessorTrue(currentUserId);
     }
 
     // User-profile permissions
@@ -374,6 +389,23 @@ public class SecurityService {
         }
 
         return userProfileRepository.existsByKeycloakIdAndStatus(userId, UserStatus.BANNED);
+    }
+
+    // GitHub integration permissions
+
+    /** Allowed to view/manage your own GitHub account connection.*/
+    public boolean canManageGithubConnection(Authentication authentication) {
+        return isRegularUser(authentication);
+    }
+
+    /** Allowed to view the GitHub repo linked to a project.*/
+    public boolean canViewProjectGithubRepo(UUID projectId, Authentication authentication) {
+        return canViewProject(projectId, authentication);
+    }
+
+    /** Allowed to link/unlink the GitHub repo on a project.*/
+    public boolean canManageProjectGithubRepo(UUID projectId, Authentication authentication) {
+        return canEditProject(projectId, authentication);
     }
 
 
@@ -463,6 +495,68 @@ public class SecurityService {
         }
         UUID currentUserId = getCurrentUserId(authentication);
         return userId.equals(currentUserId);
+    }
+
+    // Thesis permissions
+
+    /** Allowed to view a thesis (any authenticated user). */
+    public boolean canViewThesis(UUID thesisId, Authentication authentication) {
+        return hasAuthenticationContext(thesisId, authentication);
+    }
+
+    /** Allowed to view a thesis by URL (any authenticated user). */
+    public boolean canViewThesisByUrl(String thesisUrl, Authentication authentication) {
+        return hasAuthenticationContext(thesisUrl, authentication);
+    }
+
+    /** Allowed to view theses of a user (own or as moderator). */
+    public boolean canViewUserTheses(String username, Authentication authentication) {
+        if (!hasAuthenticationContext(username, authentication)) {
+            return false;
+        }
+        return hasModeratorRole(authentication) || isProfileOwnerByUsername(username, authentication);
+    }
+
+    /** Allowed to add/remove students on a thesis (supervising professor only). */
+    public boolean canManageThesisStudents(UUID thesisId, Authentication authentication) {
+        return isProfessorUser(authentication) && isThesisSupervisor(thesisId, authentication);
+    }
+
+    /** Allowed to create a thesis (professors only). */
+    public boolean canCreateThesis(Authentication authentication) {
+        return isProfessorUser(authentication);
+    }
+
+    /** Allowed to edit a thesis (only the supervising professor). */
+    public boolean canEditThesis(UUID thesisId, Authentication authentication) {
+        return isProfessorUser(authentication) && isThesisSupervisor(thesisId, authentication);
+    }
+
+    /** Allowed to delete a thesis (supervising professor or moderator). */
+    public boolean canDeleteThesis(UUID thesisId, Authentication authentication) {
+        if (!hasAuthenticationContext(thesisId, authentication)) {
+            return false;
+        }
+        if (hasModeratorRole(authentication)) {
+            return true;
+        }
+        return isProfessorUser(authentication) && isThesisSupervisor(thesisId, authentication);
+    }
+
+    private boolean isProfessorUser(Authentication authentication) {
+        if (!isRegularUser(authentication)) {
+            return false;
+        }
+        UUID currentUserId = getCurrentUserId(authentication);
+        return userProfileRepository.existsByKeycloakIdAndIsProfessorTrue(currentUserId);
+    }
+
+    private boolean isThesisSupervisor(UUID thesisId, Authentication authentication) {
+        if (!hasAuthenticationContext(thesisId, authentication)) {
+            return false;
+        }
+        UUID currentUserId = getCurrentUserId(authentication);
+        return thesisRepository.existsByIdAndSupervisorKeycloakId(thesisId, currentUserId);
     }
 
 }

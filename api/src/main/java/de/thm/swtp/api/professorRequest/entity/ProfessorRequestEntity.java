@@ -29,10 +29,16 @@ public class ProfessorRequestEntity {
     private UserProfile requestingUser;
 
     @Column(nullable = false)
-    private String name;
-
-    @Column(nullable = false)
     private String email;
+
+    @Column(name = "email_verified_at")
+    private LocalDateTime emailVerifiedAt;
+
+    @Column(name = "verification_expires_at")
+    private LocalDateTime verificationExpiresAt;
+
+    @Column(name = "verification_token_hash", length = 255)
+    private String verificationTokenHash;
 
     @Column(length = 1000, nullable = false)
     private String text;
@@ -54,7 +60,7 @@ public class ProfessorRequestEntity {
         this.updatedAt = now;
 
         if (this.status == null) {
-            this.status = ProfessorRequestStatus.PENDING;
+            this.status = ProfessorRequestStatus.WAITING_EMAIL_VERIFICATION;
         }
     }
 

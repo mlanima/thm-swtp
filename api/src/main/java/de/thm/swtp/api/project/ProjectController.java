@@ -3,7 +3,9 @@ package de.thm.swtp.api.project;
 
 import de.thm.swtp.api.project.dto.request.*;
 import de.thm.swtp.api.project.dto.response.*;
+import jakarta.validation.Valid;
 import lombok.*;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -25,7 +27,7 @@ public class ProjectController {
     @PreAuthorize("@security.hasModeratorRole(authentication)")
     public ResponseEntity<Page<ProjectResponse>> getAllProjects(
             @RequestParam(required = false) String name,
-            @PageableDefault(size = 20) Pageable pageable) {
+            @PageableDefault(size = 20, sort = "name", direction = Sort.Direction.ASC) Pageable pageable) {
         return ResponseEntity.ok(projectService.getAllProjects(name, pageable));
     }
 
@@ -93,6 +95,15 @@ public class ProjectController {
     @PreAuthorize("@security.canRemoveProjectMember(#projectId, #memberId, authentication)")
     public void deleteProjectMember(@PathVariable UUID projectId, @PathVariable UUID memberId) {
         projectService.deleteProjectMember(projectId, memberId);
+    }
+
+    @PatchMapping("/{projectId}/owner")
+    @PreAuthorize("@security.canTransferProjectOwnership(#projectId, authentication)")
+    public ResponseEntity<ProjectResponse> transferProjectOwnership(
+            @PathVariable UUID projectId,
+            @Valid @RequestBody TransferProjectOwnershipRequest request) {
+        ProjectResponse response = projectService.transferProjectOwnership(projectId, request.newOwnerId());
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/url-exists/{projectUrl}")
