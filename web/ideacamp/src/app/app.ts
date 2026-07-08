@@ -4,11 +4,12 @@ import { filter } from 'rxjs';
 import { HeaderComponent } from './shared/header/header.component';
 import { SidebarComponent } from './shared/sidebar/sidebar.component';
 import { FooterComponent } from './shared/footer/footer';
+import { ToastComponent } from './shared/toast/toast';
 import { LanguageService } from './services/language.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, HeaderComponent, SidebarComponent, FooterComponent],
+  imports: [RouterOutlet, HeaderComponent, SidebarComponent, FooterComponent, ToastComponent],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })

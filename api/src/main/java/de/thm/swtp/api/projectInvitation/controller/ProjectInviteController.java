@@ -1,5 +1,7 @@
 package de.thm.swtp.api.projectInvitation.controller;
 
+import de.thm.swtp.api.discord.entity.LinkedChannelEntity;
+import de.thm.swtp.api.discord.repository.LinkedChannelRepository;
 import de.thm.swtp.api.projectInvitation.dto.CreateProjectInviteRequest;
 import de.thm.swtp.api.projectInvitation.dto.ProjectInviteResponse;
 import de.thm.swtp.api.projectInvitation.dto.UpdateProjectInviteStatusRequest;
@@ -19,6 +21,14 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ProjectInviteController {
     private final ProjectInviteService projectInviteService;
+    private final LinkedChannelRepository linkedChannelRepository;
+
+    private String getDiscordInviteUrl(UUID projectId) {
+        return linkedChannelRepository.findByProjectId(projectId)
+                .filter(LinkedChannelEntity::isActive)
+                .map(LinkedChannelEntity::getDiscordInviteUrl)
+                .orElse(null);
+    }
 
     /** Creates invitation to a project. Only the owner can create the invitation.*/
     @PostMapping("/projects/{projectId}/invitations")
@@ -26,7 +36,8 @@ public class ProjectInviteController {
     public ProjectInviteResponse createProjectInvite(@PathVariable UUID projectId,
                                                          @Valid @RequestBody CreateProjectInviteRequest request) {
         return ProjectInviteResponse.toResponse(
-                projectInviteService.createProjectInvite(projectId, request.invitedUserId(), request.message())
+                projectInviteService.createProjectInvite(projectId, request.invitedUserId(), request.message()),
+                getDiscordInviteUrl(projectId)
         );
     }
 
@@ -36,16 +47,17 @@ public class ProjectInviteController {
         UUID currentUserId = UUID.fromString(jwt.getSubject());
         return projectInviteService.getInvitesForUser(currentUserId)
                 .stream()
-                .map(ProjectInviteResponse::toResponse)
+                .map(invite -> ProjectInviteResponse.toResponse(invite, getDiscordInviteUrl(invite.getProjectId())))
                 .toList();
     }
 
     @GetMapping("/projects/{projectId}/invitations")
     @PreAuthorize("@security.canViewProjectInvites(#projectId, authentication)")
     public List<ProjectInviteResponse> getInvitesForProject(@PathVariable UUID projectId) {
+        String inviteUrl = getDiscordInviteUrl(projectId);
         return projectInviteService.getInvitesForProject(projectId)
                 .stream()
-                .map(ProjectInviteResponse::toResponse)
+                .map(invite -> ProjectInviteResponse.toResponse(invite, inviteUrl))
                 .toList();
     }
 
@@ -53,8 +65,14 @@ public class ProjectInviteController {
     @PatchMapping("/invitations/{invitationId}")
     @PreAuthorize("@security.canRespondToProjectInvite(#invitationId, authentication)")
     public ProjectInviteResponse updateInviteStatus(@PathVariable UUID invitationId, @Valid @RequestBody UpdateProjectInviteStatusRequest request) {
-        return ProjectInviteResponse.toResponse(
+        ProjectInviteResponse response = ProjectInviteResponse.toResponse(
                 projectInviteService.updateInviteStatus(invitationId, request.status())
+        );
+        return new ProjectInviteResponse(
+                response.id(), response.projectId(), response.projectName(),
+                response.projectUrl(), response.invitedByUsername(), response.invitedUserId(),
+                response.message(), response.status(), response.createdAt(),
+                getDiscordInviteUrl(response.projectId())
         );
     }
 

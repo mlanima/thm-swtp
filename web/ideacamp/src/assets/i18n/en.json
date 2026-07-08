@@ -64,6 +64,7 @@
   "MYPROJECTS": {
     "TITLE": "My projects",
     "CREATE_PROJECT": "Create project",
+    "CREATE_THESIS": "Create thesis",
     "PROJECTS": "Projects",
     "PROJECTS_COUNT_LABEL": "Projects",
     "OWNED_PROJECTS_COUNT_LABEL": "Owned projects",
@@ -71,6 +72,7 @@
     "INVITED_BY": "Invited by:",
     "ACCEPT": "Accept",
     "DECLINE": "Decline",
+    "JOIN_DISCORD": "Join Discord",
     "NO_SHORT_DESCRIPTION": "No short description.",
     "PRIVATE": "Private",
     "PUBLIC": "Public",
@@ -111,11 +113,15 @@
     "ERROR_EDIT_FORBIDDEN": "You are not authorized to edit this profile.",
     "FOLLOWERS": "Followers",
     "ERROR_UPDATE_PROFILE": "The profile could not be updated. Please try again later.",
+    "ERROR_INVALID_PLACE": "This is not a real city. Please select a place from the suggestions.",
+    "ERROR_CONTENT_NOT_VALID": "This input contains content that is not allowed.",
     "FOLLOW": "Follow",
     "FOLLOWING": "Following",
     "UNFOLLOW": "Unfollow",
     "INVITE": "Invite",
-    "PROFESSOR_BADGE": "Professor"
+    "PROFESSOR_BADGE": "Professor",
+    "DISCORD_SHOW": "Username",
+    "DISCORD_COPIED": "Copied!"
   },
   "CONTACT-REQUESTS": {
     "CONTACT": "Contact Requests",
@@ -312,6 +318,7 @@
     "SUCCESS_CREATED": "Project created successfully!",
     "SUCCESS_CREATED_WITH_INVITES": "Project created successfully and invitations sent!",
     "ERROR_CREATE_PROJECT": "Project could not be created. Please try again.",
+    "ERROR_MODERATION": "Project could not be created because some content was flagged as inappropriate. Please review your entries.",
     "VALIDATION": {
       "NAME_MIN": "Project name must be at least 3 characters long.",
       "NAME_MAX": "Project name must not be longer than 20 characters.",
@@ -323,6 +330,61 @@
       "PROJECT_URL_MIN": "Project URL must be at least 3 characters long.",
       "PROJECT_URL_MAX": "Project URL must not be longer than 30 characters.",
       "PROJECT_URL_FORMAT": "Use only lowercase letters, numbers and hyphens. Hyphens are not allowed at the beginning or end."
+    }
+  },
+  "THESISCREATE": {
+    "PAGE_TITLE": "Create a new thesis",
+    "CREATING": "Thesis is being created…",
+    "THESIS_TITLE": "Thesis title",
+    "THESIS_TITLE_PLACEHOLDER": "Enter the thesis title",
+    "NO_THESIS_TITLE": "No title",
+    "SHORT_DESCRIPTION": "Short description",
+    "SHORT_DESCRIPTION_PLACEHOLDER": "Describe the thesis in one or two sentences",
+    "NO_SHORT_DESCRIPTION": "No short description",
+    "DESCRIPTION": "Description",
+    "DESCRIPTION_PLACEHOLDER": "Describe the thesis in detail",
+    "NO_DESCRIPTION": "No description",
+    "THESIS_URL": "Thesis URL",
+    "THESIS_URL_LABEL": "Thesis URL (Your thesis will be available at /thesis/your-input)",
+    "THESIS_URL_PLACEHOLDER": "e.g. my-thesis",
+    "NO_THESIS_URL": "No thesis URL",
+    "CHECKING_THESIS_URL": "Checking thesis URL...",
+    "THESIS_URL_EXISTS": "This thesis URL is already taken.",
+    "THESIS_URL_AVAILABLE": "This thesis URL is available.",
+    "STUDENTS": "Students",
+    "ADD_STUDENT": "Add student",
+    "ADD": "Add",
+    "INVITED_STUDENTS": "Invited students",
+    "NO_STUDENTS_INVITED": "No students invited",
+    "STUDENT_DIALOG_TITLE": "Add students to your thesis",
+    "STUDENT_DIALOG_SUBTITLE": "Search by username",
+    "USER_SEARCH_PLACEHOLDER": "Find user",
+    "USER_SEARCH_EMPTY_PREFIX": "No matching users found",
+    "FINISH_TITLE": "Finish",
+    "FINISH_DESCRIPTION": "Review all entries to complete your thesis.",
+    "STEPS": {
+      "GENERAL": "General",
+      "SETTINGS": "Settings",
+      "STUDENTS": "Students",
+      "FINISH": "Finish"
+    },
+    "THESIS_URL_CHECK_ERROR": "Thesis URL could not be checked.",
+    "SUCCESS_CREATED": "Thesis created successfully!",
+    "SUCCESS_CREATED_WITH_STUDENTS": "Thesis created successfully and students added!",
+    "SUCCESS_CREATED_STUDENTS_PARTIAL": "Thesis created successfully. Some students could not be added.",
+    "SUCCESS_CREATED_STUDENTS_FAILED": "Thesis created successfully. The students could not be added.",
+    "ERROR_CREATE_THESIS": "Thesis could not be created. Please try again.",
+    "VALIDATION": {
+      "TITLE_MIN": "Title must be at least 3 characters long.",
+      "TITLE_MAX": "Title must not be longer than 100 characters.",
+      "TITLE_NO_QUOTES": "Title must not contain quotation marks.",
+      "SHORT_DESCRIPTION_MAX": "Short description must not be longer than 300 characters.",
+      "SHORT_DESCRIPTION_NO_QUOTES": "Short description must not contain quotation marks.",
+      "DESCRIPTION_MAX": "Description must not be longer than 2000 characters.",
+      "DESCRIPTION_NO_QUOTES": "Description must not contain quotation marks.",
+      "THESIS_URL_MIN": "Thesis URL must be at least 3 characters long.",
+      "THESIS_URL_MAX": "Thesis URL must not be longer than 30 characters.",
+      "THESIS_URL_FORMAT": "Use only lowercase letters, numbers and hyphens. Hyphens are not allowed at the beginning or end."
     }
   },
   "SEARCH": {
@@ -395,7 +457,32 @@
       "JOIN_REQUESTS": "Join requests",
       "MEMBERS": "Members",
       "PRIVACY": "Privacy",
-      "DANGER_ZONE": "Danger zone"
+"GITHUB": "GitHub",
+      "DANGER_ZONE": "Danger zone",
+      "DISCORD": "Discord"
+    },
+    "DISCORD": {
+      "TITLE": "Discord Integration",
+      "CONNECTED": "Connected",
+      "CHANNEL_ID": "Channel ID",
+      "CHANNEL_ID_LABEL": "Discord Channel ID",
+      "ADD_BOT": "Connect Discord Server",
+      "ADD_BOT_LOADING": "Opening Discord...",
+      "ADD_BOT_HINT": "The bot will find or create a #posts channel and automatically make it read-only for everyone except the project owner.",
+      "AUTO_SETUP_LOADING": "Setting up channel...",
+      "CHANGE_CHANNEL": "Change Channel",
+      "TEST_AND_CONNECT": "Test & Connect",
+      "DISCONNECT": "Disconnect",
+      "INVITE_URL_LABEL": "Discord Invite Link",
+      "INVITE_URL_HINT": "This link will be shown to invited users so they can join the server.",
+      "ERROR_CONNECT": "Could not connect to Discord channel.",
+      "ERROR_LINK": "Could not connect to Discord.",
+      "NEEDS_DISCORD_LINK": "You need to link your Discord account before connecting a server.",
+      "LINK_DISCORD": "Link Discord Account",
+      "SELECT_SERVER": "Bot is in multiple servers — select which one to use:",
+      "SELECT_SERVER_PLACEHOLDER": "Select a server...",
+      "CONNECT_SERVER": "Connect",
+      "BOT_NO_WRITE_PERMISSION": "The bot cannot send messages in the existing #posts channel. Grant the \"Send Messages\" permission to the bot in Discord, or connect a different channel manually."
     },
     "ERRORS": {
       "NO_PROJECT_URL": "No project URL provided.",
@@ -474,7 +561,8 @@
     "ERRORS": {
       "NO_PROJECT_URL": "No project URL provided.",
       "LOAD_PROJECT": "Project data could not be loaded.",
-      "SAVE_PROJECT": "Project could not be saved."
+      "SAVE_PROJECT": "Project could not be saved.",
+      "CONTENT_NOT_VALID": "This input contains content that is not allowed."
     },
     "INFO": {
       "VISIBILITY": "Visibility",
@@ -486,9 +574,12 @@
     "HEADER": {
       "SETTINGS": "Settings"
     },
+    "DISCORD_CHANNEL": "Discord Channel",
     "MEMBERS": {
       "ALL_MEMBERS": "All members",
-      "NO_MEMBERS": "No members yet."
+      "NO_MEMBERS": "No members yet.",
+      "DISCORD_SHOW": "Username",
+      "DISCORD_COPIED": "Copied!"
     },
     "TAGS": {
       "ERROR_INVALID_CHARS": "Tag contains invalid characters. Allowed: letters, numbers, spaces, hyphen and dot.",
@@ -516,12 +607,16 @@
       "DROP_HINT": "Drop file here",
       "DOWNLOAD_FILE": "Download file",
       "DELETE_FILE": "Delete file",
+      "TOGGLE_VISIBILITY": "Change visibility",
+      "PUBLIC": "Public",
+      "PRIVATE": "Private",
       "ERROR_TYPE_NOT_ALLOWED": "File type not allowed. Allowed: PDF, PNG, JPG, DOCX, TXT, MD",
       "ERROR_FILE_TOO_LARGE": "File is too large. Maximum file size: 10 MB.",
       "ERROR_LOAD": "Files could not be loaded.",
       "ERROR_UPLOAD": "File could not be uploaded.",
       "ERROR_DELETE": "File could not be deleted.",
-      "ERROR_DOWNLOAD": "File could not be downloaded."
+      "ERROR_DOWNLOAD": "File could not be downloaded.",
+      "ERROR_UPDATE_VISIBILITY": "Visibility could not be updated."
     }
   },
   "JOIN_REQUEST": {
@@ -582,8 +677,10 @@
     "TITLE": "Settings",
     "TABS": {
       "PROFESSOR_REQUEST": "Become a professor",
+      "INTEGRATIONS": "GitHub",
       "CONTACT": "Contact",
-      "IMPRESSUM": "Legal notice"
+      "IMPRESSUM": "Legal notice",
+      "DISCORD": "Discord"
     },
     "CONTACT": {
       "TITLE": "Contact",
@@ -591,6 +688,61 @@
       "SEND_EMAIL": "Send email",
       "COPIED": "Email copied",
       "COPY": "Copy email"
+    },
+    "DISCORD": {
+      "TITLE": "Discord Connection",
+      "CONNECT": "Connect Discord",
+      "DISCONNECT": "Disconnect",
+      "NOT_CONNECTED": "You are not connected to Discord.",
+      "ERROR_LOAD": "Could not load Discord connection status.",
+      "ERROR_CONNECT": "Could not connect Discord account.",
+      "ERROR_DISCONNECT": "Could not disconnect Discord account."
+    }
+  },
+  "GITHUB": {
+    "LOADING": "Loading GitHub connection",
+    "ERROR_LOAD": "The GitHub connection status could not be loaded.",
+    "ERROR_CONNECT": "Could not start the GitHub connection. Please try again.",
+    "ERROR_DISCONNECT": "The GitHub account could not be disconnected. Please try again.",
+    "CARD_TITLE": "GitHub",
+    "CARD_DESCRIPTION": "Connect your GitHub account to link repositories to your projects.",
+    "DISABLED": "GitHub integration is currently not available.",
+    "CONNECT": "Connect GitHub account",
+    "RECONNECT": "Reconnect",
+    "DISCONNECT": "Disconnect",
+    "STATUS_CONNECTED": "Connected",
+    "STATUS_RECONNECT_REQUIRED": "Reconnect required",
+    "DISCONNECT_CONFIRM_TITLE": "Disconnect GitHub account?",
+    "DISCONNECT_CONFIRM_DESCRIPTION": "Repositories already linked to your projects stay linked, but you'll need to reconnect to link new ones.",
+    "CANCEL": "Cancel",
+    "CALLBACK": {
+      "LOADING": "Connecting your GitHub account...",
+      "SUCCESS": "GitHub account connected successfully.",
+      "DENIED_TITLE": "Connection cancelled",
+      "DENIED_DESCRIPTION": "You cancelled the GitHub authorization. No changes were made.",
+      "ERROR_TITLE": "Connection failed",
+      "ERROR_DESCRIPTION": "Your GitHub account could not be connected. Please try again.",
+      "BACK_TO_SETTINGS": "Back to settings"
+    },
+    "REPO": {
+      "ERROR_LOAD": "The linked GitHub repository could not be loaded.",
+      "ERROR_LINK": "The repository could not be linked. Please try again.",
+      "ERROR_UNLINK": "The repository could not be unlinked. Please try again.",
+      "INVALID_INPUT": "Enter a GitHub repository as owner/name or a github.com URL.",
+      "CONNECTION_REQUIRED": "Connect your GitHub account before linking a repository.",
+      "ACCESS_DENIED": "You don't have write access to this repository on GitHub.",
+      "NOT_FOUND": "That repository could not be found on GitHub.",
+      "GO_TO_SETTINGS": "Go to settings",
+      "LINK_TITLE": "Link a GitHub repository",
+      "LINK_DESCRIPTION": "Show the repository's description, stars, forks and languages on the project page.",
+      "LINK_PLACEHOLDER": "owner/repository or https://github.com/owner/repository",
+      "LINK": "Link repository",
+      "UNLINK": "Unlink repository",
+      "UNAVAILABLE": "Repository data is temporarily unavailable.",
+      "SHOW_README": "Show README on project page",
+      "ERROR_README_TOGGLE": "Could not update the README visibility. Please try again.",
+      "AUTO_INVITE_COLLABORATORS": "Automatically invite new members as GitHub collaborators",
+      "ERROR_AUTO_INVITE_TOGGLE": "Could not update the auto-invite setting. Please try again."
     }
   },
   "PROFESSOR_REQUEST": {
@@ -710,6 +862,80 @@
     "PROJECTS": {
       "TITLE": "Recent",
       "EMPTY": "You are not a member of any projects yet."
+      "LOADING": "Projects are loading…",
+      "EMPTY": "You are not a member of any projects yet."
+    }
+  },
+  "THESISSITE": {
+    "LOADING": "Thesis is loading…",
+    "INFORMATION": "Thesis information",
+    "THESIS_UPDATED": "Thesis updated successfully.",
+    "ERRORS": {
+      "NO_THESIS_URL": "No thesis URL provided.",
+      "LOAD_THESIS": "Thesis data could not be loaded.",
+      "SAVE_THESIS": "Thesis could not be saved."
+    },
+    "HEADER": {
+      "BADGE": "Thesis",
+      "SETTINGS": "Settings"
+    },
+    "FORM": {
+      "TITLE": "Thesis title"
+    },
+    "TAGS": {
+      "TITLE": "Tags",
+      "EMPTY": "No tags yet.",
+      "ERROR_DUPLICATE": "Tag is already included in this thesis.",
+      "ERROR_SAVE": "Tag could not be saved. Please try again."
+    },
+    "PEOPLE": {
+      "TITLE": "Supervisor & students",
+      "EMPTY": "No supervisor or students yet.",
+      "SUPERVISOR": "Supervisor"
+    }
+  },
+  "THESISSETTINGS": {
+    "TITLE": "Thesis settings",
+    "BACK_TO_THESIS": "Back to thesis",
+    "UNEXPECTED_ERROR": "An unexpected error occurred",
+    "TABS": {
+      "STUDENTS": "Students",
+      "DANGER_ZONE": "Danger zone"
+    },
+    "ERRORS": {
+      "NO_THESIS_URL": "No thesis URL provided.",
+      "LOAD_THESIS": "Thesis could not be loaded."
+    },
+    "STUDENTS": {
+      "SUBTITLE": "Manage which students are part of this thesis.",
+      "ADD_STUDENT": "Add student",
+      "ADD_SUBTITLE": "Search for a user",
+      "EMPTY": "This thesis does not have any students yet.",
+      "TABLE_STUDENT": "Student",
+      "REMOVE_STUDENT": "Remove student",
+      "REMOVE_SUBTITLE": "Access to the thesis will be removed",
+      "REMOVE_CONFIRM_START": "Are you sure you want to remove",
+      "REMOVE_CONFIRM_END": "from this thesis?",
+      "USER_SEARCH_PLACEHOLDER": "Search user",
+      "ERROR_ADD_STUDENT": "Student could not be added. Please try again.",
+      "ERROR_REMOVE_STUDENT": "Student could not be removed. Please try again shortly.",
+      "LOADING": "Loading students...",
+      "ERROR_LOAD_STUDENTS": "Students could not be loaded. Please try again later.",
+      "ERROR_ADD_INVALID": "This user cannot be added as a student: they are a professor, or already the supervisor of this thesis.",
+      "ERROR_ADD_DUPLICATE": "This user is already a student on this thesis.",
+      "ERROR_REMOVE_NOT_FOUND": "This user is not a student on this thesis (they may have already been removed)."
+    },
+    "DANGER": {
+      "TITLE": "Delete thesis",
+      "SUBTITLE": "This action cannot be undone.",
+      "DESCRIPTION": "This thesis and all related data will be permanently deleted!",
+      "MODAL_SUBTITLE": "This is an irreversible action",
+      "DELETE_TEXT_START": "If you permanently delete",
+      "DELETE_TEXT_END": "all students, tags and settings will be deleted. The data cannot be restored.",
+      "CONFIRM_TYPE_START": "To confirm this action, please type",
+      "CONFIRM_TYPE_END": ".",
+      "DELETING": "Deleting…",
+      "ERROR_DELETE_THESIS": "Thesis could not be deleted."
     }
   }
 }

@@ -1,0 +1,6 @@
+@if (html(); as content) {
+  <div class="rounded-2xl bg-white p-6 shadow-sm">
+    <h2 class="mb-4 text-lg font-semibold text-slate-700">README</h2>
+    <div class="readme-content" [innerHTML]="content"></div>
+  </div>
+}

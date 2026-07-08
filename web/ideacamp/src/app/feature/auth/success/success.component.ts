@@ -77,5 +77,7 @@ export class SuccessComponent implements OnInit {
 
   private navigateAfterSuccess(): void {
     void this.router.navigateByUrl(this.redirectUrl ?? this.defaultRedirectUrl);
+    this.userProfileService.getMyProfile().subscribe();
+    await this.router.navigateByUrl('/dashboard');
   }
 }

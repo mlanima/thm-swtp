@@ -20,6 +20,9 @@ export interface UserProfileModel {
   /** Optional location displayed on the user's profile */
   location: string | null;
 
+  /** Google Place ID for the validated location */
+  placeId: string | null;
+
   /** Number of followers the user has */
   followers: number;
 
@@ -34,4 +37,13 @@ export interface UserProfileModel {
 
   /** Whether the user has completed the onboarding.*/
   onboardingCompleted: boolean;
+  
+  /** Discord user ID if linked */
+  discordId?: string | null;
+
+  /** Discord username if linked */
+  discordUsername?: string | null;
+
+  /** Discord avatar URL if linked */
+  discordAvatar?: string | null;
 }

@@ -1,5 +1,5 @@
-import { Component, input, signal, effect, inject, ChangeDetectionStrategy } from '@angular/core';
-import { forkJoin, of } from 'rxjs';
+import { Component, input, signal, effect, inject, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
+import { forkJoin, of, Subscription } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ProjectResponse, ProjectPostResponse } from '../../../../models/project.model';
@@ -37,11 +37,16 @@ export class RecentPosts {
 
   private readonly projectService = inject(ProjectService);
   private readonly translateService = inject(TranslateService);
+  private readonly destroyRef = inject(DestroyRef);
+
+  private postsSubscription?: Subscription;
+
 
   readonly posts = signal<FeedPost[]>([]);
   readonly isLoading = signal(false);
   readonly errorMessage = signal('');
   readonly expanded = signal(true);
+  readonly postImageUrls = signal<Record<string, string>>({});
 
   toggle(): void {
     this.expanded.update((v) => !v);
@@ -52,9 +57,16 @@ export class RecentPosts {
       const projects = this.projects();
       if (projects.length === 0) {
         this.posts.set([]);
+        this.postsSubscription?.unsubscribe();
+        this.posts.set([]);
+        this.clearPostImageUrls();
         return;
       }
       this.loadPosts(projects);
+    });
+    this.destroyRef.onDestroy(() => {
+      this.postsSubscription?.unsubscribe();
+      this.clearPostImageUrls();
     });
   }
 
@@ -71,6 +83,7 @@ export class RecentPosts {
   }
 
   private loadPosts(projects: ProjectResponse[]): void {
+    this.postsSubscription?.unsubscribe();
     this.isLoading.set(true);
     this.errorMessage.set('');
 
@@ -79,8 +92,9 @@ export class RecentPosts {
         catchError(() => of<ProjectPostResponse[]>([])),
       ),
     );
-
+    
     forkJoin(requests).subscribe({
+    this.postsSubscription = forkJoin(requests).subscribe({
       next: (results) => {
         const merged: FeedPost[] = results.flatMap((posts, index) =>
           posts.map((post) => ({
@@ -94,13 +108,38 @@ export class RecentPosts {
           const bTime = new Date(b.publishedAt ?? b.createdAt).getTime();
           return bTime - aTime;
         });
+        
         this.posts.set(merged.slice(0, MAX_POSTS));
         this.isLoading.set(false);
+        
+        const visiblePosts = merged.slice(0, MAX_POSTS);
+        this.posts.set(visiblePosts);
+        this.isLoading.set(false);
+        this.clearPostImageUrls();
+        this.loadPostImages(visiblePosts);
       },
       error: () => {
         this.errorMessage.set(this.translateService.instant('DASHBOARD.POSTS.ERROR_LOAD'));
         this.isLoading.set(false);
       },
     });
+  }
+
+  private loadPostImages(posts: FeedPost[]): void {
+    posts
+      .filter((post) => !!post.imageUrl)
+      .forEach((post) => {
+        this.projectService.getProjectPostImage(post.projectId, post.id).subscribe({
+          next: (blob: Blob) => {
+            const objectUrl = URL.createObjectURL(blob);
+            this.postImageUrls.update((urls) => ({ ...urls, [post.id]: objectUrl }));
+          },
+        });
+      });
+  }
+
+  private clearPostImageUrls(): void {
+    Object.values(this.postImageUrls()).forEach((url) => URL.revokeObjectURL(url));
+    this.postImageUrls.set({});
   }
 }
