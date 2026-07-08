@@ -11,9 +11,6 @@ import { bannedAccountGuard } from './feature/auth/banned-account.guard';
 import { SearchPage } from './feature/search/pages/search-page/search-page';
 import { MyProjectsPage } from './feature/my-projects/pages/my-projects-page/my-projects-page';
 import { ProjectSettings } from './feature/project-settings/project-settings';
-import { ThesisSite } from './feature/thesis-site/thesis-site';
-import { ThesisSettings } from './feature/thesis-settings/thesis-settings';
-import { ThesisCreate } from './feature/thesis-create/thesis-create';
 import { FavoritesPage } from './feature/favorites/pages/favorites-page/favorites-page';
 import { LandingPage } from './feature/landing-page/pages/landing-page/landing-page';
 import { UserSettings } from './feature/user-settings/user-settings';
@@ -22,7 +19,6 @@ import { ProjectsComponent } from './feature/moderator/projects/projects.compone
 import { UserManagement } from './feature/moderator/user-management/pages/user-management';
 import { BannedAccount } from './feature/banned-account/pages/banned-account';
 import { ProfessorRequestComponent } from './feature/moderator/professor-request/professor-request.component';
-import { GithubCallback } from './feature/github/pages/github-callback/github-callback';
 
 export const routes: Routes = [
   {path: '', redirectTo: 'landing', pathMatch: 'full' },
@@ -35,15 +31,11 @@ export const routes: Routes = [
   {path: 'contact-requests', component: ContactRequests, canActivate: [authGuard]},
   {path: 'project/:projectUrl', component: ProjectSite, canActivate: [authGuard]},
   {path: 'project/:projectUrl/settings', component: ProjectSettings, canActivate: [authGuard]},
-  {path: 'thesis/:thesisUrl', component: ThesisSite, canActivate: [authGuard]},
-  {path: 'thesis/:thesisUrl/settings', component: ThesisSettings, canActivate: [authGuard]},
   {path: 'search', component: SearchPage, canActivate: [authGuard]},
   {path: 'createProject', component: ProjectCreate, canActivate: [authGuard]},
-  {path: 'createThesis', component: ThesisCreate, canActivate: [authGuard]},
   {path: 'my-projects', component: MyProjectsPage, canActivate: [authGuard]},
   {path: 'favorites', component: FavoritesPage, canActivate: [authGuard]},
   {path: 'settings', component: UserSettings, canActivate: [authGuard]},
-  {path: 'github/callback', component: GithubCallback, canActivate: [authGuard]},
   {path: 'professor-request', redirectTo: 'settings', pathMatch: 'full'},
   {path: 'moderator/users', component: UserManagement, canActivate: [moderatorGuard]},
   {path: 'account-banned', component: BannedAccount, canActivate: [bannedAccountGuard]},

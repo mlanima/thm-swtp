@@ -5,7 +5,6 @@ import de.thm.swtp.api.exceptionhandling.exceptions.ProjectJoinRequestAccessDeni
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectJoinRequestAlreadyExistsException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectJoinRequestInvalidStatusForEditException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectJoinRequestNotFoundException;
-import de.thm.swtp.api.notification.event.ProjectMemberAddedEvent;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
 import de.thm.swtp.api.project.exception.ProjectNotFoundException;
@@ -19,7 +18,6 @@ import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +33,6 @@ public class ProjectJoinRequestService {
     private final ProjectJoinRequestRepository projectJoinRequestRepository;
     private final ProjectRepository projectRepository;
     private final UserProfileRepository userProfileRepository;
-    private final ApplicationEventPublisher eventPublisher;
 
 
     /** Creates a new join-request for the given project and from the given user.
@@ -92,8 +89,6 @@ public class ProjectJoinRequestService {
         ProjectJoinRequestEntity saved = projectJoinRequestRepository.save(joinRequestEntity);
         TxLogger.afterCommit(log, "Join request accepted: request={}, project={}, user={}",
                 saved.getId(), projectEntity.getId(), joinRequestEntity.getRequestingUser().getKeycloakId());
-        eventPublisher.publishEvent(new ProjectMemberAddedEvent(
-                projectEntity.getId(), joinRequestEntity.getRequestingUser().getKeycloakId()));
 
         return ProjectJoinRequestMapper.toDomain(saved);
 

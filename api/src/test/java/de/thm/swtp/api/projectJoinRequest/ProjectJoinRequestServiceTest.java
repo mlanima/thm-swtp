@@ -3,7 +3,6 @@ package de.thm.swtp.api.projectJoinRequest;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectJoinRequestAlreadyExistsException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectJoinRequestInvalidStatusForEditException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectJoinRequestNotFoundException;
-import de.thm.swtp.api.notification.event.ProjectMemberAddedEvent;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
 import de.thm.swtp.api.projectJoinRequest.domain.ProjectJoinRequest;
@@ -15,7 +14,6 @@ import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.context.ApplicationEventPublisher;
 
 
 import java.time.LocalDateTime;
@@ -43,7 +41,6 @@ public class ProjectJoinRequestServiceTest {
     private ProjectJoinRequestRepository projectJoinRequestRepository;
     private ProjectRepository projectRepository;
     private UserProfileRepository userProfileRepository;
-    private ApplicationEventPublisher eventPublisher;
     private ProjectJoinRequestService projectJoinRequestService;
 
     @BeforeEach
@@ -51,13 +48,11 @@ public class ProjectJoinRequestServiceTest {
         projectJoinRequestRepository = mock(ProjectJoinRequestRepository.class);
         projectRepository = mock(ProjectRepository.class);
         userProfileRepository = mock(UserProfileRepository.class);
-        eventPublisher = mock(ApplicationEventPublisher.class);
 
         projectJoinRequestService = new ProjectJoinRequestService(
                 projectJoinRequestRepository,
                 projectRepository,
-                userProfileRepository,
-                eventPublisher
+                userProfileRepository
         );
 
         projectId = UUID.randomUUID();
@@ -150,7 +145,6 @@ public class ProjectJoinRequestServiceTest {
         assertThat(res.getStatus()).isEqualTo(ProjectJoinRequestStatus.ACCEPTED);
         assertThat(project.getMembers()).contains(requestingUser);
         verify(projectJoinRequestRepository).save(joinRequest);
-        verify(eventPublisher).publishEvent(new ProjectMemberAddedEvent(projectId, requestingUserId));
     }
 
 

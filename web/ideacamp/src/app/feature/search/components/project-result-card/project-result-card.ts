@@ -1,7 +1,8 @@
-import { Component, input, ChangeDetectionStrategy } from '@angular/core';
+import { Component, input, signal, inject, DestroyRef, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ProjectSearchResult } from '../../models/project-search-result.model';
+import { SearchService } from '../../services/search.service';
 import { FavoriteButton } from '../../../../shared/favorite-button/favorite-button';
 
 @Component({
@@ -28,9 +29,20 @@ import { FavoriteButton } from '../../../../shared/favorite-button/favorite-butt
     `,
   ],
 })
-export class ProjectResultCard {
+export class ProjectResultCard implements OnInit {
   readonly project = input.required<ProjectSearchResult>();
+  readonly tags = signal<string[]>([]);
   readonly animationDelay = input(0);
+
+  private readonly searchService = inject(SearchService);
+  private readonly destroyRef = inject(DestroyRef);
+
+  ngOnInit(): void {
+    const sub = this.searchService.getProjectTags(this.project().id).subscribe({
+      next: tags => this.tags.set(tags),
+    });
+    this.destroyRef.onDestroy(() => sub.unsubscribe());
+  }
 
   getInitials(name: string): string {
     return name

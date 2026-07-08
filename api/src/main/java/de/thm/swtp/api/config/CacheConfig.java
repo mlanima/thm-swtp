@@ -34,9 +34,8 @@ public class CacheConfig implements CachingConfigurer {
                 log.info("Redis available \u2014 using RedisCacheManager");
                 return RedisCacheManager.builder(factory)
                         .cacheDefaults(defaultCacheConfig())
-                        .withCacheConfiguration("tag-exists", tagExistsCacheConfig())
-                        .withCacheConfiguration("github-repo-card", githubRepoCardCacheConfig())
-                        .withCacheConfiguration("github-readme", githubReadmeCacheConfig())
+                        .withCacheConfiguration("tag-rejected", tagRejectedCacheConfig())
+                        .withCacheConfiguration("content-moderation", contentModerationCacheConfig())
                         .build();
             } catch (Exception e) {
                 log.warn("Redis unreachable \u2014 caching disabled: {}", e.getMessage());
@@ -58,22 +57,16 @@ public class CacheConfig implements CachingConfigurer {
                                 RedisSerializer.json()));
     }
 
-    private RedisCacheConfiguration tagExistsCacheConfig() {
+    private RedisCacheConfiguration tagRejectedCacheConfig() {
         return defaultCacheConfig()
                 .entryTtl(Duration.ofHours(1))
                 .prefixCacheNameWith("tags:");
     }
 
-    private RedisCacheConfiguration githubRepoCardCacheConfig() {
+    private RedisCacheConfiguration contentModerationCacheConfig() {
         return defaultCacheConfig()
                 .entryTtl(Duration.ofMinutes(10))
-                .prefixCacheNameWith("github:");
-    }
-
-    private RedisCacheConfiguration githubReadmeCacheConfig() {
-        return defaultCacheConfig()
-                .entryTtl(Duration.ofMinutes(30))
-                .prefixCacheNameWith("github:");
+                .prefixCacheNameWith("content:");
     }
 
     @Override
