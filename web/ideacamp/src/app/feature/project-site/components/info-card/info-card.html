@@ -1,6 +1,6 @@
 @if (project) {
   @if (project.description) {
-    <div class="text-sm leading-7 text-slate-500" [innerHTML]="project.description | markdown"></div>
+    <div [innerHTML]="project.description | markdown"></div>
   } @else {
     <p class="text-sm leading-7 text-slate-500">
       {{ 'FAVORITE.NO_DESCRIPTION' | translate }}
