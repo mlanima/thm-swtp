@@ -132,6 +132,7 @@
     "MESSAGE_PLACEHOLDER": "Briefly describe why you are reporting this content...",
     "SUBMIT": "Submit report",
     "ERROR_SEND": "The report could not be submitted.",
+    "ERROR_DUPLICATE": "You have already reported this content for this reason.",
     "SUCCESS": "The report has been submitted.",
     "VALIDATION": {
       "TARGET_INVALID": "The reported content is invalid.",

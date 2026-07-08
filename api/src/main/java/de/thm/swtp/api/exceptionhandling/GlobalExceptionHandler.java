@@ -436,7 +436,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidProfessorEmailDomainException.class)
     public ResponseEntity<ErrorResponse> handleInvalidProfessorEmailDomain(InvalidProfessorEmailDomainException ex) {
-        log.debug("Bad Request (400): {}", ex.getMessage());
+        log.debug("Bad Request (400): {}", LogSafe.clean(ex.getMessage()));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
     }
@@ -450,7 +450,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidReportSortFieldException.class)
     public ResponseEntity<ErrorResponse> handleInvalidReportSortField(InvalidReportSortFieldException ex) {
-        log.debug("Bad Request (400): {}", ex.getMessage());
+        log.debug("Bad Request (400): {}", LogSafe.clean(ex.getMessage()));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
     }
@@ -489,6 +489,13 @@ public class GlobalExceptionHandler {
         log.debug("Bad Request (400): {}", LogSafe.clean(ex.getMessage()));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ErrorResponse.of(400, "Bad Request", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ReportAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleReportAlreadyExists(ReportAlreadyExistsException ex) {
+        log.debug("Conflict (409): {}", LogSafe.clean(ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
     }
 
 

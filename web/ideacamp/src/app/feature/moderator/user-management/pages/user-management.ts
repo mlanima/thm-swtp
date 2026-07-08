@@ -44,6 +44,9 @@ export class UserManagement implements OnInit {
   activeUserCount = signal(0);
   bannedUserCount = signal(0);
 
+  readonly isBanSubmitting = signal(false);
+  readonly banErrorMessage = signal<string | null>(null);
+
   ngOnInit() {
     if (!isPlatformBrowser(this.platformId)) {
       return;
@@ -174,6 +177,7 @@ export class UserManagement implements OnInit {
 
   openBanDialog(user: ManagedUser): void {
     this.selectedUser.set(user);
+    this.banErrorMessage.set(null);
   }
 
   closeBanDialog(): void {
@@ -182,6 +186,8 @@ export class UserManagement implements OnInit {
 
   banUser(reason?: string): void {
     const user = this.selectedUser();
+    this.isBanSubmitting.set(true);
+    this.banErrorMessage.set(null);
 
     if (!user) {
       return;
@@ -189,6 +195,7 @@ export class UserManagement implements OnInit {
 
     this.userManagementService.banUser(user.keycloakId, reason).subscribe({
       next: () => {
+        this.isBanSubmitting.set(false);
         this.closeBanDialog();
         this.activeTab.set('banned');
         this.loadActiveUsers(this.activeCurrentPage());
@@ -196,6 +203,7 @@ export class UserManagement implements OnInit {
       },
       error: () => {
         this.errorMessage.set('MODERATOR.USER_MANAGEMENT.ERROR_BAN');
+        this.isBanSubmitting.set(false);
       },
     });
   }

@@ -110,20 +110,6 @@ export class ReportTableComponent {
     }
   }
 
-  isTargetTranslationKey(value: string | null): boolean {
-    const normalizedValue = value?.trim().toUpperCase();
-
-    return (
-      normalizedValue === 'USER' ||
-      normalizedValue === 'PROJECT' ||
-      normalizedValue === 'PROJECT_POST'
-    );
-  }
-
-  getTargetSubtitleTranslationKey(value: string): string {
-    return `MODERATOR.REPORTS.TARGET.${value.trim().toUpperCase()}`;
-  }
-
   shouldShowSimilarReports(report: ManagedReport): boolean {
     return (
       report.similarReportsCount > 1 && (report.status === 'OPEN' || report.status === 'IN_REVIEW')

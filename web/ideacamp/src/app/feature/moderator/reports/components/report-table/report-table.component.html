@@ -121,11 +121,7 @@
 
               @if (report.targetSummary.subtitle) {
                 <div class="max-w-44 truncate text-xs text-slate-400">
-                  @if (isTargetTranslationKey(report.targetSummary.subtitle)) {
-                    {{ getTargetSubtitleTranslationKey(report.targetSummary.subtitle) | translate }}
-                  } @else {
-                    {{ report.targetSummary.subtitle }}
-                  }
+                  {{ report.targetSummary.subtitle }}
                 </div>
               }
 
@@ -280,11 +276,7 @@
 
           @if (report.targetSummary.subtitle) {
             <p class="truncate text-xs text-slate-400">
-              @if (isTargetTranslationKey(report.targetSummary.subtitle)) {
-                {{ getTargetSubtitleTranslationKey(report.targetSummary.subtitle) | translate }}
-              } @else {
-                {{ report.targetSummary.subtitle }}
-              }
+              {{ report.targetSummary.subtitle }}
             </p>
           }
 

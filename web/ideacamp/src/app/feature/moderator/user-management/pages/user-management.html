@@ -477,6 +477,8 @@
 @if (selectedUser(); as user) {
   <app-ban-user-dialog
     [user]="user"
+    [isSubmitting]="isBanSubmitting()"
+    [errorMessage]="banErrorMessage()"
     (closeDialog)="closeBanDialog()"
     (confirmBan)="banUser($event)"
   />

@@ -9,13 +9,18 @@ function getPathWithoutQueryAndFragment(url: string): string {
 }
 
 function isProjectDetailPage(path: string): boolean {
-  return hasPathParameter(path, '/project/');
+  return hasExactlyOnePathParameter(path, '/project/');
 }
 
 function isUserProfilePage(path: string): boolean {
-  return hasPathParameter(path, '/profiles/');
+  return hasExactlyOnePathParameter(path, '/profiles/');
 }
 
-function hasPathParameter(path: string, prefix: string): boolean {
-  return path.startsWith(prefix) && path.length > prefix.length;
+function hasExactlyOnePathParameter(path: string, prefix: string): boolean {
+  if (!path.startsWith(prefix)) {
+    return false;
+  }
+
+  const rest = path.slice(prefix.length);
+  return rest.length > 0 && !rest.includes('/');
 }

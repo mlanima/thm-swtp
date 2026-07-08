@@ -4,11 +4,11 @@ import de.thm.swtp.api.reports.domain.ReportReason;
 import de.thm.swtp.api.reports.domain.ReportStatus;
 import de.thm.swtp.api.reports.domain.ReportTarget;
 import de.thm.swtp.api.reports.entity.ReportEntity;
-import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Collection;
 import java.util.List;
@@ -47,4 +47,12 @@ public interface ReportRepository extends JpaRepository<ReportEntity, UUID> {
 
     /** Returns all reports for the same reported target with the specified status.*/
     List<ReportEntity> findAllByTargetAndTargetIdAndStatusIn(ReportTarget target, UUID targetId, Collection<ReportStatus> statuses);
+
+    boolean existsByReporterKeycloakIdAndTargetAndTargetIdAndReasonAndStatusIn(
+            UUID reporterId,
+            ReportTarget target,
+            UUID targetId,
+            ReportReason reason,
+            Collection<ReportStatus> statuses
+    );
 }

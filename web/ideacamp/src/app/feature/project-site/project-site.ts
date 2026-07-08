@@ -220,8 +220,10 @@ export class ProjectSite implements OnInit {
           this.closeReportDialog();
           this.showReportSuccess.set(true);
         },
-        error: () => {
-          this.reportErrorMessage.set('REPORT_DIALOG.ERROR_SEND');
+        error: (error) => {
+          this.reportErrorMessage.set(
+            error.status === 409 ? 'REPORT_DIALOG.ERROR_DUPLICATE' : 'REPORT_DIALOG.ERROR_SEND',
+          );
           this.isReportSubmitting.set(false);
         },
       });

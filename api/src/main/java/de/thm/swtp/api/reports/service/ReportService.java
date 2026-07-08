@@ -49,6 +49,10 @@ public class ReportService {
             throw new InvalidReportTargetException("Users cannot report themselves.");
         }
 
+        if (reportRepository.existsByReporterKeycloakIdAndTargetAndTargetIdAndReasonAndStatusIn(currentUserId, target, targetId, reason, ACTIVE_REPORT_STATUSES)) {
+            throw new ReportAlreadyExistsException("User already has an active report for this target.");
+        }
+
         validateReportTarget(target, targetId);
 
         ReportEntity reportEntity = ReportEntity.builder()
@@ -183,13 +187,13 @@ public class ReportService {
         return userProfileRepository.findById(userId)
                 .map(user -> new ReportTargetSummary(
                         user.getUsername(),
-                        "USER",
+                        null,
                         "/profiles/" + user.getUsername(),
                         null
                 ))
                 .orElse(new ReportTargetSummary(
                         "Deleted user",
-                        "USER",
+                        null,
                         null,
                         null
                 ));
@@ -200,13 +204,13 @@ public class ReportService {
         return projectRepository.findById(projectId)
                 .map(project -> new ReportTargetSummary(
                         project.getName(),
-                        "PROJECT",
+                        null,
                         "/project/" + project.getProjectUrl(),
                         null
                 ))
                 .orElse(new ReportTargetSummary(
                         "Deleted project",
-                        "PROJECT",
+                        null,
                         null,
                         null
                 ));
@@ -223,7 +227,7 @@ public class ReportService {
                 ))
                 .orElse(new ReportTargetSummary(
                         "Deleted project post",
-                        "PROJECT_POST",
+                        null,
                         null,
                         null
                 ));
