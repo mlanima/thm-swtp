@@ -15,6 +15,7 @@ public record UserProfileResponse(
         String about,
         String experience,
         boolean isProfessor,
+        boolean onboardingCompleted,
         String discordId,
         String discordUsername,
         String discordAvatar

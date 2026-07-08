@@ -19,6 +19,7 @@ public class UserProfileMapper {
                 .about(profile.getAbout())
                 .experience(profile.getExperience())
                 .isProfessor(profile.isProfessor())
+                .onboardingCompleted(profile.isOnboardingCompleted())
                 .discordId(profile.getDiscordId())
                 .discordUsername(profile.getDiscordUsername())
                 .discordAvatar(profile.getDiscordAvatar())

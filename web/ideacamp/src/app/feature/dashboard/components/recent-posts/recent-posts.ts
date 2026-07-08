@@ -41,6 +41,7 @@ export class RecentPosts {
 
   private postsSubscription?: Subscription;
 
+
   readonly posts = signal<FeedPost[]>([]);
   readonly isLoading = signal(false);
   readonly errorMessage = signal('');
@@ -55,14 +56,13 @@ export class RecentPosts {
     effect(() => {
       const projects = this.projects();
       if (projects.length === 0) {
-        this.postsSubscription?.unsubscribe();
         this.posts.set([]);
+        this.postsSubscription?.unsubscribe();
         this.clearPostImageUrls();
         return;
       }
       this.loadPosts(projects);
     });
-
     this.destroyRef.onDestroy(() => {
       this.postsSubscription?.unsubscribe();
       this.clearPostImageUrls();
@@ -83,7 +83,6 @@ export class RecentPosts {
 
   private loadPosts(projects: ProjectResponse[]): void {
     this.postsSubscription?.unsubscribe();
-
     this.isLoading.set(true);
     this.errorMessage.set('');
 
@@ -92,6 +91,7 @@ export class RecentPosts {
         catchError(() => of<ProjectPostResponse[]>([])),
       ),
     );
+
 
     this.postsSubscription = forkJoin(requests).subscribe({
       next: (results) => {
@@ -107,6 +107,10 @@ export class RecentPosts {
           const bTime = new Date(b.publishedAt ?? b.createdAt).getTime();
           return bTime - aTime;
         });
+
+        this.posts.set(merged.slice(0, MAX_POSTS));
+        this.isLoading.set(false);
+
         const visiblePosts = merged.slice(0, MAX_POSTS);
         this.posts.set(visiblePosts);
         this.isLoading.set(false);

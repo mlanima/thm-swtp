@@ -35,6 +35,9 @@ export interface UserProfileModel {
   /** Whether the user has professor permissions */
   isProfessor: boolean;
 
+  /** Whether the user has completed the onboarding.*/
+  onboardingCompleted: boolean;
+  
   /** Discord user ID if linked */
   discordId?: string | null;
 

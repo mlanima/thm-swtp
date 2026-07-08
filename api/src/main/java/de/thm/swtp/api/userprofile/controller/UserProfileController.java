@@ -2,6 +2,7 @@ package de.thm.swtp.api.userprofile.controller;
 
 import de.thm.swtp.api.project.ProjectService;
 import de.thm.swtp.api.project.dto.response.ProjectResponse;
+import de.thm.swtp.api.userprofile.dto.UpdateOnboardingRequest;
 import de.thm.swtp.api.thesis.ThesisService;
 import de.thm.swtp.api.thesis.dto.response.ThesisResponse;
 import de.thm.swtp.api.userprofile.dto.UserProfileRequest;
@@ -10,6 +11,7 @@ import de.thm.swtp.api.userprofile.dto.UserStatusResponse;
 import de.thm.swtp.api.userprofile.mapper.UserProfileMapper;
 import de.thm.swtp.api.userprofile.mapper.UserStatusMapper;
 import de.thm.swtp.api.userprofile.service.UserProfileService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -94,5 +96,12 @@ public class UserProfileController {
         return userProfileService.findProfileByKeycloakId(keycloakId)
                 .map(userStatusMapper::toBannedResponse)
                 .orElseGet(userStatusMapper::toNotBannedResponse);
+    }
+
+    @PatchMapping("/api/v1/users/me/onboarding")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateOnboardingCompleted(@Valid @RequestBody UpdateOnboardingRequest request, @AuthenticationPrincipal Jwt jwt) {
+        UUID currentUserId = UUID.fromString(jwt.getSubject());
+        userProfileService.updateOnboardingCompleted(currentUserId, request.onboardingCompleted());
     }
 }

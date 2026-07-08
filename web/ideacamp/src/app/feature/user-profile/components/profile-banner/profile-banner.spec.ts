@@ -28,6 +28,7 @@ describe('ProfileBanner', () => {
       about: '',
       experience: '',
       isProfessor: false,
+      onboardingCompleted: false,
     };
 
     fixture.detectChanges();

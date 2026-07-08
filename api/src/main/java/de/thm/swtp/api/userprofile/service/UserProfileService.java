@@ -147,6 +147,17 @@ public class UserProfileService {
     public Optional<UserProfile> findProfileByKeycloakId(UUID keycloakId) {
         return userProfileRepository.findByKeycloakId(keycloakId);
     }
+
+    @Transactional
+    public void updateOnboardingCompleted(UUID currentUserId, boolean onboardingCompleted) {
+        UserProfile userProfile = userProfileRepository.findById(currentUserId)
+                .orElseThrow(() -> new UserProfileNotFoundException(currentUserId.toString()));
+
+        userProfile.setOnboardingCompleted(onboardingCompleted);
+        userProfileRepository.save(userProfile);
+        TxLogger.afterCommit(log, "User completed onboarding: username={}, userId={}", userProfile.getUsername(), currentUserId);
+    }
+
     private void validateManagedUserSort(Sort sort){
        sort.forEach((sortField) -> {
            if (!MANAGED_USER_SORT_FIELDS.contains(sortField.getProperty())) {

@@ -60,7 +60,8 @@
   "AUTH": {
     "P1": "Success!",
     "H1": "Welcome to IdeaCamp",
-    "P2": "What are your plans for today? Create your first project, discover exciting ideas, or connect with other creative minds. Your adventure starts here!"
+    "P2": "What are your plans for today? Create your first project, discover exciting ideas, or connect with other creative minds. Your adventure starts here!",
+    "REDIRECTING": "Redirecting…"
   },
   "MYPROJECTS": {
     "TITLE": "My projects",
@@ -964,6 +965,40 @@
     "BANNED_AT": "Banned on:",
     "CONTACT_HINT": "If you have any questions, please contact the project team."
   },
+  "ONBOARDING": {
+    "LABEL": "Quick introduction",
+    "TITLE": "Welcome to IdeaCamp",
+    "REMIND_LATER": "Remind me later",
+    "BACK": "Back",
+    "NEXT": "Next",
+    "FINISH": "Finish",
+    "STEPS": {
+      "DASHBOARD": {
+        "TITLE": "Your dashboard",
+        "TEXT": "The dashboard gives you an overview of project invitations, recent posts from your projects and recently viewed projects."
+      },
+      "SIDEBAR": {
+        "TITLE": "Navigation with the sidebar",
+        "TEXT": "Use the menu in the top left to open the sidebar. There you can find the main areas such as dashboard, search, my projects, favorites, profile and settings."
+      },
+      "SEARCH": {
+        "TITLE": "Discover projects",
+        "TEXT": "Use search to find projects and users. This helps you to discover suitable projects and get involved."
+      },
+      "MY_PROJECTS": {
+        "TITLE": "My projects",
+        "TEXT": "Under “My projects” you can find your own projects, project memberships, and project invitations."
+      },
+      "FAVORITES": {
+        "TITLE": "Favorites",
+        "TEXT": "You can mark interesting projects as favorites and find them again later in one place."
+      },
+      "PROFILE_SETTINGS": {
+        "TITLE": "Profile and settings",
+        "TEXT": "In your profile you can add information about yourself. In settings you can find more options and additional features."
+      }
+    }
+  },
   "DASHBOARD": {
     "POSTS": {
       "TITLE": "Recent Posts",
@@ -976,6 +1011,7 @@
     },
     "PROJECTS": {
       "TITLE": "Recent",
+      "EMPTY": "You are not a member of any projects yet.",
       "LOADING": "Projects are loading…",
       "EMPTY": "You are not a member of any projects yet."
     }
