@@ -180,7 +180,6 @@ public class ProjectPostService {
                 projectName
         );
 
-        projectPostRepository.delete(postEntity);
         UUID imageFileId = postEntity.getImageFileId();
 
         projectPostRepository.delete(postEntity);
