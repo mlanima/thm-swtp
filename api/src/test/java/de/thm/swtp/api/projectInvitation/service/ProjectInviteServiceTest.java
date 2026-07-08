@@ -5,6 +5,7 @@ import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
 import de.thm.swtp.api.projectInvitation.domain.ProjectInviteStatus;
 import de.thm.swtp.api.projectInvitation.entity.ProjectInviteEntity;
+import de.thm.swtp.api.projectInvitation.mapper.ProjectInviteMapper;
 import de.thm.swtp.api.projectInvitation.repository.ProjectInviteRepository;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
@@ -27,6 +28,7 @@ class ProjectInviteServiceTest {
     private ProjectRepository projectRepository;
     private UserProfileRepository userProfileRepository;
     private ApplicationEventPublisher eventPublisher;
+    private ProjectInviteMapper projectInviteMapper;
     private ProjectInviteService service;
 
     private UUID projectId;
@@ -44,9 +46,10 @@ class ProjectInviteServiceTest {
         projectRepository = mock(ProjectRepository.class);
         userProfileRepository = mock(UserProfileRepository.class);
         eventPublisher = mock(ApplicationEventPublisher.class);
+        projectInviteMapper = mock(ProjectInviteMapper.class);
 
         service = new ProjectInviteService(
-                projectInviteRepository, projectRepository, userProfileRepository, eventPublisher);
+                projectInviteRepository, projectRepository, userProfileRepository, eventPublisher, projectInviteMapper);
 
         projectId = UUID.randomUUID();
         ownerId = UUID.randomUUID();
