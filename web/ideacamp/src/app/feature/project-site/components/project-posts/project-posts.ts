@@ -5,6 +5,7 @@ import { catchError, finalize, of, switchMap } from 'rxjs';
 import { ProjectPostResponse, ProjectResponse } from '../../../../models/project.model';
 import { ProjectService } from '../../project.service';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { ToastService } from '../../../../shared/toast/toast.service';
 import { MarkdownPipe } from '../../../../shared/pipes/markdown.pipe';
 import { SuccessModal } from '../../../../shared/success-modal/success-modal';
 
@@ -25,13 +26,13 @@ export class ProjectPosts implements OnChanges, OnDestroy {
 
   private readonly projectService = inject(ProjectService);
   private readonly translateService = inject(TranslateService);
+  private readonly toastService = inject(ToastService);
   private readonly maxImageSize = 5 * 1024 * 1024;
   private readonly allowedImageTypes = ['image/jpeg', 'image/png', 'image/webp'];
 
   posts = signal<ProjectPostResponse[]>([]);
   isLoading = signal(false);
   isCreating = signal(false);
-  errorMessage = signal<string | null>(null);
 
   visibleCount = signal(3);
 
@@ -79,7 +80,6 @@ export class ProjectPosts implements OnChanges, OnDestroy {
 
   loadPosts(): void {
     this.isLoading.set(true);
-    this.errorMessage.set(null);
 
     const request =
       this.postView() === 'drafts'
@@ -97,7 +97,7 @@ export class ProjectPosts implements OnChanges, OnDestroy {
         this.isLoading.set(false);
       },
       error: () => {
-        this.errorMessage.set(this.translateService.instant('PROJECTPOSTS.ERRORS.LOAD'));
+        this.toastService.error(this.translateService.instant('PROJECTPOSTS.ERRORS.LOAD'));
         this.isLoading.set(false);
       },
     });
@@ -111,7 +111,6 @@ export class ProjectPosts implements OnChanges, OnDestroy {
     const nextValue = !this.showCreateForm();
 
     this.showCreateForm.set(nextValue);
-    this.errorMessage.set(null);
 
     if (!nextValue) { this.resetCreateForm(); }
   }
@@ -121,12 +120,11 @@ export class ProjectPosts implements OnChanges, OnDestroy {
     const content = this.content().trim();
 
     if (!title || !content) {
-      this.errorMessage.set(this.translateService.instant('PROJECTPOSTS.ERRORS.EMPTY_FIELDS'));
+      this.toastService.warning(this.translateService.instant('PROJECTPOSTS.ERRORS.EMPTY_FIELDS'));
       return;
     }
 
     this.isCreating.set(true);
-    this.errorMessage.set(null);
 
     const image = this.selectedImage();
     const editingPostId = this.editingPostId();
@@ -154,9 +152,7 @@ export class ProjectPosts implements OnChanges, OnDestroy {
           image
         ).pipe(
           catchError(() => {
-            this.errorMessage.set(
-              this.translateService.instant('PROJECTPOSTS.ERRORS.IMAGE_UPLOAD')
-            );
+            this.toastService.error(this.translateService.instant('PROJECTPOSTS.ERRORS.IMAGE_UPLOAD'));
 
             return of(savedPost);
           })
@@ -172,7 +168,8 @@ export class ProjectPosts implements OnChanges, OnDestroy {
         this.loadPosts();
       },
       error: () => {
-        this.errorMessage.set(this.translateService.instant('PROJECTPOSTS.ERRORS.CREATE'));
+        this.toastService.error(this.translateService.instant('PROJECTPOSTS.ERRORS.CREATE'));
+        this.isCreating.set(false);
       },
     });
   }
@@ -243,7 +240,6 @@ export class ProjectPosts implements OnChanges, OnDestroy {
     }
 
     this.deletingPostId.set(postId);
-    this.errorMessage.set(null);
 
     this.projectService.deleteProjectPost(this.project.id, postId).subscribe({
       next: () => {
@@ -252,9 +248,7 @@ export class ProjectPosts implements OnChanges, OnDestroy {
         this.showDeleteSuccessModal.set(true);
       },
       error: () => {
-        this.errorMessage.set(
-          this.translateService.instant('PROJECTPOSTS.ERRORS.DELETE')
-        );
+        this.toastService.error(this.translateService.instant('PROJECTPOSTS.ERRORS.DELETE'));
         this.deletingPostId.set(null);
       },
     });
@@ -273,18 +267,17 @@ export class ProjectPosts implements OnChanges, OnDestroy {
     }
 
     if (!this.allowedImageTypes.includes(file.type)) {
-      this.errorMessage.set(this.translateService.instant('PROJECTPOSTS.ERRORS.IMAGE_TYPE'));
+      this.toastService.error(this.translateService.instant('PROJECTPOSTS.ERRORS.IMAGE_TYPE'));
       input.value = '';
       return;
     }
 
     if (file.size > this.maxImageSize) {
-      this.errorMessage.set(this.translateService.instant('PROJECTPOSTS.ERRORS.IMAGE_SIZE'));
+      this.toastService.error(this.translateService.instant('PROJECTPOSTS.ERRORS.IMAGE_SIZE'));
       input.value = '';
       return;
     }
 
-    this.errorMessage.set(null);
     this.revokeImagePreviewUrl();
 
     this.selectedImage.set(file);

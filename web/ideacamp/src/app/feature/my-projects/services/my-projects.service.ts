@@ -19,4 +19,10 @@ export class MyProjectsService {
       `${environment.apiUrl}/v1/users/${encodeURIComponent(username)}/projects/all`,
     );
   }
+
+  getRecentProjects(username: string): Observable<ProjectResponse[]> {
+    return this.http.get<ProjectResponse[]>(
+      `${environment.apiUrl}/v1/users/${encodeURIComponent(username)}/projects/recent`,
+    );
+  }
 }

@@ -2,6 +2,7 @@ package de.thm.swtp.api.tag.validation;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import de.thm.swtp.api.common.LogSafe;
+import de.thm.swtp.api.tag.exception.TagSourceApiException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -41,13 +42,13 @@ public class GitHubTopicsClient {
                         (request, res) -> {
                             log.debug("GitHub Topics API returned {} for tag: {}",
                                     res.getStatusCode(), LogSafe.clean(tagName));
-                            throw new TagValidationException("Tag validation service temporarily unavailable");
+                            throw new TagSourceApiException("Tag validation service temporarily unavailable");
                         })
                 .body(GitHubSearchResponse.class);
 
         if (response == null) {
             log.debug("GitHub Topics API returned null response for tag: {}", LogSafe.clean(tagName));
-            throw new TagValidationException("Tag validation service temporarily unavailable");
+            throw new TagSourceApiException("Tag validation service temporarily unavailable");
         }
 
         return response.items() != null

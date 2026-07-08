@@ -16,11 +16,12 @@ public record ProjectInviteResponse(
         UUID invitedUserId,
         String message,
         ProjectInviteStatus status,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        String discordInviteUrl
 ) {
 
     /** Converts a project invitation domain object into a response DTO.*/
-    public static ProjectInviteResponse toResponse(ProjectInvite invite){
+    public static ProjectInviteResponse toResponse(ProjectInvite invite, String discordInviteUrl){
         return new ProjectInviteResponse(
               invite.getId(),
               invite.getProjectId(),
@@ -30,7 +31,12 @@ public record ProjectInviteResponse(
               invite.getInvitedUserId(),
               invite.getMessage(),
               invite.getStatus(),
-              invite.getCreatedAt()
+              invite.getCreatedAt(),
+              discordInviteUrl
         );
+    }
+
+    public static ProjectInviteResponse toResponse(ProjectInvite invite){
+        return toResponse(invite, null);
     }
 }

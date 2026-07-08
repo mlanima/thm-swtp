@@ -32,13 +32,13 @@
               </div>
               <span class="text-sm">{{ member.name }}</span>
             </div>
-            @if (member.isOwner) {
+              @if (member.isOwner) {
               <span class="rounded-full border border-lime-400/30 bg-lime-500/20 px-2 py-0.5 text-xs font-medium text-lime-400">
                 {{ 'MYPROJECTS.OWNER' | translate }}
               </span>
             }
-          </div>
-        </a>
+            </div>
+          </a>
       }
 
       @if (hasMore()) {

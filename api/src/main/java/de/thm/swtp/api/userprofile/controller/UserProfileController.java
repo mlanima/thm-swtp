@@ -49,6 +49,12 @@ public class UserProfileController {
         return projectService.getProjectsByUsername(username);
     }
 
+    @GetMapping("/api/v1/users/{username}/projects/recent")
+    @PreAuthorize("@security.canViewUserProjects(#username, authentication)")
+    public List<ProjectResponse> getRecentProjects(@PathVariable String username, @AuthenticationPrincipal Jwt jwt) {
+        return projectService.getRecentProjectsByUsername(username, UUID.fromString(jwt.getSubject()));
+    }
+
     @GetMapping("/api/v1/users/{username}/projects/all")
     @PreAuthorize("@security.canViewUserProjects(#username, authentication)")
     public List<ProjectResponse> getAllProjects(@PathVariable String username) {
@@ -69,7 +75,7 @@ public class UserProfileController {
     public UserProfileResponse updateProfile(
             @PathVariable String username,
             @RequestBody UserProfileRequest request) {
-        return userProfileMapper.toResponse(userProfileService.updateProfile(username, request.title(), request.location(), request.about(), request.experience()));
+        return userProfileMapper.toResponse(userProfileService.updateProfile(username, request.title(), request.location(), request.about(), request.experience(), request.placeId()));
     }
 
     @DeleteMapping("/api/v1/users/{username}/profile")

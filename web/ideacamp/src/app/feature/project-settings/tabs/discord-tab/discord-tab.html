@@ -1,0 +1,144 @@
+<div class="rounded-xl border border-slate-200 bg-white p-6">
+  <h3 class="mb-4 text-lg font-semibold text-slate-700">{{ 'PROJECTSETTINGS.DISCORD.TITLE' | translate }}</h3>
+
+  @if (isUserLoading() || isLoading()) {
+    <p class="text-sm text-slate-400">{{ 'COMMON.LOADING' | translate }}</p>
+  }
+
+  @if (connectError(); as err) {
+    <p class="mb-3 text-sm text-red-500">{{ err | translate }}</p>
+  }
+
+  @if (linkError(); as err) {
+    <p class="mb-3 text-sm text-red-500">{{ err | translate }}</p>
+  }
+
+  @if (!isUserLoading() && !isLoading()) {
+    @if (!isDiscordLinked()) {
+      <p class="mb-4 text-sm text-slate-500">{{ 'PROJECTSETTINGS.DISCORD.NEEDS_DISCORD_LINK' | translate }}</p>
+      <button
+        (click)="linkDiscord()"
+        [disabled]="isLinkingDiscord()"
+        class="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:opacity-50"
+      >
+        @if (isLinkingDiscord()) {
+          <i class="pi pi-spin pi-spinner text-xs"></i>
+        }
+        <i class="pi pi-comments"></i>
+        {{ 'PROJECTSETTINGS.DISCORD.LINK_DISCORD' | translate }}
+      </button>
+    } @else if (connectionStatus()?.isActive) {
+      <div class="mb-4 flex items-center gap-2">
+        <span class="h-2 w-2 rounded-full bg-green-500"></span>
+        <span class="text-sm font-medium text-green-700">{{ 'PROJECTSETTINGS.DISCORD.CONNECTED' | translate }}</span>
+      </div>
+
+      @if (connectWarning(); as warn) {
+        <p class="mb-3 text-sm text-amber-600">{{ warn | translate }}</p>
+      }
+
+      <p class="mb-4 text-sm text-slate-500">
+        {{ 'PROJECTSETTINGS.DISCORD.CHANNEL_ID' | translate }}: <code class="rounded bg-slate-100 px-1.5 py-0.5 text-xs">{{ connectionStatus()?.channelId }}</code>
+      </p>
+
+      <div class="mb-4">
+        <label for="inviteUrlInput" class="mb-1 block text-sm font-medium text-slate-600">{{ 'PROJECTSETTINGS.DISCORD.INVITE_URL_LABEL' | translate }}</label>
+        <div class="flex gap-2">
+          <input
+            id="inviteUrlInput"
+            [ngModel]="inviteUrl()"
+            (ngModelChange)="inviteUrl.set($event)"
+            type="text"
+            placeholder="https://discord.gg/example"
+            class="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+          />
+          <button
+            (click)="updateInviteUrl()"
+            [disabled]="isUpdatingInvite()"
+            class="cursor-pointer rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:opacity-50"
+          >
+            {{ 'COMMON.SAVE' | translate }}
+          </button>
+        </div>
+        @if (connectionStatus()?.discordInviteUrl) {
+          <p class="mt-1 text-xs text-slate-400">
+            {{ 'PROJECTSETTINGS.DISCORD.INVITE_URL_HINT' | translate }}
+          </p>
+        }
+      </div>
+
+      <div class="mb-4">
+        <label for="channelIdInput" class="mb-1 block text-sm font-medium text-slate-600">{{ 'PROJECTSETTINGS.DISCORD.CHANNEL_ID_LABEL' | translate }}</label>
+        <div class="flex gap-2">
+          <input
+            id="channelIdInput"
+            [ngModel]="channelId()"
+            (ngModelChange)="channelId.set($event)"
+            type="text"
+            placeholder="123456789012345678"
+            class="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+          />
+          <button
+            (click)="testAndConnect()"
+            [disabled]="isConnecting() || !channelId().trim()"
+            class="cursor-pointer rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:opacity-50"
+          >
+            {{ 'PROJECTSETTINGS.DISCORD.CHANGE_CHANNEL' | translate }}
+          </button>
+        </div>
+      </div>
+
+      <button
+        (click)="disconnect()"
+        [disabled]="isDisconnecting()"
+        class="cursor-pointer rounded-lg border border-red-300 bg-white px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-50"
+      >
+        {{ 'PROJECTSETTINGS.DISCORD.DISCONNECT' | translate }}
+      </button>
+    } @else if (isAutoConnecting()) {
+      <div class="flex items-center gap-2 text-sm text-slate-500">
+        <i class="pi pi-spin pi-spinner text-xs"></i>
+        {{ 'PROJECTSETTINGS.DISCORD.AUTO_SETUP_LOADING' | translate }}
+      </div>
+    } @else {
+      <div class="mb-4">
+        <button
+          (click)="addBotToServer()"
+          [disabled]="isFetchingBotInvite()"
+          class="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:opacity-50"
+        >
+          @if (isFetchingBotInvite()) {
+            <i class="pi pi-spin pi-spinner text-xs"></i>
+          }
+          {{ (isFetchingBotInvite() ? 'PROJECTSETTINGS.DISCORD.ADD_BOT_LOADING' : 'PROJECTSETTINGS.DISCORD.ADD_BOT') | translate }}
+        </button>
+        <p class="mt-2 text-xs text-slate-400">{{ 'PROJECTSETTINGS.DISCORD.ADD_BOT_HINT' | translate }}</p>
+      </div>
+
+      @if (showGuildPicker()) {
+        <div class="mb-4 rounded-lg border border-slate-200 bg-slate-50 p-4">
+          <p class="mb-2 text-sm font-medium text-slate-700">{{ 'PROJECTSETTINGS.DISCORD.SELECT_SERVER' | translate }}</p>
+          <div class="flex gap-2">
+            <select
+              [ngModel]="selectedGuildId()"
+              (ngModelChange)="selectedGuildId.set($event)"
+              class="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+            >
+              <option value="" disabled>{{ 'PROJECTSETTINGS.DISCORD.SELECT_SERVER_PLACEHOLDER' | translate }}</option>
+              @for (g of availableGuilds(); track g.id) {
+                <option [value]="g.id">{{ g.name }}</option>
+              }
+            </select>
+            <button
+              (click)="connectWithSelectedGuild()"
+              [disabled]="!selectedGuildId() || isConnectingGuild()"
+              class="cursor-pointer rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:opacity-50"
+            >
+              {{ 'PROJECTSETTINGS.DISCORD.CONNECT_SERVER' | translate }}
+            </button>
+          </div>
+        </div>
+      }
+    }
+  }
+</div>

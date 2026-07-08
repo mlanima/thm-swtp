@@ -72,6 +72,7 @@
     "INVITED_BY": "Invited by:",
     "ACCEPT": "Accept",
     "DECLINE": "Decline",
+    "JOIN_DISCORD": "Join Discord",
     "NO_SHORT_DESCRIPTION": "No short description.",
     "PRIVATE": "Private",
     "PUBLIC": "Public",
@@ -112,11 +113,15 @@
     "ERROR_EDIT_FORBIDDEN": "You are not authorized to edit this profile.",
     "FOLLOWERS": "Followers",
     "ERROR_UPDATE_PROFILE": "The profile could not be updated. Please try again later.",
+    "ERROR_INVALID_PLACE": "This is not a real city. Please select a place from the suggestions.",
+    "ERROR_CONTENT_NOT_VALID": "This input contains content that is not allowed.",
     "FOLLOW": "Follow",
     "FOLLOWING": "Following",
     "UNFOLLOW": "Unfollow",
     "INVITE": "Invite",
-    "PROFESSOR_BADGE": "Professor"
+    "PROFESSOR_BADGE": "Professor",
+    "DISCORD_SHOW": "Username",
+    "DISCORD_COPIED": "Copied!"
   },
   "CONTACT-REQUESTS": {
     "CONTACT": "Contact Requests",
@@ -258,6 +263,7 @@
     }
   },
   "SIDEBAR": {
+    "DASHBOARD": "Dashboard",
     "MYPROJECTS": "My projects",
     "FAVORITE": "Favorites",
     "PROFILE": "My profile",
@@ -312,6 +318,7 @@
     "SUCCESS_CREATED": "Project created successfully!",
     "SUCCESS_CREATED_WITH_INVITES": "Project created successfully and invitations sent!",
     "ERROR_CREATE_PROJECT": "Project could not be created. Please try again.",
+    "ERROR_MODERATION": "Project could not be created because some content was flagged as inappropriate. Please review your entries.",
     "VALIDATION": {
       "NAME_MIN": "Project name must be at least 3 characters long.",
       "NAME_MAX": "Project name must not be longer than 20 characters.",
@@ -450,8 +457,32 @@
       "JOIN_REQUESTS": "Join requests",
       "MEMBERS": "Members",
       "PRIVACY": "Privacy",
-      "GITHUB": "GitHub",
-      "DANGER_ZONE": "Danger zone"
+"GITHUB": "GitHub",
+      "DANGER_ZONE": "Danger zone",
+      "DISCORD": "Discord"
+    },
+    "DISCORD": {
+      "TITLE": "Discord Integration",
+      "CONNECTED": "Connected",
+      "CHANNEL_ID": "Channel ID",
+      "CHANNEL_ID_LABEL": "Discord Channel ID",
+      "ADD_BOT": "Connect Discord Server",
+      "ADD_BOT_LOADING": "Opening Discord...",
+      "ADD_BOT_HINT": "The bot will find or create a #posts channel and automatically make it read-only for everyone except the project owner.",
+      "AUTO_SETUP_LOADING": "Setting up channel...",
+      "CHANGE_CHANNEL": "Change Channel",
+      "TEST_AND_CONNECT": "Test & Connect",
+      "DISCONNECT": "Disconnect",
+      "INVITE_URL_LABEL": "Discord Invite Link",
+      "INVITE_URL_HINT": "This link will be shown to invited users so they can join the server.",
+      "ERROR_CONNECT": "Could not connect to Discord channel.",
+      "ERROR_LINK": "Could not connect to Discord.",
+      "NEEDS_DISCORD_LINK": "You need to link your Discord account before connecting a server.",
+      "LINK_DISCORD": "Link Discord Account",
+      "SELECT_SERVER": "Bot is in multiple servers — select which one to use:",
+      "SELECT_SERVER_PLACEHOLDER": "Select a server...",
+      "CONNECT_SERVER": "Connect",
+      "BOT_NO_WRITE_PERMISSION": "The bot cannot send messages in the existing #posts channel. Grant the \"Send Messages\" permission to the bot in Discord, or connect a different channel manually."
     },
     "ERRORS": {
       "NO_PROJECT_URL": "No project URL provided.",
@@ -530,7 +561,8 @@
     "ERRORS": {
       "NO_PROJECT_URL": "No project URL provided.",
       "LOAD_PROJECT": "Project data could not be loaded.",
-      "SAVE_PROJECT": "Project could not be saved."
+      "SAVE_PROJECT": "Project could not be saved.",
+      "CONTENT_NOT_VALID": "This input contains content that is not allowed."
     },
     "INFO": {
       "VISIBILITY": "Visibility",
@@ -542,9 +574,12 @@
     "HEADER": {
       "SETTINGS": "Settings"
     },
+    "DISCORD_CHANNEL": "Discord Channel",
     "MEMBERS": {
       "ALL_MEMBERS": "All members",
-      "NO_MEMBERS": "No members yet."
+      "NO_MEMBERS": "No members yet.",
+      "DISCORD_SHOW": "Username",
+      "DISCORD_COPIED": "Copied!"
     },
     "TAGS": {
       "ERROR_INVALID_CHARS": "Tag contains invalid characters. Allowed: letters, numbers, spaces, hyphen and dot.",
@@ -657,7 +692,8 @@
       "PROFESSOR_REQUEST": "Become a professor",
       "INTEGRATIONS": "GitHub",
       "CONTACT": "Contact",
-      "IMPRESSUM": "Legal notice"
+      "IMPRESSUM": "Legal notice",
+      "DISCORD": "Discord"
     },
     "CONTACT": {
       "TITLE": "Contact",
@@ -665,6 +701,15 @@
       "SEND_EMAIL": "Send email",
       "COPIED": "Email copied",
       "COPY": "Copy email"
+    },
+    "DISCORD": {
+      "TITLE": "Discord Connection",
+      "CONNECT": "Connect Discord",
+      "DISCONNECT": "Disconnect",
+      "NOT_CONNECTED": "You are not connected to Discord.",
+      "ERROR_LOAD": "Could not load Discord connection status.",
+      "ERROR_CONNECT": "Could not connect Discord account.",
+      "ERROR_DISCONNECT": "Could not disconnect Discord account."
     }
   },
   "GITHUB": {
@@ -782,6 +827,22 @@
     "NO_REASON": "No reason provided",
     "BANNED_AT": "Banned on:",
     "CONTACT_HINT": "If you have any questions, please contact the project team."
+  },
+  "DASHBOARD": {
+    "POSTS": {
+      "TITLE": "Recent Posts",
+      "SUBTITLE": "Updates from your projects",
+      "POSTED_IN": "Posted in {{ project }}",
+      "LOADING": "Posts are loading…",
+      "EMPTY": "There are no posts yet. Posts from your projects will appear here.",
+      "ERROR_LOAD": "Posts could not be loaded.",
+      "UNKNOWN_AUTHOR": "Unknown"
+    },
+    "PROJECTS": {
+      "TITLE": "Recent",
+      "LOADING": "Projects are loading…",
+      "EMPTY": "You are not a member of any projects yet."
+    }
   },
   "THESISSITE": {
     "LOADING": "Thesis is loading…",

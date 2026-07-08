@@ -72,6 +72,7 @@
     "INVITED_BY": "Eingeladen von:",
     "ACCEPT": "Annehmen",
     "DECLINE": "Ablehnen",
+    "JOIN_DISCORD": "Discord beitreten",
     "NO_SHORT_DESCRIPTION": "Keine Kurzbeschreibung.",
     "PRIVATE": "Privat",
     "PUBLIC": "Öffentlich",
@@ -112,11 +113,15 @@
     "ERROR_EDIT_FORBIDDEN": "Du bist nicht berechtigt, dieses Profil zu bearbeiten.",
     "FOLLOWERS": "Follower",
     "ERROR_UPDATE_PROFILE": "Das Profil konnte nicht aktualisiert werden. Bitte versuche es später erneut.",
+    "ERROR_INVALID_PLACE": "Dies ist keine reale Stadt. Bitte wähle einen Ort aus den Vorschlägen aus.",
+    "ERROR_CONTENT_NOT_VALID": "Diese Eingabe enthält nicht erlaubten Inhalt.",
     "FOLLOW": "Folgen",
     "FOLLOWING": "Folge ich",
     "UNFOLLOW": "Entfolgen",
     "INVITE": "Einladen",
-    "PROFESSOR_BADGE": "Professor"
+    "PROFESSOR_BADGE": "Professor",
+    "DISCORD_SHOW": "Nutzername",
+    "DISCORD_COPIED": "Kopiert!"
   },
   "CONTACT-REQUESTS": {
     "CONTACT": "Kontaktanfragen",
@@ -258,6 +263,7 @@
     }
   },
   "SIDEBAR": {
+    "DASHBOARD": "Dashboard",
     "MYPROJECTS": "Meine Projekte",
     "FAVORITE": "Favoriten",
     "PROFILE": "Mein Profil",
@@ -312,6 +318,7 @@
     "SUCCESS_CREATED": "Projekt erfolgreich erstellt!",
     "SUCCESS_CREATED_WITH_INVITES": "Projekt erfolgreich erstellt und Einladungen gesendet!",
     "ERROR_CREATE_PROJECT": "Projekt konnte nicht erstellt werden. Bitte versuche es erneut.",
+    "ERROR_MODERATION": "Projekt konnte nicht erstellt werden, da einige Inhalte als unangemessen eingestuft wurden. Bitte überprüfe deine Eingaben.",
     "VALIDATION": {
       "NAME_MIN": "Projektname muss mindestens 3 Zeichen lang sein.",
       "NAME_MAX": "Projektname darf höchstens 20 Zeichen lang sein.",
@@ -450,8 +457,32 @@
       "JOIN_REQUESTS": "Beitrittsanfragen",
       "MEMBERS": "Mitglieder",
       "PRIVACY": "Privatsphäre",
-      "GITHUB": "GitHub",
-      "DANGER_ZONE": "Gefahrenzone"
+"GITHUB": "GitHub",
+      "DANGER_ZONE": "Gefahrenzone",
+      "DISCORD": "Discord"
+    },
+    "DISCORD": {
+      "TITLE": "Discord Integration",
+      "CONNECTED": "Verbunden",
+      "CHANNEL_ID": "Kanal-ID",
+      "CHANNEL_ID_LABEL": "Discord Kanal-ID",
+      "ADD_BOT": "Discord Server verbinden",
+      "ADD_BOT_LOADING": "Öffne Discord...",
+      "ADD_BOT_HINT": "Der Bot findet oder erstellt einen #posts-Kanal und macht ihn automatisch schreibgeschützt für alle außer dem Projektinhaber.",
+      "AUTO_SETUP_LOADING": "Kanal wird eingerichtet...",
+      "CHANGE_CHANNEL": "Kanal ändern",
+      "TEST_AND_CONNECT": "Testen & Verbinden",
+      "DISCONNECT": "Trennen",
+      "INVITE_URL_LABEL": "Discord Einladungslink",
+      "INVITE_URL_HINT": "Dieser Link wird eingeladenen Nutzern angezeigt, damit sie dem Server beitreten können.",
+      "ERROR_CONNECT": "Konnte keine Verbindung zum Discord-Kanal herstellen.",
+      "ERROR_LINK": "Verbindung zu Discord fehlgeschlagen.",
+      "NEEDS_DISCORD_LINK": "Du musst dein Discord-Konto verknüpfen, bevor du einen Server verbinden kannst.",
+      "LINK_DISCORD": "Discord-Konto verknüpfen",
+      "SELECT_SERVER": "Bot ist in mehreren Servern — wähle einen aus:",
+      "SELECT_SERVER_PLACEHOLDER": "Server auswählen...",
+      "CONNECT_SERVER": "Verbinden",
+      "BOT_NO_WRITE_PERMISSION": "Der Bot kann im vorhandenen #posts-Kanal keine Nachrichten senden. Erteile dem Bot die \"Nachrichten senden\"-Berechtigung in Discord oder verbinde manuell einen anderen Kanal."
     },
     "ERRORS": {
       "NO_PROJECT_URL": "Keine Projekt-URL gegeben.",
@@ -530,7 +561,8 @@
     "ERRORS": {
       "NO_PROJECT_URL": "Keine Projekt-URL angegeben.",
       "LOAD_PROJECT": "Projektdaten konnten nicht abgerufen werden.",
-      "SAVE_PROJECT": "Projekt konnte nicht gespeichert werden."
+      "SAVE_PROJECT": "Projekt konnte nicht gespeichert werden.",
+      "CONTENT_NOT_VALID": "Dieser Inhalt ist nicht erlaubt."
     },
     "INFO": {
       "VISIBILITY": "Sichtbarkeit",
@@ -542,9 +574,12 @@
     "HEADER": {
       "SETTINGS": "Einstellungen"
     },
+    "DISCORD_CHANNEL": "Discord Kanal",
     "MEMBERS": {
       "ALL_MEMBERS": "Alle Mitglieder",
-      "NO_MEMBERS": "Noch keine Mitglieder."
+      "NO_MEMBERS": "Noch keine Mitglieder.",
+      "DISCORD_SHOW": "Nutzername",
+      "DISCORD_COPIED": "Kopiert!"
     },
     "TAGS": {
       "ERROR_INVALID_CHARS": "Tag enthält ungültige Zeichen. Erlaubt: Buchstaben, Zahlen, Leerzeichen, Bindestrich und Punkt.",
@@ -657,7 +692,8 @@
       "PROFESSOR_REQUEST": "Professor:in werden",
       "INTEGRATIONS": "GitHub",
       "CONTACT": "Kontakt",
-      "IMPRESSUM": "Impressum"
+      "IMPRESSUM": "Impressum",
+      "DISCORD": "Discord"
     },
     "CONTACT": {
       "TITLE": "Kontakt",
@@ -665,6 +701,15 @@
       "SEND_EMAIL": "E-Mail senden",
       "COPIED": "Email kopiert",
       "COPY": "Email kopieren"
+    },
+    "DISCORD": {
+      "TITLE": "Discord Verbindung",
+      "CONNECT": "Discord verbinden",
+      "DISCONNECT": "Trennen",
+      "NOT_CONNECTED": "Du bist nicht mit Discord verbunden.",
+      "ERROR_LOAD": "Verbindungsstatus konnte nicht geladen werden.",
+      "ERROR_CONNECT": "Discord-Verbindung konnte nicht hergestellt werden.",
+      "ERROR_DISCONNECT": "Verbindung konnte nicht getrennt werden."
     }
   },
   "GITHUB": {
@@ -782,6 +827,22 @@
     "NO_REASON": "Kein Grund angegeben",
     "BANNED_AT": "Gesperrt am:",
     "CONTACT_HINT": "Wenn du Fragen hast, wende dich bitte an das Projektteam."
+  },
+  "DASHBOARD": {
+    "POSTS": {
+      "TITLE": "Neueste Beiträge",
+      "SUBTITLE": "Updates aus deinen Projekten",
+      "POSTED_IN": "Veröffentlicht in {{ project }}",
+      "LOADING": "Beiträge werden geladen…",
+      "EMPTY": "Es gibt noch keine Beiträge. Beiträge aus deinen Projekten erscheinen hier.",
+      "ERROR_LOAD": "Beiträge konnten nicht geladen werden.",
+      "UNKNOWN_AUTHOR": "Unbekannt"
+    },
+    "PROJECTS": {
+      "TITLE": "Zuletzt",
+      "LOADING": "Projekte werden geladen…",
+      "EMPTY": "Du bist noch in keinem Projekt Mitglied."
+    }
   },
   "THESISSITE": {
     "LOADING": "Abschlussarbeit wird geladen…",
