@@ -98,6 +98,16 @@ github:
   topics:
     api:
       base-url: https://api.github.com
+  api:
+    base-url: https://api.github.com
+  oauth:
+    client-id: ${GITHUB_OAUTH_CLIENT_ID:}
+    client-secret: ${GITHUB_OAUTH_CLIENT_SECRET:}
+    redirect-uri: ${GITHUB_OAUTH_REDIRECT_URI:http://localhost:4200/github/callback}
+    scopes: repo
+    authorize-url: https://github.com/login/oauth/authorize
+    token-url: https://github.com/login/oauth/access_token
+    token-encryption-key: ${GITHUB_TOKEN_ENCRYPTION_KEY:}
 
 google:
   api:

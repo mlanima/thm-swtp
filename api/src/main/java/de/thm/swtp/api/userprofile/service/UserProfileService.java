@@ -147,7 +147,6 @@ public class UserProfileService {
     public Optional<UserProfile> findProfileByKeycloakId(UUID keycloakId) {
         return userProfileRepository.findByKeycloakId(keycloakId);
     }
-
     private void validateManagedUserSort(Sort sort){
        sort.forEach((sortField) -> {
            if (!MANAGED_USER_SORT_FIELDS.contains(sortField.getProperty())) {

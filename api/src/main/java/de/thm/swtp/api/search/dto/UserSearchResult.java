@@ -11,11 +11,12 @@ import java.util.UUID;
  * Contains the fields that are relevant for displaying a user profile
  * in search results, including its tag names as a flat string list.
  *
- * @param keycloakId the user's unique Keycloak identifier
- * @param username   the display username
- * @param title      the user's professional title
- * @param location   the user's location
- * @param tags       list of tag names assigned to the user
+ * @param keycloakId  the user's unique Keycloak identifier
+ * @param username    the display username
+ * @param title       the user's professional title
+ * @param location    the user's location
+ * @param tags        list of tag names assigned to the user
+ * @param isProfessor whether the user is a verified professor
  */
 @Builder
 public record UserSearchResult(
@@ -23,5 +24,6 @@ public record UserSearchResult(
         String username,
         String title,
         String location,
-        List<String> tags
+        List<String> tags,
+        boolean isProfessor
 ) {}

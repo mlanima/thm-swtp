@@ -36,6 +36,9 @@ public class CacheConfig implements CachingConfigurer {
                         .cacheDefaults(defaultCacheConfig())
                         .withCacheConfiguration("tag-rejected", tagRejectedCacheConfig())
                         .withCacheConfiguration("content-moderation", contentModerationCacheConfig())
+                        .withCacheConfiguration("tag-exists", tagExistsCacheConfig())
+                        .withCacheConfiguration("github-repo-card", githubRepoCardCacheConfig())
+                        .withCacheConfiguration("github-readme", githubReadmeCacheConfig())
                         .build();
             } catch (Exception e) {
                 log.warn("Redis unreachable \u2014 caching disabled: {}", e.getMessage());
@@ -67,6 +70,18 @@ public class CacheConfig implements CachingConfigurer {
         return defaultCacheConfig()
                 .entryTtl(Duration.ofMinutes(10))
                 .prefixCacheNameWith("content:");
+    }
+
+    private RedisCacheConfiguration githubRepoCardCacheConfig() {
+        return defaultCacheConfig()
+                .entryTtl(Duration.ofMinutes(10))
+                .prefixCacheNameWith("github:");
+    }
+
+    private RedisCacheConfiguration githubReadmeCacheConfig() {
+        return defaultCacheConfig()
+                .entryTtl(Duration.ofMinutes(30))
+                .prefixCacheNameWith("github:");
     }
 
     @Override

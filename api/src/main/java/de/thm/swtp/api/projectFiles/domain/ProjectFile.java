@@ -16,4 +16,5 @@ public class ProjectFile {
     private String mimeType;
     private long sizeBytes;
     private LocalDateTime createdAt;
+    private FileVisibility visibility;
 }
