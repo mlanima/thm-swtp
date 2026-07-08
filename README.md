@@ -1,10 +1,12 @@
 <div align="center">
 
-# 💡 IdeaCamp
+<img src="docs/assets/ideacamp-logo.png" alt="IdeaCamp Logo" width="440"/>
 
-**A collaborative platform for pitching, discovering and managing project ideas.**
+<br/><br/>
 
-Built by Group 3 for the *Software Engineering: Realisierung* course at THM (Technische Hochschule Mittelhessen).
+**Eine kollaborative Plattform zum Vorschlagen, Entdecken und Verwalten von Projektideen.**
+
+Entwickelt von Gruppe 3 im Modul *Software Engineering: Realisierung* an der THM (Technische Hochschule Mittelhessen).
 
 [![CI Backend](https://github.com/mlanima/thm-swtp/actions/workflows/ci-backend.yml/badge.svg)](https://github.com/mlanima/thm-swtp/actions/workflows/ci-backend.yml)
 [![CI Frontend](https://github.com/mlanima/thm-swtp/actions/workflows/ci-frontend.yml/badge.svg)](https://github.com/mlanima/thm-swtp/actions/workflows/ci-frontend.yml)
@@ -20,44 +22,44 @@ Built by Group 3 for the *Software Engineering: Realisierung* course at THM (Tec
 
 ---
 
-## 📑 Table of Contents
+## 📑 Inhaltsverzeichnis
 
-- [About](#-about)
-- [Built With](#-built-with)
-- [Getting Started](#-getting-started)
-  - [Prerequisites](#prerequisites)
+- [Über das Projekt](#-über-das-projekt)
+- [Tech-Stack](#-tech-stack)
+- [Erste Schritte](#-erste-schritte)
+  - [Voraussetzungen](#voraussetzungen)
   - [Backend](#backend-api)
   - [Frontend](#frontend-webideacamp)
-- [Project Structure](#-project-structure)
-- [Environments](#-environments)
-- [Documentation](#-documentation)
-- [Contributing](#-contributing)
-- [Contributors](#-contributors)
+- [Projektstruktur](#-projektstruktur)
+- [Umgebungen](#-umgebungen)
+- [Dokumentation](#-dokumentation)
+- [Mitwirken](#-mitwirken)
+- [Mitwirkende](#-mitwirkende)
 
-## 🎯 About
+## 🎯 Über das Projekt
 
-IdeaCamp lets students and staff propose project ideas, browse and search existing ones, and collaborate on turning them into real projects. Authentication and role management are handled centrally via Keycloak (OAuth2 / OIDC), and every pull request gets its own fully deployed review environment.
+IdeaCamp ermöglicht es Studierenden und Mitarbeitenden, Projektideen einzureichen, bestehende Ideen zu durchsuchen und gemeinsam daraus echte Projekte zu machen. Authentifizierung und Rollenverwaltung laufen zentral über Keycloak (OAuth2 / OIDC) — und jeder Pull Request bekommt automatisch eine eigene, vollständig deployte Review-Umgebung.
 
-## 🛠 Built With
+## 🛠 Tech-Stack
 
-| Layer | Technology |
+| Ebene | Technologie |
 |---|---|
 | **Backend** | Java 25, Spring Boot (Web, Data JPA, Security), Maven, Checkstyle |
 | **Frontend** | Angular 21 (SSR via `@angular/ssr` + Express), TypeScript, Tailwind CSS, Zod, ngx-translate |
 | **Auth** | Keycloak (OAuth2 / OIDC), `angular-oauth2-oidc` |
-| **Database** | MySQL 9 (production), SQLite (local dev/test) |
-| **Infrastructure** | Docker Compose, Traefik (TLS via Let's Encrypt), Babashka deploy scripts |
-| **CI/CD** | GitHub Actions — build, lint, test, auto-deploy & per-PR review apps |
+| **Datenbank** | MySQL 9 (Produktion), SQLite (lokale Entwicklung & Tests) |
+| **Infrastruktur** | Docker Compose, Traefik (TLS via Let's Encrypt), Babashka-Deploy-Skripte |
+| **CI/CD** | GitHub Actions — Build, Lint, Tests, Auto-Deploy & Review-Apps pro PR |
 
-## 🚀 Getting Started
+## 🚀 Erste Schritte
 
-### Prerequisites
+### Voraussetzungen
 
-- **Java 25** (backend)
-- **Node.js 20+** with npm 11+ (frontend)
-- **Docker** (optional, for containerized runs)
+- **Java 25** (Backend)
+- **Node.js 20+** mit npm 11+ (Frontend)
+- **Docker** (optional, für containerisierte Ausführung)
 
-Clone the repository:
+Repository klonen:
 
 ```bash
 git clone git@github.com:mlanima/thm-swtp.git
@@ -71,15 +73,15 @@ cd api
 ./mvnw spring-boot:run
 ```
 
-The API starts at `http://localhost:8080` using a local SQLite database. Keycloak (realm `swtp`) is expected at `https://auth.swtp-ss26.de` — adjust `src/main/resources/application.yaml` if needed.
+Die API startet unter `http://localhost:8080` mit einer lokalen SQLite-Datenbank. Keycloak (Realm `swtp`) wird unter `https://auth.swtp-ss26.de` erwartet — bei Bedarf in `src/main/resources/application.yaml` anpassen.
 
 <details>
-<summary>Run with Docker instead</summary>
+<summary>Alternativ mit Docker starten</summary>
 
 ```bash
 cd api
 docker build -t swtp-api .
-docker run -p 8080:8080 -v $(pwd)/db:/app/db swtp-api   # Windows: use ${PWD}
+docker run -p 8080:8080 -v $(pwd)/db:/app/db swtp-api   # Windows: ${PWD} verwenden
 ```
 
 </details>
@@ -92,57 +94,57 @@ npm install
 npm start
 ```
 
-The app runs at `http://localhost:4200` and proxies API calls to the backend on port 8080.
+Die App läuft unter `http://localhost:4200` und leitet API-Aufrufe per Proxy an das Backend auf Port 8080 weiter.
 
-Other useful scripts:
+Weitere nützliche Skripte:
 
 ```bash
-npm run build                  # production build
-npm run serve:ssr:ideacamp     # serve the SSR build
-npm test                       # unit tests (Vitest)
+npm run build                  # Produktions-Build
+npm run serve:ssr:ideacamp     # SSR-Build ausliefern
+npm test                       # Unit-Tests (Vitest)
 npm run lint                   # ESLint
 ```
 
-## 📁 Project Structure
+## 📁 Projektstruktur
 
 ```
 thm-swtp/
-├── api/            # Spring Boot backend (REST API, Keycloak-secured)
-├── web/ideacamp/   # Angular frontend (SSR)
-├── infra/          # Docker Compose stacks, Traefik config, deploy scripts
-├── docs/           # Architecture & integration docs
-└── .github/        # CI/CD workflows
+├── api/            # Spring-Boot-Backend (REST-API, abgesichert via Keycloak)
+├── web/ideacamp/   # Angular-Frontend (SSR)
+├── infra/          # Docker-Compose-Stacks, Traefik-Konfiguration, Deploy-Skripte
+├── docs/           # Architektur- & Integrationsdokumentation
+└── .github/        # CI/CD-Workflows
 ```
 
-Each sub-project has its own README with more detail.
+Jedes Teilprojekt hat ein eigenes README mit weiteren Details.
 
-## 🌍 Environments
+## 🌍 Umgebungen
 
-| Environment | Branch | URL |
+| Umgebung | Branch | URL |
 |---|---|---|
-| **Production** | `main` | [www.swtp-ss26.de](https://www.swtp-ss26.de) |
-| **Development** | `developer` | [dev.swtp-ss26.de](https://dev.swtp-ss26.de) |
-| **Review apps** | per PR | spun up automatically, torn down on close |
-| **Status dashboard** | — | [status.swtp-ss26.de](https://status.swtp-ss26.de) |
+| **Produktion** | `main` | [www.swtp-ss26.de](https://www.swtp-ss26.de) |
+| **Entwicklung** | `developer` | [dev.swtp-ss26.de](https://dev.swtp-ss26.de) |
+| **Review-Apps** | pro PR | werden automatisch erstellt und beim Schließen abgebaut |
+| **Status-Dashboard** | — | [status.swtp-ss26.de](https://status.swtp-ss26.de) |
 
-Pushes to `main` and `developer` are deployed automatically via GitHub Actions. Every pull request additionally gets its own isolated environment (dedicated database schema, containers and Keycloak client).
+Pushes auf `main` und `developer` werden automatisch über GitHub Actions deployt. Jeder Pull Request erhält zusätzlich eine eigene isolierte Umgebung (eigenes Datenbank-Schema, eigene Container und Keycloak-Client).
 
-## 📚 Documentation
+## 📚 Dokumentation
 
-- [Backend API documentation](docs/BACKEND_API_DOCUMENTATION.md)
-- [Frontend structure & auth](docs/FRONTEND_STRUCTURE_AND_AUTH.md)
-- [Keycloak setup & configuration](docs/Keycloak%20-%20Setup%20&%20Konfiguration.md)
-- [Roles & permissions](docs/ROLLEN.md)
+- [Backend-API-Dokumentation](docs/BACKEND_API_DOCUMENTATION.md)
+- [Frontend-Struktur & Auth](docs/FRONTEND_STRUCTURE_AND_AUTH.md)
+- [Keycloak — Setup & Konfiguration](docs/Keycloak%20-%20Setup%20&%20Konfiguration.md)
+- [Rollen & Berechtigungen](docs/ROLLEN.md)
 - [Caching](docs/CACHING.md)
 
-## 🤝 Contributing
+## 🤝 Mitwirken
 
-1. Create a feature branch from `developer` (e.g. `feat/my-feature`).
-2. Commit your changes — CI runs Checkstyle, ESLint, builds and tests on every PR.
-3. Open a pull request against `developer`. A review app is deployed automatically so reviewers can try your changes live.
-4. Get a review and merge. 🎉
+1. Feature-Branch von `developer` erstellen (z. B. `feat/mein-feature`).
+2. Änderungen committen — die CI führt bei jedem PR Checkstyle, ESLint, Builds und Tests aus.
+3. Pull Request gegen `developer` öffnen. Eine Review-App wird automatisch deployt, sodass Reviewer die Änderungen live ausprobieren können.
+4. Review einholen und mergen. 🎉
 
-## 👥 Contributors
+## 👥 Mitwirkende
 
 <a href="https://github.com/mlanima"><img src="https://github.com/mlanima.png" width="60" style="border-radius:50%" alt="mlanima"/></a>
 <a href="https://github.com/chrishnz"><img src="https://github.com/chrishnz.png" width="60" style="border-radius:50%" alt="chrishnz"/></a>
