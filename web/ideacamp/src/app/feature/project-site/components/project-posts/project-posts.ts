@@ -41,7 +41,6 @@ export class ProjectPosts implements OnChanges, OnDestroy {
   contentFormat = signal<ProjectPostContentFormat>('MARKDOWN');
   deletingPostId = signal<string | null>(null);
   showDeleteSuccessModal = signal(false);
-  errorMessage = signal<string | null>(null);
 
   selectedImage = signal<File | null>(null);
   imagePreviewUrl = signal<string | null>(null);
@@ -98,7 +97,6 @@ export class ProjectPosts implements OnChanges, OnDestroy {
     const nextValue = !this.showCreateForm();
 
     this.showCreateForm.set(nextValue);
-    this.errorMessage.set(null);
 
     if (!nextValue) { this.resetCreateForm(); }
   }
@@ -133,9 +131,7 @@ export class ProjectPosts implements OnChanges, OnDestroy {
           image
         ).pipe(
           catchError(() => {
-            this.errorMessage.set(
-              this.translateService.instant('PROJECTPOSTS.ERRORS.IMAGE_UPLOAD')
-            );
+            this.toastService.error(this.translateService.instant('PROJECTPOSTS.ERRORS.IMAGE_UPLOAD'));
 
             return of(createdPost);
           })
@@ -156,7 +152,7 @@ export class ProjectPosts implements OnChanges, OnDestroy {
         this.showCreateForm.set(false);
       },
       error: () => {
-        this.errorMessage.set(this.translateService.instant('PROJECTPOSTS.ERRORS.CREATE'));
+        this.toastService.error(this.translateService.instant('PROJECTPOSTS.ERRORS.CREATE'));
         this.isCreating.set(false);
       },
     });
@@ -255,18 +251,17 @@ export class ProjectPosts implements OnChanges, OnDestroy {
     }
 
     if (!this.allowedImageTypes.includes(file.type)) {
-      this.errorMessage.set(this.translateService.instant('PROJECTPOSTS.ERRORS.IMAGE_TYPE'));
+      this.toastService.error(this.translateService.instant('PROJECTPOSTS.ERRORS.IMAGE_TYPE'));
       input.value = '';
       return;
     }
 
     if (file.size > this.maxImageSize) {
-      this.errorMessage.set(this.translateService.instant('PROJECTPOSTS.ERRORS.IMAGE_SIZE'));
+      this.toastService.error(this.translateService.instant('PROJECTPOSTS.ERRORS.IMAGE_SIZE'));
       input.value = '';
       return;
     }
 
-    this.errorMessage.set(null);
     this.revokeImagePreviewUrl();
 
     this.selectedImage.set(file);
