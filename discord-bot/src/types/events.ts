@@ -11,6 +11,7 @@ export interface PostCreatedPayload {
   projectId: string;
   channelId: string;
   content: string;
+  title: string;
   authorName: string;
   authorAvatar?: string;
   platformUrl: string;

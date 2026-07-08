@@ -5,6 +5,7 @@ export const PostCreatedSchema = z.object({
   projectId: z.string().uuid(),
   channelId: z.string(),
   content: z.string().max(3900),
+  title: z.string().max(200),
   authorName: z.string().max(100),
   authorAvatar: z.string().optional(),
   platformUrl: z.string().url(),

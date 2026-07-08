@@ -45,6 +45,7 @@ public class DiscordEventPublisher {
         payload.put("projectId", post.getProject().getId().toString());
         payload.put("channelId", link.getDiscordChannelId());
         payload.put("content", content);
+        payload.put("title", post.getTitle());
         payload.put("authorName", post.getAuthor().getUsername());
         payload.put("platformUrl", buildPostUrl(post));
 

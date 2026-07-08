@@ -9,6 +9,7 @@ function validPostCreated() {
       projectId: '660e8400-e29b-41d4-a716-446655440001',
       channelId: '123456789012345678',
       content: 'Hello from the platform!',
+      title: 'Test Post Title',
       authorName: 'testuser',
       platformUrl: 'https://swtp-ss26.de/project/test-project',
     },

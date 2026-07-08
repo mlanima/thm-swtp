@@ -25,7 +25,7 @@ function resolveSendableChannel(channelId: string): SendableChannel | null {
 }
 
 export async function handleSendPost(job: Job<PostCreatedPayload>): Promise<void> {
-  const { postId, channelId, content, authorName, authorAvatar, platformUrl } = job.data;
+  const { postId, channelId, content, title, authorName, authorAvatar, platformUrl } = job.data;
 
   const channel = resolveSendableChannel(channelId);
   if (!channel) {
@@ -34,6 +34,7 @@ export async function handleSendPost(job: Job<PostCreatedPayload>): Promise<void
 
   const embed = new EmbedBuilder()
     .setAuthor({ name: authorName, iconURL: authorAvatar ?? undefined })
+    .setTitle(title.length > 256 ? title.slice(0, 253) + '...' : title)
     .setDescription(content.length > 4096 ? content.slice(0, 4093) + '...' : content)
     .setColor(NEUTRAL_COLOR)
     .setURL(platformUrl)
