@@ -33,7 +33,6 @@ export class ProjectPosts implements OnChanges, OnDestroy {
   posts = signal<ProjectPostResponse[]>([]);
   isLoading = signal(false);
   isCreating = signal(false);
-  errorMessage = signal<string | null>(null);
 
   visibleCount = signal(3);
 
@@ -385,12 +384,12 @@ export class ProjectPosts implements OnChanges, OnDestroy {
   }
 
   editPost(post: ProjectPostResponse): void {
+    this.removeSelectedImage();
     this.editingPostId.set(post.id);
     this.title.set(post.title);
     this.content.set(post.content);
     this.contentFormat.set(post.contentFormat);
     this.showCreateForm.set(true);
-    this.errorMessage.set(null);
   }
 
   publishPost(postId: string): void {

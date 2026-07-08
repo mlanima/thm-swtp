@@ -265,6 +265,10 @@ public class ProjectPostService {
             throw new InvalidProjectPostException("Archived posts cannot be updated.");
         }
 
+        if (postEntity.getStatus() == ProjectPostStatus.PUBLISHED && status == ProjectPostStatus.DRAFT) {
+            throw new InvalidProjectPostException("Published posts cannot be changed back to draft.");
+        }
+
         contentModerationService.assertAppropriate(title, "postTitle");
         contentModerationService.assertAppropriate(content, "postContent");
 
