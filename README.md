@@ -9,7 +9,7 @@
 
 Gruppe 3 · *Software Engineering: Realisierung* · THM
 
-[Dokumentation](#dokumentation) · [Umgebungen](#umgebungen) · [Mitwirken](#mitwirken)
+[Dokumentation](#dokumentation) · [Umgebungen](#umgebungen) · [Mitwirkende](#mitwirkende)
 
 [![CI Backend](https://github.com/mlanima/thm-swtp/actions/workflows/ci-backend.yml/badge.svg)](https://github.com/mlanima/thm-swtp/actions/workflows/ci-backend.yml)
 [![CI Frontend](https://github.com/mlanima/thm-swtp/actions/workflows/ci-frontend.yml/badge.svg)](https://github.com/mlanima/thm-swtp/actions/workflows/ci-frontend.yml)
@@ -111,10 +111,6 @@ thm-swtp/
 - [Keycloak — Setup & Konfiguration](docs/Keycloak%20-%20Setup%20&%20Konfiguration.md)
 - [Rollen & Berechtigungen](docs/ROLLEN.md)
 - [Caching](docs/CACHING.md)
-
-## Mitwirken
-
-Feature-Branch von `developer` erstellen, Pull Request gegen `developer` öffnen. Die CI prüft Checkstyle, ESLint, Builds und Tests; eine Review-App wird automatisch deployt, sodass Änderungen live begutachtet werden können.
 
 ## Mitwirkende
 
