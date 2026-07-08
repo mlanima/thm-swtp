@@ -1,6 +1,7 @@
 package de.thm.swtp.api.reports;
 
 import de.thm.swtp.api.exceptionhandling.exceptions.InvalidReportStatusException;
+import de.thm.swtp.api.exceptionhandling.exceptions.ReportAlreadyExistsException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ReportNotFoundException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ReportTargetNotFoundException;
 import de.thm.swtp.api.project.ProjectRepository;
@@ -364,5 +365,114 @@ public class ReportServiceTest {
                 .isInstanceOf(InvalidReportStatusException.class);
 
         verify(reportRepository, never()).save(any());
+    }
+
+    @Test
+    void createReport_shouldThrow_whenActiveReportForSameTargetAndReasonAlreadyExists() {
+        when(userProfileRepository.findById(reporterId)).thenReturn(Optional.of(reporter));
+        when(reportRepository.existsByReporterKeycloakIdAndTargetAndTargetIdAndReasonAndStatusIn(
+                reporterId,
+                ReportTarget.PROJECT,
+                targetId,
+                ReportReason.SPAM,
+                List.of(ReportStatus.OPEN, ReportStatus.IN_REVIEW)
+        )).thenReturn(true);
+
+        assertThatThrownBy(() -> reportService.createReport(
+                reporterId,
+                ReportTarget.PROJECT,
+                targetId,
+                ReportReason.SPAM,
+                "Spam report"
+        )).isInstanceOf(ReportAlreadyExistsException.class);
+
+        verify(projectRepository, never()).existsById(any());
+        verify(reportRepository, never()).save(any());
+    }
+
+    @Test
+    void createReport_shouldCreateReport_whenSameTargetWasReportedWithDifferentReason() {
+        when(userProfileRepository.findById(reporterId)).thenReturn(Optional.of(reporter));
+
+        when(reportRepository.existsByReporterKeycloakIdAndTargetAndTargetIdAndReasonAndStatusIn(
+                eq(reporterId),
+                eq(ReportTarget.PROJECT),
+                eq(targetId),
+                eq(ReportReason.HATE_SPEECH),
+                anyCollection()
+        )).thenReturn(false);
+
+        when(projectRepository.existsById(targetId)).thenReturn(true);
+
+        when(reportRepository.save(any(ReportEntity.class))).thenAnswer(invocation -> {
+            ReportEntity saved = invocation.getArgument(0);
+            saved.setId(reportId);
+            saved.setCreatedAt(LocalDateTime.now());
+            saved.setUpdatedAt(LocalDateTime.now());
+            return saved;
+        });
+
+        Report result = reportService.createReport(
+                reporterId,
+                ReportTarget.PROJECT,
+                targetId,
+                ReportReason.HATE_SPEECH,
+                "Contains hate speech"
+        );
+
+        assertThat(result.getReason()).isEqualTo(ReportReason.HATE_SPEECH);
+        assertThat(result.getTarget()).isEqualTo(ReportTarget.PROJECT);
+        assertThat(result.getTargetId()).isEqualTo(targetId);
+
+        verify(projectRepository).existsById(targetId);
+        verify(reportRepository).save(any(ReportEntity.class));
+    }
+
+    @Test
+    void resolveActiveReportsForTarget_shouldResolveOpenAndInReviewReports() {
+        ReportEntity openReport = ReportEntity.builder()
+                .id(UUID.randomUUID())
+                .target(ReportTarget.PROJECT)
+                .targetId(targetId)
+                .status(ReportStatus.OPEN)
+                .build();
+
+        ReportEntity inReviewReport = ReportEntity.builder()
+                .id(UUID.randomUUID())
+                .target(ReportTarget.PROJECT)
+                .targetId(targetId)
+                .status(ReportStatus.IN_REVIEW)
+                .build();
+
+        UUID moderatorId = UUID.randomUUID();
+
+        when(reportRepository.findAllByTargetAndTargetIdAndStatusIn(
+                eq(ReportTarget.PROJECT),
+                eq(targetId),
+                anyCollection()
+        )).thenReturn(List.of(openReport, inReviewReport));
+
+        reportService.resolveActiveReportsForTarget(
+                ReportTarget.PROJECT,
+                targetId,
+                moderatorId,
+                "moderator",
+                "Project was deleted after report review."
+        );
+
+        assertThat(openReport.getStatus()).isEqualTo(ReportStatus.RESOLVED);
+        assertThat(inReviewReport.getStatus()).isEqualTo(ReportStatus.RESOLVED);
+
+        assertThat(openReport.getReviewerKeycloakId()).isEqualTo(moderatorId);
+        assertThat(inReviewReport.getReviewerKeycloakId()).isEqualTo(moderatorId);
+
+        assertThat(openReport.getReviewerUsername()).isEqualTo("moderator");
+        assertThat(inReviewReport.getReviewerUsername()).isEqualTo("moderator");
+
+        assertThat(openReport.getReviewedAt()).isNotNull();
+        assertThat(inReviewReport.getReviewedAt()).isNotNull();
+
+        assertThat(openReport.getModeratorMessage()).isEqualTo("Project was deleted after report review.");
+        assertThat(inReviewReport.getModeratorMessage()).isEqualTo("Project was deleted after report review.");
     }
 }
