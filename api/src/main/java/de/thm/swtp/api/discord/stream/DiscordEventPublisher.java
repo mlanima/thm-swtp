@@ -90,6 +90,15 @@ public class DiscordEventPublisher {
         );
     }
 
+    public void publishDirectDelete(UUID postId, String discordMsgId, String channelId) {
+        send("POST_DELETED", Map.of(
+                "postId", postId.toString(),
+                "discordMsgId", discordMsgId,
+                "channelId", channelId
+        ));
+        log.info("Discord direct delete sent: postId={}, discordMsgId={}", postId, discordMsgId);
+    }
+
     public void publishProjectInvite(UUID inviteId, String targetDiscordId, String projectName, String inviterName) {
         send("PROJECT_INVITE", Map.of(
                 "inviteId", inviteId.toString(),

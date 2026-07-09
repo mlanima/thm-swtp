@@ -7,6 +7,7 @@ import de.thm.swtp.api.discord.entity.DiscordMessageSyncEntity;
 import de.thm.swtp.api.discord.entity.LinkedChannelEntity;
 import de.thm.swtp.api.discord.repository.DiscordMessageSyncRepository;
 import de.thm.swtp.api.discord.repository.LinkedChannelRepository;
+import de.thm.swtp.api.discord.stream.DiscordEventPublisher;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.projectPost.domain.ProjectPostStatus;
 import de.thm.swtp.api.projectPost.entity.ProjectPostEntity;
@@ -42,6 +43,7 @@ public class PlatformSyncConsumer {
     private final LinkedChannelRepository linkedChannelRepository;
     private final ProjectPostRepository projectPostRepository;
     private final UserProfileRepository userProfileRepository;
+    private final DiscordEventPublisher discordEventPublisher;
     private final ObjectMapper objectMapper;
 
     private String consumerName;
@@ -257,8 +259,20 @@ public class PlatformSyncConsumer {
             return;
         }
 
+        UUID postUuid = UUID.fromString(postId);
+        boolean postExistsAndPublished = projectPostRepository.findById(postUuid)
+                .map(post -> post.getStatus() == ProjectPostStatus.PUBLISHED)
+                .orElse(false);
+
+        if (!postExistsAndPublished) {
+            log.warn("Post {} no longer published — deleting orphaned Discord message {}",
+                    postId, discordMsgId);
+            discordEventPublisher.publishDirectDelete(postUuid, discordMsgId, channelId);
+            return;
+        }
+
         DiscordMessageSyncEntity sync = DiscordMessageSyncEntity.builder()
-                .platformPostId(UUID.fromString(postId))
+                .platformPostId(postUuid)
                 .discordMessageId(discordMsgId)
                 .discordChannelId(channelId)
                 .discordGuildId(guildId)
