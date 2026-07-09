@@ -81,12 +81,8 @@ async function processBatch(): Promise<void> {
           await redis.xack(OUTBOUND_STREAM, CONSUMER_GROUP, messageId);
           logger.debug({ type: parsed.type, messageId }, 'enqueued job');
         } catch (err) {
-          if (err instanceof Error && err.name === 'ZodError') {
-            logger.warn({ err, messageId }, 'invalid stream payload, acking without job');
-            await redis.xack(OUTBOUND_STREAM, CONSUMER_GROUP, messageId);
-          } else {
-            logger.error({ err, messageId }, 'failed to process stream message');
-          }
+          logger.warn({ err, messageId }, 'invalid stream message, acking without job');
+          await redis.xack(OUTBOUND_STREAM, CONSUMER_GROUP, messageId);
         }
       }
     }
