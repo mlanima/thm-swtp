@@ -96,6 +96,18 @@
       "DAYS_AGO": "{{ count }} days ago"
     }
   },
+  "MYTHESES": {
+    "TITLE": "My theses",
+    "CREATE_THESIS": "Create thesis",
+    "THESES": "Theses",
+    "THESES_COUNT_LABEL": "Theses",
+    "NO_SHORT_DESCRIPTION": "No short description.",
+    "LOADING": "Your theses are loading…",
+    "EMPTY_TITLE": "No theses yet",
+    "EMPTY_DESCRIPTION": "Once you create your first thesis, it will appear here.",
+    "ERROR_LOAD_USERNAME": "Your username could not be loaded.",
+    "ERROR_LOAD_THESES": "Your theses could not be loaded."
+  },
   "USERPROFILE": {
     "LOADING": "Profile is loading...",
     "NO_TITLE": "No title available",
@@ -265,6 +277,7 @@
   "SIDEBAR": {
     "DASHBOARD": "Dashboard",
     "MYPROJECTS": "My projects",
+    "MYTHESES": "My theses",
     "FAVORITE": "Favorites",
     "PROFILE": "My profile",
     "MODERATOR": "Moderator",
@@ -829,6 +842,11 @@
       "TITLE": "Recent",
       "LOADING": "Projects are loading…",
       "EMPTY": "You are not a member of any projects yet."
+    },
+    "THESES": {
+      "TITLE": "My theses",
+      "LOADING": "Theses are loading…",
+      "EMPTY": "You are not supervising any theses yet."
     }
   },
   "THESISSITE": {

@@ -96,6 +96,18 @@
       "DAYS_AGO": "vor {{ count }} Tagen"
     }
   },
+  "MYTHESES": {
+    "TITLE": "Meine Abschlussarbeiten",
+    "CREATE_THESIS": "Abschlussarbeit erstellen",
+    "THESES": "Abschlussarbeiten",
+    "THESES_COUNT_LABEL": "Abschlussarbeiten",
+    "NO_SHORT_DESCRIPTION": "Keine Kurzbeschreibung.",
+    "LOADING": "Deine Abschlussarbeiten werden geladen…",
+    "EMPTY_TITLE": "Noch keine Abschlussarbeiten",
+    "EMPTY_DESCRIPTION": "Sobald du deine erste Abschlussarbeit erstellst, erscheint sie hier.",
+    "ERROR_LOAD_USERNAME": "Dein Benutzername konnte nicht geladen werden.",
+    "ERROR_LOAD_THESES": "Deine Abschlussarbeiten konnten nicht geladen werden."
+  },
   "USERPROFILE": {
     "LOADING": "Profil lädt...",
     "NO_TITLE": "Kein Titel vorhanden",
@@ -265,6 +277,7 @@
   "SIDEBAR": {
     "DASHBOARD": "Dashboard",
     "MYPROJECTS": "Meine Projekte",
+    "MYTHESES": "Meine Abschlussarbeiten",
     "FAVORITE": "Favoriten",
     "PROFILE": "Mein Profil",
     "MODERATOR": "Moderator",
@@ -829,6 +842,11 @@
       "TITLE": "Zuletzt",
       "LOADING": "Projekte werden geladen…",
       "EMPTY": "Du bist noch in keinem Projekt Mitglied."
+    },
+    "THESES": {
+      "TITLE": "Meine Abschlussarbeiten",
+      "LOADING": "Abschlussarbeiten werden geladen…",
+      "EMPTY": "Du betreust noch keine Abschlussarbeiten."
     }
   },
   "THESISSITE": {
