@@ -8,10 +8,13 @@ export function registerMessageDeleteHandler(client: Client): void {
     if (message.author?.bot) return;
     if (!message.id) return;
 
+    const full = message.partial ? await message.fetch() : message;
+    if (full.author?.bot) return;
+
     await streamProducer.discordMessageDeleted({
-      discordMsgId: message.id,
+      discordMsgId: full.id,
     });
 
-    logger.debug({ messageId: message.id }, 'discord message deleted event produced');
+    logger.debug({ messageId: full.id }, 'discord message deleted event produced');
   }, 'messageDelete'));
 }
