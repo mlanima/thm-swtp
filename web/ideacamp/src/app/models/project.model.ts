@@ -19,6 +19,11 @@ export interface ProjectResponse {
   allowJoinRequests: boolean;
   ownerId: string;
   ownerUsername: string;
+  ownerDiscordId?: string | null;
+  ownerDiscordUsername?: string | null;
+  discordChannelId?: string | null;
+  discordGuildId?: string | null;
+  discordInviteUrl?: string | null;
   memberIds: string[];
   favoriteCount: number;
   stats: ProjectStatsResponse;
@@ -33,6 +38,7 @@ export interface ProjectPostResponse {
   authorName: string;
   title: string;
   content: string;
+  imageUrl: string | null;
   contentFormat: PostContentFormat;
   status: ProjectPostStatus;
   publishedAt: string | null;

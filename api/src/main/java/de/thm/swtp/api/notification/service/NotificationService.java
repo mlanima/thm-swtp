@@ -1,6 +1,8 @@
 package de.thm.swtp.api.notification.service;
 
+import de.thm.swtp.api.notification.event.ProfessorRequestVerificationCreatedEvent;
 import de.thm.swtp.api.notification.event.ProjectInviteCreatedEvent;
+import de.thm.swtp.api.professorRequest.domain.ProfessorRequest;
 import de.thm.swtp.api.projectInvitation.domain.ProjectInvite;
 import jakarta.annotation.PostConstruct;
 import jakarta.mail.internet.MimeMessage;
@@ -33,14 +35,20 @@ public class NotificationService {
     @Value("${app.frontend-url}")
     private String frontendUrl;
 
+
     @Value("${app.mail.language:de}")
     private String mailLanguage;
 
     private String inviteTemplate;
+    private String professorRequestVerificationTemplate;
+
 
     @PostConstruct
     public void loadTemplates() throws Exception {
         inviteTemplate = new ClassPathResource("templates/emails/invite.html")
+                .getContentAsString(StandardCharsets.UTF_8);
+
+        professorRequestVerificationTemplate = new ClassPathResource("templates/emails/professor-request-verification.html")
                 .getContentAsString(StandardCharsets.UTF_8);
     }
 
@@ -93,9 +101,59 @@ public class NotificationService {
                 invite.getId(), event.invitedUserEmail(), invite.getProjectName(), locale);
     }
 
+    @Retryable(retryFor = Exception.class, maxAttempts = 4, backoff = @Backoff(delay = 10_000, multiplier = 6, maxDelay = 300_000))
+    public void sendProfessorRequestVerificationMail(ProfessorRequestVerificationCreatedEvent event) {
+        ProfessorRequest request = event.professorRequest();
+        Locale locale = Locale.forLanguageTag(mailLanguage);
+
+        String verificationUrl = frontendUrl + "/settings?verifyToken=" + event.verificationToken();
+
+        String safeUsername = HtmlUtils.htmlEscape(request.getRequestingUsername());
+        String safeVerificationUrl = HtmlUtils.htmlEscape(verificationUrl);
+
+        String subject = messageSource.getMessage("mail.professor.verification.subject", null, locale);
+        String greeting = messageSource.getMessage("mail.professor.verification.greeting",
+                new Object[]{safeUsername}, locale);
+        String body = messageSource.getMessage("mail.professor.verification.body", null, locale);
+        String cta = messageSource.getMessage("mail.professor.verification.cta", null, locale);
+        String hint = messageSource.getMessage("mail.professor.verification.hint", null, locale);
+        String footer = messageSource.getMessage("mail.professor.verification.footer", null, locale);
+
+        String html = professorRequestVerificationTemplate
+                .replace("{lang}", mailLanguage)
+                .replace("{greeting}", greeting)
+                .replace("{body}", body)
+                .replace("{verificationUrl}", safeVerificationUrl)
+                .replace("{cta}", cta)
+                .replace("{hint}", hint)
+                .replace("{footer}", footer);
+
+        try {
+            MimeMessage mail = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mail, false, "UTF-8");
+            helper.setFrom(mailFrom);
+            helper.setTo(request.getEmail());
+            helper.setSubject(subject);
+            helper.setText(html, true);
+            mailSender.send(mail);
+        } catch (jakarta.mail.MessagingException e) {
+            throw new RuntimeException("Failed to build professor request verification mail for " + request.getEmail(), e);
+        }
+
+        log.info("Professor request verification mail sent: request={}, to={}, user={}, locale={}",
+                request.getId(), request.getEmail(), request.getRequestingUsername(), locale);
+    }
+
     @Recover
     public void recoverSendInviteMail(Exception ex, ProjectInviteCreatedEvent event) {
         log.error("Invite mail failed after retries: invite={}, to={}, cause={}",
                 event.invite().getId(), event.invitedUserEmail(), ex.getMessage());
+    }
+
+    @Recover
+    public void recoverSendProfessorRequestVerificationMail(Exception ex, ProfessorRequestVerificationCreatedEvent event) {
+        ProfessorRequest request = event.professorRequest();
+        log.error("Professor request verification mail failed after retries: request={}, to={}, user={}, cause={}",
+                request.getId(), request.getEmail(), request.getRequestingUsername(), ex.getMessage());
     }
 }

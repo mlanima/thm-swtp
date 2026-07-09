@@ -22,4 +22,7 @@ public interface ProjectInviteRepository extends JpaRepository<ProjectInviteEnti
 
     /** Deletes all invitations for a given project. */
     void deleteByProjectId(UUID projectId);
+
+    /** Deletes all invitations for a given project with a specific status. */
+    void deleteByProjectIdAndStatus(UUID projectId, ProjectInviteStatus status);
 }

@@ -8,9 +8,49 @@
     <div class="w-full flex-1">
       <div class="flex items-start justify-between gap-4">
         <div class="w-full max-w-xl">
-          <h1 class="text-3xl font-bold text-slate-800">
-            {{ profile.username }}
-          </h1>
+          <div class="flex items-center justify-center gap-2 sm:justify-start">
+            <h1 class="text-3xl font-bold text-slate-800">
+              {{ profile.username }}
+            </h1>
+
+            @if (profile.isProfessor) {
+              <span
+                class="inline-flex h-7 w-7 shrink-0 items-center justify-center bg-primary text-white [clip-path:polygon(50%_0%,61%_10%,75%_6%,80%_19%,94%_21%,92%_35%,100%_50%,92%_65%,94%_79%,80%_81%,75%_94%,61%_90%,50%_100%,39%_90%,25%_94%,20%_81%,6%_79%,8%_65%,0%_50%,8%_35%,6%_21%,20%_19%,25%_6%,39%_10%)]"
+                [attr.aria-label]="'USERPROFILE.PROFESSOR_BADGE' | translate"
+                [title]="'USERPROFILE.PROFESSOR_BADGE' | translate">
+                <i class="pi pi-graduation-cap text-sm"></i>
+              </span>
+            }
+            @if (profile.discordUsername) {
+              <button
+                (click)="toggleDiscord()"
+                class="inline-flex cursor-pointer items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-all duration-300 active:scale-95"
+                [class.bg-indigo-500]="discordState() === 'initial' || discordState() === 'copied'"
+                [class.text-white]="discordState() === 'initial' || discordState() === 'copied'"
+                [class.hover:bg-indigo-600]="discordState() === 'initial' || discordState() === 'copied'"
+                [class.border]="discordState() === 'revealed'"
+                [class.border-indigo-500]="discordState() === 'revealed'"
+                [class.text-indigo-500]="discordState() === 'revealed'"
+                [class.bg-white]="discordState() === 'revealed'"
+                [class.hover:bg-indigo-50]="discordState() === 'revealed'"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 127.14 96.36" class="h-3.5 w-3.5 shrink-0 fill-current">
+                  <path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,46,96.12,53,91.08,65.69,84.69,65.69Z"/>
+                </svg>
+                <span class="relative">
+                  <span class="transition-all duration-300" [class.opacity-0]="discordState() === 'copied'" [class.-translate-y-1]="discordState() === 'copied'">
+                    {{ discordState() === 'initial' ? ('USERPROFILE.DISCORD_SHOW' | translate) : profile.discordUsername }}
+                  </span>
+                  <span class="absolute inset-0 flex items-center transition-all duration-300" [class.opacity-0]="discordState() !== 'copied'" [class.translate-y-1]="discordState() !== 'copied'">
+                    {{ 'USERPROFILE.DISCORD_COPIED' | translate }}
+                  </span>
+                </span>
+                @if (discordState() === 'revealed') {
+                  <i class="pi pi-copy text-xs opacity-70 hover:opacity-100"></i>
+                }
+              </button>
+            }
+          </div>
 
           @if (isEditing) {
             <input
@@ -21,15 +61,18 @@
               (keydown.enter)="!isSaving && save.emit()">
 
             <div class="mt-3 flex flex-wrap items-center justify-center gap-5 text-sm text-slate-500 sm:justify-start">
-              <div class="flex w-full max-w-sm items-center gap-1.5">
-                <app-location-icon></app-location-icon>
+              <div class="w-full max-w-sm">
+                <div class="flex items-center gap-1.5">
+                  <app-location-icon></app-location-icon>
 
-                <input
-                  type="text"
-                  class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700 outline-none focus:border-slate-500"
-                  [(ngModel)]="editForm.location"
-                  [placeholder]="'USERPROFILE.NO_LOCATION' | translate"
-                  (keydown.enter)="!isSaving && save.emit()">
+                  <app-place-autocomplete
+                    [value]="editForm.location"
+                    [placeIdInput]="editForm.placeId"
+                    [placeholder]="'USERPROFILE.NO_LOCATION' | translate"
+                    (placeChange)="onPlaceChange($event)"
+                    (enterKey)="save.emit()">
+                  </app-place-autocomplete>
+                </div>
               </div>
 
               <div class="flex items-center gap-1.5">
@@ -69,12 +112,23 @@
 
   @if (!isOwnProfile) {
     <div class="absolute right-4 top-4 flex gap-2">
-      <app-follow-button [username]="profile.username" [count]="profile.followers" (followerCountChanged)="followerCount.set($event)"></app-follow-button>
-      <!--<button
-        type="button"
-        class="rounded-lg bg-slate-700 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-slate-800">
-        {{ 'USERPROFILE.INVITE' | translate }}
-      </button>-->
+    @if (canFollow) {
+      <app-follow-button
+        [username]="profile.username"
+        [count]="profile.followers"
+        (followerCountChanged)="followerCount.set($event)">
+      </app-follow-button>
+    }
+      @if (canReport) {
+        <button
+          type="button"
+          class="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-sm font-medium text-red-600 transition hover:bg-red-100"
+          (click)="report.emit()"
+        >
+          <i class="pi pi-flag mr-1 text-xs"></i>
+          {{ 'REPORT_DIALOG.REPORT' | translate }}
+        </button>
+      }
     </div>
   }
 

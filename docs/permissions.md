@@ -84,12 +84,17 @@ The project owner cannot remove themselves through the project-member endpoint.
 
 ## Project Files
 
-| Action             | Security method  | Rule                                          |
-|--------------------|------------------|-----------------------------------------------|
-| View the file list | `canViewProject` | Follows project visibility                    |
-| Download a file    | `canViewProject` | Follows project visibility                    |
-| Upload a file      | `canEditProject` | Project owner only; moderators are denied     |
-| Delete a file      | `canEditProject` | Project owner only; moderators are denied     |
+Files additionally carry a per-file `visibility` (`PUBLIC`/`PRIVATE`), independent of the
+project's own visibility. A private file is hidden from anyone who is not the project owner
+or a member, even if the project itself is public — mirroring [Project Links](#project-links).
+
+| Action                     | Security method         | Rule                                                                |
+|-----------------------------|--------------------------|----------------------------------------------------------------------|
+| View the file list         | `canViewProjectFiles`    | Follows project visibility; private files are filtered out for non-contributors in the service layer |
+| Download a file            | `canDownloadProjectFile` | Follows project visibility; a private file additionally requires being the project owner/member |
+| Upload a file              | `canCreateProjectFile`   | Project owner only; moderators are denied                            |
+| Change a file's visibility | `canEditProjectFile`     | Project owner only; moderators are denied                            |
+| Delete a file              | `canDeleteProjectFile`   | Project owner only; moderators are denied                             |
 
 ## Project Tags
 
@@ -130,7 +135,7 @@ The service additionally checks whether join requests are enabled and whether an
 | Publish a draft                           | `canPublishProjectPost` | Denied         | Only as author | Only as author | Allowed                         | Denied    |
 | Republish an archived post                | `canPublishProjectPost` | Denied         | Only as author | Allowed        | Allowed                         | Denied    |
 | Publish an already published post         | `canPublishProjectPost` | Denied         | Only as author | Allowed        | Allowed                         | Denied    |
-| Delete a post                             | `canDeleteProjectPost`  | Denied         | Only as author | Allowed        | Allowed                         | Denied    |
+| Delete a post                             | `canDeleteProjectPost`  | Denied         | Only as author | Allowed        | Allowed                         | Allowed   |
 
 Authorship takes precedence for drafts: a project owner cannot publish another user's draft.
 

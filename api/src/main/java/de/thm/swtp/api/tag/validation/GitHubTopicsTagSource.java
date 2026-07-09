@@ -1,0 +1,20 @@
+package de.thm.swtp.api.tag.validation;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Component;
+
+@Slf4j
+@RequiredArgsConstructor
+@Component
+@ConditionalOnProperty(name = "app.tags.source", havingValue = "github")
+public class GitHubTopicsTagSource implements TagSource {
+
+    private final GitHubTopicsClient gitHubTopicsClient;
+
+    @Override
+    public boolean tagExists(final String tagName) {
+        return gitHubTopicsClient.tagExists(tagName);
+    }
+}

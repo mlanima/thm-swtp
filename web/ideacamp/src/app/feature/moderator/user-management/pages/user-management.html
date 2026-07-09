@@ -1,0 +1,485 @@
+<div class="min-h-screen bg-slate-50 px-3 py-6 sm:px-6 sm:py-10">
+  <main class="mx-auto max-w-5xl">
+    <section class="mb-6">
+      <div class="flex items-center gap-3">
+        <h1 class="text-2xl font-bold text-slate-800">
+          {{ 'MODERATOR.USER_MANAGEMENT.TITLE' | translate }}
+        </h1>
+
+        <span class="rounded-md bg-slate-700 px-2 py-1 text-xs font-bold uppercase text-white">
+          {{ 'MODERATOR.USER_MANAGEMENT.BADGE' | translate }}
+        </span>
+      </div>
+
+      <p class="mt-1 text-sm text-slate-500">
+        {{ 'MODERATOR.USER_MANAGEMENT.DESCRIPTION' | translate }}
+      </p>
+    </section>
+
+    @if (errorMessage()) {
+      <div class="mb-6 rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
+        {{ errorMessage()! | translate }}
+      </div>
+    }
+
+    @if (isLoading()) {
+      <div class="mb-6 rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-500">
+        {{ 'MODERATOR.USER_MANAGEMENT.LOADING' | translate }}
+      </div>
+    }
+
+    <section class="mb-6 grid w-full grid-cols-2 rounded-xl bg-slate-100 p-1 shadow-sm sm:inline-grid sm:w-auto">
+      <button
+        type="button"
+        class="rounded-lg px-5 py-2 text-sm font-medium transition"
+        [class.bg-white]="activeTab() === 'active'"
+        [class.text-slate-800]="activeTab() === 'active'"
+        [class.shadow-sm]="activeTab() === 'active'"
+        [class.text-slate-500]="activeTab() !== 'active'"
+        (click)="activeTab.set('active')">
+        {{ 'MODERATOR.USER_MANAGEMENT.TABS.ACTIVE_USERS' | translate }}
+
+        <span class="ml-2 rounded-full bg-slate-200 px-2 py-0.5 text-xs text-slate-700">
+          {{ activeUserCount() }}
+        </span>
+      </button>
+
+      <button
+        type="button"
+        class="rounded-lg px-5 py-2 text-sm font-medium transition"
+        [class.bg-white]="activeTab() === 'banned'"
+        [class.text-slate-800]="activeTab() === 'banned'"
+        [class.shadow-sm]="activeTab() === 'banned'"
+        [class.text-slate-500]="activeTab() !== 'banned'"
+        (click)="activeTab.set('banned')">
+        {{ 'MODERATOR.USER_MANAGEMENT.TABS.BANNED_USERS' | translate }}
+
+        <span class="ml-2 rounded-full bg-orange-100 px-2 py-0.5 text-xs text-orange-700">
+          {{ bannedUserCount() }}
+        </span>
+      </button>
+    </section>
+
+    @if (activeTab() === 'active') {
+      <section class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+        <div class="hidden md:block">
+          <div class="grid grid-cols-[2fr_1fr_1fr_1fr] border-b border-slate-200 bg-slate-50 px-6 py-3 text-xs font-bold uppercase tracking-wide text-slate-500">
+            <button
+              type="button"
+              class="inline-flex items-center gap-1 text-left uppercase tracking-wide transition hover:text-slate-700"
+              [title]="getActiveSortTitle('username') | translate"
+              (click)="changeActiveSort('username')">
+              {{ 'MODERATOR.USER_MANAGEMENT.TABLE.USER' | translate }}
+              <span
+                class="text-slate-400"
+                [class.text-slate-700]="activeSortField() === 'username'" aria-hidden="true">
+                {{ getActiveSortIndicator('username') }}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              class="inline-flex items-center gap-1 text-left uppercase tracking-wide transition hover:text-slate-700"
+              [title]="getActiveSortTitle('isProfessor') | translate"
+              (click)="changeActiveSort('isProfessor')">
+              {{ 'MODERATOR.USER_MANAGEMENT.TABLE.ROLE' | translate }}
+              <span
+                class="text-slate-400"
+                [class.text-slate-700]="activeSortField() === 'isProfessor'" aria-hidden="true">
+                {{ getActiveSortIndicator('isProfessor') }}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              class="inline-flex items-center gap-1 text-left uppercase tracking-wide transition hover:text-slate-700"
+              [title]="getActiveSortTitle('createdAt') | translate"
+              (click)="changeActiveSort('createdAt')">
+              {{ 'MODERATOR.USER_MANAGEMENT.TABLE.JOINED_AT' | translate }}
+              <span
+                class="text-slate-400"
+                [class.text-slate-700]="activeSortField() === 'createdAt'" aria-hidden="true">
+                {{ getActiveSortIndicator('createdAt') }}
+              </span>
+            </button>
+
+            <span class="text-right">
+              {{ 'MODERATOR.USER_MANAGEMENT.TABLE.ACTIONS' | translate }}
+            </span>
+          </div>
+
+        @if (activeUserCount() === 0) {
+          <div class="px-6 py-16 text-center">
+            <p class="text-sm font-medium text-slate-400">
+              {{ 'MODERATOR.USER_MANAGEMENT.EMPTY_ACTIVE_TITLE' | translate }}
+            </p>
+            <p class="mt-1 text-xs text-slate-300">
+              {{ 'MODERATOR.USER_MANAGEMENT.EMPTY_ACTIVE_DESCRIPTION' | translate }}
+            </p>
+          </div>
+        } @else {
+          @for (user of activeUsers(); track user.keycloakId) {
+            <div class="grid grid-cols-[2fr_1fr_1fr_1fr] items-center border-b border-slate-100 px-6 py-4 last:border-b-0">
+              <div class="flex items-center gap-3">
+                <div class="flex size-10 items-center justify-center rounded-full bg-slate-700 text-sm font-bold text-white">
+                  {{ getInitials(user.username) }}
+                </div>
+
+                <div>
+                  <p class="text-sm font-semibold text-slate-800">
+                    {{ user.username }}
+                  </p>
+                  <p class="text-xs text-slate-500">
+                    {{ user.email || '-' }}
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+                  {{ getRoleTranslationKey(user) | translate }}
+                </span>
+              </div>
+
+                <p class="text-sm text-slate-500">
+                  {{ user.createdAt | date: 'dd.MM.yyyy' }}
+                </p>
+
+                <div class="text-right">
+                  <button
+                    type="button"
+                    class="text-sm font-medium text-orange-600 transition hover:text-orange-700 hover:underline"
+                    (click)="openBanDialog(user)">
+                    {{ 'MODERATOR.USER_MANAGEMENT.ACTIONS.BAN' | translate }}
+                  </button>
+                </div>
+              </div>
+          }
+        }
+      </div>
+        <div class="md:hidden">
+          <div class="border-b border-slate-200 bg-slate-50 px-4 py-3">
+            <p class="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">
+              {{ 'MODERATOR.USER_MANAGEMENT.SORT.LABEL' | translate }}
+            </p>
+
+            <div class="flex flex-wrap gap-2">
+              <button
+                type="button"
+                class="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600"
+                (click)="changeActiveSort('username')">
+                {{ 'MODERATOR.USER_MANAGEMENT.TABLE.USER' | translate }}
+                {{ getActiveSortIndicator('username') }}
+              </button>
+
+              <button
+                type="button"
+                class="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600"
+                (click)="changeActiveSort('isProfessor')">
+                {{ 'MODERATOR.USER_MANAGEMENT.TABLE.ROLE' | translate }}
+                {{ getActiveSortIndicator('isProfessor') }}
+              </button>
+
+              <button
+                type="button"
+                class="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600"
+                (click)="changeActiveSort('createdAt')">
+                {{ 'MODERATOR.USER_MANAGEMENT.TABLE.JOINED_AT' | translate }}
+                {{ getActiveSortIndicator('createdAt') }}
+              </button>
+            </div>
+          </div>
+
+          @if (activeUserCount() === 0) {
+            <div class="px-4 py-12 text-center">
+              <p class="text-sm font-medium text-slate-400">
+                {{ 'MODERATOR.USER_MANAGEMENT.EMPTY_ACTIVE_TITLE' | translate }}
+              </p>
+              <p class="mt-1 text-xs text-slate-300">
+                {{ 'MODERATOR.USER_MANAGEMENT.EMPTY_ACTIVE_DESCRIPTION' | translate }}
+              </p>
+            </div>
+          } @else {
+            <div class="divide-y divide-slate-100">
+              @for (user of activeUsers(); track user.keycloakId) {
+                <article class="p-4">
+                  <div class="flex items-start gap-3">
+                    <div class="flex size-11 shrink-0 items-center justify-center rounded-full bg-slate-700 text-sm font-bold text-white">
+                      {{ getInitials(user.username) }}
+                    </div>
+
+                    <div class="min-w-0 flex-1">
+                      <p class="truncate text-sm font-semibold text-slate-800">
+                        {{ user.username }}
+                      </p>
+
+                      <p class="truncate text-xs text-slate-500">
+                        {{ user.email || '-' }}
+                      </p>
+
+                      <div class="mt-3 flex flex-wrap items-center gap-2">
+                    <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+                      {{ getRoleTranslationKey(user) | translate }}
+                    </span>
+
+                        <span class="text-xs text-slate-400">
+                      {{ user.createdAt | date: 'dd.MM.yyyy' }}
+                    </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="mt-4 flex justify-end">
+                    <button
+                      type="button"
+                      class="rounded-lg border border-orange-200 bg-orange-50 px-3 py-2 text-sm font-semibold text-orange-700 transition hover:bg-orange-100"
+                      (click)="openBanDialog(user)">
+                      {{ 'MODERATOR.USER_MANAGEMENT.ACTIONS.BAN' | translate }}
+                    </button>
+                  </div>
+                </article>
+              }
+            </div>
+          }
+        </div>
+      </section>
+
+      <app-pagination
+        [currentPage]="activeCurrentPage()"
+        [totalPages]="activeTotalPages()"
+        (pageChange)="onActivePageChange($event)"
+      />
+    }
+
+    @if (activeTab() === 'banned') {
+      <section class="overflow-hidden rounded-xl border border-red-100 bg-white shadow-sm">
+        <div class="hidden md:block">
+          <div class="grid grid-cols-[1.5fr_1fr_1fr_1.5fr_1fr] border-b border-red-100 bg-red-50 px-6 py-3 text-xs font-bold uppercase tracking-wide text-slate-500">
+            <button
+              type="button"
+              class="inline-flex items-center gap-1 text-left uppercase tracking-wide transition hover:text-slate-700"
+              [title]="getBannedSortTitle('username') | translate"
+              (click)="changeBannedSort('username')">
+              {{ 'MODERATOR.USER_MANAGEMENT.TABLE.USER' | translate }}
+              <span
+                class="text-slate-400"
+                [class.text-slate-700]="bannedSortField() === 'username'" aria-hidden="true">
+                {{ getBannedSortIndicator('username') }}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              class="inline-flex items-center gap-1 text-left uppercase tracking-wide transition hover:text-slate-700"
+              [title]="getBannedSortTitle('isProfessor') | translate"
+              (click)="changeBannedSort('isProfessor')">
+              {{ 'MODERATOR.USER_MANAGEMENT.TABLE.ROLE' | translate }}
+              <span
+                class="text-slate-400"
+                [class.text-slate-700]="bannedSortField() === 'isProfessor'" aria-hidden="true">
+                {{ getBannedSortIndicator('isProfessor') }}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              class="inline-flex items-center gap-1 text-left uppercase tracking-wide transition hover:text-slate-700"
+              [title]="getBannedSortTitle('bannedAt') | translate"
+              (click)="changeBannedSort('bannedAt')">
+              {{ 'MODERATOR.USER_MANAGEMENT.TABLE.BANNED_AT' | translate }}
+              <span
+                class="text-slate-400"
+                [class.text-slate-700]="bannedSortField() === 'bannedAt'" aria-hidden="true">
+                {{ getBannedSortIndicator('bannedAt') }}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              class="inline-flex items-center gap-1 text-left uppercase tracking-wide transition hover:text-slate-700"
+              [title]="getBannedSortTitle('banReason') | translate"
+              (click)="changeBannedSort('banReason')">
+              {{ 'MODERATOR.USER_MANAGEMENT.TABLE.REASON' | translate }}
+              <span
+                class="text-slate-400"
+                [class.text-slate-700]="bannedSortField() === 'banReason'" aria-hidden="true">
+                {{ getBannedSortIndicator('banReason') }}
+              </span>
+            </button>
+
+            <span class="text-right">
+              {{ 'MODERATOR.USER_MANAGEMENT.TABLE.ACTIONS' | translate }}
+            </span>
+          </div>
+
+          @if (bannedUserCount() === 0) {
+            <div class="px-6 py-16 text-center">
+              <p class="text-sm font-medium text-slate-400">
+                {{ 'MODERATOR.USER_MANAGEMENT.EMPTY_BANNED_TITLE' | translate }}
+              </p>
+              <p class="mt-1 text-xs text-slate-300">
+                {{ 'MODERATOR.USER_MANAGEMENT.EMPTY_BANNED_DESCRIPTION' | translate }}
+              </p>
+            </div>
+          } @else {
+            @for (user of bannedUsers(); track user.keycloakId) {
+              <div class="grid grid-cols-[1.5fr_1fr_1fr_1.5fr_1fr] items-center border-b border-slate-100 px-6 py-4 last:border-b-0">
+                <div class="flex items-center gap-3">
+                  <div class="flex size-10 items-center justify-center rounded-full bg-slate-700 text-sm font-bold text-white">
+                    {{ getInitials(user.username) }}
+                  </div>
+
+                  <div>
+                    <p class="text-sm font-semibold text-slate-800">
+                      {{ user.username }}
+                    </p>
+                    <p class="text-xs text-slate-500">
+                      {{ user.email || '-' }}
+                    </p>
+                  </div>
+                </div>
+
+                <span class="text-sm text-slate-500">
+                  {{ getRoleTranslationKey(user) | translate }}
+                </span>
+
+                <span class="text-sm text-slate-500">
+                  {{ user.bannedAt | date: 'dd.MM.yyyy' }}
+                </span>
+
+                <span
+                  class="text-sm text-slate-500"
+                  [title]="user.banReason || ('MODERATOR.USER_MANAGEMENT.NO_REASON' | translate)">
+                  {{ getBanReasonPreview(user.banReason) || ('MODERATOR.USER_MANAGEMENT.NO_REASON' | translate) }}
+                </span>
+
+                <div class="text-right">
+                  <button
+                    type="button"
+                    class="text-sm font-medium text-slate-600 transition hover:text-slate-800 hover:underline"
+                    (click)="unbanUser(user)">
+                    {{ 'MODERATOR.USER_MANAGEMENT.ACTIONS.UNBAN' | translate }}
+                  </button>
+                </div>
+              </div>
+            }
+          }
+        </div>
+
+        <div class="md:hidden">
+          <div class="border-b border-red-100 bg-red-50 px-4 py-3">
+            <p class="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">
+              {{ 'MODERATOR.USER_MANAGEMENT.SORT.LABEL' | translate }}
+            </p>
+
+            <div class="flex flex-wrap gap-2">
+              <button
+                type="button"
+                class="rounded-full border border-red-100 bg-white px-3 py-1 text-xs font-medium text-slate-600"
+                (click)="changeBannedSort('username')">
+                {{ 'MODERATOR.USER_MANAGEMENT.TABLE.USER' | translate }}
+                {{ getBannedSortIndicator('username') }}
+              </button>
+
+              <button
+                type="button"
+                class="rounded-full border border-red-100 bg-white px-3 py-1 text-xs font-medium text-slate-600"
+                (click)="changeBannedSort('isProfessor')">
+                {{ 'MODERATOR.USER_MANAGEMENT.TABLE.ROLE' | translate }}
+                {{ getBannedSortIndicator('isProfessor') }}
+              </button>
+
+              <button
+                type="button"
+                class="rounded-full border border-red-100 bg-white px-3 py-1 text-xs font-medium text-slate-600"
+                (click)="changeBannedSort('bannedAt')">
+                {{ 'MODERATOR.USER_MANAGEMENT.TABLE.BANNED_AT' | translate }}
+                {{ getBannedSortIndicator('bannedAt') }}
+              </button>
+
+              <button
+                type="button"
+                class="rounded-full border border-red-100 bg-white px-3 py-1 text-xs font-medium text-slate-600"
+                (click)="changeBannedSort('banReason')">
+                {{ 'MODERATOR.USER_MANAGEMENT.TABLE.REASON' | translate }}
+                {{ getBannedSortIndicator('banReason') }}
+              </button>
+            </div>
+          </div>
+
+          @if (bannedUserCount() === 0) {
+            <div class="px-4 py-12 text-center">
+              <p class="text-sm font-medium text-slate-400">
+                {{ 'MODERATOR.USER_MANAGEMENT.EMPTY_BANNED_TITLE' | translate }}
+              </p>
+              <p class="mt-1 text-xs text-slate-300">
+                {{ 'MODERATOR.USER_MANAGEMENT.EMPTY_BANNED_DESCRIPTION' | translate }}
+              </p>
+            </div>
+          } @else {
+            <div class="divide-y divide-slate-100">
+              @for (user of bannedUsers(); track user.keycloakId) {
+                <article class="p-4">
+                  <div class="flex items-start gap-3">
+                    <div class="flex size-11 shrink-0 items-center justify-center rounded-full bg-slate-700 text-sm font-bold text-white">
+                      {{ getInitials(user.username) }}
+                    </div>
+
+                    <div class="min-w-0 flex-1">
+                      <p class="truncate text-sm font-semibold text-slate-800">
+                        {{ user.username }}
+                      </p>
+
+                      <p class="truncate text-xs text-slate-500">
+                        {{ user.email || '-' }}
+                      </p>
+
+                      <div class="mt-3 flex flex-wrap items-center gap-2">
+                    <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+                      {{ getRoleTranslationKey(user) | translate }}
+                    </span>
+
+                        <span class="text-xs text-red-400">
+                      {{ user.bannedAt | date: 'dd.MM.yyyy' }}
+                    </span>
+                      </div>
+
+                      <p class="mt-3 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">
+                        {{ getBanReasonPreview(user.banReason) || ('MODERATOR.USER_MANAGEMENT.NO_REASON' | translate) }}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="mt-4 flex justify-end">
+                    <button
+                      type="button"
+                      class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
+                      (click)="unbanUser(user)">
+                      {{ 'MODERATOR.USER_MANAGEMENT.ACTIONS.UNBAN' | translate }}
+                    </button>
+                  </div>
+                </article>
+              }
+            </div>
+          }
+        </div>
+      </section>
+
+      <app-pagination
+        [currentPage]="bannedCurrentPage()"
+        [totalPages]="bannedTotalPages()"
+        (pageChange)="onBannedPageChange($event)"
+      />
+    }
+  </main>
+</div>
+
+@if (selectedUser(); as user) {
+  <app-ban-user-dialog
+    [user]="user"
+    [isSubmitting]="isBanSubmitting()"
+    [errorMessage]="banErrorMessage()"
+    (closeDialog)="closeBanDialog()"
+    (confirmBan)="banUser($event)"
+  />
+}

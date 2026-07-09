@@ -1,8 +1,12 @@
 package de.thm.swtp.api.professorRequest;
 
+import de.thm.swtp.api.exceptionhandling.exceptions.InvalidProfessorEmailDomainException;
+import de.thm.swtp.api.notification.event.ProfessorRequestVerificationCreatedEvent;
+import de.thm.swtp.api.professorRequest.config.ProfessorRequestProperties;
 import de.thm.swtp.api.professorRequest.domain.ProfessorRequest;
 import de.thm.swtp.api.professorRequest.domain.ProfessorRequestStatus;
 import de.thm.swtp.api.professorRequest.entity.ProfessorRequestEntity;
+import de.thm.swtp.api.professorRequest.exception.ProfessorRequestAlreadyExistsException;
 import de.thm.swtp.api.professorRequest.exception.ProfessorRequestInvalidStatusException;
 import de.thm.swtp.api.professorRequest.exception.ProfessorRequestNotFoundException;
 import de.thm.swtp.api.professorRequest.repository.ProfessorRequestRepository;
@@ -10,9 +14,12 @@ import de.thm.swtp.api.professorRequest.service.ProfessorRequestService;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
+import de.thm.swtp.api.auditlog.service.AuditLogService;
+import de.thm.swtp.api.auditlog.domain.AuditActor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -32,38 +39,58 @@ public class ProfessorRequestServiceTest {
 
     private UUID requestId;
     private UUID userId;
+    private AuditActor actor;
 
     private UserProfile user;
 
     private ProfessorRequestRepository professorRequestRepository;
     private UserProfileRepository userProfileRepository;
     private ProfessorRequestService professorRequestService;
+    private ApplicationEventPublisher eventPublisher;
+    private ProfessorRequestProperties professorRequestProperties;
+    private AuditLogService auditLogService;
 
     @BeforeEach
     void setUp() {
         professorRequestRepository = mock(ProfessorRequestRepository.class);
         userProfileRepository = mock(UserProfileRepository.class);
+        eventPublisher = mock(ApplicationEventPublisher.class);
+        auditLogService = mock(AuditLogService.class);
+        professorRequestProperties = new ProfessorRequestProperties(
+                List.of("thm.de", "mni.thm.de"),
+                24
+        );
 
         professorRequestService = new ProfessorRequestService(
                 professorRequestRepository,
-                userProfileRepository
+                userProfileRepository,
+                professorRequestProperties,
+                eventPublisher,
+                auditLogService
         );
 
         requestId = UUID.randomUUID();
         userId = UUID.randomUUID();
+        actor = new AuditActor(
+                UUID.randomUUID(),
+                "moderator",
+                "moderator@test.de"
+        );
 
         user = new UserProfile();
         user.setKeycloakId(userId);
-        user.setUsername("testuser");
+        user.setUsername("testUser");
     }
 
-    String name = "Prof. Test User";
-    String email = "testuser@example.com";
+    String email = "testuser@thm.de";
     String text = "I would like professor rights to create courses.";
 
     @Test
     void createProfessorRequest_shouldCreateRequest_whenUserExists() {
         when(userProfileRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        when(professorRequestRepository.existsByRequestingUserKeycloakIdAndStatusIn(eq(userId), any()))
+                .thenReturn(false);
 
         when(professorRequestRepository.save(any(ProfessorRequestEntity.class)))
                 .thenAnswer(invocation -> {
@@ -71,29 +98,30 @@ public class ProfessorRequestServiceTest {
                     entity.setId(requestId);
                     entity.setCreatedAt(LocalDateTime.now());
                     entity.setUpdatedAt(LocalDateTime.now());
-                    entity.setStatus(ProfessorRequestStatus.PENDING);
                     return entity;
                 });
 
-        ProfessorRequest result = professorRequestService.createProfessorRequest(userId, name, email, text);
+        ProfessorRequest result = professorRequestService.createProfessorRequest(userId, email, text);
 
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(requestId);
         assertThat(result.getRequestingUserId()).isEqualTo(userId);
-        assertThat(result.getRequestingUsername()).isEqualTo("testuser");
-        assertThat(result.getName()).isEqualTo(name);
+        assertThat(result.getRequestingUsername()).isEqualTo("testUser");
         assertThat(result.getEmail()).isEqualTo(email);
         assertThat(result.getText()).isEqualTo(text);
-        assertThat(result.getStatus()).isEqualTo(ProfessorRequestStatus.PENDING);
+        assertThat(result.getStatus()).isEqualTo(ProfessorRequestStatus.WAITING_EMAIL_VERIFICATION);
+        assertThat(result.getVerificationTokenHash()).isNotBlank();
+        assertThat(result.getVerificationExpiresAt()).isNotNull();
 
         verify(professorRequestRepository).save(any(ProfessorRequestEntity.class));
+        verify(eventPublisher).publishEvent(any(ProfessorRequestVerificationCreatedEvent.class));
     }
 
     @Test
     void createProfessorRequest_shouldThrowException_whenUserNotFound() {
         when(userProfileRepository.findById(userId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> professorRequestService.createProfessorRequest(userId, name, email, text))
+        assertThatThrownBy(() -> professorRequestService.createProfessorRequest(userId, email, text))
                 .isInstanceOf(UserProfileNotFoundException.class);
 
         verify(professorRequestRepository, never()).save(any());
@@ -104,7 +132,6 @@ public class ProfessorRequestServiceTest {
         ProfessorRequestEntity entity = ProfessorRequestEntity.builder()
                 .id(requestId)
                 .requestingUser(user)
-                .name(name)
                 .email(email)
                 .text(text)
                 .status(ProfessorRequestStatus.PENDING)
@@ -122,7 +149,7 @@ public class ProfessorRequestServiceTest {
         assertThat(result).isNotNull();
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getContent().getFirst().getId()).isEqualTo(requestId);
-        assertThat(result.getContent().getFirst().getName()).isEqualTo(name);
+        assertThat(result.getContent().getFirst().getRequestingUsername()).isEqualTo("testUser");
         assertThat(result.getContent().getFirst().getStatus()).isEqualTo(ProfessorRequestStatus.PENDING);
 
         verify(professorRequestRepository).findAllByOrderByCreatedAtDesc(pageable);
@@ -147,7 +174,6 @@ public class ProfessorRequestServiceTest {
         ProfessorRequestEntity entity = ProfessorRequestEntity.builder()
                 .id(requestId)
                 .requestingUser(user)
-                .name(name)
                 .email(email)
                 .text(text)
                 .status(ProfessorRequestStatus.PENDING)
@@ -158,9 +184,10 @@ public class ProfessorRequestServiceTest {
         when(professorRequestRepository.findById(requestId)).thenReturn(Optional.of(entity));
         when(professorRequestRepository.save(entity)).thenReturn(entity);
 
-        ProfessorRequest result = professorRequestService.acceptProfessorRequest(requestId);
+        ProfessorRequest result = professorRequestService.acceptProfessorRequest(requestId, actor);
 
         assertThat(result.getStatus()).isEqualTo(ProfessorRequestStatus.ACCEPTED);
+        assertThat(user.isProfessor()).isTrue();
 
         verify(professorRequestRepository).save(entity);
     }
@@ -169,7 +196,7 @@ public class ProfessorRequestServiceTest {
     void acceptProfessorRequest_shouldThrowNotFoundException_whenRequestDoesNotExist() {
         when(professorRequestRepository.findById(requestId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> professorRequestService.acceptProfessorRequest(requestId))
+        assertThatThrownBy(() -> professorRequestService.acceptProfessorRequest(requestId, actor))
                 .isInstanceOf(ProfessorRequestNotFoundException.class);
 
         verify(professorRequestRepository, never()).save(any());
@@ -180,7 +207,6 @@ public class ProfessorRequestServiceTest {
         ProfessorRequestEntity entity = ProfessorRequestEntity.builder()
                 .id(requestId)
                 .requestingUser(user)
-                .name(name)
                 .email(email)
                 .text(text)
                 .status(ProfessorRequestStatus.REJECTED)
@@ -190,7 +216,7 @@ public class ProfessorRequestServiceTest {
 
         when(professorRequestRepository.findById(requestId)).thenReturn(Optional.of(entity));
 
-        assertThatThrownBy(() -> professorRequestService.acceptProfessorRequest(requestId))
+        assertThatThrownBy(() -> professorRequestService.acceptProfessorRequest(requestId, actor))
                 .isInstanceOf(ProfessorRequestInvalidStatusException.class);
 
         verify(professorRequestRepository, never()).save(any());
@@ -201,10 +227,10 @@ public class ProfessorRequestServiceTest {
         ProfessorRequestEntity entity = ProfessorRequestEntity.builder()
                 .id(requestId)
                 .requestingUser(user)
-                .name(name)
                 .email(email)
                 .text(text)
                 .status(ProfessorRequestStatus.PENDING)
+                .verificationTokenHash("token-hash")
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
@@ -212,9 +238,10 @@ public class ProfessorRequestServiceTest {
         when(professorRequestRepository.findById(requestId)).thenReturn(Optional.of(entity));
         when(professorRequestRepository.save(entity)).thenReturn(entity);
 
-        ProfessorRequest result = professorRequestService.rejectProfessorRequest(requestId);
+        ProfessorRequest result = professorRequestService.rejectProfessorRequest(requestId, actor);
 
         assertThat(result.getStatus()).isEqualTo(ProfessorRequestStatus.REJECTED);
+        assertThat(entity.getVerificationTokenHash()).isNull();
 
         verify(professorRequestRepository).save(entity);
     }
@@ -223,7 +250,7 @@ public class ProfessorRequestServiceTest {
     void rejectProfessorRequest_shouldThrowNotFoundException_whenRequestDoesNotExist() {
         when(professorRequestRepository.findById(requestId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> professorRequestService.rejectProfessorRequest(requestId))
+        assertThatThrownBy(() -> professorRequestService.rejectProfessorRequest(requestId, actor))
                 .isInstanceOf(ProfessorRequestNotFoundException.class);
 
         verify(professorRequestRepository, never()).save(any());
@@ -234,7 +261,6 @@ public class ProfessorRequestServiceTest {
         ProfessorRequestEntity entity = ProfessorRequestEntity.builder()
                 .id(requestId)
                 .requestingUser(user)
-                .name(name)
                 .email(email)
                 .text(text)
                 .status(ProfessorRequestStatus.ACCEPTED)
@@ -244,9 +270,145 @@ public class ProfessorRequestServiceTest {
 
         when(professorRequestRepository.findById(requestId)).thenReturn(Optional.of(entity));
 
-        assertThatThrownBy(() -> professorRequestService.rejectProfessorRequest(requestId))
+        assertThatThrownBy(() -> professorRequestService.rejectProfessorRequest(requestId, actor))
                 .isInstanceOf(ProfessorRequestInvalidStatusException.class);
 
         verify(professorRequestRepository, never()).save(any());
+    }
+
+    @Test
+    void createProfessorRequest_shouldThrow_whenEmailDomainIsNotAllowed() {
+        String invalidEmail = "testuser@example.com";
+
+        when(userProfileRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        assertThatThrownBy(() -> professorRequestService.createProfessorRequest(userId, invalidEmail, text))
+                .isInstanceOf(InvalidProfessorEmailDomainException.class);
+
+        verify(professorRequestRepository, never()).save(any());
+        verify(eventPublisher, never()).publishEvent(any());
+    }
+
+    @Test
+    void createProfessorRequest_shouldThrow_whenOpenRequestExists() {
+        when(userProfileRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(professorRequestRepository.existsByRequestingUserKeycloakIdAndStatusIn(eq(userId), any()))
+                .thenReturn(true);
+
+        assertThatThrownBy(() -> professorRequestService.createProfessorRequest(userId, email, text))
+                .isInstanceOf(ProfessorRequestAlreadyExistsException.class);
+
+        verify(professorRequestRepository, never()).save(any());
+        verify(eventPublisher, never()).publishEvent(any());
+    }
+
+    @Test
+    void verifyProfessorRequestEmail_shouldSetStatusPending_whenTokenIsValid() {
+        String token = "valid-token";
+        String tokenHash = hashTokenForTest(token);
+
+        ProfessorRequestEntity entity = ProfessorRequestEntity.builder()
+                .id(requestId)
+                .requestingUser(user)
+                .email(email)
+                .text(text)
+                .status(ProfessorRequestStatus.WAITING_EMAIL_VERIFICATION)
+                .verificationTokenHash(tokenHash)
+                .verificationExpiresAt(LocalDateTime.now().plusHours(1))
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        when(professorRequestRepository.findByVerificationTokenHash(tokenHash))
+                .thenReturn(Optional.of(entity));
+        when(professorRequestRepository.save(entity)).thenReturn(entity);
+
+        ProfessorRequest result = professorRequestService.verifyProfessorRequestEmail(token);
+
+        assertThat(result.getStatus()).isEqualTo(ProfessorRequestStatus.PENDING);
+        assertThat(entity.getEmailVerifiedAt()).isNotNull();
+        assertThat(entity.getVerificationTokenHash()).isNull();
+
+        verify(professorRequestRepository).save(entity);
+    }
+
+    @Test
+    void verifyProfessorRequestEmail_shouldSetStatusExpired_whenTokenIsExpired() {
+        String token = "expired-token";
+        String tokenHash = hashTokenForTest(token);
+
+        ProfessorRequestEntity entity = ProfessorRequestEntity.builder()
+                .id(requestId)
+                .requestingUser(user)
+                .email(email)
+                .text(text)
+                .status(ProfessorRequestStatus.WAITING_EMAIL_VERIFICATION)
+                .verificationTokenHash(tokenHash)
+                .verificationExpiresAt(LocalDateTime.now().minusHours(1))
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        when(professorRequestRepository.findByVerificationTokenHash(tokenHash))
+                .thenReturn(Optional.of(entity));
+        when(professorRequestRepository.save(entity)).thenReturn(entity);
+
+        ProfessorRequest result = professorRequestService.verifyProfessorRequestEmail(token);
+
+        assertThat(result.getStatus()).isEqualTo(ProfessorRequestStatus.EXPIRED);
+        assertThat(entity.getVerificationTokenHash()).isNull();
+
+        verify(professorRequestRepository).save(entity);
+    }
+
+    @Test
+    void verifyProfessorRequestEmail_shouldThrow_whenTokenIsInvalid() {
+        String token = "invalid-token";
+        String tokenHash = hashTokenForTest(token);
+
+        when(professorRequestRepository.findByVerificationTokenHash(tokenHash))
+                .thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> professorRequestService.verifyProfessorRequestEmail(token))
+                .isInstanceOf(ProfessorRequestInvalidStatusException.class);
+
+        verify(professorRequestRepository, never()).save(any());
+    }
+
+    @Test
+    void verifyProfessorRequestEmail_shouldThrow_whenRequestIsNotWaitingForEmailVerification() {
+        String token = "already-used-token";
+        String tokenHash = hashTokenForTest(token);
+
+        ProfessorRequestEntity entity = ProfessorRequestEntity.builder()
+                .id(requestId)
+                .requestingUser(user)
+                .email(email)
+                .text(text)
+                .status(ProfessorRequestStatus.PENDING)
+                .verificationTokenHash(tokenHash)
+                .verificationExpiresAt(LocalDateTime.now().plusHours(1))
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        when(professorRequestRepository.findByVerificationTokenHash(tokenHash))
+                .thenReturn(Optional.of(entity));
+
+        assertThatThrownBy(() -> professorRequestService.verifyProfessorRequestEmail(token))
+                .isInstanceOf(ProfessorRequestInvalidStatusException.class);
+
+        verify(professorRequestRepository, never()).save(any());
+    }
+
+
+    private String hashTokenForTest(String token) {
+        try {
+            java.security.MessageDigest digest = java.security.MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(token.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            return java.util.HexFormat.of().formatHex(hash);
+        } catch (java.security.NoSuchAlgorithmException e) {
+            throw new IllegalStateException(e);
+        }
     }
 }

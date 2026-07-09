@@ -3,6 +3,7 @@ package de.thm.swtp.api.projectPost.controller;
 import de.thm.swtp.api.projectPost.service.ProjectPostService;
 import de.thm.swtp.api.projectPost.dto.CreateProjectPostRequest;
 import de.thm.swtp.api.projectPost.dto.ProjectPostResponse;
+import de.thm.swtp.api.auditlog.domain.AuditActor;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -10,6 +11,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 import java.util.UUID;
@@ -29,6 +33,23 @@ public class ProjectPostController {
                 .toList();
     }
 
+    @GetMapping("/drafts")
+    @PreAuthorize("@security.canCreateProjectPost(#projectId, authentication)")
+    public List<ProjectPostResponse> getDraftPosts(@PathVariable UUID projectId) {
+        return projectPostService.getDraftPostsForProject(projectId)
+                .stream()
+                .map(ProjectPostResponse::toResponse)
+                .toList();
+    }
+
+    @GetMapping("/archived")
+    @PreAuthorize("@security.canCreateProjectPost(#projectId, authentication)")
+    public List<ProjectPostResponse> getArchivedPosts(@PathVariable UUID projectId) {
+        return projectPostService.getArchivedPostsForProject(projectId)
+                .stream()
+                .map(ProjectPostResponse::toResponse)
+                .toList();
+    }
 
     @PostMapping
     @PreAuthorize("@security.canCreateProjectPost(#projectId, authentication)")
@@ -44,8 +65,9 @@ public class ProjectPostController {
     @DeleteMapping("/{postId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("@security.canDeleteProjectPost(#projectId, #postId, authentication)")
-    public void deletePost(@PathVariable UUID projectId, @PathVariable UUID postId) {
-        projectPostService.deleteProjectPost(projectId, postId);
+    public void deletePost(@PathVariable UUID projectId, @PathVariable UUID postId, @AuthenticationPrincipal Jwt jwt) {
+        AuditActor actor = AuditActor.fromJwt(jwt);
+        projectPostService.deleteProjectPost(projectId, postId, actor);
     }
 
     @PatchMapping("/{postId}/publish")
@@ -59,6 +81,46 @@ public class ProjectPostController {
     public ProjectPostResponse archivePost(@PathVariable UUID projectId, @PathVariable UUID postId) {
         return ProjectPostResponse.toResponse(projectPostService.archiveProjectPost(projectId, postId));
 
+    }
+
+    @PostMapping("/{postId}/image")
+    @PreAuthorize("@security.canEditProjectPost(#projectId, #postId, authentication)")
+    public ProjectPostResponse uploadPostImage(
+            @PathVariable UUID projectId,
+            @PathVariable UUID postId,
+            @RequestParam("image") MultipartFile image
+    ) {
+        return ProjectPostResponse.toResponse(
+                projectPostService.uploadPostImage(projectId, postId, image)
+        );
+    }
+
+    @PutMapping("/{postId}")
+    @PreAuthorize("@security.canEditProjectPost(#projectId, #postId, authentication)")
+    public ProjectPostResponse updatePost(
+            @PathVariable UUID projectId,
+            @PathVariable UUID postId,
+            @Valid @RequestBody CreateProjectPostRequest request
+    ) {
+        return ProjectPostResponse.toResponse(
+                projectPostService.updateProjectPost(
+                        projectId,
+                        postId,
+                        request.title(),
+                        request.content(),
+                        request.contentFormat(),
+                        request.status()
+                )
+        );
+    }
+
+    @GetMapping("/{postId}/image")
+    @PreAuthorize("@security.canViewProject(#projectId, authentication)")
+    public ResponseEntity<Resource> getPostImage(
+            @PathVariable UUID projectId,
+            @PathVariable UUID postId
+    ) {
+        return projectPostService.getPostImage(projectId, postId);
     }
 
     private UUID getCurrentUserId(Jwt jwt){

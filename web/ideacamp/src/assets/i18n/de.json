@@ -11,6 +11,7 @@
   "COMMON": {
     "SAVE": "Speichern",
     "CANCEL": "Abbrechen",
+    "CONFIRM": "Bestätigen",
     "EDIT": "Bearbeiten",
     "DELETE": "Löschen",
     "LOADING": "Wird geladen...",
@@ -59,11 +60,13 @@
   "AUTH": {
     "P1": "Erfolgreich!",
     "H1": "Willkommen bei IdeaCamp",
-    "P2": "Was hast du heute vor? Erstelle dein erstes Projekt, entdecke spannende Ideen oder verbinde dich mit anderen kreativen Köpfen. Dein Abenteuer beginnt hier!"
+    "P2": "Was hast du heute vor? Erstelle dein erstes Projekt, entdecke spannende Ideen oder verbinde dich mit anderen kreativen Köpfen. Dein Abenteuer beginnt hier!",
+    "REDIRECTING": "Du wirst weitergeleitet…"
   },
   "MYPROJECTS": {
     "TITLE": "Meine Projekte",
     "CREATE_PROJECT": "Projekt erstellen",
+    "CREATE_THESIS": "Abschlussarbeit erstellen",
     "PROJECTS": "Projekte",
     "PROJECTS_COUNT_LABEL": "Projekte",
     "OWNED_PROJECTS_COUNT_LABEL": "Projekte im Besitz",
@@ -71,6 +74,7 @@
     "INVITED_BY": "Eingeladen von:",
     "ACCEPT": "Annehmen",
     "DECLINE": "Ablehnen",
+    "JOIN_DISCORD": "Discord beitreten",
     "NO_SHORT_DESCRIPTION": "Keine Kurzbeschreibung.",
     "PRIVATE": "Privat",
     "PUBLIC": "Öffentlich",
@@ -111,10 +115,34 @@
     "ERROR_EDIT_FORBIDDEN": "Du bist nicht berechtigt, dieses Profil zu bearbeiten.",
     "FOLLOWERS": "Follower",
     "ERROR_UPDATE_PROFILE": "Das Profil konnte nicht aktualisiert werden. Bitte versuche es später erneut.",
+    "ERROR_INVALID_PLACE": "Dies ist keine reale Stadt. Bitte wähle einen Ort aus den Vorschlägen aus.",
+    "ERROR_CONTENT_NOT_VALID": "Diese Eingabe enthält nicht erlaubten Inhalt.",
     "FOLLOW": "Folgen",
     "FOLLOWING": "Folge ich",
     "UNFOLLOW": "Entfolgen",
-    "INVITE": "Einladen"
+    "INVITE": "Einladen",
+    "PROFESSOR_BADGE": "Professor",
+    "MARKDOWN_HINT": "Du kannst Markdown verwenden, z.B. Überschriften, Listen, Links und Hervorhebungen.",
+    "DISCORD_SHOW": "Nutzername",
+    "DISCORD_COPIED": "Kopiert!"
+  },
+  "REPORT_DIALOG": {
+    "REPORT": "Melden",
+    "TITLE": "Inhalt melden",
+    "DESCRIPTION": "Wählen Sie einen Grund aus und ergänzen Sie optional eine Nachricht.",
+    "REPORTED_CONTENT": "Gemeldeter Inhalt",
+    "REASON_LABEL": "Grund",
+    "REASON_PLACEHOLDER": "Grund auswählen",
+    "MESSAGE_LABEL": "Kommentar (optional)",
+    "MESSAGE_PLACEHOLDER": "Beschreiben Sie kurz, warum Sie diesen Inhalt melden...",
+    "SUBMIT": "Meldung senden",
+    "ERROR_SEND": "Die Meldung konnte nicht gesendet werden.",
+    "ERROR_DUPLICATE": "Du hast diesen Inhalt bereits mit diesem Grund gemeldet.",
+    "SUCCESS": "Die Meldung wurde gesendet.",
+    "VALIDATION": {
+      "TARGET_INVALID": "Der gemeldete Inhalt ist ungültig.",
+      "MESSAGE_MAX": "Die Nachricht darf maximal 1000 Zeichen lang sein."
+    }
   },
   "CONTACT-REQUESTS": {
     "CONTACT": "Kontaktanfragen",
@@ -140,6 +168,12 @@
     "DESCRIPTION": "Willkommen im Moderator-Bereich. Hier können zukünftig Benutzer und Projekte verwaltet werden.",
     "PROJECTS_LINK_TITLE": "Projektverwaltung",
     "PROJECTS_LINK_DESCRIPTION": "Alle Projekte einsehen, suchen und löschen.",
+    "USERS_LINK_TITLE": "Nutzerverwaltung",
+    "USERS_LINK_DESCRIPTION": "Aktive und gebannte Nutzer einsehen und verwalten.",
+    "PROFESSOR_REQUESTS_LINK_TITLE": "Professorverwaltung",
+    "PROFESSOR_REQUESTS_LINK_DESCRIPTION": "Professor-Anfragen prüfen, annehmen oder ablehnen.",
+    "REPORTS_LINK_TITLE": "Reportverwaltung",
+    "REPORTS_LINK_DESCRIPTION": "Gemeldete Inhalte prüfen und bearbeiten.",
     "PROJECTS": {
       "TITLE": "Projektverwaltung",
       "SUBTITLE": "Alle Projekte einsehen, suchen und bei Bedarf löschen.",
@@ -147,8 +181,10 @@
       "COLUMN_PROJECT": "Projekt",
       "COLUMN_OWNER": "Ersteller",
       "COLUMN_CREATED": "Erstellt am",
+      "COLUMN_UPDATED": "Zuletzt aktualisiert",
       "COLUMN_STATUS": "Status",
       "COLUMN_ACTION": "Aktion",
+      "MEMBER": "Mitglied",
       "MEMBERS": "Mitglieder",
       "STATUS_PRIVATE": "Privat",
       "STATUS_PUBLIC": "Öffentlich",
@@ -162,10 +198,15 @@
       "ERROR_DELETE": "Projekt konnte nicht gelöscht werden.",
       "CONFIRM_DELETE_TITLE": "Projekt löschen",
       "CONFIRM_DELETE_SUBTITLE": "Diese Aktion kann nicht rückgängig gemacht werden.",
-      "CONFIRM_DELETE_TEXT": "Das Projekt \"{{ projectName }}\" wird dauerhaft gel\u00F6scht. Alle zugeh\u00F6rigen Daten gehen dabei verloren.",
+      "CONFIRM_DELETE_TEXT": "Das Projekt \"{{ projectName }}\" wird dauerhaft gelöscht. Alle zugehörigen Daten gehen dabei verloren.",
       "CONFIRM_DELETE_LABEL": "Gib zur Bestätigung den Projektnamen ein",
       "CONFIRM_DELETE_PLACEHOLDER": "Gib zur Bestätigung den Projektnamen ein",
-      "CONFIRM_DELETE_HINT_FILLED": "Der Projektname muss eingegeben werden"
+      "CONFIRM_DELETE_HINT_FILLED": "Der Projektname muss eingegeben werden",
+      "SORT": {
+        "SORT_BY": "Nach dieser Spalte sortieren",
+        "ASC": "Aufsteigend sortiert",
+        "DESC": "Absteigend sortiert"
+      }
     },
     "USER_MANAGEMENT": {
       "TITLE": "Nutzerverwaltung",
@@ -182,6 +223,12 @@
         "ACTIONS": "Aktionen",
         "BANNED_AT": "Gebannt am",
         "REASON": "Grund"
+      },
+      "SORT": {
+        "ASC": "Aufsteigend sortiert",
+        "DESC": "Absteigend sortiert",
+        "NOT_SORTED": "Nicht sortiert",
+        "LABEL": "Sortieren"
       },
       "ROLES": {
         "PROFESSOR": "Professor",
@@ -207,17 +254,215 @@
         "REASON_LABEL": "Grund für den Ban (optional)",
         "REASON_PLACEHOLDER": "z. B. Verstoß gegen Nutzungsbedingungen..."
       }
+    },
+    "PROFESSOR_REQUESTS": {
+      "TITLE": "Professor-Anfragen",
+      "SUBTITLE": "Anfragen auf Professor-Rechte einsehen und verwalten.",
+      "LOADING": "Anfragen werden geladen...",
+      "ERROR_LOAD": "Professor-Anfragen konnten nicht geladen werden.",
+      "ERROR_ACCEPT": "Anfrage konnte nicht angenommen werden.",
+      "ERROR_REJECT": "Anfrage konnte nicht abgelehnt werden.",
+      "NO_RESULTS": "Keine Professor-Anfragen vorhanden.",
+      "COLUMN_USER": "Nutzer",
+      "COLUMN_EMAIL": "E-Mail",
+      "COLUMN_MESSAGE": "Nachricht",
+      "COLUMN_CREATED": "Erstellt am",
+      "COLUMN_STATUS": "Status",
+      "COLUMN_ACTIONS": "Aktionen",
+      "ACCEPT": "Annehmen",
+      "REJECT": "Ablehnen",
+      "STATUS_PENDING": "Ausstehend",
+      "STATUS_ACCEPTED": "Angenommen",
+      "STATUS_REJECTED": "Abgelehnt",
+      "STATUS_WAITING_EMAIL_VERIFICATION": "Wartet auf E-Mail-Bestätigung",
+      "STATUS_EXPIRED": "Abgelaufen",
+      "CONFIRM_ACCEPT_TITLE": "Anfrage annehmen",
+      "CONFIRM_REJECT_TITLE": "Anfrage ablehnen",
+      "CONFIRM_ACCEPT_TEXT": "Möchtest du diese Professor-Anfrage wirklich annehmen?",
+      "CONFIRM_REJECT_TEXT": "Möchtest du diese Professor-Anfrage wirklich ablehnen?",
+      "CANCEL": "Abbrechen",
+      "CONFIRM": "Bestätigen",
+      "SHOWING_OF": "von",
+      "TOTAL_REQUESTS": "Anfragen angezeigt"
+    },
+    "AUDIT_LOGS_LINK_TITLE": "Audit Logs",
+    "AUDIT_LOGS_LINK_DESCRIPTION": "Nachvollziehen, wer kritische Aktionen durchgeführt hat.",
+    "AUDIT_LOGS": {
+      "TITLE": "Audit Logs",
+      "SUBTITLE": "Nachvollziehen, wer Projekte, Posts, Nutzer und Professor-Anfragen verwaltet hat.",
+      "LOADING": "Audit Logs werden geladen …",
+      "ERROR_LOAD": "Audit Logs konnten nicht geladen werden.",
+      "NO_RESULTS": "Keine Audit Logs vorhanden.",
+      "COLUMN_TIME": "Zeitpunkt",
+      "COLUMN_ACTION": "Aktion",
+      "COLUMN_ACTOR": "Ausgeführt von",
+      "COLUMN_TARGET": "Ziel",
+      "COLUMN_DETAILS": "Details",
+      "SHOWING_OF": "von",
+      "TOTAL_LOGS": "Logs angezeigt",
+      "ACTIONS": {
+        "PROJECT_DELETED": "Projekt gelöscht",
+        "PROJECT_POST_DELETED": "Projektpost gelöscht",
+        "USER_BANNED": "Nutzer gebannt",
+        "USER_UNBANNED": "Nutzer entbannt",
+        "PROFESSOR_REQUEST_ACCEPTED": "Professor-Anfrage angenommen",
+        "PROFESSOR_REQUEST_REJECTED": "Professor-Anfrage abgelehnt"
+      },
+      "TARGET_TYPES": {
+        "PROJECT": "Projekt",
+        "PROJECT_POST": "Projektpost",
+        "USER": "Nutzer",
+        "PROFESSOR_REQUEST": "Professor-Anfrage"
+      },
+      "DETAILS": {
+        "PROJECT_DELETED": "Projekt \"{{ targetName }}\" wurde gelöscht.",
+        "PROJECT_POST_DELETED": "Projektpost \"{{ targetName }}\" wurde aus Projekt \"{{ details }}\" gelöscht.",
+        "USER_BANNED": "Nutzer \"{{ targetName }}\" wurde gebannt. Grund: {{ details }}",
+        "USER_UNBANNED": "Nutzer \"{{ targetName }}\" wurde entbannt.",
+        "PROFESSOR_REQUEST_ACCEPTED": "Professor-Anfrage von \"{{ targetName }}\" wurde angenommen. E-Mail: {{ details }}",
+        "PROFESSOR_REQUEST_REJECTED": "Professor-Anfrage von \"{{ targetName }}\" wurde abgelehnt. E-Mail: {{ details }}"
+      }
+      },
+      "REPORTS": {
+      "TITLE": "Reportverwaltung",
+      "SUBTITLE": "Gemeldete Inhalte prüfen, priorisieren und bearbeiten.",
+      "BADGE": "Moderator",
+
+      "SEARCH_PLACEHOLDER": "Suche nach Nutzer, Meldung, Notiz oder ID...",
+
+      "FILTER": {
+        "STATUS": "Status",
+        "CONTENT_TYPE": "Inhaltstyp",
+        "REASON": "Grund",
+        "PRIORITY": "Priorität",
+        "ALL": "Alle",
+        "ALL_REASONS": "Alle Gründe"
+      },
+
+      "COLUMN": {
+        "MESSAGE": "Meldung",
+        "REASON": "Grund",
+        "REPORTED_CONTENT": "Gemeldeter Inhalt",
+        "REPORTED_BY": "Gemeldet von",
+        "STATUS": "Status",
+        "CREATED_AT": "Erstellt am",
+        "ACTIONS": "Aktionen"
+      },
+
+      "STATUS": {
+        "OPEN": "Offen",
+        "IN_REVIEW": "In Bearbeitung",
+        "RESOLVED": "Gelöst",
+        "DISMISSED": "Verworfen"
+      },
+
+      "TARGET": {
+        "USER": "Nutzer",
+        "PROJECT": "Projekt",
+        "PROJECT_POST": "Projektpost"
+      },
+
+      "REASON": {
+        "SPAM": "Spam",
+        "HARASSMENT": "Belästigung",
+        "HATE_SPEECH": "Hassrede",
+        "INAPPROPRIATE_CONTENT": "Unpassender Inhalt",
+        "VIOLENCE_OR_THREATS": "Gewalt / Drohungen",
+        "SELF_HARM_OR_SUICIDE": "Selbstverletzung",
+        "PERSONAL_DATA": "Persönliche Daten",
+        "COPYRIGHT": "Urheberrecht",
+        "MISINFORMATION": "Fehlinformation",
+        "FRAUD_OR_IMPERSONATION": "Betrug / Imitation",
+        "OTHER": "Sonstiges"
+      },
+
+      "PRIORITY": {
+        "CRITICAL": "Kritisch",
+        "MEDIUM": "Mittel",
+        "LOW": "Niedrig"
+      },
+
+      "ACTIONS": {
+        "VIEW": "Ansehen",
+        "OPEN_MENU": "Weitere Aktionen",
+        "SET_IN_REVIEW": "In Bearbeitung setzen",
+        "RESOLVE": "Als gelöst markieren",
+        "DISMISS": "Verwerfen",
+        "CLOSE": "Schließen",
+        "SAVE": "Speichern",
+        "BAN_USER": "Nutzer bannen",
+        "DELETE_PROJECT": "Projekt löschen",
+        "DELETE_PROJECT_POST": "Projektpost löschen"
+      },
+
+      "DETAIL": {
+        "TITLE": "Meldung",
+        "REPORT_ID": "Report-ID",
+        "REASON": "Grund",
+        "PRIORITY": "Priorität",
+        "CONTENT_TYPE": "Inhaltstyp",
+        "REPORTED_CONTENT": "Gemeldeter Inhalt",
+        "REPORTED_BY": "Gemeldet von",
+        "COMMENT": "Kommentar",
+        "MODERATOR_NOTE": "Moderator-Notiz",
+        "MODERATOR_NOTE_PLACEHOLDER": "z. B. „Post wurde geprüft.“ oder „Kein Verstoß erkennbar.“",
+        "NO_MODERATOR_NOTE": "Keine Moderator-Notiz vorhanden.",
+        "CREATED_AT": "Erstellt am",
+        "UPDATED_AT": "Aktualisiert am",
+        "REVIEWED_BY": "Bearbeitet von",
+        "REVIEWED_AT": "Bearbeitet am",
+        "SIMILAR_REPORTS": "Ähnliche Meldungen",
+        "SIMILAR_REPORTS_TEXT": "Zu diesem Inhalt liegen {{count}} aktive Meldungen vor.",
+        "TARGET_ACTIONS": "Zielaktionen"
+      },
+
+      "EMPTY": {
+        "TITLE": "Keine Reports gefunden.",
+        "DESCRIPTION": "Passe die Filter oder Suche an, um andere Meldungen zu finden."
+      },
+
+      "PAGINATION": {
+        "SHOWING": "{{ shown }} von {{ total }} Reports",
+        "PAGE": "Seite {{ current }} von {{ total }}"
+      },
+
+      "SORT": {
+        "SORT_BY": "Nach dieser Spalte sortieren",
+        "ASC": "Aufsteigend sortiert",
+        "DESC": "Absteigend sortiert"
+      },
+
+      "ERROR_LOAD": "Reports konnten nicht geladen werden.",
+      "ERROR_UPDATE": "Report konnte nicht aktualisiert werden.",
+      "LOADING": "Reports werden geladen...",
+      "EMPTY_MESSAGE": "Keine Nachricht angegeben.",
+
+      "SIMILAR_REPORTS": "{{count}} Meldungen",
+
+      "CONFIRM": {
+        "BAN_USER_TITLE": "Nutzer wirklich bannen?",
+        "BAN_USER_DESCRIPTION": "Der Nutzer kann danach keine normalen Plattformfunktionen mehr nutzen.",
+        "DELETE_PROJECT_TITLE": "Projekt wirklich löschen?",
+        "DELETE_PROJECT_DESCRIPTION": "Das Projekt wird dauerhaft entfernt. Diese Aktion kann nicht rückgängig gemacht werden.",
+        "DELETE_PROJECT_POST_TITLE": "Projektpost wirklich löschen?",
+        "DELETE_PROJECT_POST_DESCRIPTION": "Der Projektpost wird dauerhaft entfernt. Diese Aktion kann nicht rückgängig gemacht werden."
+      },
+      "ERROR_TARGET_ACTION": "Die Zielaktion konnte nicht ausgeführt werden."
     }
   },
   "SIDEBAR": {
+    "DASHBOARD": "Dashboard",
     "MYPROJECTS": "Meine Projekte",
     "FAVORITE": "Favoriten",
     "PROFILE": "Mein Profil",
     "MODERATOR": "Moderator",
     "MODERATOR_PROJECTS": "Projektverwaltung",
     "USER_MANAGEMENT": "Nutzerverwaltung",
+    "REPORTS": "Reportverwaltung",
+    "PROFESSOR_REQUESTS": "Professorverwaltung",
     "IMPRESSUM": "Impressum",
-    "MENU": "Menü"
+    "MENU": "Menü",
+    "AUDIT_LOGS": "Audit Logs"
   },
   "PROJECTCREATE": {
     "PAGE_TITLE": "Erstelle ein neues Projekt",
@@ -231,6 +476,7 @@
     "DESCRIPTION": "Beschreibung",
     "DESCRIPTION_PLACEHOLDER": "Beschreibe dein Projekt ausführlich",
     "NO_DESCRIPTION": "Keine Projektbeschreibung",
+    "MARKDOWN_HINT": "Du kannst Markdown verwenden, z.B. Überschriften, Listen, Links und Hervorhebungen.",
     "PROJECT_URL": "Projekt-URL",
     "PROJECT_URL_LABEL": "Projekt-URL (Dein Projekt wird unter /project/dein-input verfügbar sein)",
     "PROJECT_URL_PLACEHOLDER": "z.B. mein-projekt",
@@ -263,6 +509,7 @@
     "SUCCESS_CREATED": "Projekt erfolgreich erstellt!",
     "SUCCESS_CREATED_WITH_INVITES": "Projekt erfolgreich erstellt und Einladungen gesendet!",
     "ERROR_CREATE_PROJECT": "Projekt konnte nicht erstellt werden. Bitte versuche es erneut.",
+    "ERROR_MODERATION": "Projekt konnte nicht erstellt werden, da einige Inhalte als unangemessen eingestuft wurden. Bitte überprüfe deine Eingaben.",
     "VALIDATION": {
       "NAME_MIN": "Projektname muss mindestens 3 Zeichen lang sein.",
       "NAME_MAX": "Projektname darf höchstens 20 Zeichen lang sein.",
@@ -274,6 +521,61 @@
       "PROJECT_URL_MIN": "Projekt URL muss mindestens 3 Zeichen lang sein.",
       "PROJECT_URL_MAX": "Projekt URL darf höchstens 30 Zeichen lang sein.",
       "PROJECT_URL_FORMAT": "Verwende ausschließlich Kleinbuchstaben, Zahlen und Bindestriche. Bindestriche sind am Anfang und am Ende nicht zulässig."
+    }
+  },
+  "THESISCREATE": {
+    "PAGE_TITLE": "Erstelle eine neue Abschlussarbeit",
+    "CREATING": "Abschlussarbeit wird erstellt…",
+    "THESIS_TITLE": "Titel der Abschlussarbeit",
+    "THESIS_TITLE_PLACEHOLDER": "Gib den Titel der Abschlussarbeit ein",
+    "NO_THESIS_TITLE": "Kein Titel",
+    "SHORT_DESCRIPTION": "Kurzbeschreibung",
+    "SHORT_DESCRIPTION_PLACEHOLDER": "Beschreibe die Abschlussarbeit in ein bis zwei Sätzen",
+    "NO_SHORT_DESCRIPTION": "Keine Kurzbeschreibung",
+    "DESCRIPTION": "Beschreibung",
+    "DESCRIPTION_PLACEHOLDER": "Beschreibe die Abschlussarbeit ausführlich",
+    "NO_DESCRIPTION": "Keine Beschreibung",
+    "THESIS_URL": "Abschlussarbeit-URL",
+    "THESIS_URL_LABEL": "Abschlussarbeit-URL (Deine Abschlussarbeit wird unter /thesis/dein-input verfügbar sein)",
+    "THESIS_URL_PLACEHOLDER": "z.B. meine-abschlussarbeit",
+    "NO_THESIS_URL": "Keine Abschlussarbeit-URL",
+    "CHECKING_THESIS_URL": "Abschlussarbeit-URL wird geprüft...",
+    "THESIS_URL_EXISTS": "Diese Abschlussarbeit-URL ist bereits vergeben.",
+    "THESIS_URL_AVAILABLE": "Diese Abschlussarbeit-URL ist verfügbar.",
+    "STUDENTS": "Studierende",
+    "ADD_STUDENT": "Studierende:n hinzufügen",
+    "ADD": "Hinzufügen",
+    "INVITED_STUDENTS": "Eingeladene Studierende",
+    "NO_STUDENTS_INVITED": "Keine Studierenden eingeladen",
+    "STUDENT_DIALOG_TITLE": "Füge Studierende zu deiner Abschlussarbeit hinzu",
+    "STUDENT_DIALOG_SUBTITLE": "Suche nach Nutzername",
+    "USER_SEARCH_PLACEHOLDER": "Nutzer finden",
+    "USER_SEARCH_EMPTY_PREFIX": "Keine passenden User gefunden",
+    "FINISH_TITLE": "Fertigstellen",
+    "FINISH_DESCRIPTION": "Prüfe alle Eingaben, um deine Abschlussarbeit fertigzustellen.",
+    "STEPS": {
+      "GENERAL": "Allgemeines",
+      "SETTINGS": "Einstellungen",
+      "STUDENTS": "Studierende",
+      "FINISH": "Fertigstellen"
+    },
+    "THESIS_URL_CHECK_ERROR": "Abschlussarbeit-URL konnte nicht geprüft werden.",
+    "SUCCESS_CREATED": "Abschlussarbeit erfolgreich erstellt!",
+    "SUCCESS_CREATED_WITH_STUDENTS": "Abschlussarbeit erfolgreich erstellt und Studierende hinzugefügt!",
+    "SUCCESS_CREATED_STUDENTS_PARTIAL": "Abschlussarbeit erfolgreich erstellt. Einige Studierende konnten nicht hinzugefügt werden.",
+    "SUCCESS_CREATED_STUDENTS_FAILED": "Abschlussarbeit erfolgreich erstellt. Die Studierenden konnten nicht hinzugefügt werden.",
+    "ERROR_CREATE_THESIS": "Abschlussarbeit konnte nicht erstellt werden. Bitte versuche es erneut.",
+    "VALIDATION": {
+      "TITLE_MIN": "Titel muss mindestens 3 Zeichen lang sein.",
+      "TITLE_MAX": "Titel darf höchstens 100 Zeichen lang sein.",
+      "TITLE_NO_QUOTES": "Titel darf keine Anführungszeichen beinhalten.",
+      "SHORT_DESCRIPTION_MAX": "Kurzbeschreibung darf höchstens 300 Zeichen lang sein.",
+      "SHORT_DESCRIPTION_NO_QUOTES": "Kurzbeschreibung darf keine Anführungszeichen beinhalten.",
+      "DESCRIPTION_MAX": "Beschreibung darf höchstens 2000 Zeichen lang sein.",
+      "DESCRIPTION_NO_QUOTES": "Beschreibung darf keine Anführungszeichen beinhalten.",
+      "THESIS_URL_MIN": "Abschlussarbeit-URL muss mindestens 3 Zeichen lang sein.",
+      "THESIS_URL_MAX": "Abschlussarbeit-URL darf höchstens 30 Zeichen lang sein.",
+      "THESIS_URL_FORMAT": "Verwende ausschließlich Kleinbuchstaben, Zahlen und Bindestriche. Bindestriche sind am Anfang und am Ende nicht zulässig."
     }
   },
   "SEARCH": {
@@ -294,7 +596,25 @@
     "SHOW_ALL_USERS": "Alle {{ count }} Nutzer anzeigen",
     "PREVIOUS": "Zurück",
     "NEXT": "Weiter",
-    "ERROR_FAILED": "Die Suche ist fehlgeschlagen. Bitte versuche es erneut."
+    "ERROR_FAILED": "Die Suche ist fehlgeschlagen. Bitte versuche es erneut.",
+    "FILTERS": {
+      "TITLE": "Filter",
+      "CLEAR_ALL": "Alle zurücksetzen",
+      "HAS_OPEN_POSITIONS": "Hat offene Positionen",
+      "ALLOW_JOIN_REQUESTS": "Nimmt Beitrittsanfragen an",
+      "IS_PROFESSOR": "Verifizierte Professoren",
+      "LOCATION": "Standort",
+      "LOCATION_PLACEHOLDER": "Nach Standort filtern...",
+      "DATE_RANGE": {
+        "LABEL": "Erstellt",
+        "ANY_TIME": "Jederzeit",
+        "LAST_7_DAYS": "Letzte 7 Tage",
+        "LAST_30_DAYS": "Letzte 30 Tage",
+        "LAST_YEAR": "Letztes Jahr"
+      },
+      "PROFESSOR_BADGE": "Professor",
+      "OPEN_POSITIONS_BADGE": "{{ count }} offene Position(en)"
+    }
   },
   "IMPRESSUM": {
     "BADGE": "Rechtliches",
@@ -328,7 +648,32 @@
       "JOIN_REQUESTS": "Beitrittsanfragen",
       "MEMBERS": "Mitglieder",
       "PRIVACY": "Privatsphäre",
-      "DANGER_ZONE": "Gefahrenzone"
+"GITHUB": "GitHub",
+      "DANGER_ZONE": "Gefahrenzone",
+      "DISCORD": "Discord"
+    },
+    "DISCORD": {
+      "TITLE": "Discord Integration",
+      "CONNECTED": "Verbunden",
+      "CHANNEL_ID": "Kanal-ID",
+      "CHANNEL_ID_LABEL": "Discord Kanal-ID",
+      "ADD_BOT": "Discord Server verbinden",
+      "ADD_BOT_LOADING": "Öffne Discord...",
+      "ADD_BOT_HINT": "Der Bot findet oder erstellt einen #posts-Kanal und macht ihn automatisch schreibgeschützt für alle außer dem Projektinhaber.",
+      "AUTO_SETUP_LOADING": "Kanal wird eingerichtet...",
+      "CHANGE_CHANNEL": "Kanal ändern",
+      "TEST_AND_CONNECT": "Testen & Verbinden",
+      "DISCONNECT": "Trennen",
+      "INVITE_URL_LABEL": "Discord Einladungslink",
+      "INVITE_URL_HINT": "Dieser Link wird eingeladenen Nutzern angezeigt, damit sie dem Server beitreten können.",
+      "ERROR_CONNECT": "Konnte keine Verbindung zum Discord-Kanal herstellen.",
+      "ERROR_LINK": "Verbindung zu Discord fehlgeschlagen.",
+      "NEEDS_DISCORD_LINK": "Du musst dein Discord-Konto verknüpfen, bevor du einen Server verbinden kannst.",
+      "LINK_DISCORD": "Discord-Konto verknüpfen",
+      "SELECT_SERVER": "Bot ist in mehreren Servern — wähle einen aus:",
+      "SELECT_SERVER_PLACEHOLDER": "Server auswählen...",
+      "CONNECT_SERVER": "Verbinden",
+      "BOT_NO_WRITE_PERMISSION": "Der Bot kann im vorhandenen #posts-Kanal keine Nachrichten senden. Erteile dem Bot die \"Nachrichten senden\"-Berechtigung in Discord oder verbinde manuell einen anderen Kanal."
     },
     "ERRORS": {
       "NO_PROJECT_URL": "Keine Projekt-URL gegeben.",
@@ -384,7 +729,20 @@
       "CONFIRM_TYPE_START": "Um diese Aktion zu bestätigen, tippe bitte",
       "CONFIRM_TYPE_END": "ein.",
       "DELETING": "Wird gelöscht…",
-      "ERROR_DELETE_PROJECT": "Projekt konnte nicht gelöscht werden."
+      "ERROR_DELETE_PROJECT": "Projekt konnte nicht gelöscht werden.",
+      "TRANSFER_TITLE": "Eigentümerschaft übertragen",
+      "TRANSFER_DESCRIPTION": "Übertrage dieses Projekt an ein anderes Mitglied. Du wirst danach ein normales Mitglied.",
+      "TRANSFER_BUTTON": "Eigentümerschaft übertragen",
+      "TRANSFER_MODAL_TITLE": "Projekteigentümerschaft übertragen",
+      "TRANSFER_MODAL_SUBTITLE": "Diese Aktion kann nicht rückgängig gemacht werden",
+      "TRANSFER_CONFIRM_INFO": "Du verlierst alle Eigentümerrechte und wirst ein normales Mitglied dieses Projekts.",
+      "TRANSFER_SELECT_LABEL": "Neuen Eigentümer auswählen",
+      "TRANSFER_NO_MEMBERS": "Keine Mitglieder vorhanden. Lade zuerst Mitglieder in das Projekt ein.",
+      "TRANSFER_LOADING": "Mitglieder werden geladen…",
+      "TRANSFER_CONFIRM": "Übertragung bestätigen",
+      "TRANSFERRING": "Wird übertragen…",
+      "TRANSFER_ERROR": "Eigentumsübertragung fehlgeschlagen. Bitte versuche es erneut.",
+      "TRANSFER_ERROR_LOAD": "Mitglieder konnten nicht geladen werden."
     }
   },
   "PROJECTSITE": {
@@ -394,7 +752,8 @@
     "ERRORS": {
       "NO_PROJECT_URL": "Keine Projekt-URL angegeben.",
       "LOAD_PROJECT": "Projektdaten konnten nicht abgerufen werden.",
-      "SAVE_PROJECT": "Projekt konnte nicht gespeichert werden."
+      "SAVE_PROJECT": "Projekt konnte nicht gespeichert werden.",
+      "CONTENT_NOT_VALID": "Dieser Inhalt ist nicht erlaubt."
     },
     "INFO": {
       "VISIBILITY": "Sichtbarkeit",
@@ -406,14 +765,19 @@
     "HEADER": {
       "SETTINGS": "Einstellungen"
     },
+    "DISCORD_CHANNEL": "Discord Kanal",
     "MEMBERS": {
       "ALL_MEMBERS": "Alle Mitglieder",
-      "NO_MEMBERS": "Noch keine Mitglieder."
+      "NO_MEMBERS": "Noch keine Mitglieder.",
+      "DISCORD_SHOW": "Nutzername",
+      "DISCORD_COPIED": "Kopiert!"
     },
     "TAGS": {
       "ERROR_INVALID_CHARS": "Tag enthält ungültige Zeichen. Erlaubt: Buchstaben, Zahlen, Leerzeichen, Bindestrich und Punkt.",
       "ERROR_DUPLICATE": "Tag ist bereits in diesem Projekt enthalten.",
       "ERROR_TOO_LONG": "Tag zu lang.",
+      "ERROR_NOT_VALID": "Tag '{{name}}' ist kein gültiger Tag.",
+      "ERROR_VALIDATION": "Tag konnte nicht validiert werden. Bitte später erneut versuchen.",
       "ERROR_DELETE": "Tag konnte nicht gelöscht werden.",
       "ERROR_LOAD": "Tags konnten nicht geladen werden.",
       "LOADING": "Tags werden geladen…",
@@ -434,12 +798,16 @@
       "DROP_HINT": "Datei hierher ziehen",
       "DOWNLOAD_FILE": "Datei herunterladen",
       "DELETE_FILE": "Datei löschen",
+      "TOGGLE_VISIBILITY": "Sichtbarkeit ändern",
+      "PUBLIC": "Öffentlich",
+      "PRIVATE": "Privat",
       "ERROR_TYPE_NOT_ALLOWED": "Dateityp nicht erlaubt. Erlaubt: PDF, PNG, JPG, DOCX, TXT, MD",
       "ERROR_FILE_TOO_LARGE": "Datei ist zu groß. Maximale Dateigröße: 10 MB.",
       "ERROR_LOAD": "Dateien konnten nicht geladen werden.",
       "ERROR_UPLOAD": "Datei konnte nicht hochgeladen werden.",
       "ERROR_DELETE": "Datei konnte nicht gelöscht werden.",
-      "ERROR_DOWNLOAD": "Datei konnte nicht heruntergeladen werden."
+      "ERROR_DOWNLOAD": "Datei konnte nicht heruntergeladen werden.",
+      "ERROR_UPDATE_VISIBILITY": "Sichtbarkeit konnte nicht aktualisiert werden."
     }
   },
   "JOIN_REQUEST": {
@@ -469,11 +837,27 @@
     "AUTHOR_PREFIX": "Von",
     "UNKNOWN_AUTHOR": "Unbekannt",
     "LOAD_MORE": "Mehr laden",
+    "DRAFTS": "Entwürfe",
+    "ARCHIVED": "Archiviert",
+    "SAVE_DRAFT": "Als Entwurf speichern",
+    "ARCHIVE_POST": "Post archivieren",
+    "ARCHIVING": "Wird archiviert...",
+    "PUBLISHED": "Veröffentlicht",
+    "EDIT_POST": "Post bearbeiten",
+    "UPDATE_DRAFT": "Entwurf aktualisieren",
+    "PUBLISH_DRAFT": "Entwurf veröffentlichen",
+    "RESTORE_POST": "Post wiederherstellen",
+    "PUBLISHING": "Wird veröffentlicht...",
     "ERRORS": {
       "LOAD": "Posts konnten nicht geladen werden.",
       "EMPTY_FIELDS": "Titel und Inhalt dürfen nicht leer sein.",
       "CREATE": "Post konnte nicht erstellt werden.",
-      "DELETE": "Post konnte nicht gelöscht werden."
+      "DELETE": "Post konnte nicht gelöscht werden.",
+      "IMAGE_TYPE": "Bitte wähle ein Bild im Format JPG, PNG oder WEBP aus.",
+      "IMAGE_SIZE": "Das Bild darf maximal 5 MB groß sein.",
+      "IMAGE_UPLOAD": "Der Post wurde erstellt, aber das Bild konnte nicht hochgeladen werden.",
+      "ARCHIVE": "Der Post konnte nicht archiviert werden.",
+      "PUBLISH": "Der Post konnte nicht veröffentlicht werden."
     },
     "PLAIN_TEXT": "Klartext",
     "MARKDOWN_HINT": "Du kannst Markdown verwenden, z.B. Überschriften, Listen, Links und Hervorhebungen.",
@@ -487,14 +871,20 @@
     },
     "DELETE_POST": "Post löschen",
     "DELETING": "Wird gelöscht…",
-    "DELETE_SUCCESS": "Post erfolgreich gelöscht."
+    "DELETE_SUCCESS": "Post erfolgreich gelöscht.",
+    "SELECT_IMAGE": "Bild auswählen",
+    "IMAGE_LABEL": "Bild hinzufügen",
+    "IMAGE_HINT": "Erlaubte Formate sind JPG, PNG und WEBP bis maximal 5 MB.",
+    "REMOVE_IMAGE": "Bild entfernen"
   },
   "USER_SETTINGS": {
     "TITLE": "Einstellungen",
     "TABS": {
       "PROFESSOR_REQUEST": "Professor:in werden",
+      "INTEGRATIONS": "GitHub",
       "CONTACT": "Kontakt",
-      "IMPRESSUM": "Impressum"
+      "IMPRESSUM": "Impressum",
+      "DISCORD": "Discord"
     },
     "CONTACT": {
       "TITLE": "Kontakt",
@@ -502,6 +892,61 @@
       "SEND_EMAIL": "E-Mail senden",
       "COPIED": "Email kopiert",
       "COPY": "Email kopieren"
+    },
+    "DISCORD": {
+      "TITLE": "Discord Verbindung",
+      "CONNECT": "Discord verbinden",
+      "DISCONNECT": "Trennen",
+      "NOT_CONNECTED": "Du bist nicht mit Discord verbunden.",
+      "ERROR_LOAD": "Verbindungsstatus konnte nicht geladen werden.",
+      "ERROR_CONNECT": "Discord-Verbindung konnte nicht hergestellt werden.",
+      "ERROR_DISCONNECT": "Verbindung konnte nicht getrennt werden."
+    }
+  },
+  "GITHUB": {
+    "LOADING": "GitHub-Verbindung wird geladen",
+    "ERROR_LOAD": "Der Status der GitHub-Verbindung konnte nicht geladen werden.",
+    "ERROR_CONNECT": "Die GitHub-Verbindung konnte nicht gestartet werden. Bitte versuche es erneut.",
+    "ERROR_DISCONNECT": "Das GitHub-Konto konnte nicht getrennt werden. Bitte versuche es erneut.",
+    "CARD_TITLE": "GitHub",
+    "CARD_DESCRIPTION": "Verbinde dein GitHub-Konto, um Repositories mit deinen Projekten zu verknüpfen.",
+    "DISABLED": "Die GitHub-Integration ist derzeit nicht verfügbar.",
+    "CONNECT": "GitHub-Konto verbinden",
+    "RECONNECT": "Erneut verbinden",
+    "DISCONNECT": "Trennen",
+    "STATUS_CONNECTED": "Verbunden",
+    "STATUS_RECONNECT_REQUIRED": "Erneute Verbindung erforderlich",
+    "DISCONNECT_CONFIRM_TITLE": "GitHub-Konto trennen?",
+    "DISCONNECT_CONFIRM_DESCRIPTION": "Bereits mit Projekten verknüpfte Repositories bleiben verknüpft, aber du musst dich erneut verbinden, um neue zu verknüpfen.",
+    "CANCEL": "Abbrechen",
+    "CALLBACK": {
+      "LOADING": "Dein GitHub-Konto wird verbunden...",
+      "SUCCESS": "GitHub-Konto erfolgreich verbunden.",
+      "DENIED_TITLE": "Verbindung abgebrochen",
+      "DENIED_DESCRIPTION": "Du hast die GitHub-Autorisierung abgebrochen. Es wurden keine Änderungen vorgenommen.",
+      "ERROR_TITLE": "Verbindung fehlgeschlagen",
+      "ERROR_DESCRIPTION": "Dein GitHub-Konto konnte nicht verbunden werden. Bitte versuche es erneut.",
+      "BACK_TO_SETTINGS": "Zurück zu den Einstellungen"
+    },
+    "REPO": {
+      "ERROR_LOAD": "Das verknüpfte GitHub-Repository konnte nicht geladen werden.",
+      "ERROR_LINK": "Das Repository konnte nicht verknüpft werden. Bitte versuche es erneut.",
+      "ERROR_UNLINK": "Die Verknüpfung des Repositorys konnte nicht aufgehoben werden. Bitte versuche es erneut.",
+      "INVALID_INPUT": "Gib ein GitHub-Repository als owner/name oder als github.com-URL ein.",
+      "CONNECTION_REQUIRED": "Verbinde dein GitHub-Konto, bevor du ein Repository verknüpfst.",
+      "ACCESS_DENIED": "Du hast keinen Schreibzugriff auf dieses Repository auf GitHub.",
+      "NOT_FOUND": "Dieses Repository konnte auf GitHub nicht gefunden werden.",
+      "GO_TO_SETTINGS": "Zu den Einstellungen",
+      "LINK_TITLE": "GitHub-Repository verknüpfen",
+      "LINK_DESCRIPTION": "Zeige Beschreibung, Stars, Forks und Sprachen des Repositorys auf der Projektseite an.",
+      "LINK_PLACEHOLDER": "owner/repository oder https://github.com/owner/repository",
+      "LINK": "Repository verknüpfen",
+      "UNLINK": "Verknüpfung aufheben",
+      "UNAVAILABLE": "Repository-Daten sind vorübergehend nicht verfügbar.",
+      "SHOW_README": "README auf der Projektseite anzeigen",
+      "ERROR_README_TOGGLE": "Die Sichtbarkeit der README konnte nicht aktualisiert werden. Bitte versuche es erneut.",
+      "AUTO_INVITE_COLLABORATORS": "Neue Mitglieder automatisch als GitHub-Mitarbeiter einladen",
+      "ERROR_AUTO_INVITE_TOGGLE": "Die Einstellung für automatische Einladungen konnte nicht aktualisiert werden. Bitte versuche es erneut."
     }
   },
   "PROFESSOR_REQUEST": {
@@ -515,6 +960,8 @@
     "ACCEPTED_BADGE": "Angenommen",
     "REJECTED_TITLE": "Anfrage abgelehnt",
     "REJECTED_DESCRIPTION": "Ihre Anfrage wurde leider abgelehnt. Sie können jederzeit eine neue Anfrage stellen.",
+    "ALREADY_PROFESSOR_TITLE": "Du bist bereits Professor:in",
+    "ALREADY_PROFESSOR_DESCRIPTION": "Dein Profil hat bereits Professor:innen-Rechte. Eine weitere Anfrage ist nicht erforderlich.",
     "NEW_REQUEST": "Neue Anfrage stellen",
     "CARD_TITLE": "Professor:in werden",
     "CARD_DESCRIPTION": "Erweiterte Funktionen für Abschlussarbeiten, Forschung und Studierendenkontakt.",
@@ -526,10 +973,9 @@
     "FEATURE_STUDENTS_DESC": "Knüpfe Kontakt und begleite Abschlussprojekte.",
     "FORM_TITLE": "Jetzt bewerben",
     "FORM_DESCRIPTION": "Beschreiben Sie kurz, warum Sie Professor:innen-Rechte benötigen.",
-    "FORM_NAME": "Name *",
-    "FORM_NAME_PLACEHOLDER": "Ihr vollständiger Name",
+    "FORM_NAME": "Benutzername",
     "FORM_EMAIL": "E-Mail *",
-    "FORM_EMAIL_PLACEHOLDER": "ihre@hochschule.de",
+    "FORM_EMAIL_PLACEHOLDER": "z.B. vorname.nachname@mni.thm.de",
     "FORM_REASON": "Begründung *",
     "FORM_REASON_PLACEHOLDER": "Schreiben Sie Ihr Anschreiben für die Anfrage...",
     "SUBMITTING": "Wird gesendet",
@@ -537,13 +983,23 @@
     "SUCCESS_TITLE": "Anfrage gesendet",
     "SUCCESS_DESCRIPTION": "Ihre Anfrage wurde erfolgreich übermittelt. Wir melden uns bei Ihnen.",
     "SUCCESS_CLOSE": "Schließen",
-    "ERROR_LOAD_USER": "Benutzer konnte nicht geladen werden.",
+    "ERROR_LOAD": "Die Professor:innen-Anfrage konnte nicht geladen werden.",
     "ERROR_SEND": "Deine Anfrage konnte nicht gesendet werden. Bitte versuche es später erneut.",
+    "VERIFY_EMAIL_TITLE": "E-Mail-Adresse bestätigen",
+    "VERIFY_EMAIL_DESCRIPTION": "Bitte bestätige deine THM-E-Mail-Adresse, damit deine Anfrage von Moderatoren geprüft werden kann.",
+    "VERIFY_EMAIL_BUTTON": "E-Mail bestätigen",
+    "VERIFY_EMAIL_SUCCESS": "Deine E-Mail-Adresse wurde bestätigt. Deine Anfrage wartet nun auf Prüfung.",
+    "ERROR_VERIFY_EMAIL": "Die E-Mail-Adresse konnte nicht bestätigt werden. Der Link ist möglicherweise abgelaufen oder ungültig.",
+    "WAITING_EMAIL_VERIFICATION_TITLE": "E-Mail-Bestätigung ausstehend",
+    "WAITING_EMAIL_VERIFICATION_DESCRIPTION": "Wir haben dir eine E-Mail gesendet. Bitte bestätige deine THM-E-Mail-Adresse, damit deine Anfrage von Moderatoren geprüft werden kann.",
+    "WAITING_EMAIL_VERIFICATION_BADGE": "E-Mail-Bestätigung ausstehend",
+    "VERIFICATION_EXPIRES_AT": "Gültig bis:",
+    "EXPIRED_TITLE": "Bestätigungslink abgelaufen",
+    "EXPIRED_DESCRIPTION": "Dein Bestätigungslink ist abgelaufen. Du kannst eine neue Professor:innen-Anfrage erstellen.",
     "VALIDATION": {
-      "NAME_REQUIRED": "Bitte geben Sie Ihren Namen ein.",
-      "NAME_MAX": "Name darf höchstens 100 Zeichen lang sein.",
       "EMAIL_REQUIRED": "Bitte geben Sie Ihre E-Mail-Adresse ein.",
       "EMAIL_INVALID": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+      "EMAIL_THM_REQUIRED": "Bitte verwende eine gültige THM-E-Mail-Adresse.",
       "TEXT_REQUIRED": "Bitte geben Sie eine Begründung ein.",
       "TEXT_MAX": "Begründung darf höchstens 1000 Zeichen lang sein."
     }
@@ -562,5 +1018,129 @@
     "NO_REASON": "Kein Grund angegeben",
     "BANNED_AT": "Gesperrt am:",
     "CONTACT_HINT": "Wenn du Fragen hast, wende dich bitte an das Projektteam."
+  },
+  "ONBOARDING": {
+    "LABEL": "Kurze Einführung",
+    "TITLE": "Willkommen bei IdeaCamp",
+    "REMIND_LATER": "Später erinnern",
+    "BACK": "Zurück",
+    "NEXT": "Weiter",
+    "FINISH": "Fertig",
+    "STEPS": {
+      "DASHBOARD": {
+        "TITLE": "Dein Dashboard",
+        "TEXT": "Auf dem Dashboard bekommst du einen Überblick über Projekteinladungen, aktuelle Beiträge aus deinen Projekten und zuletzt angesehene Projekte."
+      },
+      "SIDEBAR": {
+        "TITLE": "Navigation über die Sidebar",
+        "TEXT": "Über das Menü oben links öffnest du die Sidebar. Dort findest du die wichtigsten Bereiche wie Dashboard, Suche, meine Projekte, Favoriten, Profil und Einstellungen."
+      },
+      "SEARCH": {
+        "TITLE": "Projekte entdecken",
+        "TEXT": "Über die Suche findest du Projekte und Nutzer. So kannst du passende Projekte entdecken und dich beteiligen."
+      },
+      "MY_PROJECTS": {
+        "TITLE": "Meine Projekte",
+        "TEXT": "Unter „Meine Projekte“ findest du deine eigenen Projekte, Beteiligungen und Projekteinladungen."
+      },
+      "FAVORITES": {
+        "TITLE": "Favoriten",
+        "TEXT": "Interessante Projekte kannst du als Favorit markieren und später gesammelt wiederfinden."
+      },
+      "PROFILE_SETTINGS": {
+        "TITLE": "Profil und Einstellungen",
+        "TEXT": "In deinem Profil kannst du Informationen zu dir ergänzen. In den Einstellungen findest du weitere Optionen und zusätzliche Funktionen."
+      }
+    }
+  },
+  "DASHBOARD": {
+    "POSTS": {
+      "TITLE": "Neueste Beiträge",
+      "SUBTITLE": "Updates aus deinen Projekten",
+      "POSTED_IN": "Veröffentlicht in {{ project }}",
+      "LOADING": "Beiträge werden geladen…",
+      "EMPTY": "Es gibt noch keine Beiträge. Beiträge aus deinen Projekten erscheinen hier.",
+      "ERROR_LOAD": "Beiträge konnten nicht geladen werden.",
+      "UNKNOWN_AUTHOR": "Unbekannt"
+    },
+    "PROJECTS": {
+      "TITLE": "Zuletzt",
+      "EMPTY": "Du bist noch in keinem Projekt Mitglied.",
+      "LOADING": "Projekte werden geladen…",
+      "EMPTY": "Du bist noch in keinem Projekt Mitglied."
+    }
+  },
+  "THESISSITE": {
+    "LOADING": "Abschlussarbeit wird geladen…",
+    "INFORMATION": "Informationen zur Abschlussarbeit",
+    "THESIS_UPDATED": "Abschlussarbeit erfolgreich geändert.",
+    "ERRORS": {
+      "NO_THESIS_URL": "Keine URL für die Abschlussarbeit angegeben.",
+      "LOAD_THESIS": "Daten der Abschlussarbeit konnten nicht abgerufen werden.",
+      "SAVE_THESIS": "Abschlussarbeit konnte nicht gespeichert werden."
+    },
+    "HEADER": {
+      "BADGE": "Abschlussarbeit",
+      "SETTINGS": "Einstellungen"
+    },
+    "FORM": {
+      "TITLE": "Titel der Abschlussarbeit"
+    },
+    "TAGS": {
+      "TITLE": "Tags",
+      "EMPTY": "Keine Tags vorhanden.",
+      "ERROR_DUPLICATE": "Tag ist bereits in dieser Abschlussarbeit enthalten.",
+      "ERROR_SAVE": "Tag konnte nicht gespeichert werden. Bitte versuche es erneut."
+    },
+    "PEOPLE": {
+      "TITLE": "Betreuer & Studierende",
+      "EMPTY": "Noch kein Betreuer oder Studierende.",
+      "SUPERVISOR": "Betreuer"
+    }
+  },
+  "THESISSETTINGS": {
+    "TITLE": "Einstellungen der Abschlussarbeit",
+    "BACK_TO_THESIS": "Zurück zur Abschlussarbeit",
+    "UNEXPECTED_ERROR": "Ein unerwarteter Fehler ist aufgetreten",
+    "TABS": {
+      "STUDENTS": "Studierende",
+      "DANGER_ZONE": "Gefahrenzone"
+    },
+    "ERRORS": {
+      "NO_THESIS_URL": "Keine URL für die Abschlussarbeit angegeben.",
+      "LOAD_THESIS": "Abschlussarbeit konnte nicht geladen werden."
+    },
+    "STUDENTS": {
+      "SUBTITLE": "Verwalte, welche Studierende an dieser Abschlussarbeit beteiligt sind.",
+      "ADD_STUDENT": "Studierende hinzufügen",
+      "ADD_SUBTITLE": "Suche nach einem Nutzer",
+      "EMPTY": "Diese Abschlussarbeit hat noch keine Studierenden.",
+      "TABLE_STUDENT": "Studierende:r",
+      "REMOVE_STUDENT": "Studierende:n entfernen",
+      "REMOVE_SUBTITLE": "Zugriff auf die Abschlussarbeit wird entfernt",
+      "REMOVE_CONFIRM_START": "Bist du sicher, dass du",
+      "REMOVE_CONFIRM_END": "von dieser Abschlussarbeit entfernen möchtest?",
+      "USER_SEARCH_PLACEHOLDER": "Nutzer suchen",
+      "ERROR_ADD_STUDENT": "Studierende:r konnte nicht hinzugefügt werden. Bitte versuche es erneut.",
+      "ERROR_REMOVE_STUDENT": "Studierende:r konnte nicht entfernt werden. Bitte versuche es gleich nochmal.",
+      "LOADING": "Lade Studierende...",
+      "ERROR_LOAD_STUDENTS": "Studierende konnten nicht geladen werden. Bitte versuche es später nochmal.",
+      "ERROR_ADD_INVALID": "Dieser Nutzer kann nicht als Studierende:r hinzugefügt werden: er/sie ist Professor:in oder bereits Betreuer:in dieser Abschlussarbeit.",
+      "ERROR_ADD_DUPLICATE": "Dieser Nutzer ist bereits Studierende:r dieser Abschlussarbeit.",
+      "ERROR_REMOVE_NOT_FOUND": "Dieser Nutzer ist kein:e Studierende:r dieser Abschlussarbeit (evtl. bereits entfernt)."
+    },
+    "DANGER": {
+      "TITLE": "Abschlussarbeit löschen",
+      "SUBTITLE": "Diese Aktion kann nicht rückgängig gemacht werden.",
+      "DESCRIPTION": "Diese Abschlussarbeit und alle zugehörigen Daten werden unwiderruflich gelöscht!",
+      "MODAL_SUBTITLE": "Das ist eine unwiderrufliche Aktion",
+      "DELETE_TEXT_START": "Wenn du",
+      "DELETE_TEXT_END": "endgültig löschst, werden alle Studierenden, Tags und Einstellungen gelöscht. Die Daten können nicht wiederhergestellt werden.",
+      "CONFIRM_TYPE_START": "Um diese Aktion zu bestätigen, tippe bitte",
+      "CONFIRM_TYPE_END": "ein.",
+      "DELETING": "Wird gelöscht…",
+      "ERROR_DELETE_THESIS": "Abschlussarbeit konnte nicht gelöscht werden."
+    }
   }
 }
+

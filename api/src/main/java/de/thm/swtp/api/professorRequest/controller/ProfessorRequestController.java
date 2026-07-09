@@ -3,7 +3,9 @@ package de.thm.swtp.api.professorRequest.controller;
 import de.thm.swtp.api.professorRequest.domain.ProfessorRequest;
 import de.thm.swtp.api.professorRequest.dto.CreateProfessorRequestRequest;
 import de.thm.swtp.api.professorRequest.dto.ProfessorRequestResponse;
+import de.thm.swtp.api.professorRequest.dto.VerifyProfessorRequestEmailRequest;
 import de.thm.swtp.api.professorRequest.service.ProfessorRequestService;
+import de.thm.swtp.api.auditlog.domain.AuditActor;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +47,13 @@ public class ProfessorRequestController {
                 .toList();
     }
 
+    /** Verifies the THM email address for a professor-rights request.*/
+    @PostMapping("/verify")
+    public ProfessorRequestResponse verifyProfessorRequestEmail(@Valid @RequestBody VerifyProfessorRequestEmailRequest request) {
+        ProfessorRequest professorRequest = professorRequestService.verifyProfessorRequestEmail(request.token());
+        return ProfessorRequestResponse.toResponse(professorRequest);
+    }
+
     /** Creates a new professor-rights request for the authenticated user with status PENDING. */
     @PostMapping
     @PreAuthorize("@security.canCreateProfessorRequest(authentication)")
@@ -53,7 +62,7 @@ public class ProfessorRequestController {
             @AuthenticationPrincipal Jwt jwt) {
         UUID currentUserId = UUID.fromString(jwt.getSubject());
         ProfessorRequest professorRequest = professorRequestService.createProfessorRequest(
-                currentUserId, request.name(), request.email(), request.text());
+                currentUserId, request.email(), request.text());
 
         return ProfessorRequestResponse.toResponse(professorRequest);
     }
@@ -61,16 +70,18 @@ public class ProfessorRequestController {
     /** Accepts a professor-rights request by setting its status to ACCEPTED. */
     @PatchMapping("/{requestId}/accept")
     @PreAuthorize("@security.canManageProfessorRequests(authentication)")
-    public ProfessorRequestResponse acceptProfessorRequest(@PathVariable UUID requestId) {
-        ProfessorRequest professorRequest = professorRequestService.acceptProfessorRequest(requestId);
+    public ProfessorRequestResponse acceptProfessorRequest(@PathVariable UUID requestId, @AuthenticationPrincipal Jwt jwt) {
+        AuditActor actor = AuditActor.fromJwt(jwt);
+        ProfessorRequest professorRequest = professorRequestService.acceptProfessorRequest(requestId, actor);
         return ProfessorRequestResponse.toResponse(professorRequest);
     }
 
     /** Rejects a professor-rights request by setting its status to REJECTED. */
     @PatchMapping("/{requestId}/reject")
     @PreAuthorize("@security.canManageProfessorRequests(authentication)")
-    public ProfessorRequestResponse rejectProfessorRequest(@PathVariable UUID requestId) {
-        ProfessorRequest professorRequest = professorRequestService.rejectProfessorRequest(requestId);
+    public ProfessorRequestResponse rejectProfessorRequest(@PathVariable UUID requestId, @AuthenticationPrincipal Jwt jwt) {
+        AuditActor actor = AuditActor.fromJwt(jwt);
+        ProfessorRequest professorRequest = professorRequestService.rejectProfessorRequest(requestId, actor);
         return ProfessorRequestResponse.toResponse(professorRequest);
     }
 }

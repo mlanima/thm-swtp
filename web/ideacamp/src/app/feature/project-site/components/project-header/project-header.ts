@@ -10,11 +10,14 @@ import { JoinRequestButton } from '../../../../shared/join-request-button/join-r
   selector: 'app-project-header',
   standalone: true,
   imports: [FavoriteButton, JoinRequestButton, RouterLink, TranslatePipe],
-  templateUrl: './project-header.html'
+  templateUrl: './project-header.html',
 })
 export class ProjectHeader {
   @Input({ required: true }) project!: ProjectResponse;
   @Output() favoriteCountChanged = new EventEmitter<number>();
+
+  @Input() canReport = false;
+  @Output() reportProject = new EventEmitter<void>();
 
   private readonly authService = inject(AuthService);
 
@@ -30,7 +33,11 @@ export class ProjectHeader {
     return this.project.memberIds.includes(user.id);
   }
 
+  get isModerator(): boolean {
+    return this.authService.isModerator();
+  }
+
   get showJoinButton(): boolean {
-    return this.authService.isLoggedIn() && !this.isOwner && !this.isMember;
+    return this.authService.isLoggedIn() && !this.isModerator && !this.isOwner && !this.isMember;
   }
 }

@@ -1,0 +1,33 @@
+<header
+  class="bg-linear-to-br from-slate-600 to-slate-800 px-6 py-8 text-white"
+>
+  @if (thesis) {
+    <div class="mx-auto flex max-w-6xl flex-col gap-6 md:flex-row md:items-start md:justify-between">
+      <div class="max-w-xl">
+        <span class="rounded-full bg-lime-100 px-4 py-1 text-xs text-lime-700">
+          ● {{ 'THESISSITE.HEADER.BADGE' | translate }}
+        </span>
+
+        <h1 class="mt-8 text-4xl font-bold">
+          {{ thesis.title }}
+        </h1>
+
+        <p class="mt-4 text-sm leading-6 text-slate-200">
+          {{ thesis.shortDescription }}
+        </p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-3 md:justify-end">
+        @if (isSupervisor) {
+          <a
+            [routerLink]="['/thesis', thesis.thesisUrl, 'settings']"
+            class="inline-flex items-center gap-2 rounded-full bg-slate-700/80 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-600 hover:text-lime-300"
+          >
+            <i class="pi pi-cog text-base"></i>
+            <span>{{ 'THESISSITE.HEADER.SETTINGS' | translate }}</span>
+          </a>
+        }
+      </div>
+    </div>
+  }
+</header>

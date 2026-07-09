@@ -59,8 +59,14 @@
           @if (activeTab() === 'privacy') {
             <app-privacy-tab />
           }
+          @if (activeTab() === 'github') {
+            <app-github-tab />
+          }
           @if (activeTab() === 'danger-zone') {
             <app-danger-zone-tab />
+          }
+          @if (activeTab() === 'discord') {
+            <app-discord-tab />
           }
         </main>
 

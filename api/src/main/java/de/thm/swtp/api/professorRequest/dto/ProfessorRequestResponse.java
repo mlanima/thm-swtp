@@ -11,11 +11,12 @@ public record ProfessorRequestResponse(
         UUID id,
         UUID requestingUserId,
         String requestingUsername,
-        String name,
         String email,
         String text,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
+        LocalDateTime emailVerifiedAt,
+        LocalDateTime verificationExpiresAt,
         ProfessorRequestStatus status
 ) {
 
@@ -25,11 +26,12 @@ public record ProfessorRequestResponse(
                 request.getId(),
                 request.getRequestingUserId(),
                 request.getRequestingUsername(),
-                request.getName(),
                 request.getEmail(),
                 request.getText(),
                 request.getCreatedAt(),
                 request.getUpdatedAt(),
+                request.getEmailVerifiedAt(),
+                request.getVerificationExpiresAt(),
                 request.getStatus()
         );
     }

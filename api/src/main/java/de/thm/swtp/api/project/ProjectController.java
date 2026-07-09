@@ -1,9 +1,11 @@
 package de.thm.swtp.api.project;
 
-
 import de.thm.swtp.api.project.dto.request.*;
 import de.thm.swtp.api.project.dto.response.*;
+import de.thm.swtp.api.auditlog.domain.AuditActor;
+import jakarta.validation.Valid;
 import lombok.*;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -25,7 +27,7 @@ public class ProjectController {
     @PreAuthorize("@security.hasModeratorRole(authentication)")
     public ResponseEntity<Page<ProjectResponse>> getAllProjects(
             @RequestParam(required = false) String name,
-            @PageableDefault(size = 20) Pageable pageable) {
+            @PageableDefault(size = 20, sort = "name", direction = Sort.Direction.ASC) Pageable pageable) {
         return ResponseEntity.ok(projectService.getAllProjects(name, pageable));
     }
 
@@ -41,24 +43,27 @@ public class ProjectController {
 
     @DeleteMapping("/{projectId}")
     @PreAuthorize("@security.canDeleteProject(#projectId, authentication)")
-    public ResponseEntity<DeleteProjectResponse> deleteProject(@PathVariable UUID projectId) {
-        DeleteProjectResponse response = projectService.deleteProject(projectId);
+    public ResponseEntity<DeleteProjectResponse> deleteProject(@PathVariable UUID projectId, @AuthenticationPrincipal Jwt jwt) {
+        AuditActor actor = AuditActor.fromJwt(jwt);
+        DeleteProjectResponse response = projectService.deleteProject(projectId, actor);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{projectId}")
     @PreAuthorize("@security.canViewProject(#projectId, authentication)")
     public ResponseEntity<ProjectResponse> getProject(
-            @PathVariable UUID projectId) {
-        ProjectResponse response = projectService.getProject(projectId);
+            @PathVariable UUID projectId,
+            @AuthenticationPrincipal Jwt jwt) {
+        ProjectResponse response = projectService.getProject(projectId, UUID.fromString(jwt.getSubject()));
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/by-url/{projectUrl}")
     @PreAuthorize("@security.canViewProjectByUrl(#projectUrl, authentication)")
     public ResponseEntity<ProjectResponse> getProjectByUrl(
-            @PathVariable String projectUrl) {
-        ProjectResponse response = projectService.getProjectByUrl(projectUrl);
+            @PathVariable String projectUrl,
+            @AuthenticationPrincipal Jwt jwt) {
+        ProjectResponse response = projectService.getProjectByUrl(projectUrl, UUID.fromString(jwt.getSubject()));
         return ResponseEntity.ok(response);
     }
 
@@ -93,6 +98,15 @@ public class ProjectController {
     @PreAuthorize("@security.canRemoveProjectMember(#projectId, #memberId, authentication)")
     public void deleteProjectMember(@PathVariable UUID projectId, @PathVariable UUID memberId) {
         projectService.deleteProjectMember(projectId, memberId);
+    }
+
+    @PatchMapping("/{projectId}/owner")
+    @PreAuthorize("@security.canTransferProjectOwnership(#projectId, authentication)")
+    public ResponseEntity<ProjectResponse> transferProjectOwnership(
+            @PathVariable UUID projectId,
+            @Valid @RequestBody TransferProjectOwnershipRequest request) {
+        ProjectResponse response = projectService.transferProjectOwnership(projectId, request.newOwnerId());
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/url-exists/{projectUrl}")

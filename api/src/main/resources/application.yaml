@@ -1,4 +1,6 @@
 spring:
+  config:
+    import: optional:file:.env
   application:
     name: api
 
@@ -36,6 +38,12 @@ spring:
         jwt:
           issuer-uri: https://auth.swtp-ss26.de/realms/swtp
 
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST:redis.ser.mlanima.org}
+      port: 6379
+      timeout: 2000ms
+      connect-timeout: 1000ms
 
 server:
   forward-headers-strategy: framework
@@ -51,3 +59,84 @@ app:
     from: noreply@swtp-ss26.de
     language: de
   frontend-url: http://localhost:4200
+  professor-request:
+    allowed-email-domains:
+      - thm.de
+      - verw.thm.de
+      - its.thm.de
+      - nm.thm.de
+      - ftn.thm.de
+      - bliz.thm.de
+      - zqe.thm.de
+      - zdh.thm.de
+      - bau.thm.de
+      - ei.thm.de
+      - me.thm.de
+      - lse.thm.de
+      - ges.thm.de
+      - mni.thm.de
+      - w.thm.de
+      - iem.thm.de
+      - m.thm.de
+      - mnd.thm.de
+      - wi.thm.de
+      - muk.thm.de
+    verification-token-valid-hours: 24
+    expiration-check-delay-ms: 3600000
+  content-moderation:
+    blocklist-fallback: true
+  tags:
+    source: openai-github
+
+openai:
+  api:
+    base-url: https://api.openai.com
+    key: ${OPENAI_API_KEY:}
+  moderation:
+    model: omni-moderation-latest
+    threshold: 0.1
+
+github:
+  topics:
+    api:
+      base-url: https://api.github.com
+  api:
+    base-url: https://api.github.com
+  oauth:
+    client-id: ${GITHUB_OAUTH_CLIENT_ID:}
+    client-secret: ${GITHUB_OAUTH_CLIENT_SECRET:}
+    redirect-uri: ${GITHUB_OAUTH_REDIRECT_URI:http://localhost:4200/github/callback}
+    scopes: repo
+    authorize-url: https://github.com/login/oauth/authorize
+    token-url: https://github.com/login/oauth/access_token
+    token-encryption-key: ${GITHUB_TOKEN_ENCRYPTION_KEY:}
+
+google:
+  api:
+    base-url: https://maps.googleapis.com/maps/api/place
+    key: ${GOOGLE_API_KEY:}
+
+stackoverflow:
+  api:
+    base-url: https://api.stackexchange.com/2.3
+    key: ${STACKOVERFLOW_API_KEY:}
+
+discord:
+  streams:
+    outbound: stream:discord:sync
+    inbound: stream:platform:sync
+    consumer-group: spring-platform
+    batch-size: 10
+    block-ms: 1500
+    pending-timeout-ms: 30000
+  bot:
+    base-url: ${DISCORD_BOT_BASEURL:http://discord.ser.mlanima.org:3001}
+    api-secret: ${DISCORD_BOT_API_SECRET:}
+
+# --- local overrides (uncomment and fill in for local dev) ---
+# spring.data.redis.host: localhost
+# discord.bot.base-url: http://localhost:3001
+# discord.bot.api-secret: YOUR_SECRET
+# DISCORD_CLIENT_ID: YOUR_CLIENT_ID
+# DISCORD_CLIENT_SECRET: YOUR_CLIENT_SECRET
+# DISCORD_REDIRECT_URI: http://localhost:8080/api/v1/auth/discord/callback

@@ -2,12 +2,16 @@ package de.thm.swtp.api.userprofile.controller;
 
 import de.thm.swtp.api.project.ProjectService;
 import de.thm.swtp.api.project.dto.response.ProjectResponse;
+import de.thm.swtp.api.userprofile.dto.UpdateOnboardingRequest;
+import de.thm.swtp.api.thesis.ThesisService;
+import de.thm.swtp.api.thesis.dto.response.ThesisResponse;
 import de.thm.swtp.api.userprofile.dto.UserProfileRequest;
 import de.thm.swtp.api.userprofile.dto.UserProfileResponse;
 import de.thm.swtp.api.userprofile.dto.UserStatusResponse;
 import de.thm.swtp.api.userprofile.mapper.UserProfileMapper;
 import de.thm.swtp.api.userprofile.mapper.UserStatusMapper;
 import de.thm.swtp.api.userprofile.service.UserProfileService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -26,6 +30,7 @@ public class UserProfileController {
     private final UserProfileMapper userProfileMapper;
     private final UserStatusMapper userStatusMapper;
     private final ProjectService projectService;
+    private final ThesisService thesisService;
 
     @PostMapping("/api/v1/users/me")
     public UserProfileResponse syncProfile(@AuthenticationPrincipal Jwt jwt) {
@@ -46,10 +51,25 @@ public class UserProfileController {
         return projectService.getProjectsByUsername(username);
     }
 
+    @GetMapping("/api/v1/users/{username}/projects/recent")
+    @PreAuthorize("@security.canViewUserProjects(#username, authentication)")
+    public List<ProjectResponse> getRecentProjects(@PathVariable String username, @AuthenticationPrincipal Jwt jwt) {
+        return projectService.getRecentProjectsByUsername(username, UUID.fromString(jwt.getSubject()));
+    }
+
     @GetMapping("/api/v1/users/{username}/projects/all")
     @PreAuthorize("@security.canViewUserProjects(#username, authentication)")
     public List<ProjectResponse> getAllProjects(@PathVariable String username) {
         return projectService.getAllProjectsByUsername(username);
+    }
+
+    @GetMapping("/api/v1/users/{username}/theses")
+    @PreAuthorize("@security.canViewUserTheses(#username, authentication)")
+    public List<ThesisResponse> getTheses(@PathVariable String username) {
+        return thesisService.getThesesByUsername(username)
+                .stream()
+                .map(ThesisResponse::toResponse)
+                .toList();
     }
 
     @PutMapping("/api/v1/users/{username}/profile")
@@ -57,7 +77,7 @@ public class UserProfileController {
     public UserProfileResponse updateProfile(
             @PathVariable String username,
             @RequestBody UserProfileRequest request) {
-        return userProfileMapper.toResponse(userProfileService.updateProfile(username, request.title(), request.location(), request.about(), request.experience()));
+        return userProfileMapper.toResponse(userProfileService.updateProfile(username, request.title(), request.location(), request.about(), request.experience(), request.placeId()));
     }
 
     @DeleteMapping("/api/v1/users/{username}/profile")
@@ -76,5 +96,12 @@ public class UserProfileController {
         return userProfileService.findProfileByKeycloakId(keycloakId)
                 .map(userStatusMapper::toBannedResponse)
                 .orElseGet(userStatusMapper::toNotBannedResponse);
+    }
+
+    @PatchMapping("/api/v1/users/me/onboarding")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateOnboardingCompleted(@Valid @RequestBody UpdateOnboardingRequest request, @AuthenticationPrincipal Jwt jwt) {
+        UUID currentUserId = UUID.fromString(jwt.getSubject());
+        userProfileService.updateOnboardingCompleted(currentUserId, request.onboardingCompleted());
     }
 }

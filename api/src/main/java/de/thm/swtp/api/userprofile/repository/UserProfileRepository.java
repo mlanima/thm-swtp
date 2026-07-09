@@ -16,7 +16,7 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, UUID> 
 
     Optional<UserProfile> findByUsername(String username);
     boolean existsByUsernameAndKeycloakId(String username, UUID keycloakId);
-    boolean existsByKeycloakIdAndProfessorTrue(UUID keycloakId);
+    boolean existsByKeycloakIdAndIsProfessorTrue(UUID keycloakId);
 
     @Modifying
     @Query("UPDATE user_profiles u SET u.followers = u.followers + 1 WHERE u.keycloakId = :keycloakId")
@@ -31,4 +31,5 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, UUID> 
     boolean existsByKeycloakIdAndStatus(UUID keycloakId, UserStatus status);
 
     Optional<UserProfile> findByKeycloakId(UUID keycloakId);
+    Optional<UserProfile> findByDiscordId(String discordId);
 }

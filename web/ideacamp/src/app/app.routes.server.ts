@@ -22,6 +22,11 @@ export const serverRoutes: ServerRoute[] = [
   },
 
   {
+    path: 'createThesis',
+    renderMode: RenderMode.Client,
+  },
+
+  {
     path: 'project/:id',
     renderMode: RenderMode.Client,
   },
@@ -37,7 +42,22 @@ export const serverRoutes: ServerRoute[] = [
   },
 
   {
+    path: 'dashboard',
+    renderMode: RenderMode.Client,
+  },
+
+  {
     path: 'project/:projectUrl/settings',
+    renderMode: RenderMode.Client,
+  },
+
+  {
+    path: 'thesis/:thesisUrl',
+    renderMode: RenderMode.Client,
+  },
+
+  {
+    path: 'thesis/:thesisUrl/settings',
     renderMode: RenderMode.Client,
   },
 
@@ -61,6 +81,21 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Client,
   },
 
+  {
+    path: 'moderator/professor-requests',
+    renderMode: RenderMode.Client,
+  },
+
+  {
+    path: 'moderator/audit-logs',
+    renderMode: RenderMode.Client,
+  },
+
+  {
+    path: 'moderator/reports',
+    renderMode: RenderMode.Client,
+  },
+  
   {
     path: '**',
     renderMode: RenderMode.Prerender,

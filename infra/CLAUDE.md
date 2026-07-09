@@ -8,7 +8,7 @@ Deployment infrastructure for IdeaCamp on `swtp-ss26.de`.
 
 Mirrors the directory layout on the server under `/opt/stacks/`. Three Docker Compose stacks:
 
-- **`swtp-infra/`** — shared infrastructure: MySQL 9 (central DB for all envs), Keycloak (auth), Hoppscotch (REST client), status dashboard. Always running.
+- **`swtp-infra/`** — shared infrastructure: MySQL 9 (central DB for all envs), Keycloak (auth), Hoppscotch (REST client), status dashboard. Always running. Redis is included as a commented-out service — required for caching but currently served by an external instance.
 - **`swtp-main/`** — production stack (API + frontend + Dozzle log viewer). Auto-deployed on push to `main` → image tag `latest`.
 - **`swtp-dev/`** — developer stack (API + frontend + Dozzle). Auto-deployed on push to `developer` → image tag `dev`.
 

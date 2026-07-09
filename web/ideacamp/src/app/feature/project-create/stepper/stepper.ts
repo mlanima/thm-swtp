@@ -6,12 +6,12 @@ import { TranslatePipe } from '@ngx-translate/core';
   imports: [TranslatePipe],
   templateUrl: './stepper.html',
 })
-/** Displays the steps of the project creation wizard*/
+/** Displays the steps of a creation wizard (project or thesis).*/
 export class Stepper {
 
   @Input() currentStep = 0;
 
-  steps = [
+  @Input() steps: string[] = [
     'PROJECTCREATE.STEPS.GENERAL',
     'PROJECTCREATE.STEPS.SETTINGS',
     'PROJECTCREATE.STEPS.MEMBERS',

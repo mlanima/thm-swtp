@@ -6,6 +6,7 @@ import de.thm.swtp.api.exceptionhandling.exceptions.*;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.project.ProjectRepository;
 import de.thm.swtp.api.project.exception.ProjectNotFoundException;
+import de.thm.swtp.api.projectFiles.domain.FileVisibility;
 import de.thm.swtp.api.projectFiles.domain.ProjectFile;
 import de.thm.swtp.api.projectFiles.domain.ProjectFileDownload;
 import de.thm.swtp.api.projectFiles.entity.ProjectFileEntity;
@@ -44,8 +45,16 @@ public class ProjectFileService {
             "text/plain",
             "text/markdown",
             "text/x-markdown",
+            "text/x-web-markdown",
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     );
+
+    private static final Set<String> ALLOWED_IMAGE_MIME_TYPES = Set.of(
+            "image/png",
+            "image/jpeg",
+            "image/webp"
+    );
+
 
     private static final int MAX_FILES_PER_PROJECT = 20;
 
@@ -70,22 +79,39 @@ public class ProjectFileService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProjectFile> getProjectFiles(UUID projectId) {
-        getProjectOrThrow(projectId);
-        return projectFileRepository.findByProjectIdOrderByCreatedAtAsc(projectId)
+    public List<ProjectFile> getProjectFiles(UUID projectId, UUID currentUserId) {
+        ProjectEntity project = getProjectOrThrow(projectId);
+
+        boolean allowedToSeePrivateFiles = isProjectOwner(project, currentUserId) || isProjectMember(project, currentUserId);
+
+        if (allowedToSeePrivateFiles) {
+            return projectFileRepository
+                    .findByProjectIdAndVisibilityNotOrderByCreatedAtAsc(projectId, FileVisibility.INTERNAL)
+                    .stream()
+                    .map(ProjectFileMapper::toDomain)
+                    .toList();
+        }
+
+        return projectFileRepository.findByProjectIdAndVisibilityOrderByCreatedAtAsc(projectId, FileVisibility.PUBLIC)
                 .stream()
                 .map(ProjectFileMapper::toDomain)
                 .toList();
     }
 
-    @Transactional
-    public ProjectFile uploadFile(UUID projectId, MultipartFile file) {
-        ProjectEntity project = getProjectOrThrow(projectId);
 
-        String mimeType = file.getContentType();
-        if (mimeType == null || !ALLOWED_MIME_TYPES.contains(mimeType)) {
-            throw new ProjectFileTypeNotAllowedException(mimeType);
-        }
+    @Transactional
+    public ProjectFile uploadFile(UUID projectId, MultipartFile file, FileVisibility visibility) {
+        return uploadFile(projectId, file, ALLOWED_MIME_TYPES, visibility);
+    }
+
+    @Transactional
+    public ProjectFile uploadImageFile(UUID projectId, MultipartFile file) {
+        return uploadFile(projectId, file, ALLOWED_IMAGE_MIME_TYPES, FileVisibility.INTERNAL);
+    }
+
+    private ProjectFile uploadFile(UUID projectId, MultipartFile file, Set<String> allowedMimeTypes, FileVisibility visibility) {
+        ProjectEntity project = getProjectOrThrow(projectId);
+        FileVisibility cleanedVisibility = visibility != null ? visibility : FileVisibility.PUBLIC;
 
         if (projectFileRepository.countByProjectId(projectId) >= MAX_FILES_PER_PROJECT) {
             throw new ProjectFileUploadLimitExceededException(MAX_FILES_PER_PROJECT);
@@ -108,9 +134,10 @@ public class ProjectFileService {
         }
 
         // verify actual MIME type via magic bytes — client-supplied Content-Type is not trusted
+        String mimeType;
         try {
             String detectedMime = TIKA.detect(filePath);
-            if (!ALLOWED_MIME_TYPES.contains(detectedMime)) {
+            if (!allowedMimeTypes.contains(detectedMime)) {
                 try {
                     Files.deleteIfExists(filePath);
                 } catch (IOException ignored) {
@@ -134,6 +161,7 @@ public class ProjectFileService {
                 .storageName(storageName)
                 .mimeType(mimeType)
                 .sizeBytes(file.getSize())
+                .visibility(cleanedVisibility)
                 .build();
 
         try {
@@ -162,6 +190,21 @@ public class ProjectFileService {
             throw new ProjectFileNotFoundException(fileId);
         }
         return new ProjectFileDownload(ProjectFileMapper.toDomain(fileEntity), resource);
+    }
+
+    @Transactional
+    public ProjectFile updateFileVisibility(UUID projectId, UUID fileId, FileVisibility visibility) {
+        getProjectOrThrow(projectId);
+
+        ProjectFileEntity fileEntity = getFileOrThrow(fileId);
+        checkFileBelongsToProject(fileEntity, projectId);
+
+        fileEntity.setVisibility(visibility);
+
+        ProjectFileEntity saved = projectFileRepository.save(fileEntity);
+        TxLogger.afterCommit(log, "Visibility update: project={}, file={}, visibility={}",
+                projectId, fileId, visibility);
+        return ProjectFileMapper.toDomain(saved);
     }
 
     @Transactional
@@ -206,6 +249,16 @@ public class ProjectFileService {
         if (!file.getProject().getId().equals(projectId)) {
             throw new ProjectFileDoesNotBelongToProjectException();
         }
+    }
+
+    private boolean isProjectOwner(ProjectEntity projectEntity, UUID currentUserId) {
+        return projectEntity.getOwner().getKeycloakId().equals(currentUserId);
+    }
+
+    private boolean isProjectMember(ProjectEntity projectEntity, UUID currentUserId) {
+        return projectEntity.getMembers()
+                .stream()
+                .anyMatch(member -> member.getKeycloakId().equals(currentUserId));
     }
 
     private String getExtension(String filename) {

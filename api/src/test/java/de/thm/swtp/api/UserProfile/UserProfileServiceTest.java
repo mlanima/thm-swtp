@@ -1,9 +1,15 @@
 package de.thm.swtp.api.UserProfile;
+import de.thm.swtp.api.location.GooglePlacesClient;
+import de.thm.swtp.api.location.exception.InvalidPlaceException;
+import de.thm.swtp.api.moderation.ContentModerationService;
+import de.thm.swtp.api.moderation.exception.ContentNotValidException;
 import de.thm.swtp.api.userprofile.domain.UserStatus;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import de.thm.swtp.api.userprofile.service.UserProfileService;
+import de.thm.swtp.api.auditlog.service.AuditLogService;
+import de.thm.swtp.api.auditlog.domain.AuditActor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +26,9 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -28,17 +37,31 @@ class UserProfileServiceTest {
 
     @Mock
     private UserProfileRepository userProfileRepository;
+    @Mock
+    private AuditLogService auditLogService;
+
+    @Mock
+    private ContentModerationService contentModerationService;
+
+    @Mock
+    private GooglePlacesClient googlePlacesClient;
 
     private UserProfileService userProfileService;
 
     private UUID userId;
+    private AuditActor actor;
     private UserProfile userProfile;
 
     @BeforeEach
     void setUp() {
-        userProfileService = new UserProfileService(userProfileRepository);
+        userProfileService = new UserProfileService(userProfileRepository, auditLogService, contentModerationService, googlePlacesClient);
 
         userId = UUID.randomUUID();
+        actor = new AuditActor(
+                UUID.randomUUID(),
+                "moderator",
+                "moderator@test.de"
+        );
 
         userProfile = UserProfile.builder()
                 .keycloakId(userId)
@@ -69,7 +92,7 @@ class UserProfileServiceTest {
         when(userProfileRepository.findById(userId)).thenReturn(Optional.of(userProfile));
         when(userProfileRepository.save(userProfile)).thenReturn(userProfile);
 
-        UserProfile result = userProfileService.banUser(userId, "Spam");
+        UserProfile result = userProfileService.banUser(userId, "Spam", actor);
 
         assertThat(result.getStatus()).isEqualTo(UserStatus.BANNED);
         assertThat(result.getBanReason()).isEqualTo("Spam");
@@ -88,7 +111,7 @@ class UserProfileServiceTest {
         when(userProfileRepository.findById(userId)).thenReturn(Optional.of(userProfile));
         when(userProfileRepository.save(userProfile)).thenReturn(userProfile);
 
-        UserProfile result = userProfileService.unbanUser(userId);
+        UserProfile result = userProfileService.unbanUser(userId, actor);
 
         assertThat(result.getStatus()).isEqualTo(UserStatus.ACTIVE);
         assertThat(result.getBanReason()).isNull();
@@ -105,9 +128,139 @@ class UserProfileServiceTest {
     void banUser_shouldThrow_whenUserDoesNotExist() {
         when(userProfileRepository.findById(userId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> userProfileService.banUser(userId, "Spam"))
+        assertThatThrownBy(() -> userProfileService.banUser(userId, "Spam", actor))
                 .isInstanceOf(UserProfileNotFoundException.class);
 
         verify(userProfileRepository).findById(userId);
+    }
+
+    // ── updateProfile — moderation ───────────────────────────────────────────────
+
+    @Test
+    void updateProfile_shouldModerateTitleAndSave() {
+        when(userProfileRepository.findByUsername("Chris")).thenReturn(Optional.of(userProfile));
+        when(userProfileRepository.save(userProfile)).thenReturn(userProfile);
+
+        userProfileService.updateProfile("Chris", "Clean Title", null, null, null, null);
+
+        verify(contentModerationService).assertAppropriate("Clean Title", "title");
+        verify(contentModerationService, never()).assertAppropriate(any(), eq("about"));
+        verify(contentModerationService, never()).assertAppropriate(any(), eq("experience"));
+        verify(userProfileRepository).save(userProfile);
+    }
+
+    @Test
+    void updateProfile_shouldModerateAllTextFields() {
+        when(userProfileRepository.findByUsername("Chris")).thenReturn(Optional.of(userProfile));
+        when(userProfileRepository.save(userProfile)).thenReturn(userProfile);
+
+        userProfileService.updateProfile("Chris", "Title", null, "About", "Exp", null);
+
+        verify(contentModerationService).assertAppropriate("Title", "title");
+        verify(contentModerationService).assertAppropriate("About", "about");
+        verify(contentModerationService).assertAppropriate("Exp", "experience");
+        verify(userProfileRepository).save(userProfile);
+    }
+
+    @Test
+    void updateProfile_shouldSkipNullFields() {
+        when(userProfileRepository.findByUsername("Chris")).thenReturn(Optional.of(userProfile));
+        when(userProfileRepository.save(userProfile)).thenReturn(userProfile);
+
+        userProfileService.updateProfile("Chris", null, null, null, null, null);
+
+        verify(contentModerationService, never()).assertAppropriate(any(), any());
+        verify(userProfileRepository).save(userProfile);
+    }
+
+    @Test
+    void updateProfile_shouldThrow_whenTitleFlagged() {
+        when(userProfileRepository.findByUsername("Chris")).thenReturn(Optional.of(userProfile));
+        var ex = new ContentNotValidException("title");
+        org.mockito.Mockito.doThrow(ex).when(contentModerationService).assertAppropriate("bad", "title");
+
+        assertThatThrownBy(() -> userProfileService.updateProfile("Chris", "bad", null, null, null, null))
+                .isInstanceOf(ContentNotValidException.class);
+
+        verify(userProfileRepository, never()).save(any());
+    }
+
+    @Test
+    void updateProfile_shouldThrow_whenAboutFlagged() {
+        when(userProfileRepository.findByUsername("Chris")).thenReturn(Optional.of(userProfile));
+        var ex = new ContentNotValidException("about");
+        org.mockito.Mockito.lenient()
+                .doThrow(ex)
+                .when(contentModerationService)
+                .assertAppropriate("bad", "about");
+
+        assertThatThrownBy(() -> userProfileService.updateProfile("Chris", "title", null, "bad", null, null))
+                .isInstanceOf(ContentNotValidException.class);
+
+        verify(userProfileRepository, never()).save(any());
+    }
+
+    @Test
+    void updateProfile_shouldThrow_whenExperienceFlagged() {
+        when(userProfileRepository.findByUsername("Chris")).thenReturn(Optional.of(userProfile));
+        var ex = new ContentNotValidException("experience");
+        org.mockito.Mockito.lenient()
+                .doThrow(ex)
+                .when(contentModerationService)
+                .assertAppropriate("bad", "experience");
+
+        assertThatThrownBy(() -> userProfileService.updateProfile("Chris", "title", null, null, "bad", null))
+                .isInstanceOf(ContentNotValidException.class);
+
+        verify(userProfileRepository, never()).save(any());
+    }
+
+    // ── updateProfile — location / placeId ───────────────────────────────────────
+
+    @Test
+    void updateProfile_shouldSetLocation_whenPlaceIdValid() {
+        when(userProfileRepository.findByUsername("Chris")).thenReturn(Optional.of(userProfile));
+        when(googlePlacesClient.validatePlaceId("ChIJ...")).thenReturn("Munich, Germany");
+        when(userProfileRepository.save(userProfile)).thenReturn(userProfile);
+
+        userProfileService.updateProfile("Chris", null, "Munich", null, null, "ChIJ...");
+
+        assertThat(userProfile.getLocation()).isEqualTo("Munich, Germany");
+        assertThat(userProfile.getPlaceId()).isEqualTo("ChIJ...");
+        verify(userProfileRepository).save(userProfile);
+    }
+
+    @Test
+    void updateProfile_shouldClearLocation_whenLocationBlank() {
+        userProfile.setLocation("Old City");
+        userProfile.setPlaceId("OldPlaceId");
+        when(userProfileRepository.findByUsername("Chris")).thenReturn(Optional.of(userProfile));
+        when(userProfileRepository.save(userProfile)).thenReturn(userProfile);
+
+        userProfileService.updateProfile("Chris", null, "", null, null, "anything");
+
+        assertThat(userProfile.getLocation()).isNull();
+        assertThat(userProfile.getPlaceId()).isNull();
+        verify(googlePlacesClient, never()).validatePlaceId(any());
+    }
+
+    @Test
+    void updateProfile_shouldSkipLocation_whenPlaceIdNull() {
+        when(userProfileRepository.findByUsername("Chris")).thenReturn(Optional.of(userProfile));
+        when(userProfileRepository.save(userProfile)).thenReturn(userProfile);
+
+        userProfileService.updateProfile("Chris", null, "Munich", null, null, null);
+
+        verify(googlePlacesClient, never()).validatePlaceId(any());
+    }
+
+    @Test
+    void updateProfile_shouldThrow_whenLocationWithoutPlaceId() {
+        when(userProfileRepository.findByUsername("Chris")).thenReturn(Optional.of(userProfile));
+
+        assertThatThrownBy(() -> userProfileService.updateProfile("Chris", null, "Munich", null, null, ""))
+                .isInstanceOf(InvalidPlaceException.class);
+
+        verify(userProfileRepository, never()).save(any());
     }
 }

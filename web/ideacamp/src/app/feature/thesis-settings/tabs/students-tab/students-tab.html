@@ -1,0 +1,166 @@
+<div>
+  <div class="flex items-start justify-between">
+    <div>
+      <h1 class="text-2xl font-semibold text-slate-800">{{ 'THESISSETTINGS.TABS.STUDENTS' | translate }}</h1>
+      <p class="mt-1 text-sm text-slate-500">{{ 'THESISSETTINGS.STUDENTS.SUBTITLE' | translate }}</p>
+    </div>
+    <button
+      type="button"
+      (click)="openPicker()"
+      class="cursor-pointer rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700">
+      {{ 'THESISSETTINGS.STUDENTS.ADD_STUDENT' | translate }}
+    </button>
+  </div>
+
+  @if (isLoading()) {
+    <p class="mt-6 text-sm text-slate-500">
+      {{ 'THESISSETTINGS.STUDENTS.LOADING' | translate }}
+    </p>
+  }
+
+  @if (!isLoading() && loadErrorMessage()) {
+    <p class="mt-6 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+      {{ loadErrorMessage() }}
+    </p>
+  }
+
+  @if (!isLoading() && !loadErrorMessage() && students().length === 0) {
+    <div class="mt-6 rounded-xl border border-dashed border-slate-200 bg-white p-6 text-center">
+      <p class="mt-1 text-xs text-slate-400">
+        {{ 'THESISSETTINGS.STUDENTS.EMPTY' | translate }}
+      </p>
+    </div>
+  }
+
+  @if (!isLoading() && students().length > 0) {
+    <div class="mt-6 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
+      <table class="w-full min-w-[420px] text-sm">
+        <thead>
+          <tr class="border-b border-slate-100">
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">{{ 'THESISSETTINGS.STUDENTS.TABLE_STUDENT' | translate }}</th>
+            <th class="px-4 py-3"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (student of students(); track student.id; let last = $last) {
+            <tr [class.border-b]="!last" class="border-slate-100">
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white"
+                    [ngClass]="student.avatarColor"
+                  >
+                    {{ student.initials }}
+                  </div>
+                  <div>
+                    <p class="font-medium text-slate-800">{{ student.name }}</p>
+                    <p class="text-xs text-slate-400">{{ student.email }}</p>
+                  </div>
+                </div>
+              </td>
+              <td class="px-4 py-3 text-right">
+                <button
+                  (click)="openRemoveModal(student)"
+                  [disabled]="isRemoving()"
+                  class="cursor-pointer text-sm text-slate-400 hover:text-red-500"
+                >
+                  {{ 'COMMON.DELETE' | translate }}
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
+
+@if (studentToRemove()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+    <div class="relative w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+      <button
+        (click)="closeRemoveModal()"
+        class="absolute right-4 top-4 cursor-pointer text-slate-400 hover:text-slate-700"
+      >
+        <i class="pi pi-times text-sm"></i>
+      </button>
+
+      <div class="flex items-center gap-3">
+        <div class="flex h-9 w-9 items-center justify-center rounded-full bg-red-100">
+          <i class="pi pi-user-minus text-sm text-red-500"></i>
+        </div>
+        <div>
+          <h2 class="font-semibold text-slate-800">{{ 'THESISSETTINGS.STUDENTS.REMOVE_STUDENT' | translate }}</h2>
+          <p class="text-xs text-slate-400">{{ 'THESISSETTINGS.STUDENTS.REMOVE_SUBTITLE' | translate }}</p>
+        </div>
+      </div>
+
+      <p class="mt-4 text-sm text-slate-600">
+        {{ 'THESISSETTINGS.STUDENTS.REMOVE_CONFIRM_START' | translate }}
+        <strong>{{ studentToRemove()!.name }}</strong>
+        {{ 'THESISSETTINGS.STUDENTS.REMOVE_CONFIRM_END' | translate }}
+      </p>
+
+      @if (removeErrorMessage()) {
+        <p class="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{{ removeErrorMessage() }}</p>
+      }
+
+      <div class="mt-5 flex gap-3">
+        <button
+          (click)="closeRemoveModal()"
+          [disabled]="isRemoving()"
+          class="flex-1 cursor-pointer rounded-lg border border-slate-200 bg-white py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+        >
+          {{ 'COMMON.CANCEL' | translate }}
+        </button>
+        <button
+          (click)="confirmRemove()"
+          [disabled]="isRemoving()"
+          class="flex-1 cursor-pointer rounded-lg bg-red-500 py-2 text-sm font-medium text-white hover:bg-red-600"
+        >
+          @if (isRemoving()) {
+            {{ 'COMMON.DELETE' | translate }}...
+          } @else {
+            {{ 'THESISSETTINGS.STUDENTS.REMOVE_STUDENT' | translate }}
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (isPickerOpen()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+    <div class="relative w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
+      <div class="mb-5 flex items-start justify-between">
+        <div>
+          <h2 class="text-sm font-bold text-slate-900">
+            {{ 'THESISSETTINGS.STUDENTS.ADD_STUDENT' | translate }}
+          </h2>
+          <p class="mt-1 text-xs text-slate-500">
+            {{ 'THESISSETTINGS.STUDENTS.ADD_SUBTITLE' | translate }}
+          </p>
+        </div>
+
+        <button
+          type="button"
+          (click)="closePicker()"
+          [disabled]="isAdding()"
+          class="text-sm text-slate-400 hover:text-slate-700 disabled:opacity-50">
+          ×
+        </button>
+      </div>
+
+      <app-user-search-pick
+        [excludedUserIds]="excludedUserIds()"
+        [placeholder]="'THESISSETTINGS.STUDENTS.USER_SEARCH_PLACEHOLDER' | translate"
+        [emptyMessage]="'PROJECTSETTINGS.MEMBERS.USER_SEARCH_EMPTY' | translate"
+        (userSelected)="addStudent($event)">
+      </app-user-search-pick>
+
+      @if (addErrorMessage()) {
+        <p class="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{{ addErrorMessage() }}</p>
+      }
+    </div>
+  </div>
+}

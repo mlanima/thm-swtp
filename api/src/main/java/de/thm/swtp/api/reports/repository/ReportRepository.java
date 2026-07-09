@@ -1,0 +1,59 @@
+package de.thm.swtp.api.reports.repository;
+
+import de.thm.swtp.api.reports.domain.ReportReason;
+import de.thm.swtp.api.reports.domain.ReportStatus;
+import de.thm.swtp.api.reports.domain.ReportTarget;
+import de.thm.swtp.api.reports.entity.ReportEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
+
+/** Repository for report entities.*/
+public interface ReportRepository extends JpaRepository<ReportEntity, UUID> {
+
+
+    /** Searches reports using filters and a query.*/
+    @Query("""
+        SELECT r
+        FROM ReportEntity r
+        JOIN r.reporter reporter
+            WHERE (:status IS NULL OR r.status = :status)
+              AND (:target IS NULL OR r.target = :target)
+              AND (:reason IS NULL OR r.reason = :reason)
+              AND (
+                    :query IS NULL
+                    OR LOWER(r.message) LIKE :query
+                    OR LOWER(reporter.username) LIKE :query
+                    OR LOWER(r.reviewerUsername) LIKE :query
+                    OR LOWER(r.moderatorMessage) LIKE :query
+          )
+        """)
+    Page<ReportEntity> searchReports(
+            @Param("status") ReportStatus status,
+            @Param("target") ReportTarget target,
+            @Param("reason") ReportReason reason,
+            @Param("query") String query,
+            Pageable pageable
+    );
+
+    /** Counts active reports for the same reported target.*/
+    long countByTargetAndTargetIdAndStatusIn(ReportTarget target, UUID targetId, Collection<ReportStatus> statuses);
+
+    /** Returns all reports for the same reported target with the specified status.*/
+    List<ReportEntity> findAllByTargetAndTargetIdAndStatusIn(ReportTarget target, UUID targetId, Collection<ReportStatus> statuses);
+
+    /** Checks whether the reporter already has an active report for the same target and reason.*/
+    boolean existsByReporterKeycloakIdAndTargetAndTargetIdAndReasonAndStatusIn(
+            UUID reporterId,
+            ReportTarget target,
+            UUID targetId,
+            ReportReason reason,
+            Collection<ReportStatus> statuses
+    );
+}

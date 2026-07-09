@@ -36,4 +36,7 @@ public class ProjectInvite {
 
     /** Current status of the invitation.*/
     ProjectInviteStatus status;
+
+    /** Discord invite link for the project's linked channel, if any.*/
+    String discordInviteUrl;
 }

@@ -1,18 +1,26 @@
 package de.thm.swtp.api.userprofile.service;
 
 import de.thm.swtp.api.common.TxLogger;
+import de.thm.swtp.api.location.GooglePlacesClient;
+import de.thm.swtp.api.location.exception.InvalidPlaceException;
+import de.thm.swtp.api.moderation.ContentModerationService;
+import de.thm.swtp.api.exceptionhandling.exceptions.InvalidUserManagementSortFieldException;
 import de.thm.swtp.api.userprofile.domain.UserStatus;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
+import de.thm.swtp.api.auditlog.service.AuditLogService;
+import de.thm.swtp.api.auditlog.domain.AuditActor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 import java.util.Optional;
 
@@ -22,6 +30,12 @@ import java.util.Optional;
 public class UserProfileService {
 
     private final UserProfileRepository userProfileRepository;
+    private final AuditLogService auditLogService;
+    private final ContentModerationService contentModerationService;
+    private final GooglePlacesClient googlePlacesClient;
+
+
+    private static final Set<String> MANAGED_USER_SORT_FIELDS = Set.of("username", "email", "isProfessor", "createdAt", "bannedAt", "banReason", "status");
 
     @Transactional(readOnly = true)
     public UserProfile getProfile(String username) {
@@ -35,9 +49,6 @@ public class UserProfileService {
                     existing.setUsername(username);
                     existing.setEmail(email);
                     UserProfile synced = userProfileRepository.save(existing);
-                    // note: debug, not info/txlogger — this runs on every authenticated
-                    // request (jwt sync), so info would be noise; and it's a sync, not a
-                    // durability lifecycle claim, so txlogger (commit-gated info) doesn't fit.
                     log.debug("Profile synced from JWT: user={}", username);
                     return synced;
                 })
@@ -55,12 +66,34 @@ public class UserProfileService {
     }
 
     @Transactional
-    public UserProfile updateProfile(String username, String title, String location, String about, String experience) {
+    public UserProfile updateProfile(String username, String title, String location, String about, String experience, String placeId) {
         UserProfile profile = findOrThrow(username);
-        profile.setTitle(title);
-        profile.setLocation(location);
-        profile.setAbout(about);
-        profile.setExperience(experience);
+
+        if (title != null) {
+            contentModerationService.assertAppropriate(title, "title");
+            profile.setTitle(title);
+        }
+        if (about != null) {
+            contentModerationService.assertAppropriate(about, "about");
+            profile.setAbout(about);
+        }
+        if (experience != null) {
+            contentModerationService.assertAppropriate(experience, "experience");
+            profile.setExperience(experience);
+        }
+        if (location != null && placeId != null) {
+            if (location.isBlank()) {
+                profile.setLocation(null);
+                profile.setPlaceId(null);
+            } else if (placeId.isBlank()) {
+                throw new InvalidPlaceException("Location provided without a valid placeId");
+            } else {
+                var validatedLocation = googlePlacesClient.validatePlaceId(placeId);
+                profile.setLocation(validatedLocation);
+                profile.setPlaceId(placeId);
+            }
+        }
+
         UserProfile saved = userProfileRepository.save(profile);
         TxLogger.afterCommit(log, "Profile updated: user={}", username);
         return saved;
@@ -69,7 +102,6 @@ public class UserProfileService {
     @Transactional
     public void deleteProfile(String username) {
         UserProfile profile = findOrThrow(username);
-        // TODO: will throw FK constraint violation if the user owns projects — handle cascade or block deletion first
         userProfileRepository.delete(profile);
         TxLogger.afterCommit(log, "Profile deleted: user={}", username);
     }
@@ -81,11 +113,12 @@ public class UserProfileService {
 
     @Transactional(readOnly = true)
     public Page<UserProfile> getUsersByStatus(UserStatus status, Pageable pageable) {
+        validateManagedUserSort(pageable.getSort());
         return userProfileRepository.findByStatus(status, pageable);
     }
 
     @Transactional
-    public UserProfile banUser(UUID userId, String reason){
+    public UserProfile banUser(UUID userId, String reason, AuditActor actor) {
         UserProfile userProfile = userProfileRepository.findById(userId)
                 .orElseThrow(() -> new UserProfileNotFoundException(userId.toString()));
 
@@ -95,26 +128,60 @@ public class UserProfileService {
 
         UserProfile saved =  userProfileRepository.save(userProfile);
 
-        TxLogger.afterCommit(log, "User banned: username={}, userId={}", userProfile.getUsername(), userId);
+        auditLogService.logUserBanned(
+                actor,
+                userId,
+                saved.getUsername(),
+                reason
+        );
+
+        TxLogger.afterCommit(log, "User banned: username={}, userId={}, actor={}", saved.getUsername(), userId, actor.userId());
         return saved;
     }
 
     @Transactional
-    public UserProfile unbanUser(UUID userId){
+    public UserProfile unbanUser(UUID userId, AuditActor actor) {
         UserProfile userProfile = userProfileRepository.findById(userId)
                 .orElseThrow(() -> new UserProfileNotFoundException(userId.toString()));
+
+        String username = userProfile.getUsername();
 
         userProfile.setStatus(UserStatus.ACTIVE);
         userProfile.setBanReason(null);
         userProfile.setBannedAt(null);
 
         UserProfile saved =  userProfileRepository.save(userProfile);
-        TxLogger.afterCommit(log, "User unbanned: username={}, userId={}", userProfile.getUsername(), userId);
+
+        auditLogService.logUserUnbanned(
+                actor,
+                userId,
+                username
+        );
+
+        TxLogger.afterCommit(log, "User unbanned: username={}, userId={}, actor={}", username, userId, actor.userId());
         return saved;
     }
 
     @Transactional(readOnly = true)
     public Optional<UserProfile> findProfileByKeycloakId(UUID keycloakId) {
         return userProfileRepository.findByKeycloakId(keycloakId);
+    }
+
+    @Transactional
+    public void updateOnboardingCompleted(UUID currentUserId, boolean onboardingCompleted) {
+        UserProfile userProfile = userProfileRepository.findById(currentUserId)
+                .orElseThrow(() -> new UserProfileNotFoundException(currentUserId.toString()));
+
+        userProfile.setOnboardingCompleted(onboardingCompleted);
+        userProfileRepository.save(userProfile);
+        TxLogger.afterCommit(log, "User completed onboarding: username={}, userId={}", userProfile.getUsername(), currentUserId);
+    }
+
+    private void validateManagedUserSort(Sort sort){
+       sort.forEach((sortField) -> {
+           if (!MANAGED_USER_SORT_FIELDS.contains(sortField.getProperty())) {
+               throw new InvalidUserManagementSortFieldException("Unsupported sort field: " + sortField.getProperty());
+           }
+       });
     }
 }
