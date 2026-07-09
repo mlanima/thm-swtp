@@ -222,6 +222,9 @@
     (let [{:keys [exit err]} (sh ["sudo" "cp" "-r" template dir])]
       (when-not (zero? exit)
         (throw (ex-info (str "Upload dir provisioning FAILED: " err) {:dir dir}))))
+    (let [{:keys [exit err]} (sh ["sudo" "chown" "-R" "100:101" dir])]
+      (when-not (zero? exit)
+        (throw (ex-info (str "Upload dir chown FAILED: " err) {:dir dir}))))
     (log "Upload dir provisioned")
     dir))
 
