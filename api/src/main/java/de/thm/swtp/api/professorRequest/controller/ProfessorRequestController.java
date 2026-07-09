@@ -5,6 +5,7 @@ import de.thm.swtp.api.professorRequest.dto.CreateProfessorRequestRequest;
 import de.thm.swtp.api.professorRequest.dto.ProfessorRequestResponse;
 import de.thm.swtp.api.professorRequest.dto.VerifyProfessorRequestEmailRequest;
 import de.thm.swtp.api.professorRequest.service.ProfessorRequestService;
+import de.thm.swtp.api.auditlog.domain.AuditActor;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -69,16 +70,18 @@ public class ProfessorRequestController {
     /** Accepts a professor-rights request by setting its status to ACCEPTED. */
     @PatchMapping("/{requestId}/accept")
     @PreAuthorize("@security.canManageProfessorRequests(authentication)")
-    public ProfessorRequestResponse acceptProfessorRequest(@PathVariable UUID requestId) {
-        ProfessorRequest professorRequest = professorRequestService.acceptProfessorRequest(requestId);
+    public ProfessorRequestResponse acceptProfessorRequest(@PathVariable UUID requestId, @AuthenticationPrincipal Jwt jwt) {
+        AuditActor actor = AuditActor.fromJwt(jwt);
+        ProfessorRequest professorRequest = professorRequestService.acceptProfessorRequest(requestId, actor);
         return ProfessorRequestResponse.toResponse(professorRequest);
     }
 
     /** Rejects a professor-rights request by setting its status to REJECTED. */
     @PatchMapping("/{requestId}/reject")
     @PreAuthorize("@security.canManageProfessorRequests(authentication)")
-    public ProfessorRequestResponse rejectProfessorRequest(@PathVariable UUID requestId) {
-        ProfessorRequest professorRequest = professorRequestService.rejectProfessorRequest(requestId);
+    public ProfessorRequestResponse rejectProfessorRequest(@PathVariable UUID requestId, @AuthenticationPrincipal Jwt jwt) {
+        AuditActor actor = AuditActor.fromJwt(jwt);
+        ProfessorRequest professorRequest = professorRequestService.rejectProfessorRequest(requestId, actor);
         return ProfessorRequestResponse.toResponse(professorRequest);
     }
 }

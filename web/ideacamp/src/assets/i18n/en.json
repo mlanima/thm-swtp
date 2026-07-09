@@ -284,6 +284,44 @@
       "SHOWING_OF": "From",
       "TOTAL_REQUESTS": "Requests shown"
     },
+    "AUDIT_LOGS_LINK_TITLE": "Audit logs",
+    "AUDIT_LOGS_LINK_DESCRIPTION": "Track who performed critical actions.",
+    "AUDIT_LOGS": {
+      "TITLE": "Audit logs",
+      "SUBTITLE": "Track who managed projects, posts, users, and professor requests.",
+      "LOADING": "Loading audit logs …",
+      "ERROR_LOAD": "Audit logs could not be loaded.",
+      "NO_RESULTS": "No audit logs available.",
+      "COLUMN_TIME": "Time",
+      "COLUMN_ACTION": "Action",
+      "COLUMN_ACTOR": "Performed by",
+      "COLUMN_TARGET": "Target",
+      "COLUMN_DETAILS": "Details",
+      "SHOWING_OF": "of",
+      "TOTAL_LOGS": "logs displayed",
+      "ACTIONS": {
+        "PROJECT_DELETED": "Project deleted",
+        "PROJECT_POST_DELETED": "Project post deleted",
+        "USER_BANNED": "User banned",
+        "USER_UNBANNED": "User unbanned",
+        "PROFESSOR_REQUEST_ACCEPTED": "Professor request accepted",
+        "PROFESSOR_REQUEST_REJECTED": "Professor request rejected"
+      },
+      "TARGET_TYPES": {
+        "PROJECT": "Project",
+        "PROJECT_POST": "Project post",
+        "USER": "User",
+        "PROFESSOR_REQUEST": "Professor request"
+      },
+      "DETAILS": {
+        "PROJECT_DELETED": "Project \"{{ targetName }}\" was deleted.",
+        "PROJECT_POST_DELETED": "Project post \"{{ targetName }}\" was deleted from project \"{{ details }}\".",
+        "USER_BANNED": "User \"{{ targetName }}\" was banned. Reason: {{ details }}",
+        "USER_UNBANNED": "User \"{{ targetName }}\" was unbanned.",
+        "PROFESSOR_REQUEST_ACCEPTED": "Professor request from \"{{ targetName }}\" was accepted. Email: {{ details }}",
+        "PROFESSOR_REQUEST_REJECTED": "Professor request from \"{{ targetName }}\" was rejected. Email: {{ details }}"
+      }
+    },
     "REPORTS": {
       "TITLE": "Report Management",
       "SUBTITLE": "Review, prioritize, and process reported content.",
@@ -422,7 +460,8 @@
     "REPORTS": "Report management",
     "PROFESSOR_REQUESTS": "Professor management",
     "IMPRESSUM": "Legal notice",
-    "MENU": "Menu"
+    "MENU": "Menu",
+    "AUDIT_LOGS": "Audit logs"
   },
   "PROJECTCREATE": {
     "PAGE_TITLE": "Create a new project",

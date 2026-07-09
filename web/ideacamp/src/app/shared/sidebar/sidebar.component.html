@@ -77,6 +77,13 @@
                 <span>{{ 'SIDEBAR.PROFESSOR_REQUESTS' | translate }}</span>
               </app-menu-link>
             </a>
+
+            <a routerLink="/moderator/audit-logs" (click)="requestClose()">
+              <app-menu-link>
+                <i class="pi pi-history text-sm text-zinc-400"></i>
+                <span>{{ 'SIDEBAR.AUDIT_LOGS' | translate }}</span>
+              </app-menu-link>
+            </a>
           } @else {
             <a routerLink="/dashboard" (click)="requestClose()">
             <app-menu-link>

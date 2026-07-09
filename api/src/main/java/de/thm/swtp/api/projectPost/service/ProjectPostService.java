@@ -18,6 +18,8 @@ import de.thm.swtp.api.projectPost.repository.ProjectPostRepository;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
+import de.thm.swtp.api.auditlog.service.AuditLogService;
+import de.thm.swtp.api.auditlog.domain.AuditActor;
 import de.thm.swtp.api.projectFiles.service.ProjectFileService;
 import de.thm.swtp.api.projectFiles.domain.ProjectFile;
 import de.thm.swtp.api.projectFiles.domain.ProjectFileDownload;
@@ -41,6 +43,7 @@ public class ProjectPostService {
     private final ProjectPostRepository projectPostRepository;
     private final ProjectRepository projectRepository;
     private final UserProfileRepository userProfileRepository;
+    private final AuditLogService auditLogService;
     private final DiscordEventPublisher discordEventPublisher;
     private final DiscordPostSyncService discordPostSyncService;
     private final ContentModerationService contentModerationService;
@@ -202,9 +205,20 @@ public class ProjectPostService {
     }
 
     @Transactional
-    public void deleteProjectPost(UUID projectId, UUID postId) {
+    public void deleteProjectPost(UUID projectId, UUID postId, AuditActor actor) {
         ProjectPostEntity postEntity = getPostOrThrowError(postId);
         assertPostBelongsToProject(postEntity, projectId);
+
+        String postTitle = postEntity.getTitle();
+        String projectName = postEntity.getProject().getName();
+
+        auditLogService.logProjectPostDeleted(
+                actor,
+                postId,
+                postTitle,
+                projectId,
+                projectName
+        );
 
         UUID imageFileId = postEntity.getImageFileId();
 
@@ -219,8 +233,7 @@ public class ProjectPostService {
         if (imageFileId != null) {
             projectFileService.deleteFile(projectId, imageFileId);
         }
-
-        TxLogger.afterCommit(log, "Post deleted: project={}, post={}", projectId, postId);
+        TxLogger.afterCommit(log, "Post deleted: project={}, post={}, actor={}", projectId, postId, actor.userId());
     }
 
     private ProjectEntity getProjectOrThrowError(UUID projectId) {

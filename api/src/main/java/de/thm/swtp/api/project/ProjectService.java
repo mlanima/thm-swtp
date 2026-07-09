@@ -22,6 +22,8 @@ import de.thm.swtp.api.projectView.entity.ProjectViewEntity;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import de.thm.swtp.api.projectView.repository.ProjectViewRepository;
+import de.thm.swtp.api.auditlog.service.AuditLogService;
+import de.thm.swtp.api.auditlog.domain.AuditActor;
 
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -50,7 +52,8 @@ public class ProjectService {
     private static final String PROJECT_CREATION_INVITE_MESSAGE = "You have been invited to join this project.";
     private final ProjectFavoriteRepository projectFavoriteRepository;
     private final ProjectViewRepository projectViewRepository;
-private final LinkedChannelRepository linkedChannelRepository;
+    private final AuditLogService auditLogService;
+    private final LinkedChannelRepository linkedChannelRepository;
     private final DiscordNotificationService discordNotificationService;
     private final ProjectGithubRepoRepository projectGithubRepoRepository;
     private static final Set<String> MANAGED_PROJECT_SORT_FIELDS = Set.of("name", "owner.username", "createdAt", "updatedAt", "isPrivateProject");
@@ -181,7 +184,7 @@ private final LinkedChannelRepository linkedChannelRepository;
     }
 
     @Transactional
-    public DeleteProjectResponse deleteProject(UUID projectId) {
+    public DeleteProjectResponse deleteProject(UUID projectId, AuditActor actor) {
 
         ProjectEntity project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ExceptionProjectNotFound(projectId));
@@ -190,13 +193,17 @@ private final LinkedChannelRepository linkedChannelRepository;
             throw new ExceptionProjectAlreadyDeleted(projectId);
         }
 
+        String projectName = project.getName();
+
+        auditLogService.logProjectDeleted(actor, projectId, projectName);
+
         projectFavoriteRepository.deleteByProjectId(projectId);
         projectViewRepository.deleteByProjectId(projectId);
         projectInviteRepository.deleteByProjectId(projectId);
         projectJoinRequestRepository.deleteByProjectId(projectId);
         projectRepository.delete(project);
 
-        TxLogger.afterCommit(log, "Project deleted: project={}", projectId);
+        TxLogger.afterCommit(log, "Project deleted: project={}, actor={}", projectId, actor.userId());
         return DeleteProjectResponse.builder()
                 .projectId(projectId)
                 .message("Projekt erfolgreich gelöscht.")

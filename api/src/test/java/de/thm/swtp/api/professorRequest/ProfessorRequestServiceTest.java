@@ -14,6 +14,8 @@ import de.thm.swtp.api.professorRequest.service.ProfessorRequestService;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
+import de.thm.swtp.api.auditlog.service.AuditLogService;
+import de.thm.swtp.api.auditlog.domain.AuditActor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,6 +39,7 @@ public class ProfessorRequestServiceTest {
 
     private UUID requestId;
     private UUID userId;
+    private AuditActor actor;
 
     private UserProfile user;
 
@@ -45,12 +48,14 @@ public class ProfessorRequestServiceTest {
     private ProfessorRequestService professorRequestService;
     private ApplicationEventPublisher eventPublisher;
     private ProfessorRequestProperties professorRequestProperties;
+    private AuditLogService auditLogService;
 
     @BeforeEach
     void setUp() {
         professorRequestRepository = mock(ProfessorRequestRepository.class);
         userProfileRepository = mock(UserProfileRepository.class);
         eventPublisher = mock(ApplicationEventPublisher.class);
+        auditLogService = mock(AuditLogService.class);
         professorRequestProperties = new ProfessorRequestProperties(
                 List.of("thm.de", "mni.thm.de"),
                 24
@@ -60,11 +65,17 @@ public class ProfessorRequestServiceTest {
                 professorRequestRepository,
                 userProfileRepository,
                 professorRequestProperties,
-                eventPublisher
+                eventPublisher,
+                auditLogService
         );
 
         requestId = UUID.randomUUID();
         userId = UUID.randomUUID();
+        actor = new AuditActor(
+                UUID.randomUUID(),
+                "moderator",
+                "moderator@test.de"
+        );
 
         user = new UserProfile();
         user.setKeycloakId(userId);
@@ -173,7 +184,7 @@ public class ProfessorRequestServiceTest {
         when(professorRequestRepository.findById(requestId)).thenReturn(Optional.of(entity));
         when(professorRequestRepository.save(entity)).thenReturn(entity);
 
-        ProfessorRequest result = professorRequestService.acceptProfessorRequest(requestId);
+        ProfessorRequest result = professorRequestService.acceptProfessorRequest(requestId, actor);
 
         assertThat(result.getStatus()).isEqualTo(ProfessorRequestStatus.ACCEPTED);
         assertThat(user.isProfessor()).isTrue();
@@ -185,7 +196,7 @@ public class ProfessorRequestServiceTest {
     void acceptProfessorRequest_shouldThrowNotFoundException_whenRequestDoesNotExist() {
         when(professorRequestRepository.findById(requestId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> professorRequestService.acceptProfessorRequest(requestId))
+        assertThatThrownBy(() -> professorRequestService.acceptProfessorRequest(requestId, actor))
                 .isInstanceOf(ProfessorRequestNotFoundException.class);
 
         verify(professorRequestRepository, never()).save(any());
@@ -205,7 +216,7 @@ public class ProfessorRequestServiceTest {
 
         when(professorRequestRepository.findById(requestId)).thenReturn(Optional.of(entity));
 
-        assertThatThrownBy(() -> professorRequestService.acceptProfessorRequest(requestId))
+        assertThatThrownBy(() -> professorRequestService.acceptProfessorRequest(requestId, actor))
                 .isInstanceOf(ProfessorRequestInvalidStatusException.class);
 
         verify(professorRequestRepository, never()).save(any());
@@ -227,7 +238,7 @@ public class ProfessorRequestServiceTest {
         when(professorRequestRepository.findById(requestId)).thenReturn(Optional.of(entity));
         when(professorRequestRepository.save(entity)).thenReturn(entity);
 
-        ProfessorRequest result = professorRequestService.rejectProfessorRequest(requestId);
+        ProfessorRequest result = professorRequestService.rejectProfessorRequest(requestId, actor);
 
         assertThat(result.getStatus()).isEqualTo(ProfessorRequestStatus.REJECTED);
         assertThat(entity.getVerificationTokenHash()).isNull();
@@ -239,7 +250,7 @@ public class ProfessorRequestServiceTest {
     void rejectProfessorRequest_shouldThrowNotFoundException_whenRequestDoesNotExist() {
         when(professorRequestRepository.findById(requestId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> professorRequestService.rejectProfessorRequest(requestId))
+        assertThatThrownBy(() -> professorRequestService.rejectProfessorRequest(requestId, actor))
                 .isInstanceOf(ProfessorRequestNotFoundException.class);
 
         verify(professorRequestRepository, never()).save(any());
@@ -259,7 +270,7 @@ public class ProfessorRequestServiceTest {
 
         when(professorRequestRepository.findById(requestId)).thenReturn(Optional.of(entity));
 
-        assertThatThrownBy(() -> professorRequestService.rejectProfessorRequest(requestId))
+        assertThatThrownBy(() -> professorRequestService.rejectProfessorRequest(requestId, actor))
                 .isInstanceOf(ProfessorRequestInvalidStatusException.class);
 
         verify(professorRequestRepository, never()).save(any());

@@ -19,6 +19,8 @@ import de.thm.swtp.api.projectPost.service.ProjectPostService;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
+import de.thm.swtp.api.auditlog.domain.AuditActor;
+import de.thm.swtp.api.auditlog.service.AuditLogService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,6 +49,9 @@ class ProjectPostServiceTest {
     private UserProfileRepository userProfileRepository;
 
     @Mock
+    private AuditLogService auditLogService;
+
+    @Mock
     private DiscordEventPublisher discordEventPublisher;
 
     @Mock
@@ -68,7 +73,7 @@ class ProjectPostServiceTest {
     @BeforeEach
     void setUp() {
         service = new ProjectPostService(projectPostRepository, projectRepository,
-                userProfileRepository, discordEventPublisher, discordPostSyncService,
+                userProfileRepository, auditLogService, discordEventPublisher, discordPostSyncService,
                 contentModerationService, projectFileService);
 
         lenient().when(discordPostSyncService.getDiscordMessageId(any())).thenReturn(Optional.empty());
@@ -312,9 +317,11 @@ class ProjectPostServiceTest {
                 .content("content")
                 .build();
 
+        var actor = new AuditActor(authorId, "Alice", "alice@example.com");
+
         when(projectPostRepository.findById(postEntity.getId())).thenReturn(Optional.of(postEntity));
 
-        service.deleteProjectPost(projectId, postEntity.getId());
+        service.deleteProjectPost(projectId, postEntity.getId(), actor);
 
         verify(projectPostRepository).delete(postEntity);
     }
@@ -330,9 +337,11 @@ class ProjectPostServiceTest {
                 .content("content")
                 .build();
 
+        var actor = new AuditActor(authorId, "Alice", "alice@example.com");
+
         when(projectPostRepository.findById(postEntity.getId())).thenReturn(Optional.of(postEntity));
 
-        assertThatThrownBy(() -> service.deleteProjectPost(projectId, postEntity.getId()))
+        assertThatThrownBy(() -> service.deleteProjectPost(projectId, postEntity.getId(), actor))
                 .isInstanceOf(ProjectPostNotFoundException.class);
     }
 

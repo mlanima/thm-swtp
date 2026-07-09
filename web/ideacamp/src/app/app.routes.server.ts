@@ -87,10 +87,15 @@ export const serverRoutes: ServerRoute[] = [
   },
 
   {
-    path: 'moderator/reports',
+    path: 'moderator/audit-logs',
     renderMode: RenderMode.Client,
   },
 
+  {
+    path: 'moderator/reports',
+    renderMode: RenderMode.Client,
+  },
+  
   {
     path: '**',
     renderMode: RenderMode.Prerender,

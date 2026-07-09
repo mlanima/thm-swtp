@@ -3,6 +3,7 @@ package de.thm.swtp.api.projectPost.controller;
 import de.thm.swtp.api.projectPost.service.ProjectPostService;
 import de.thm.swtp.api.projectPost.dto.CreateProjectPostRequest;
 import de.thm.swtp.api.projectPost.dto.ProjectPostResponse;
+import de.thm.swtp.api.auditlog.domain.AuditActor;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -64,8 +65,9 @@ public class ProjectPostController {
     @DeleteMapping("/{postId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("@security.canDeleteProjectPost(#projectId, #postId, authentication)")
-    public void deletePost(@PathVariable UUID projectId, @PathVariable UUID postId) {
-        projectPostService.deleteProjectPost(projectId, postId);
+    public void deletePost(@PathVariable UUID projectId, @PathVariable UUID postId, @AuthenticationPrincipal Jwt jwt) {
+        AuditActor actor = AuditActor.fromJwt(jwt);
+        projectPostService.deleteProjectPost(projectId, postId, actor);
     }
 
     @PatchMapping("/{postId}/publish")

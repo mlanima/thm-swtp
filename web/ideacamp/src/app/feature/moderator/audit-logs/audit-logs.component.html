@@ -1,0 +1,97 @@
+<section class="min-h-screen bg-slate-100 px-6 py-8 text-slate-700">
+  <div class="mx-auto max-w-6xl">
+    <header class="mb-6">
+      <div class="flex items-center gap-3">
+        <h1 class="text-3xl font-bold text-slate-700">
+          {{ 'MODERATOR.AUDIT_LOGS.TITLE' | translate }}
+        </h1>
+        <span class="inline-flex items-center rounded-md bg-slate-700 px-2.5 py-0.5 text-xs font-medium uppercase text-white">
+          MODERATOR
+        </span>
+      </div>
+      <p class="mt-1 text-sm text-slate-500">
+        {{ 'MODERATOR.AUDIT_LOGS.SUBTITLE' | translate }}
+      </p>
+    </header>
+
+    @if (isLoading()) {
+      <div class="flex items-center justify-center rounded-xl border border-slate-200 bg-white px-6 py-16 shadow-sm">
+        <p class="text-sm text-slate-500">
+          {{ 'MODERATOR.AUDIT_LOGS.LOADING' | translate }}
+        </p>
+      </div>
+    } @else if (errorMessage()) {
+      <div class="flex items-center justify-center rounded-xl border border-red-200 bg-red-50 px-6 py-12 shadow-sm">
+        <p class="text-sm font-medium text-red-700">
+          {{ errorMessage() }}
+        </p>
+      </div>
+    } @else if (auditLogs().length === 0) {
+      <div class="flex items-center justify-center rounded-xl border border-slate-200 bg-white px-6 py-16 shadow-sm">
+        <p class="text-sm text-slate-500">
+          {{ 'MODERATOR.AUDIT_LOGS.NO_RESULTS' | translate }}
+        </p>
+      </div>
+    } @else {
+      <section class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+        <div class="grid grid-cols-[1.2fr_1.4fr_1.2fr_1.4fr_1.4fr] border-b border-slate-200 bg-slate-50 px-6 py-3 text-xs font-bold uppercase tracking-wide text-slate-500">
+          <span>{{ 'MODERATOR.AUDIT_LOGS.COLUMN_TIME' | translate }}</span>
+          <span>{{ 'MODERATOR.AUDIT_LOGS.COLUMN_ACTION' | translate }}</span>
+          <span>{{ 'MODERATOR.AUDIT_LOGS.COLUMN_ACTOR' | translate }}</span>
+          <span>{{ 'MODERATOR.AUDIT_LOGS.COLUMN_TARGET' | translate }}</span>
+          <span>{{ 'MODERATOR.AUDIT_LOGS.COLUMN_DETAILS' | translate }}</span>
+        </div>
+
+        @for (log of auditLogs(); track log.id) {
+          <div class="grid grid-cols-[1.2fr_1.4fr_1.2fr_1.4fr_1.4fr] items-start border-b border-slate-100 px-6 py-4 text-sm last:border-b-0">
+            <div class="text-slate-500">
+              {{ log.createdAt | date: 'dd.MM.yyyy HH:mm' }}
+            </div>
+
+            <div>
+              <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
+                {{ getActionTranslationKey(log.action) | translate }}
+              </span>
+            </div>
+
+            <div>
+              <p class="font-medium text-slate-800">
+                {{ log.actorUsername || 'Unknown user' }}
+              </p>
+              <p class="text-xs text-slate-400">
+                {{ log.actorEmail || log.actorUserId }}
+              </p>
+            </div>
+
+            <div>
+              <p class="font-medium text-slate-800">
+                {{ log.targetName || log.targetId }}
+              </p>
+              <p class="text-xs text-slate-400">
+                {{ getTargetTypeTranslationKey(log.targetType) | translate }}
+              </p>
+            </div>
+
+            <p class="text-slate-500">
+              {{ getDetailsTranslationKey(log.action) | translate: {
+              targetName: log.targetName || log.targetId,
+              details: log.details || ''
+            } }}
+            </p>
+          </div>
+        }
+      </section>
+
+      <app-pagination
+        [currentPage]="currentPage()"
+        [totalPages]="totalPages()"
+        (pageChange)="onPageChange($event)"
+      />
+
+      <p class="mt-4 text-center text-sm text-slate-400">
+        {{ auditLogs().length }} {{ 'MODERATOR.AUDIT_LOGS.SHOWING_OF' | translate }}
+        {{ totalElements() }} {{ 'MODERATOR.AUDIT_LOGS.TOTAL_LOGS' | translate }}
+      </p>
+    }
+  </div>
+</section>

@@ -1,8 +1,8 @@
 package de.thm.swtp.api.project;
 
-
 import de.thm.swtp.api.project.dto.request.*;
 import de.thm.swtp.api.project.dto.response.*;
+import de.thm.swtp.api.auditlog.domain.AuditActor;
 import jakarta.validation.Valid;
 import lombok.*;
 import org.springframework.data.domain.Sort;
@@ -43,8 +43,9 @@ public class ProjectController {
 
     @DeleteMapping("/{projectId}")
     @PreAuthorize("@security.canDeleteProject(#projectId, authentication)")
-    public ResponseEntity<DeleteProjectResponse> deleteProject(@PathVariable UUID projectId) {
-        DeleteProjectResponse response = projectService.deleteProject(projectId);
+    public ResponseEntity<DeleteProjectResponse> deleteProject(@PathVariable UUID projectId, @AuthenticationPrincipal Jwt jwt) {
+        AuditActor actor = AuditActor.fromJwt(jwt);
+        DeleteProjectResponse response = projectService.deleteProject(projectId, actor);
         return ResponseEntity.ok(response);
     }
 
