@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AuthService } from '../../feature/auth/auth.service';
 import { SidebarService } from './sidebar.service';
 import { ProjectInvitationService } from '../../feature/my-projects/services/project-invitation.service';
+import { UserProfileService } from '../../services/user-profile.service';
 import { of } from 'rxjs';
 
 import { SidebarComponent } from './sidebar.component';
@@ -19,6 +20,7 @@ describe('SidebarComponent', () => {
       providers: [
         { provide: AuthService, useValue: { logout: () => logoutCalls++, waitUntilAuthReady: () => Promise.resolve(), isModerator: () => false } },
         { provide: ProjectInvitationService, useValue: { getInvitations: () => of([]) } },
+        { provide: UserProfileService, useValue: { getMyProfile: () => of({ isProfessor: false }) } },
       ],
       imports: [SidebarComponent],
     }).compileComponents();

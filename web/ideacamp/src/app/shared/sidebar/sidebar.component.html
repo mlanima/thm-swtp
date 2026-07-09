@@ -109,6 +109,14 @@
                }
              </app-menu-link>
             </a>
+            @if (isProfessor()) {
+              <a routerLink="/my-theses" (click)="requestClose()">
+              <app-menu-link>
+                 <i class="pi pi-graduation-cap text-sm text-zinc-400"></i>
+                 <span>{{ 'SIDEBAR.MYTHESES' | translate }}</span>
+               </app-menu-link>
+              </a>
+            }
             <a routerLink="/favorites" (click)="requestClose()">
             <app-menu-link>
                <i class="pi pi-heart text-sm text-zinc-400"></i>

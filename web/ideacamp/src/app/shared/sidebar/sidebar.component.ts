@@ -6,6 +6,7 @@ import { AuthService } from '../../feature/auth/auth.service';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ProjectInvitationService } from '../../feature/my-projects/services/project-invitation.service';
+import { UserProfileService } from '../../services/user-profile.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -17,8 +18,10 @@ export class SidebarComponent {
   sidebarService = inject(SidebarService);
   auth = inject(AuthService);
   private readonly invitationService = inject(ProjectInvitationService);
+  private readonly userProfileService = inject(UserProfileService);
   isRendered = signal(false);
   isClosing = signal(false);
+  isProfessor = signal(false);
 
   private readonly platformId = inject(PLATFORM_ID);
 
@@ -28,6 +31,9 @@ export class SidebarComponent {
         if (this.auth.isModerator()) {
           return;
         }
+        this.userProfileService.getMyProfile().subscribe({
+          next: (profile) => this.isProfessor.set(profile.isProfessor),
+        });
         this.invitationService.getInvitations().subscribe({
           next: (invitations) =>
             this.sidebarService.pendingInvitationsCount.set(
