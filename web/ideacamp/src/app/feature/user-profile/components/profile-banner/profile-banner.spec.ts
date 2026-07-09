@@ -23,10 +23,12 @@ describe('ProfileBanner', () => {
       email: '',
       title: '',
       location: '',
+      placeId: null,
       followers: 0,
       about: '',
       experience: '',
       isProfessor: false,
+      onboardingCompleted: false,
     };
 
     fixture.detectChanges();

@@ -1,0 +1,87 @@
+<div class="fixed inset-0 z-60 flex items-center justify-center bg-slate-900/50 px-4">
+  <section class="w-full max-w-md rounded-xl bg-white p-6 shadow-2xl">
+    <h2 class="text-lg font-bold text-slate-800">
+      {{ 'REPORT_DIALOG.TITLE' | translate }}
+    </h2>
+
+    <p class="mt-2 text-sm text-slate-500">
+      {{ 'REPORT_DIALOG.DESCRIPTION' | translate }}
+    </p>
+
+    @if (targetTitle()) {
+      <div class="mt-4 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
+        <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">
+          {{ 'REPORT_DIALOG.REPORTED_CONTENT' | translate }}
+        </p>
+        <p class="mt-1 text-sm font-semibold text-slate-700">
+          {{ targetTitle() }}
+        </p>
+      </div>
+    }
+
+    <label class="mt-5 block text-sm font-medium text-slate-700" for="reportReason">
+      {{ 'REPORT_DIALOG.REASON_LABEL' | translate }}
+    </label>
+
+    <select
+      id="reportReason"
+      class="mt-2 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-100"
+      [ngModel]="selectedReason()"
+      (ngModelChange)="selectedReason.set($event)"
+    >
+      <option [ngValue]="null" disabled>
+        {{ 'REPORT_DIALOG.REASON_PLACEHOLDER' | translate }}
+      </option>
+
+      @for (reason of reasons; track reason) {
+        <option [ngValue]="reason">
+          {{ ('MODERATOR.REPORTS.REASON.' + reason) | translate }}
+        </option>
+      }
+    </select>
+
+    <label class="mt-5 block text-sm font-medium text-slate-700" for="reportMessage">
+      {{ 'REPORT_DIALOG.MESSAGE_LABEL' | translate }}
+    </label>
+
+    <textarea
+      id="reportMessage"
+      rows="4"
+      [maxlength]="maxMessageLength"
+      class="mt-2 w-full resize-none rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 outline-none placeholder:text-slate-300 focus:border-slate-400 focus:ring-2 focus:ring-slate-100"
+      [placeholder]="'REPORT_DIALOG.MESSAGE_PLACEHOLDER' | translate"
+      [ngModel]="message()"
+      (ngModelChange)="message.set($event)"
+    ></textarea>
+
+    <p class="mt-1 text-right text-xs text-slate-400">
+      {{ message().length }}/{{ maxMessageLength }}
+    </p>
+
+    @if (errorMessage()) {
+      <p class="mt-4 rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-sm text-red-700">
+        {{ errorMessage()! | translate }}
+      </p>
+    }
+
+    <div class="mt-6 flex justify-end gap-3">
+      <button
+        type="button"
+        class="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+        (click)="closeDialog.emit()"
+        [disabled]="isSubmitting()"
+      >
+        {{ 'COMMON.CANCEL' | translate }}
+      </button>
+
+      <button
+        type="button"
+        class="rounded-lg bg-red-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-600 disabled:opacity-60"
+        (click)="submit()"
+        [disabled]="isSubmitting() || !selectedReason()"
+      >
+        {{ 'REPORT_DIALOG.SUBMIT' | translate }}
+      </button>
+    </div>
+  </section>
+</div>

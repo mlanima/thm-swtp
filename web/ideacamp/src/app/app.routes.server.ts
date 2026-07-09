@@ -42,6 +42,11 @@ export const serverRoutes: ServerRoute[] = [
   },
 
   {
+    path: 'dashboard',
+    renderMode: RenderMode.Client,
+  },
+
+  {
     path: 'project/:projectUrl/settings',
     renderMode: RenderMode.Client,
   },
@@ -86,6 +91,11 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Client,
   },
 
+  {
+    path: 'moderator/reports',
+    renderMode: RenderMode.Client,
+  },
+  
   {
     path: '**',
     renderMode: RenderMode.Prerender,

@@ -16,6 +16,27 @@
           </button>
         </div>
       </div>
+      @if (auth.isAuthenticated()) {
+        <div class="border-b border-zinc-700 px-6 py-4">
+          <div class="flex items-center gap-3">
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-zinc-700 text-sm font-semibold text-zinc-100">
+              {{ auth.username().slice(0, 2).toUpperCase() }}
+            </div>
+
+            <div class="min-w-0">
+              <p class="truncate text-sm font-semibold text-zinc-100">
+                {{ auth.username() }}
+              </p>
+
+              @if (auth.isModerator()) {
+                <p class="mt-0.5 text-xs font-medium text-amber-400">
+                  {{ 'SIDEBAR.MODERATOR' | translate }}
+                </p>
+              }
+            </div>
+          </div>
+        </div>
+      }
 
       <menu class="flex-1 overflow-y-auto px-6 py-6">
         <p class="text-xs font-semibold uppercase tracking-wider text-zinc-400">{{ 'SIDEBAR.MENU' | translate }}</p>
@@ -43,6 +64,13 @@
               </app-menu-link>
             </a>
 
+            <a routerLink="/moderator/reports" (click)="requestClose()">
+              <app-menu-link>
+                <i class="pi pi-flag text-sm text-zinc-400"></i>
+                <span>{{ 'SIDEBAR.REPORTS' | translate }}</span>
+              </app-menu-link>
+            </a>
+
             <a routerLink="/moderator/professor-requests" (click)="requestClose()">
               <app-menu-link>
                 <i class="pi pi-graduation-cap text-sm text-zinc-400"></i>
@@ -57,6 +85,12 @@
               </app-menu-link>
             </a>
           } @else {
+            <a routerLink="/dashboard" (click)="requestClose()">
+            <app-menu-link>
+               <i class="pi pi-th-large text-sm text-zinc-400"></i>
+               <span>{{ 'SIDEBAR.DASHBOARD' | translate }}</span>
+             </app-menu-link>
+            </a>
             <a routerLink="/search" (click)="requestClose()">
             <app-menu-link>
                <i class="pi pi-search text-sm text-zinc-400"></i>

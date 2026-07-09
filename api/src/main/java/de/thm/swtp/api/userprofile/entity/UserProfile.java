@@ -33,6 +33,8 @@ public class UserProfile {
 
     private String location;
 
+    private String placeId;
+
     @Column(columnDefinition = "INTEGER DEFAULT 0")
     private int followers;
 
@@ -68,4 +70,19 @@ public class UserProfile {
     private String banReason;
 
     private LocalDateTime bannedAt;
+
+    @Builder.Default
+    @Column(nullable = false)
+    private boolean onboardingCompleted = false;
+
+    @Column(unique = true, length = 20)
+    private String discordId;
+
+    @Column(length = 50)
+    private String discordUsername;
+
+    @Column(length = 100)
+    private String discordAvatar;
+
+    private LocalDateTime discordConnectedAt;
 }

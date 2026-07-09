@@ -58,7 +58,7 @@ export class ProfessorRequestComponent implements OnInit {
     this.professorRequestService.getRequests(page, PAGE_SIZE).subscribe({
       next: (pageResponse) => {
         this.requests.set(pageResponse.content);
-        this.currentPage.set(pageResponse.number);
+        this.currentPage.set(pageResponse.page);
         this.totalPages.set(pageResponse.totalPages);
         this.totalElements.set(pageResponse.totalElements);
         this.isLoading.set(false);

@@ -199,12 +199,6 @@
     </form>
   }
 
-  @if (errorMessage()) {
-    <div class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-      {{ errorMessage() }}
-    </div>
-  }
-
   @if (isLoading()) {
     <p class="text-sm text-slate-400">
       {{ 'PROJECTPOSTS.LOADING' | translate }}
@@ -234,6 +228,17 @@
                 <p class="text-xs text-slate-400">
                   {{ post.publishedAt | date:'dd.MM.yyyy HH:mm' }}
                 </p>
+              }
+
+              @if (canReportPosts) {
+                <button
+                  type="button"
+                  class="rounded-md p-1 text-slate-400 transition hover:bg-red-50 hover:text-red-600"
+                  [attr.aria-label]="'REPORT_DIALOG.REPORT' | translate"
+                  [title]="'REPORT_DIALOG.REPORT' | translate"
+                  (click)="reportPost.emit({ id: post.id, title: post.title })">
+                  <i class="pi pi-flag"></i>
+                </button>
               }
 
               @if (canCreatePosts) {

@@ -10,6 +10,7 @@ import {moderatorGuard} from './feature/auth/moderator.guard';
 import { bannedAccountGuard } from './feature/auth/banned-account.guard';
 import { SearchPage } from './feature/search/pages/search-page/search-page';
 import { MyProjectsPage } from './feature/my-projects/pages/my-projects-page/my-projects-page';
+import { DashboardPage } from './feature/dashboard/pages/dashboard-page/dashboard-page';
 import { ProjectSettings } from './feature/project-settings/project-settings';
 import { ThesisSite } from './feature/thesis-site/thesis-site';
 import { ThesisSettings } from './feature/thesis-settings/thesis-settings';
@@ -23,6 +24,7 @@ import { UserManagement } from './feature/moderator/user-management/pages/user-m
 import { BannedAccount } from './feature/banned-account/pages/banned-account';
 import { ProfessorRequestComponent } from './feature/moderator/professor-request/professor-request.component';
 import { AuditLogsComponent } from './feature/moderator/audit-logs/audit-logs.component';
+import { ReportManagement } from './feature/moderator/reports/pages/report-management';
 import { GithubCallback } from './feature/github/pages/github-callback/github-callback';
 
 export const routes: Routes = [
@@ -42,6 +44,7 @@ export const routes: Routes = [
   {path: 'createProject', component: ProjectCreate, canActivate: [authGuard]},
   {path: 'createThesis', component: ThesisCreate, canActivate: [authGuard]},
   {path: 'my-projects', component: MyProjectsPage, canActivate: [authGuard]},
+  {path: 'dashboard', component: DashboardPage, canActivate: [authGuard]},
   {path: 'favorites', component: FavoritesPage, canActivate: [authGuard]},
   {path: 'settings', component: UserSettings, canActivate: [authGuard]},
   {path: 'github/callback', component: GithubCallback, canActivate: [authGuard]},
@@ -50,4 +53,5 @@ export const routes: Routes = [
   {path: 'account-banned', component: BannedAccount, canActivate: [bannedAccountGuard]},
   {path: 'moderator/professor-requests', component: ProfessorRequestComponent, canActivate: [moderatorGuard]},
   {path: 'moderator/audit-logs', component: AuditLogsComponent, canActivate: [moderatorGuard]},
+  {path: 'moderator/reports', component: ReportManagement, canActivate: [moderatorGuard]},
 ];

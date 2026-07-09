@@ -11,6 +11,7 @@
   "COMMON": {
     "SAVE": "Speichern",
     "CANCEL": "Abbrechen",
+    "CONFIRM": "Bestätigen",
     "EDIT": "Bearbeiten",
     "DELETE": "Löschen",
     "LOADING": "Wird geladen...",
@@ -59,7 +60,8 @@
   "AUTH": {
     "P1": "Erfolgreich!",
     "H1": "Willkommen bei IdeaCamp",
-    "P2": "Was hast du heute vor? Erstelle dein erstes Projekt, entdecke spannende Ideen oder verbinde dich mit anderen kreativen Köpfen. Dein Abenteuer beginnt hier!"
+    "P2": "Was hast du heute vor? Erstelle dein erstes Projekt, entdecke spannende Ideen oder verbinde dich mit anderen kreativen Köpfen. Dein Abenteuer beginnt hier!",
+    "REDIRECTING": "Du wirst weitergeleitet…"
   },
   "MYPROJECTS": {
     "TITLE": "Meine Projekte",
@@ -72,6 +74,7 @@
     "INVITED_BY": "Eingeladen von:",
     "ACCEPT": "Annehmen",
     "DECLINE": "Ablehnen",
+    "JOIN_DISCORD": "Discord beitreten",
     "NO_SHORT_DESCRIPTION": "Keine Kurzbeschreibung.",
     "PRIVATE": "Privat",
     "PUBLIC": "Öffentlich",
@@ -112,11 +115,33 @@
     "ERROR_EDIT_FORBIDDEN": "Du bist nicht berechtigt, dieses Profil zu bearbeiten.",
     "FOLLOWERS": "Follower",
     "ERROR_UPDATE_PROFILE": "Das Profil konnte nicht aktualisiert werden. Bitte versuche es später erneut.",
+    "ERROR_INVALID_PLACE": "Dies ist keine reale Stadt. Bitte wähle einen Ort aus den Vorschlägen aus.",
+    "ERROR_CONTENT_NOT_VALID": "Diese Eingabe enthält nicht erlaubten Inhalt.",
     "FOLLOW": "Folgen",
     "FOLLOWING": "Folge ich",
     "UNFOLLOW": "Entfolgen",
     "INVITE": "Einladen",
-    "PROFESSOR_BADGE": "Professor"
+    "PROFESSOR_BADGE": "Professor",
+    "DISCORD_SHOW": "Nutzername",
+    "DISCORD_COPIED": "Kopiert!"
+  },
+  "REPORT_DIALOG": {
+    "REPORT": "Melden",
+    "TITLE": "Inhalt melden",
+    "DESCRIPTION": "Wählen Sie einen Grund aus und ergänzen Sie optional eine Nachricht.",
+    "REPORTED_CONTENT": "Gemeldeter Inhalt",
+    "REASON_LABEL": "Grund",
+    "REASON_PLACEHOLDER": "Grund auswählen",
+    "MESSAGE_LABEL": "Kommentar (optional)",
+    "MESSAGE_PLACEHOLDER": "Beschreiben Sie kurz, warum Sie diesen Inhalt melden...",
+    "SUBMIT": "Meldung senden",
+    "ERROR_SEND": "Die Meldung konnte nicht gesendet werden.",
+    "ERROR_DUPLICATE": "Du hast diesen Inhalt bereits mit diesem Grund gemeldet.",
+    "SUCCESS": "Die Meldung wurde gesendet.",
+    "VALIDATION": {
+      "TARGET_INVALID": "Der gemeldete Inhalt ist ungültig.",
+      "MESSAGE_MAX": "Die Nachricht darf maximal 1000 Zeichen lang sein."
+    }
   },
   "CONTACT-REQUESTS": {
     "CONTACT": "Kontaktanfragen",
@@ -146,6 +171,8 @@
     "USERS_LINK_DESCRIPTION": "Aktive und gebannte Nutzer einsehen und verwalten.",
     "PROFESSOR_REQUESTS_LINK_TITLE": "Professorverwaltung",
     "PROFESSOR_REQUESTS_LINK_DESCRIPTION": "Professor-Anfragen prüfen, annehmen oder ablehnen.",
+    "REPORTS_LINK_TITLE": "Reportverwaltung",
+    "REPORTS_LINK_DESCRIPTION": "Gemeldete Inhalte prüfen und bearbeiten.",
     "PROJECTS": {
       "TITLE": "Projektverwaltung",
       "SUBTITLE": "Alle Projekte einsehen, suchen und bei Bedarf löschen.",
@@ -199,7 +226,8 @@
       "SORT": {
         "ASC": "Aufsteigend sortiert",
         "DESC": "Absteigend sortiert",
-        "NOT_SORTED": "Nicht sortiert"
+        "NOT_SORTED": "Nicht sortiert",
+        "LABEL": "Sortieren"
       },
       "ROLES": {
         "PROFESSOR": "Professor",
@@ -293,15 +321,142 @@
         "PROFESSOR_REQUEST_ACCEPTED": "Professor-Anfrage von \"{{ targetName }}\" wurde angenommen. E-Mail: {{ details }}",
         "PROFESSOR_REQUEST_REJECTED": "Professor-Anfrage von \"{{ targetName }}\" wurde abgelehnt. E-Mail: {{ details }}"
       }
+    "REPORTS": {
+      "TITLE": "Reportverwaltung",
+      "SUBTITLE": "Gemeldete Inhalte prüfen, priorisieren und bearbeiten.",
+      "BADGE": "Moderator",
+
+      "SEARCH_PLACEHOLDER": "Suche nach Nutzer, Meldung, Notiz oder ID...",
+
+      "FILTER": {
+        "STATUS": "Status",
+        "CONTENT_TYPE": "Inhaltstyp",
+        "REASON": "Grund",
+        "PRIORITY": "Priorität",
+        "ALL": "Alle",
+        "ALL_REASONS": "Alle Gründe"
+      },
+
+      "COLUMN": {
+        "MESSAGE": "Meldung",
+        "REASON": "Grund",
+        "REPORTED_CONTENT": "Gemeldeter Inhalt",
+        "REPORTED_BY": "Gemeldet von",
+        "STATUS": "Status",
+        "CREATED_AT": "Erstellt am",
+        "ACTIONS": "Aktionen"
+      },
+
+      "STATUS": {
+        "OPEN": "Offen",
+        "IN_REVIEW": "In Bearbeitung",
+        "RESOLVED": "Gelöst",
+        "DISMISSED": "Verworfen"
+      },
+
+      "TARGET": {
+        "USER": "Nutzer",
+        "PROJECT": "Projekt",
+        "PROJECT_POST": "Projektpost"
+      },
+
+      "REASON": {
+        "SPAM": "Spam",
+        "HARASSMENT": "Belästigung",
+        "HATE_SPEECH": "Hassrede",
+        "INAPPROPRIATE_CONTENT": "Unpassender Inhalt",
+        "VIOLENCE_OR_THREATS": "Gewalt / Drohungen",
+        "SELF_HARM_OR_SUICIDE": "Selbstverletzung",
+        "PERSONAL_DATA": "Persönliche Daten",
+        "COPYRIGHT": "Urheberrecht",
+        "MISINFORMATION": "Fehlinformation",
+        "FRAUD_OR_IMPERSONATION": "Betrug / Imitation",
+        "OTHER": "Sonstiges"
+      },
+
+      "PRIORITY": {
+        "CRITICAL": "Kritisch",
+        "MEDIUM": "Mittel",
+        "LOW": "Niedrig"
+      },
+
+      "ACTIONS": {
+        "VIEW": "Ansehen",
+        "OPEN_MENU": "Weitere Aktionen",
+        "SET_IN_REVIEW": "In Bearbeitung setzen",
+        "RESOLVE": "Als gelöst markieren",
+        "DISMISS": "Verwerfen",
+        "CLOSE": "Schließen",
+        "SAVE": "Speichern",
+        "BAN_USER": "Nutzer bannen",
+        "DELETE_PROJECT": "Projekt löschen",
+        "DELETE_PROJECT_POST": "Projektpost löschen"
+      },
+
+      "DETAIL": {
+        "TITLE": "Meldung",
+        "REPORT_ID": "Report-ID",
+        "REASON": "Grund",
+        "PRIORITY": "Priorität",
+        "CONTENT_TYPE": "Inhaltstyp",
+        "REPORTED_CONTENT": "Gemeldeter Inhalt",
+        "REPORTED_BY": "Gemeldet von",
+        "COMMENT": "Kommentar",
+        "MODERATOR_NOTE": "Moderator-Notiz",
+        "MODERATOR_NOTE_PLACEHOLDER": "z. B. „Post wurde geprüft.“ oder „Kein Verstoß erkennbar.“",
+        "NO_MODERATOR_NOTE": "Keine Moderator-Notiz vorhanden.",
+        "CREATED_AT": "Erstellt am",
+        "UPDATED_AT": "Aktualisiert am",
+        "REVIEWED_BY": "Bearbeitet von",
+        "REVIEWED_AT": "Bearbeitet am",
+        "SIMILAR_REPORTS": "Ähnliche Meldungen",
+        "SIMILAR_REPORTS_TEXT": "Zu diesem Inhalt liegen {{count}} aktive Meldungen vor.",
+        "TARGET_ACTIONS": "Zielaktionen"
+      },
+
+      "EMPTY": {
+        "TITLE": "Keine Reports gefunden.",
+        "DESCRIPTION": "Passe die Filter oder Suche an, um andere Meldungen zu finden."
+      },
+
+      "PAGINATION": {
+        "SHOWING": "{{ shown }} von {{ total }} Reports",
+        "PAGE": "Seite {{ current }} von {{ total }}"
+      },
+
+      "SORT": {
+        "SORT_BY": "Nach dieser Spalte sortieren",
+        "ASC": "Aufsteigend sortiert",
+        "DESC": "Absteigend sortiert"
+      },
+
+      "ERROR_LOAD": "Reports konnten nicht geladen werden.",
+      "ERROR_UPDATE": "Report konnte nicht aktualisiert werden.",
+      "LOADING": "Reports werden geladen...",
+      "EMPTY_MESSAGE": "Keine Nachricht angegeben.",
+
+      "SIMILAR_REPORTS": "{{count}} Meldungen",
+
+      "CONFIRM": {
+        "BAN_USER_TITLE": "Nutzer wirklich bannen?",
+        "BAN_USER_DESCRIPTION": "Der Nutzer kann danach keine normalen Plattformfunktionen mehr nutzen.",
+        "DELETE_PROJECT_TITLE": "Projekt wirklich löschen?",
+        "DELETE_PROJECT_DESCRIPTION": "Das Projekt wird dauerhaft entfernt. Diese Aktion kann nicht rückgängig gemacht werden.",
+        "DELETE_PROJECT_POST_TITLE": "Projektpost wirklich löschen?",
+        "DELETE_PROJECT_POST_DESCRIPTION": "Der Projektpost wird dauerhaft entfernt. Diese Aktion kann nicht rückgängig gemacht werden."
+      },
+      "ERROR_TARGET_ACTION": "Die Zielaktion konnte nicht ausgeführt werden."
     }
   },
   "SIDEBAR": {
+    "DASHBOARD": "Dashboard",
     "MYPROJECTS": "Meine Projekte",
     "FAVORITE": "Favoriten",
     "PROFILE": "Mein Profil",
     "MODERATOR": "Moderator",
     "MODERATOR_PROJECTS": "Projektverwaltung",
     "USER_MANAGEMENT": "Nutzerverwaltung",
+    "REPORTS": "Reportverwaltung",
     "PROFESSOR_REQUESTS": "Professorverwaltung",
     "IMPRESSUM": "Impressum",
     "MENU": "Menü",
@@ -351,6 +506,7 @@
     "SUCCESS_CREATED": "Projekt erfolgreich erstellt!",
     "SUCCESS_CREATED_WITH_INVITES": "Projekt erfolgreich erstellt und Einladungen gesendet!",
     "ERROR_CREATE_PROJECT": "Projekt konnte nicht erstellt werden. Bitte versuche es erneut.",
+    "ERROR_MODERATION": "Projekt konnte nicht erstellt werden, da einige Inhalte als unangemessen eingestuft wurden. Bitte überprüfe deine Eingaben.",
     "VALIDATION": {
       "NAME_MIN": "Projektname muss mindestens 3 Zeichen lang sein.",
       "NAME_MAX": "Projektname darf höchstens 20 Zeichen lang sein.",
@@ -489,8 +645,32 @@
       "JOIN_REQUESTS": "Beitrittsanfragen",
       "MEMBERS": "Mitglieder",
       "PRIVACY": "Privatsphäre",
-      "GITHUB": "GitHub",
-      "DANGER_ZONE": "Gefahrenzone"
+"GITHUB": "GitHub",
+      "DANGER_ZONE": "Gefahrenzone",
+      "DISCORD": "Discord"
+    },
+    "DISCORD": {
+      "TITLE": "Discord Integration",
+      "CONNECTED": "Verbunden",
+      "CHANNEL_ID": "Kanal-ID",
+      "CHANNEL_ID_LABEL": "Discord Kanal-ID",
+      "ADD_BOT": "Discord Server verbinden",
+      "ADD_BOT_LOADING": "Öffne Discord...",
+      "ADD_BOT_HINT": "Der Bot findet oder erstellt einen #posts-Kanal und macht ihn automatisch schreibgeschützt für alle außer dem Projektinhaber.",
+      "AUTO_SETUP_LOADING": "Kanal wird eingerichtet...",
+      "CHANGE_CHANNEL": "Kanal ändern",
+      "TEST_AND_CONNECT": "Testen & Verbinden",
+      "DISCONNECT": "Trennen",
+      "INVITE_URL_LABEL": "Discord Einladungslink",
+      "INVITE_URL_HINT": "Dieser Link wird eingeladenen Nutzern angezeigt, damit sie dem Server beitreten können.",
+      "ERROR_CONNECT": "Konnte keine Verbindung zum Discord-Kanal herstellen.",
+      "ERROR_LINK": "Verbindung zu Discord fehlgeschlagen.",
+      "NEEDS_DISCORD_LINK": "Du musst dein Discord-Konto verknüpfen, bevor du einen Server verbinden kannst.",
+      "LINK_DISCORD": "Discord-Konto verknüpfen",
+      "SELECT_SERVER": "Bot ist in mehreren Servern — wähle einen aus:",
+      "SELECT_SERVER_PLACEHOLDER": "Server auswählen...",
+      "CONNECT_SERVER": "Verbinden",
+      "BOT_NO_WRITE_PERMISSION": "Der Bot kann im vorhandenen #posts-Kanal keine Nachrichten senden. Erteile dem Bot die \"Nachrichten senden\"-Berechtigung in Discord oder verbinde manuell einen anderen Kanal."
     },
     "ERRORS": {
       "NO_PROJECT_URL": "Keine Projekt-URL gegeben.",
@@ -569,7 +749,8 @@
     "ERRORS": {
       "NO_PROJECT_URL": "Keine Projekt-URL angegeben.",
       "LOAD_PROJECT": "Projektdaten konnten nicht abgerufen werden.",
-      "SAVE_PROJECT": "Projekt konnte nicht gespeichert werden."
+      "SAVE_PROJECT": "Projekt konnte nicht gespeichert werden.",
+      "CONTENT_NOT_VALID": "Dieser Inhalt ist nicht erlaubt."
     },
     "INFO": {
       "VISIBILITY": "Sichtbarkeit",
@@ -581,9 +762,12 @@
     "HEADER": {
       "SETTINGS": "Einstellungen"
     },
+    "DISCORD_CHANNEL": "Discord Kanal",
     "MEMBERS": {
       "ALL_MEMBERS": "Alle Mitglieder",
-      "NO_MEMBERS": "Noch keine Mitglieder."
+      "NO_MEMBERS": "Noch keine Mitglieder.",
+      "DISCORD_SHOW": "Nutzername",
+      "DISCORD_COPIED": "Kopiert!"
     },
     "TAGS": {
       "ERROR_INVALID_CHARS": "Tag enthält ungültige Zeichen. Erlaubt: Buchstaben, Zahlen, Leerzeichen, Bindestrich und Punkt.",
@@ -683,7 +867,8 @@
       "PROFESSOR_REQUEST": "Professor:in werden",
       "INTEGRATIONS": "GitHub",
       "CONTACT": "Kontakt",
-      "IMPRESSUM": "Impressum"
+      "IMPRESSUM": "Impressum",
+      "DISCORD": "Discord"
     },
     "CONTACT": {
       "TITLE": "Kontakt",
@@ -691,6 +876,15 @@
       "SEND_EMAIL": "E-Mail senden",
       "COPIED": "Email kopiert",
       "COPY": "Email kopieren"
+    },
+    "DISCORD": {
+      "TITLE": "Discord Verbindung",
+      "CONNECT": "Discord verbinden",
+      "DISCONNECT": "Trennen",
+      "NOT_CONNECTED": "Du bist nicht mit Discord verbunden.",
+      "ERROR_LOAD": "Verbindungsstatus konnte nicht geladen werden.",
+      "ERROR_CONNECT": "Discord-Verbindung konnte nicht hergestellt werden.",
+      "ERROR_DISCONNECT": "Verbindung konnte nicht getrennt werden."
     }
   },
   "GITHUB": {
@@ -809,6 +1003,57 @@
     "BANNED_AT": "Gesperrt am:",
     "CONTACT_HINT": "Wenn du Fragen hast, wende dich bitte an das Projektteam."
   },
+  "ONBOARDING": {
+    "LABEL": "Kurze Einführung",
+    "TITLE": "Willkommen bei IdeaCamp",
+    "REMIND_LATER": "Später erinnern",
+    "BACK": "Zurück",
+    "NEXT": "Weiter",
+    "FINISH": "Fertig",
+    "STEPS": {
+      "DASHBOARD": {
+        "TITLE": "Dein Dashboard",
+        "TEXT": "Auf dem Dashboard bekommst du einen Überblick über Projekteinladungen, aktuelle Beiträge aus deinen Projekten und zuletzt angesehene Projekte."
+      },
+      "SIDEBAR": {
+        "TITLE": "Navigation über die Sidebar",
+        "TEXT": "Über das Menü oben links öffnest du die Sidebar. Dort findest du die wichtigsten Bereiche wie Dashboard, Suche, meine Projekte, Favoriten, Profil und Einstellungen."
+      },
+      "SEARCH": {
+        "TITLE": "Projekte entdecken",
+        "TEXT": "Über die Suche findest du Projekte und Nutzer. So kannst du passende Projekte entdecken und dich beteiligen."
+      },
+      "MY_PROJECTS": {
+        "TITLE": "Meine Projekte",
+        "TEXT": "Unter „Meine Projekte“ findest du deine eigenen Projekte, Beteiligungen und Projekteinladungen."
+      },
+      "FAVORITES": {
+        "TITLE": "Favoriten",
+        "TEXT": "Interessante Projekte kannst du als Favorit markieren und später gesammelt wiederfinden."
+      },
+      "PROFILE_SETTINGS": {
+        "TITLE": "Profil und Einstellungen",
+        "TEXT": "In deinem Profil kannst du Informationen zu dir ergänzen. In den Einstellungen findest du weitere Optionen und zusätzliche Funktionen."
+      }
+    }
+  },
+  "DASHBOARD": {
+    "POSTS": {
+      "TITLE": "Neueste Beiträge",
+      "SUBTITLE": "Updates aus deinen Projekten",
+      "POSTED_IN": "Veröffentlicht in {{ project }}",
+      "LOADING": "Beiträge werden geladen…",
+      "EMPTY": "Es gibt noch keine Beiträge. Beiträge aus deinen Projekten erscheinen hier.",
+      "ERROR_LOAD": "Beiträge konnten nicht geladen werden.",
+      "UNKNOWN_AUTHOR": "Unbekannt"
+    },
+    "PROJECTS": {
+      "TITLE": "Zuletzt",
+      "EMPTY": "Du bist noch in keinem Projekt Mitglied.",
+      "LOADING": "Projekte werden geladen…",
+      "EMPTY": "Du bist noch in keinem Projekt Mitglied."
+    }
+  },
   "THESISSITE": {
     "LOADING": "Abschlussarbeit wird geladen…",
     "INFORMATION": "Informationen zur Abschlussarbeit",
@@ -882,3 +1127,4 @@
     }
   }
 }
+
