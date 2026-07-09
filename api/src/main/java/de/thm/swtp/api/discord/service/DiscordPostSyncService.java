@@ -56,7 +56,9 @@ public class DiscordPostSyncService {
 
     @Transactional
     public void removeSync(UUID postId) {
-        messageSyncRepository.findByPlatformPostId(postId)
-                .ifPresent(messageSyncRepository::delete);
+        messageSyncRepository.findByPlatformPostId(postId).ifPresent(sync -> {
+            messageSyncRepository.delete(sync);
+            log.info("Sync mapping removed: postId={}, discordMsgId={}", postId, sync.getDiscordMessageId());
+        });
     }
 }

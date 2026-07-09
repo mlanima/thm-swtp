@@ -41,7 +41,7 @@ public class ProjectPostService {
     private final ProjectPostRepository projectPostRepository;
     private final ProjectRepository projectRepository;
     private final UserProfileRepository userProfileRepository;
-private final DiscordEventPublisher discordEventPublisher;
+    private final DiscordEventPublisher discordEventPublisher;
     private final DiscordPostSyncService discordPostSyncService;
     private final ContentModerationService contentModerationService;
     private final ProjectFileService projectFileService;
@@ -55,7 +55,27 @@ private final DiscordEventPublisher discordEventPublisher;
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<ProjectPost> getDraftPostsForProject(UUID projectId) {
+        getProjectOrThrowError(projectId);
 
+        return projectPostRepository
+                .findAllByProjectIdAndStatusOrderByCreatedAtDesc(projectId, ProjectPostStatus.DRAFT)
+                .stream()
+                .map(ProjectPostMapper::toDomain)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProjectPost> getArchivedPostsForProject(UUID projectId) {
+        getProjectOrThrowError(projectId);
+
+        return projectPostRepository
+                .findAllByProjectIdAndStatusOrderByArchivedAtDesc(projectId, ProjectPostStatus.ARCHIVED)
+                .stream()
+                .map(ProjectPostMapper::toDomain)
+                .toList();
+    }
 
     @Transactional
     public ProjectPost createProjectPost(UUID projectId, UUID authorId, String title, String content, PostContentFormat contentFormat, ProjectPostStatus status) {
@@ -134,7 +154,7 @@ private final DiscordEventPublisher discordEventPublisher;
     }
 
     @Transactional
-    public ProjectPost publishProjectPost(UUID projectId, UUID postId){
+    public ProjectPost publishProjectPost(UUID projectId, UUID postId) {
         ProjectPostEntity postEntity = getPostOrThrowError(postId);
 
         assertPostBelongsToProject(postEntity, projectId);
@@ -172,7 +192,10 @@ private final DiscordEventPublisher discordEventPublisher;
 
         ProjectPostEntity saved = projectPostRepository.save(postEntity);
         discordPostSyncService.getDiscordMessageId(postId).ifPresent(
-                discordMsgId -> discordEventPublisher.publishPostUpdated(saved, discordMsgId));
+                discordMsgId -> {
+                    discordEventPublisher.publishPostDeleted(postId, discordMsgId);
+                    discordPostSyncService.removeSync(postId);
+                });
         ProjectPost post = ProjectPostMapper.toDomain(saved);
         TxLogger.afterCommit(log, "Post archived: project={}, post={}", projectId, postId);
         return post;
@@ -186,7 +209,10 @@ private final DiscordEventPublisher discordEventPublisher;
         UUID imageFileId = postEntity.getImageFileId();
 
         discordPostSyncService.getDiscordMessageId(postId).ifPresent(
-                discordMsgId -> discordEventPublisher.publishPostDeleted(postId, discordMsgId));
+                discordMsgId -> {
+                    discordEventPublisher.publishPostDeleted(postId, discordMsgId);
+                    discordPostSyncService.removeSync(postId);
+                });
 
         projectPostRepository.delete(postEntity);
 
@@ -196,10 +222,6 @@ private final DiscordEventPublisher discordEventPublisher;
 
         TxLogger.afterCommit(log, "Post deleted: project={}, post={}", projectId, postId);
     }
-
-
-
-
 
     private ProjectEntity getProjectOrThrowError(UUID projectId) {
         return projectRepository.findById(projectId)
@@ -231,7 +253,74 @@ private final DiscordEventPublisher discordEventPublisher;
         }
     }
 
-    private void assertPostBelongsToProject(ProjectPostEntity postEntity, UUID projectId){
+    @Transactional
+    public ProjectPost updateProjectPost(
+            UUID projectId,
+            UUID postId,
+            String title,
+            String content,
+            PostContentFormat contentFormat,
+            ProjectPostStatus status
+    ) {
+        validateUpdatePost(status, contentFormat);
+
+        ProjectPostEntity postEntity = getPostOrThrowError(postId);
+        assertPostBelongsToProject(postEntity, projectId);
+
+        if (postEntity.getStatus() == ProjectPostStatus.ARCHIVED) {
+            throw new InvalidProjectPostException("Archived posts cannot be updated.");
+        }
+
+        if (postEntity.getStatus() == ProjectPostStatus.PUBLISHED && status == ProjectPostStatus.DRAFT) {
+            throw new InvalidProjectPostException("Published posts cannot be changed back to draft.");
+        }
+
+        contentModerationService.assertAppropriate(title, "postTitle");
+        contentModerationService.assertAppropriate(content, "postContent");
+
+        ProjectPostStatus previousStatus = postEntity.getStatus();
+
+        postEntity.setTitle(title);
+        postEntity.setContent(content);
+        postEntity.setContentFormat(contentFormat);
+
+        if (status == ProjectPostStatus.PUBLISHED && postEntity.getPublishedAt() == null) {
+            postEntity.setPublishedAt(LocalDateTime.now());
+        }
+
+        if (status == ProjectPostStatus.PUBLISHED) {
+            postEntity.setArchivedAt(null);
+        }
+
+        postEntity.setStatus(status);
+
+        ProjectPostEntity saved = projectPostRepository.save(postEntity);
+
+        if (previousStatus != ProjectPostStatus.PUBLISHED && status == ProjectPostStatus.PUBLISHED) {
+            discordEventPublisher.publishPostCreated(saved);
+        } else if (status == ProjectPostStatus.PUBLISHED) {
+            discordPostSyncService.getDiscordMessageId(postId).ifPresent(
+                    discordMsgId -> discordEventPublisher.publishPostUpdated(saved, discordMsgId));
+        }
+
+        ProjectPost post = ProjectPostMapper.toDomain(saved);
+        TxLogger.afterCommit(log, "Post updated: project={}, post={}", projectId, postId);
+        return post;
+    }
+
+    private void validateUpdatePost(ProjectPostStatus status, PostContentFormat contentFormat) {
+        if (status == null) {
+            throw new InvalidProjectPostException("Post status must not be null.");
+        }
+        if (status == ProjectPostStatus.ARCHIVED) {
+            throw new InvalidProjectPostException("Post cannot be updated as archived.");
+        }
+        if (contentFormat == null) {
+            throw new InvalidProjectPostException("Post content format must not be null.");
+        }
+    }
+
+    private void assertPostBelongsToProject(ProjectPostEntity postEntity, UUID projectId) {
         if (!postEntity.getProject().getId().equals(projectId)) {
             throw new ProjectPostNotFoundException(postEntity.getId());
         }

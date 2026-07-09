@@ -13,6 +13,8 @@ public interface ProjectFileRepository extends JpaRepository<ProjectFileEntity, 
 
     List<ProjectFileEntity> findByProjectIdAndVisibilityOrderByCreatedAtAsc(UUID projectId, FileVisibility visibility);
 
+    List<ProjectFileEntity> findByProjectIdAndVisibilityNotOrderByCreatedAtAsc(UUID projectId, FileVisibility visibility);
+
     long countByProjectId(UUID projectId);
 
     boolean existsByIdAndProjectIdAndVisibility(UUID id, UUID projectId, FileVisibility visibility);

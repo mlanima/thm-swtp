@@ -59,7 +59,7 @@ export class ProjectService {
   getProjectPostImage(projectId: string, postId: string) {
     return this.http.get(`${this.baseUrl}/${projectId}/posts/${postId}/image`, { responseType: 'blob' });
   }
-  
+
   createProjectPost(projectId: string, request: CreateProjectPostRequest): Observable<ProjectPostResponse> {
     return this.http.post<ProjectPostResponse>(`${this.baseUrl}/${projectId}/posts`, request);
   }
@@ -73,5 +73,34 @@ export class ProjectService {
 
   deleteProjectPost(projectId: string, postId: string) {
     return this.http.delete<void>(`${this.baseUrl}/${projectId}/posts/${postId}`);
+  }
+
+  getProjectPostDrafts(projectId: string): Observable<ProjectPostResponse[]> {
+    return this.http.get<ProjectPostResponse[]>(`${this.baseUrl}/${projectId}/posts/drafts`);
+  }
+
+  getProjectPostArchived(projectId: string): Observable<ProjectPostResponse[]> {
+    return this.http.get<ProjectPostResponse[]>(`${this.baseUrl}/${projectId}/posts/archived`);
+  }
+
+  archiveProjectPost(projectId: string, postId: string): Observable<ProjectPostResponse> {
+    return this.http.patch<ProjectPostResponse>(`${this.baseUrl}/${projectId}/posts/${postId}/archive`, {});
+  }
+
+  updateProjectPost(
+    projectId: string,
+    postId: string,
+    request: {
+      title: string;
+      content: string;
+      contentFormat: 'PLAIN_TEXT' | 'MARKDOWN';
+      status: 'PUBLISHED' | 'DRAFT';
+    }
+  ): Observable<ProjectPostResponse> {
+    return this.http.put<ProjectPostResponse>(`${this.baseUrl}/${projectId}/posts/${postId}`, request);
+  }
+
+  publishProjectPost(projectId: string, postId: string): Observable<ProjectPostResponse> {
+    return this.http.patch<ProjectPostResponse>(`${this.baseUrl}/${projectId}/posts/${postId}/publish`, {});
   }
 }
