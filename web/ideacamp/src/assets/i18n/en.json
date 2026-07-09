@@ -320,7 +320,8 @@
         "USER_UNBANNED": "User \"{{ targetName }}\" was unbanned.",
         "PROFESSOR_REQUEST_ACCEPTED": "Professor request from \"{{ targetName }}\" was accepted. Email: {{ details }}",
         "PROFESSOR_REQUEST_REJECTED": "Professor request from \"{{ targetName }}\" was rejected. Email: {{ details }}"
-      },
+      }
+    },
     "REPORTS": {
       "TITLE": "Report Management",
       "SUBTITLE": "Review, prioritize, and process reported content.",

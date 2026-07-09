@@ -320,6 +320,7 @@
         "USER_UNBANNED": "Nutzer \"{{ targetName }}\" wurde entbannt.",
         "PROFESSOR_REQUEST_ACCEPTED": "Professor-Anfrage von \"{{ targetName }}\" wurde angenommen. E-Mail: {{ details }}",
         "PROFESSOR_REQUEST_REJECTED": "Professor-Anfrage von \"{{ targetName }}\" wurde abgelehnt. E-Mail: {{ details }}"
+      }
       },
       "REPORTS": {
       "TITLE": "Reportverwaltung",
