@@ -112,13 +112,13 @@
 
   @if (!isOwnProfile) {
     <div class="mt-6 flex flex-wrap items-center justify-center gap-3 sm:justify-end">
-    @if (canFollow) {
-      <app-follow-button
-        [username]="profile.username"
-        [count]="profile.followers"
-        (followerCountChanged)="followerCount.set($event)">
-      </app-follow-button>
-    }
+      @if (canFollow) {
+        <app-follow-button
+          [username]="profile.username"
+          [count]="profile.followers"
+          (followerCountChanged)="followerCount.set($event)">
+        </app-follow-button>
+      }
       @if (canReport) {
         <button
           type="button"
@@ -134,7 +134,7 @@
   @if (isOwnProfile) {
     <div class="mt-6 flex justify-center sm:justify-end">
       @if (isEditing) {
-        <div class="flex items-wrap items-center justify-center gap-3">
+        <div class="flex flex-wrap items-center justify-center gap-3">
           <button
             type="button"
             class="inline-flex h-10 items-center justify-center rounded-lg bg-slate-700 px-4 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:opacity-50"
