@@ -317,7 +317,7 @@ class ProjectPostServiceTest {
                 .content("content")
                 .build();
 
-        var actor = new AuditActor(authorId, "Alice");
+        var actor = new AuditActor(authorId, "Alice", "alice@example.com");
 
         when(projectPostRepository.findById(postEntity.getId())).thenReturn(Optional.of(postEntity));
 
@@ -337,7 +337,7 @@ class ProjectPostServiceTest {
                 .content("content")
                 .build();
 
-        var actor = new AuditActor(authorId, "Alice");
+        var actor = new AuditActor(authorId, "Alice", "alice@example.com");
 
         when(projectPostRepository.findById(postEntity.getId())).thenReturn(Optional.of(postEntity));
 
