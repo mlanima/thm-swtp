@@ -26,6 +26,35 @@ describe('renderGithubReadme', () => {
     expect(html).toContain('src="https://raw.githubusercontent.com/mlanima/thm-swtp/main/docs/logo.png"');
   });
 
+  it('rewrites a relative srcset on a <source> inside a <picture>', () => {
+    // A matched <source media="..."> wins over the <img> src and does not fall back on load
+    // error, so a srcset left relative breaks the image (common light/dark logo pattern).
+    const markdown =
+      '<picture>\n' +
+      '  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/logo-dark.png">\n' +
+      '  <img src="docs/assets/logo-light.png" alt="logo">\n' +
+      '</picture>';
+    const html = renderGithubReadme(markdown, 'mlanima', 'thm-swtp', 'developer', CURRENT_PATH);
+
+    expect(html).toContain(
+      'srcset="https://raw.githubusercontent.com/mlanima/thm-swtp/developer/docs/assets/logo-dark.png"',
+    );
+    expect(html).toContain(
+      'src="https://raw.githubusercontent.com/mlanima/thm-swtp/developer/docs/assets/logo-light.png"',
+    );
+  });
+
+  it('rewrites each candidate of a multi-entry srcset, keeping descriptors and absolute URLs', () => {
+    const markdown = '<img src="logo.png" srcset="logo.png 1x, ./logo@2x.png 2x, https://example.com/logo.png 3x">';
+    const html = renderGithubReadme(markdown, 'mlanima', 'thm-swtp', 'main', CURRENT_PATH);
+
+    expect(html).toContain(
+      'srcset="https://raw.githubusercontent.com/mlanima/thm-swtp/main/logo.png 1x, ' +
+        'https://raw.githubusercontent.com/mlanima/thm-swtp/main/logo@2x.png 2x, ' +
+        'https://example.com/logo.png 3x"',
+    );
+  });
+
   it('rewrites a relative link to an absolute github.com blob URL', () => {
     const html = renderGithubReadme('[docs](docs/guide.md)', 'mlanima', 'thm-swtp', 'develop', CURRENT_PATH);
 
