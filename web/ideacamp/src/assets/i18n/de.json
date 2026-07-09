@@ -835,6 +835,17 @@
     "AUTHOR_PREFIX": "Von",
     "UNKNOWN_AUTHOR": "Unbekannt",
     "LOAD_MORE": "Mehr laden",
+    "DRAFTS": "Entwürfe",
+    "ARCHIVED": "Archiviert",
+    "SAVE_DRAFT": "Als Entwurf speichern",
+    "ARCHIVE_POST": "Post archivieren",
+    "ARCHIVING": "Wird archiviert...",
+    "PUBLISHED": "Veröffentlicht",
+    "EDIT_POST": "Post bearbeiten",
+    "UPDATE_DRAFT": "Entwurf aktualisieren",
+    "PUBLISH_DRAFT": "Entwurf veröffentlichen",
+    "RESTORE_POST": "Post wiederherstellen",
+    "PUBLISHING": "Wird veröffentlicht...",
     "ERRORS": {
       "LOAD": "Posts konnten nicht geladen werden.",
       "EMPTY_FIELDS": "Titel und Inhalt dürfen nicht leer sein.",
@@ -842,7 +853,9 @@
       "DELETE": "Post konnte nicht gelöscht werden.",
       "IMAGE_TYPE": "Bitte wähle ein Bild im Format JPG, PNG oder WEBP aus.",
       "IMAGE_SIZE": "Das Bild darf maximal 5 MB groß sein.",
-      "IMAGE_UPLOAD": "Der Post wurde erstellt, aber das Bild konnte nicht hochgeladen werden."
+      "IMAGE_UPLOAD": "Der Post wurde erstellt, aber das Bild konnte nicht hochgeladen werden.",
+      "ARCHIVE": "Der Post konnte nicht archiviert werden.",
+      "PUBLISH": "Der Post konnte nicht veröffentlicht werden."
     },
     "PLAIN_TEXT": "Klartext",
     "MARKDOWN_HINT": "Du kannst Markdown verwenden, z.B. Überschriften, Listen, Links und Hervorhebungen.",

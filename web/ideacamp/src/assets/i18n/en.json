@@ -835,6 +835,17 @@
     "AUTHOR_PREFIX": "By",
     "UNKNOWN_AUTHOR": "Unknown",
     "LOAD_MORE": "Load more",
+    "DRAFTS": "Drafts",
+    "ARCHIVED": "Archived",
+    "SAVE_DRAFT": "Save as draft",
+    "ARCHIVE_POST": "Archive post",
+    "ARCHIVING": "Archiving...",
+    "PUBLISHED": "Published",
+    "EDIT_POST": "Edit post",
+    "UPDATE_DRAFT": "Update draft",
+    "PUBLISH_DRAFT": "Publish draft",
+    "RESTORE_POST": "Restore post",
+    "PUBLISHING": "Publishing...",
     "ERRORS": {
       "LOAD": "Posts could not be loaded.",
       "EMPTY_FIELDS": "Title and content must not be empty.",
@@ -842,7 +853,9 @@
       "DELETE": "Post could not be deleted.",
       "IMAGE_TYPE": "Please select an image in JPG, PNG or WEBP format.",
       "IMAGE_SIZE": "The image must not be larger than 5 MB.",
-      "IMAGE_UPLOAD": "The post was created, but the image could not be uploaded."
+      "IMAGE_UPLOAD": "The post was created, but the image could not be uploaded.",
+      "ARCHIVE": "The post could not be archived.",
+      "PUBLISH": "The post could not be published."
     },
     "PLAIN_TEXT": "Plain text",
     "MARKDOWN_HINT": "You can use Markdown, e.g. headings, lists, links and emphasis.",
