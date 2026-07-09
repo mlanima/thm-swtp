@@ -51,7 +51,7 @@ export class AuditLogsComponent implements OnInit {
     this.auditLogsService.getAuditLogs({ page, size: PAGE_SIZE }).subscribe({
       next: (pageResponse) => {
         this.auditLogs.set(pageResponse.content);
-        this.currentPage.set(pageResponse.number);
+        this.currentPage.set(page);
         this.totalPages.set(pageResponse.totalPages);
         this.totalElements.set(pageResponse.totalElements);
         this.isLoading.set(false);
