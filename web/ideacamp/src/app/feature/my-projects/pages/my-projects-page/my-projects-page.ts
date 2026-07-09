@@ -4,6 +4,7 @@ import { MyProjectsService } from '../../services/my-projects.service';
 import { ProjectResponse } from '../../../../models/project.model';
 import { AuthService } from '../../../auth/auth.service';
 import { SearchService } from '../../../search/services/search.service';
+import { UserProfileService } from '../../../../services/user-profile.service';
 import { ProjectFilter } from '../../components/project-filter/project-filter';
 import { ProjectList } from '../../components/project-list/project-list';
 import { InvitationsSection } from '../../components/invitations-section/invitations-section';
@@ -20,6 +21,7 @@ export class MyProjectsPage implements OnInit {
   private readonly myProjectsService = inject(MyProjectsService);
   private readonly authService = inject(AuthService);
   private readonly searchService = inject(SearchService);
+  private readonly userProfileService = inject(UserProfileService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly translateService = inject(TranslateService);
   readonly projects = signal<ProjectResponse[]>([]);
@@ -28,9 +30,19 @@ export class MyProjectsPage implements OnInit {
   readonly errorMessage = signal('');
   readonly projectTags = signal<Map<string, string[]>>(new Map());
   readonly activeFilter = signal<'my' | 'all'>('my');
+  readonly isProfessor = signal(false);
 
   ngOnInit(): void {
-    this.authService.waitUntilAuthReady().then(() => this.loadProjects());
+    this.authService.waitUntilAuthReady().then(() => {
+      this.loadProjects();
+      this.loadIsProfessor();
+    });
+  }
+
+  private loadIsProfessor(): void {
+    this.userProfileService.getMyProfile().subscribe({
+      next: (profile) => this.isProfessor.set(profile.isProfessor),
+    });
   }
 
   setFilter(filter: 'my' | 'all'): void {

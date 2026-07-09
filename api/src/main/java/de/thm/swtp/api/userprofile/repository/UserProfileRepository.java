@@ -31,4 +31,5 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, UUID> 
     boolean existsByKeycloakIdAndStatus(UUID keycloakId, UserStatus status);
 
     Optional<UserProfile> findByKeycloakId(UUID keycloakId);
+    Optional<UserProfile> findByDiscordId(String discordId);
 }

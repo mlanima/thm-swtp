@@ -2,8 +2,12 @@ package de.thm.swtp.api.project;
 
 
 import de.thm.swtp.api.common.TxLogger;
+import de.thm.swtp.api.discord.entity.LinkedChannelEntity;
+import de.thm.swtp.api.discord.repository.LinkedChannelRepository;
+import de.thm.swtp.api.discord.service.DiscordNotificationService;
 import de.thm.swtp.api.exceptionhandling.exceptions.InvalidProjectManagementSortFieldException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectMemberNotFoundException;
+import de.thm.swtp.api.moderation.ContentModerationService;
 import de.thm.swtp.api.project.dto.request.*;
 import de.thm.swtp.api.project.dto.response.*;
 import de.thm.swtp.api.project.exception.*;
@@ -11,6 +15,7 @@ import de.thm.swtp.api.projectInvitation.domain.ProjectInviteStatus;
 import de.thm.swtp.api.projectInvitation.repository.ProjectInviteRepository;
 import de.thm.swtp.api.projectInvitation.service.ProjectInviteService;
 import de.thm.swtp.api.projectFavorite.repository.ProjectFavoriteRepository;
+import de.thm.swtp.api.projectGithubRepo.repository.ProjectGithubRepoRepository;
 import de.thm.swtp.api.projectJoinRequest.repository.ProjectJoinRequestRepository;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.projectView.entity.ProjectViewEntity;
@@ -26,6 +31,8 @@ import java.time.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,12 +43,16 @@ public class ProjectService {
 
     private final ProjectRepository projectRepository;
     private final UserProfileRepository userProfileRepository;
+    private final ContentModerationService contentModerationService;
     private final ProjectInviteService projectInviteService;
     private final ProjectInviteRepository projectInviteRepository;
     private final ProjectJoinRequestRepository projectJoinRequestRepository;
     private static final String PROJECT_CREATION_INVITE_MESSAGE = "You have been invited to join this project.";
     private final ProjectFavoriteRepository projectFavoriteRepository;
     private final ProjectViewRepository projectViewRepository;
+private final LinkedChannelRepository linkedChannelRepository;
+    private final DiscordNotificationService discordNotificationService;
+    private final ProjectGithubRepoRepository projectGithubRepoRepository;
     private static final Set<String> MANAGED_PROJECT_SORT_FIELDS = Set.of("name", "owner.username", "createdAt", "updatedAt", "isPrivateProject");
 
     private ProjectResponse toResponse(ProjectEntity project) {
@@ -55,6 +66,17 @@ public class ProjectService {
             contributors++;
         }
 
+        LinkedChannelEntity channel = linkedChannelRepository.findByProjectId(project.getId()).orElse(null);
+
+        boolean isContributor = false;
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+            UUID currentUserId = UUID.fromString(auth.getName());
+            boolean isOwner = project.getOwner() != null && project.getOwner().getKeycloakId().equals(currentUserId);
+            boolean isMember = memberIds.contains(currentUserId);
+            isContributor = isOwner || isMember;
+        }
+
         return ProjectResponse.builder()
                 .id(project.getId())
                 .name(project.getName())
@@ -65,6 +87,11 @@ public class ProjectService {
                 .allowJoinRequests(project.isAllowJoinRequests())
                 .ownerId(project.getOwner().getKeycloakId())
                 .ownerUsername(project.getOwner().getUsername())
+                .ownerDiscordId(project.getOwner().getDiscordId())
+                .ownerDiscordUsername(project.getOwner().getDiscordUsername())
+                .discordChannelId(channel != null && channel.isActive() ? channel.getDiscordChannelId() : null)
+                .discordGuildId(channel != null ? channel.getDiscordGuildId() : null)
+                .discordInviteUrl(channel != null && channel.isActive() && isContributor ? channel.getDiscordInviteUrl() : null)
                 .memberIds(project.getMembers().stream()
                         .map(UserProfile::getKeycloakId)
                         .collect(java.util.stream.Collectors.toSet()))
@@ -83,10 +110,13 @@ public class ProjectService {
 
     @Transactional
     public ProjectResponse createProject(CreateProjectRequest request, UUID currentUserId) {
-
         if (projectRepository.existsByName(request.name())) {
             throw new ExceptionProjectResponse(request.name());
         }
+
+        contentModerationService.assertAppropriate(request.name(), "name");
+        contentModerationService.assertAppropriate(request.description(), "description");
+        contentModerationService.assertAppropriate(request.shortDescription(), "shortDescription");
 
         UserProfile owner = userProfileRepository.findById(currentUserId)
                 .orElseThrow(() -> new UserProfileNotFoundException(currentUserId.toString()));
@@ -101,6 +131,7 @@ public class ProjectService {
             if (projectRepository.existsByProjectUrl(request.projectUrl())) {
                 throw new ExceptionProjectUrlAlreadyExists(request.projectUrl());
             }
+            contentModerationService.assertAppropriate(request.projectUrl(), "projectUrl");
             projectUrl = request.projectUrl();
         }
 
@@ -172,7 +203,7 @@ public class ProjectService {
                 .build();
     }
     @Transactional
-    public ProjectResponse getProject(UUID projectId) {
+    public ProjectResponse getProject(UUID projectId, UUID viewerId) {
 
         ProjectEntity project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ExceptionProjectNotFound(projectId));
@@ -181,17 +212,13 @@ public class ProjectService {
             throw new ExceptionProjectAlreadyDeleted(projectId);
         }
 
-        projectViewRepository.save(
-                ProjectViewEntity.builder()
-                        .project(project)
-                        .build()
-        );
+        recordView(project, viewerId);
 
         return toResponse(project);
     }
 
     @Transactional
-    public ProjectResponse getProjectByUrl(String projectUrl) {
+    public ProjectResponse getProjectByUrl(String projectUrl, UUID viewerId) {
 
         ProjectEntity project = projectRepository.findByProjectUrl(projectUrl)
                 .orElseThrow(() -> new ProjectNotFoundByUrlException(projectUrl));
@@ -200,13 +227,23 @@ public class ProjectService {
             throw new ExceptionProjectAlreadyDeleted(project.getId());
         }
 
+        recordView(project, viewerId);
+
+        return toResponse(project);
+    }
+
+    private void recordView(ProjectEntity project, UUID viewerId) {
+        UserProfile viewer = userProfileRepository.findById(viewerId).orElse(null);
+        if (viewer == null) {
+            log.warn("No UserProfile found for viewer={}, recording anonymous view for project={}",
+                    viewerId, project.getId());
+        }
         projectViewRepository.save(
                 ProjectViewEntity.builder()
                         .project(project)
+                        .user(viewer)
                         .build()
         );
-
-        return toResponse(project);
     }
 
     @Transactional
@@ -231,12 +268,15 @@ public class ProjectService {
         }
 
         if (request.getName() != null) {
+            contentModerationService.assertAppropriate(request.getName(), "name");
             project.setName(request.getName());
         }
         if (request.getDescription() != null) {
+            contentModerationService.assertAppropriate(request.getDescription(), "description");
             project.setDescription(request.getDescription());
         }
         if (request.getShortDescription() != null) {
+            contentModerationService.assertAppropriate(request.getShortDescription(), "shortDescription");
             project.setShortDescription(request.getShortDescription());
         }
         if (request.getProjectUrl() != null) {
@@ -247,6 +287,7 @@ public class ProjectService {
                     projectRepository.existsByProjectUrl(request.getProjectUrl())) {
                 throw new ExceptionProjectUrlAlreadyExists(request.getProjectUrl());
             }
+            contentModerationService.assertAppropriate(request.getProjectUrl(), "projectUrl");
             project.setProjectUrl(request.getProjectUrl());
         }
         project.setPrivateProject(request.isPrivateProject());
@@ -270,6 +311,31 @@ public class ProjectService {
     public List<ProjectResponse> getProjectsByUsername(String username) {
         return projectRepository.findAllByOwnerUsernameAndDeletedAtIsNullOrderByCreatedAtDesc(username)
                 .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    @Transactional
+    public List<ProjectResponse> getRecentProjectsByUsername(String username, UUID viewerId) {
+        List<ProjectEntity> projects =
+                projectRepository.findAllByOwnerOrMemberUsernameAndDeletedAtIsNull(username);
+
+        if (projects.isEmpty()) {
+            return List.of();
+        }
+
+        List<UUID> projectIds = projects.stream().map(ProjectEntity::getId).toList();
+        Map<UUID, LocalDateTime> lastViewedByProjectId = projectViewRepository
+                .findLastViewedByUserAndProjectIdIn(viewerId, projectIds)
+                .stream()
+                .collect(java.util.stream.Collectors.toMap(
+                        ProjectViewRepository.ProjectLastViewed::getProjectId,
+                        ProjectViewRepository.ProjectLastViewed::getLastViewedAt));
+
+        return projects.stream()
+                .sorted(Comparator.comparing(
+                        (ProjectEntity p) -> lastViewedByProjectId.getOrDefault(p.getId(), LocalDateTime.MIN))
+                        .reversed())
                 .map(this::toResponse)
                 .toList();
     }
@@ -326,6 +392,7 @@ public class ProjectService {
 
         projectEntity.getMembers().remove(member);
         projectRepository.save(projectEntity);
+        discordNotificationService.notifyMemberLeft(projectId, projectEntity.getName(), member.getUsername());
         TxLogger.afterCommit(log, "Project member removed: project={}, member={}", projectId, memberId);
     }
 
@@ -351,6 +418,11 @@ public class ProjectService {
                 .orElseThrow(() -> new ProjectOwnerTransferToNonMemberException(newOwnerId, projectId));
 
         projectInviteRepository.deleteByProjectIdAndStatus(projectId, ProjectInviteStatus.PENDING);
+
+        // The linked repo's GitHub API calls run on the linker's token, not the project
+        // owner's — unlinking forces the new owner to explicitly re-link with their own
+        // account rather than silently inheriting a former owner's GitHub credentials.
+        projectGithubRepoRepository.deleteByProjectId(projectId);
 
         project.getMembers().add(project.getOwner());
         project.getMembers().remove(newOwnerProfile);

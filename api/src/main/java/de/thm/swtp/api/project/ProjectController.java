@@ -51,16 +51,18 @@ public class ProjectController {
     @GetMapping("/{projectId}")
     @PreAuthorize("@security.canViewProject(#projectId, authentication)")
     public ResponseEntity<ProjectResponse> getProject(
-            @PathVariable UUID projectId) {
-        ProjectResponse response = projectService.getProject(projectId);
+            @PathVariable UUID projectId,
+            @AuthenticationPrincipal Jwt jwt) {
+        ProjectResponse response = projectService.getProject(projectId, UUID.fromString(jwt.getSubject()));
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/by-url/{projectUrl}")
     @PreAuthorize("@security.canViewProjectByUrl(#projectUrl, authentication)")
     public ResponseEntity<ProjectResponse> getProjectByUrl(
-            @PathVariable String projectUrl) {
-        ProjectResponse response = projectService.getProjectByUrl(projectUrl);
+            @PathVariable String projectUrl,
+            @AuthenticationPrincipal Jwt jwt) {
+        ProjectResponse response = projectService.getProjectByUrl(projectUrl, UUID.fromString(jwt.getSubject()));
         return ResponseEntity.ok(response);
     }
 

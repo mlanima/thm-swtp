@@ -10,8 +10,12 @@ public record UserProfileResponse(
         String email,
         String title,
         String location,
+        String placeId,
         int followers,
         String about,
         String experience,
-        boolean isProfessor
+        boolean isProfessor,
+        String discordId,
+        String discordUsername,
+        String discordAvatar
 ) {}
