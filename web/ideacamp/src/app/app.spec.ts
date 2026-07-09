@@ -5,6 +5,7 @@ import { OAuthService } from 'angular-oauth2-oidc';
 import { App } from './app';
 import { AuthService } from './feature/auth/auth.service';
 import { ProjectInvitationService } from './feature/my-projects/services/project-invitation.service';
+import { UserProfileService } from './services/user-profile.service';
 import { provideTranslateTesting } from './testing/translate-testing.provider';
 
 describe('App', () => {
@@ -34,6 +35,10 @@ describe('App', () => {
         {
           provide: ProjectInvitationService,
           useValue: { getInvitations: () => of([]) },
+        },
+        {
+          provide: UserProfileService,
+          useValue: { getMyProfile: () => of({ isProfessor: false }) },
         },
       ],
       imports: [App],

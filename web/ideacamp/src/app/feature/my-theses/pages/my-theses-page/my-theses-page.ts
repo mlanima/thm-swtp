@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { ThesisService } from '../../../thesis-site/thesis.service';
+import { MyThesesService } from '../../services/my-theses.service';
 import { ThesisResponse } from '../../../../models/thesis.model';
 import { AuthService } from '../../../auth/auth.service';
 import { ThesisList } from '../../components/thesis-list/thesis-list';
@@ -14,7 +14,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MyThesesPage implements OnInit {
-  private readonly thesisService = inject(ThesisService);
+  private readonly myThesesService = inject(MyThesesService);
   private readonly authService = inject(AuthService);
   private readonly translateService = inject(TranslateService);
   readonly theses = signal<ThesisResponse[]>([]);
@@ -39,7 +39,7 @@ export class MyThesesPage implements OnInit {
     this.isLoading.set(true);
     this.errorMessage.set('');
 
-    this.thesisService.getMyTheses(username).subscribe({
+    this.myThesesService.getMyTheses(username).subscribe({
       next: (theses) => {
         this.theses.set(theses);
         this.isLoading.set(false);

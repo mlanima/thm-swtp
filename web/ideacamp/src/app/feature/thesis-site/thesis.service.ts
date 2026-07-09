@@ -44,10 +44,4 @@ export class ThesisService {
   thesisUrlExists(thesisUrl: string) {
     return this.http.get<boolean>(`${this.baseUrl}/url-exists/${encodeURIComponent(thesisUrl)}`);
   }
-
-  getMyTheses(username: string): Observable<ThesisResponse[]> {
-    return this.http.get<ThesisResponse[]>(
-      `${environment.apiUrl}/v1/users/${encodeURIComponent(username)}/theses`,
-    );
-  }
 }

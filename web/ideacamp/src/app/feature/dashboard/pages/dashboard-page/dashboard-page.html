@@ -31,7 +31,13 @@
         }
 
         @if (isProfessor()) {
-          <app-current-theses [theses]="theses()" />
+          @if (isThesesLoading()) {
+            <div class="rounded-2xl bg-white p-6 text-sm text-slate-400 shadow-sm">
+              {{ 'DASHBOARD.THESES.LOADING' | translate }}
+            </div>
+          } @else {
+            <app-current-theses [theses]="theses()" />
+          }
         }
       </div>
     </div>
