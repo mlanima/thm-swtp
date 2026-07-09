@@ -22,8 +22,6 @@ import { MarkdownPipe } from '../../../../shared/pipes/markdown.pipe';
 import { SuccessModal } from '../../../../shared/success-modal/success-modal';
 
 type ProjectPostContentFormat = 'PLAIN_TEXT' | 'MARKDOWN';
-type ProjectPostView = 'published' | 'drafts' | 'archived';
-type ProjectPostStatus = 'PUBLISHED' | 'DRAFT';
 
 @Component({
   selector: 'app-project-posts',
@@ -66,11 +64,6 @@ export class ProjectPosts implements OnChanges, OnDestroy {
   imagePreviewUrl = signal<string | null>(null);
   postImageUrls = signal<Record<string, string>>({});
 
-  postView = signal<ProjectPostView>('published');
-  archivingPostId = signal<string | null>(null);
-  editingPostId = signal<string | null>(null);
-  publishingPostId = signal<string | null>(null);
-
   @ViewChild('postContentInput')
   postContentInput?: ElementRef<HTMLTextAreaElement>;
 
@@ -99,14 +92,7 @@ export class ProjectPosts implements OnChanges, OnDestroy {
   loadPosts(): void {
     this.isLoading.set(true);
 
-    const request =
-      this.postView() === 'drafts'
-        ? this.projectService.getProjectPostDrafts(this.project.id)
-        : this.postView() === 'archived'
-          ? this.projectService.getProjectPostArchived(this.project.id)
-          : this.projectService.getProjectPosts(this.project.id);
-
-    request.subscribe({
+    this.projectService.getProjectPosts(this.project.id).subscribe({
       next: (posts) => {
         this.clearPostImageUrls();
         this.posts.set(posts);
@@ -133,7 +119,7 @@ export class ProjectPosts implements OnChanges, OnDestroy {
     if (!nextValue) { this.resetCreateForm(); }
   }
 
-  createPost(status: ProjectPostStatus = 'PUBLISHED'): void {
+  createPost(): void {
     const title = this.title().trim();
     const content = this.content().trim();
 
@@ -145,34 +131,27 @@ export class ProjectPosts implements OnChanges, OnDestroy {
     this.isCreating.set(true);
 
     const image = this.selectedImage();
-    const editingPostId = this.editingPostId();
 
-    const request = {
+    this.projectService.createProjectPost(this.project.id, {
       title,
       content,
       contentFormat: this.contentFormat(),
-      status,
-    };
-
-    const saveRequest = editingPostId
-      ? this.projectService.updateProjectPost(this.project.id, editingPostId, request)
-      : this.projectService.createProjectPost(this.project.id, request);
-
-    saveRequest.pipe(
-      switchMap((savedPost) => {
+      status: 'PUBLISHED',
+    }).pipe(
+      switchMap((createdPost) => {
         if (!image) {
-          return of(savedPost);
+          return of(createdPost);
         }
 
         return this.projectService.uploadProjectPostImage(
           this.project.id,
-          savedPost.id,
+          createdPost.id,
           image
         ).pipe(
           catchError(() => {
             this.toastService.error(this.translateService.instant('PROJECTPOSTS.ERRORS.IMAGE_UPLOAD'));
 
-            return of(savedPost);
+            return of(createdPost);
           })
         );
       }),
@@ -180,10 +159,15 @@ export class ProjectPosts implements OnChanges, OnDestroy {
         this.isCreating.set(false);
       })
     ).subscribe({
-      next: () => {
+      next: (createdOrUpdatedPost) => {
+        this.posts.update((posts) => [createdOrUpdatedPost, ...posts]);
+
+        if (createdOrUpdatedPost.imageUrl) {
+          this.loadPostImage(createdOrUpdatedPost);
+        }
+
         this.resetCreateForm();
         this.showCreateForm.set(false);
-        this.loadPosts();
       },
       error: () => {
         this.toastService.error(this.translateService.instant('PROJECTPOSTS.ERRORS.CREATE'));
@@ -310,7 +294,6 @@ export class ProjectPosts implements OnChanges, OnDestroy {
     this.title.set('');
     this.content.set('');
     this.contentFormat.set('MARKDOWN');
-    this.editingPostId.set(null);
     this.selectedImage.set(null);
     this.revokeImagePreviewUrl();
 
@@ -368,59 +351,5 @@ export class ProjectPosts implements OnChanges, OnDestroy {
     });
 
     this.postImageUrls.set({});
-  }
-
-  setPostView(view: ProjectPostView): void {
-    this.postView.set(view);
-    this.showCreateForm.set(false);
-    this.resetCreateForm();
-    this.loadPosts();
-  }
-
-  archivePost(postId: string): void {
-    if (this.archivingPostId()) {
-      return;
-    }
-
-    this.archivingPostId.set(postId);
-
-    this.projectService.archiveProjectPost(this.project.id, postId).subscribe({
-      next: () => {
-        this.posts.update((posts) => posts.filter((post) => post.id !== postId));
-        this.archivingPostId.set(null);
-      },
-      error: () => {
-        this.toastService.error(this.translateService.instant('PROJECTPOSTS.ERRORS.ARCHIVE'));
-        this.archivingPostId.set(null);
-      },
-    });
-  }
-
-  editPost(post: ProjectPostResponse): void {
-    this.removeSelectedImage();
-    this.editingPostId.set(post.id);
-    this.title.set(post.title);
-    this.content.set(post.content);
-    this.contentFormat.set(post.contentFormat);
-    this.showCreateForm.set(true);
-  }
-
-  publishPost(postId: string): void {
-    if (this.publishingPostId()) {
-      return;
-    }
-
-    this.publishingPostId.set(postId);
-
-    this.projectService.publishProjectPost(this.project.id, postId).subscribe({
-      next: () => {
-        this.posts.update((posts) => posts.filter((post) => post.id !== postId));
-        this.publishingPostId.set(null);
-      },
-      error: () => {
-        this.toastService.error(this.translateService.instant('PROJECTPOSTS.ERRORS.PUBLISH'));
-        this.publishingPostId.set(null);
-      },
-    });
   }
 }

@@ -77,26 +77,13 @@ public class DiscordEventPublisher {
     }
 
     public void publishPostDeleted(UUID postId, String discordMsgId) {
-        messageSyncRepository.findByDiscordMessageId(discordMsgId).ifPresentOrElse(
-            sync -> {
-                send("POST_DELETED", Map.of(
-                        "postId", postId.toString(),
-                        "discordMsgId", sync.getDiscordMessageId(),
-                        "channelId", sync.getDiscordChannelId()
-                ));
-                log.info("Discord delete event sent: postId={}, discordMsgId={}", postId, discordMsgId);
-            },
-            () -> log.info("Discord delete skipped — no sync record found: postId={}, discordMsgId={}", postId, discordMsgId)
-        );
-    }
-
-    public void publishDirectDelete(UUID postId, String discordMsgId, String channelId) {
-        send("POST_DELETED", Map.of(
-                "postId", postId.toString(),
-                "discordMsgId", discordMsgId,
-                "channelId", channelId
-        ));
-        log.info("Discord direct delete sent: postId={}, discordMsgId={}", postId, discordMsgId);
+        messageSyncRepository.findByPlatformPostId(postId).ifPresent(sync -> {
+            send("POST_DELETED", Map.of(
+                    "postId", postId.toString(),
+                    "discordMsgId", sync.getDiscordMessageId(),
+                    "channelId", sync.getDiscordChannelId()
+            ));
+        });
     }
 
     public void publishProjectInvite(UUID inviteId, String targetDiscordId, String projectName, String inviterName) {

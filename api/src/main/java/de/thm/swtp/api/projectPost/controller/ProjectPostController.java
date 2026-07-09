@@ -33,23 +33,6 @@ public class ProjectPostController {
                 .toList();
     }
 
-    @GetMapping("/drafts")
-    @PreAuthorize("@security.canCreateProjectPost(#projectId, authentication)")
-    public List<ProjectPostResponse> getDraftPosts(@PathVariable UUID projectId) {
-        return projectPostService.getDraftPostsForProject(projectId)
-                .stream()
-                .map(ProjectPostResponse::toResponse)
-                .toList();
-    }
-
-    @GetMapping("/archived")
-    @PreAuthorize("@security.canCreateProjectPost(#projectId, authentication)")
-    public List<ProjectPostResponse> getArchivedPosts(@PathVariable UUID projectId) {
-        return projectPostService.getArchivedPostsForProject(projectId)
-                .stream()
-                .map(ProjectPostResponse::toResponse)
-                .toList();
-    }
 
     @PostMapping
     @PreAuthorize("@security.canCreateProjectPost(#projectId, authentication)")
@@ -92,25 +75,6 @@ public class ProjectPostController {
     ) {
         return ProjectPostResponse.toResponse(
                 projectPostService.uploadPostImage(projectId, postId, image)
-        );
-    }
-
-    @PutMapping("/{postId}")
-    @PreAuthorize("@security.canEditProjectPost(#projectId, #postId, authentication)")
-    public ProjectPostResponse updatePost(
-            @PathVariable UUID projectId,
-            @PathVariable UUID postId,
-            @Valid @RequestBody CreateProjectPostRequest request
-    ) {
-        return ProjectPostResponse.toResponse(
-                projectPostService.updateProjectPost(
-                        projectId,
-                        postId,
-                        request.title(),
-                        request.content(),
-                        request.contentFormat(),
-                        request.status()
-                )
         );
     }
 

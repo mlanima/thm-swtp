@@ -22,8 +22,6 @@ async function ensureGroup(): Promise<void> {
   }
 }
 
-const RETRY_DELAY_MS = 1000;
-
 const eventToJob: Record<string, string> = {
   POST_CREATED: 'sendPost',
   POST_UPDATED: 'editPost',
@@ -92,16 +90,6 @@ async function processBatch(): Promise<void> {
     }
   } catch (err) {
     logger.error({ err }, 'stream consumer error');
-
-    if (err instanceof Error && err.message.includes('NOGROUP')) {
-      try {
-        await ensureGroup();
-      } catch {
-        logger.error({ err }, 'failed to recreate consumer group');
-      }
-    }
-
-    await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
   }
 }
 

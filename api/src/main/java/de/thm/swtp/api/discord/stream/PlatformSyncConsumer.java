@@ -42,7 +42,6 @@ public class PlatformSyncConsumer {
     private final LinkedChannelRepository linkedChannelRepository;
     private final ProjectPostRepository projectPostRepository;
     private final UserProfileRepository userProfileRepository;
-    private final DiscordEventPublisher discordEventPublisher;
     private final ObjectMapper objectMapper;
 
     private String consumerName;
@@ -258,20 +257,8 @@ public class PlatformSyncConsumer {
             return;
         }
 
-        UUID postUuid = UUID.fromString(postId);
-        boolean postExistsAndPublished = projectPostRepository.findById(postUuid)
-                .map(post -> post.getStatus() == ProjectPostStatus.PUBLISHED)
-                .orElse(false);
-
-        if (!postExistsAndPublished) {
-            log.warn("Post {} no longer published — deleting orphaned Discord message {}",
-                    postId, discordMsgId);
-            discordEventPublisher.publishDirectDelete(postUuid, discordMsgId, channelId);
-            return;
-        }
-
         DiscordMessageSyncEntity sync = DiscordMessageSyncEntity.builder()
-                .platformPostId(postUuid)
+                .platformPostId(UUID.fromString(postId))
                 .discordMessageId(discordMsgId)
                 .discordChannelId(channelId)
                 .discordGuildId(guildId)

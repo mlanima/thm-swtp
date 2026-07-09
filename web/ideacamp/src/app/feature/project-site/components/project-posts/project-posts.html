@@ -1,5 +1,5 @@
 <section class="rounded-2xl bg-white p-6 shadow-sm">
-  <div class="mb-5 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+  <div class="mb-5 flex items-center justify-between gap-4">
     <div>
       <h2 class="text-lg font-semibold text-slate-700">
         Posts
@@ -10,65 +10,18 @@
     </div>
 
     @if (canCreatePosts) {
-      <div class="flex flex-wrap items-center gap-2">
-        <button
-          type="button"
-          class="rounded-md border px-4 py-2 text-sm font-medium transition"
-          [class.border-lime-500]="postView() === 'published'"
-          [class.bg-lime-50]="postView() === 'published'"
-          [class.text-lime-700]="postView() === 'published'"
-          [class.border-slate-200]="postView() !== 'published'"
-          [class.text-slate-500]="postView() !== 'published'"
-          (click)="setPostView('published')"
-        >
-          {{ 'PROJECTPOSTS.PUBLISHED' | translate }}
-        </button>
-
-        <button
-          type="button"
-          class="rounded-md border px-4 py-2 text-sm font-medium transition"
-          [class.border-lime-500]="postView() === 'drafts'"
-          [class.bg-lime-50]="postView() === 'drafts'"
-          [class.text-lime-700]="postView() === 'drafts'"
-          [class.border-slate-200]="postView() !== 'drafts'"
-          [class.text-slate-500]="postView() !== 'drafts'"
-          (click)="setPostView('drafts')"
-        >
-          {{ 'PROJECTPOSTS.DRAFTS' | translate }}
-        </button>
-
-        <button
-          type="button"
-          class="rounded-md border px-4 py-2 text-sm font-medium transition"
-          [class.border-lime-500]="postView() === 'archived'"
-          [class.bg-lime-50]="postView() === 'archived'"
-          [class.text-lime-700]="postView() === 'archived'"
-          [class.border-slate-200]="postView() !== 'archived'"
-          [class.text-slate-500]="postView() !== 'archived'"
-          (click)="setPostView('archived')"
-        >
-          {{ 'PROJECTPOSTS.ARCHIVED' | translate }}
-        </button>
-
-        <button
-          type="button"
-          class="flex h-10 w-10 items-center justify-center rounded-md bg-lime-500 text-lg font-semibold text-white transition hover:bg-lime-600"
-          [attr.aria-label]="showCreateForm() ? ('COMMON.CANCEL' | translate) : ('PROJECTPOSTS.ADD_POST' | translate)"
-          [title]="showCreateForm() ? ('COMMON.CANCEL' | translate) : ('PROJECTPOSTS.ADD_POST' | translate)"
-          (click)="toggleCreateForm()"
-        >
-          @if (showCreateForm()) {
-            <i class="pi pi-times"></i>
-          } @else {
-            <i class="pi pi-plus"></i>
-          }
-        </button>
-      </div>
+      <button
+        type="button"
+        class="rounded-md bg-lime-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-lime-600"
+        (click)="toggleCreateForm()"
+      >
+        {{ showCreateForm() ? ('COMMON.CANCEL' | translate) : ('PROJECTPOSTS.ADD_POST' | translate) }}
+      </button>
     }
   </div>
 
   @if (showCreateForm()) {
-    <form class="mb-6 space-y-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
+    <form class="mb-6 space-y-4 rounded-xl border border-slate-200 bg-slate-50 p-4" (ngSubmit)="createPost()">
       <div>
         <label for="postTitle" class="text-xs font-medium text-slate-500">
           {{ 'PROJECTPOSTS.TITLE_LABEL' | translate }}
@@ -236,25 +189,13 @@
         </div>
       </div>
 
-      <div class="flex flex-wrap gap-2">
-        <button
-          type="button"
-          [disabled]="isCreating()"
-          class="rounded-md border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 disabled:opacity-50"
-          (click)="createPost('DRAFT')"
-        >
-          {{ editingPostId() ? ('PROJECTPOSTS.UPDATE_DRAFT' | translate) : ('PROJECTPOSTS.SAVE_DRAFT' | translate) }}
-        </button>
-
-        <button
-          type="button"
-          [disabled]="isCreating()"
-          class="rounded-md bg-lime-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-lime-600 disabled:opacity-50"
-          (click)="createPost('PUBLISHED')"
-        >
-          {{ isCreating() ? ('PROJECTPOSTS.CREATING' | translate) : (editingPostId() ? ('PROJECTPOSTS.PUBLISH_DRAFT' | translate) : ('PROJECTPOSTS.PUBLISH' | translate)) }}
-        </button>
-      </div>
+      <button
+        type="submit"
+        [disabled]="isCreating()"
+        class="rounded-md bg-lime-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-lime-600 disabled:opacity-50"
+      >
+        {{ isCreating() ? ('PROJECTPOSTS.CREATING' | translate) : ('PROJECTPOSTS.PUBLISH' | translate) }}
+      </button>
     </form>
   }
 
@@ -289,49 +230,6 @@
                 </p>
               }
 
-              @if (canCreatePosts && postView() === 'drafts') {
-                <button
-                  type="button"
-                  class="rounded-md p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
-                  [attr.aria-label]="'PROJECTPOSTS.EDIT_POST' | translate"
-                  [title]="'PROJECTPOSTS.EDIT_POST' | translate"
-                  (click)="editPost(post)"
-                >
-                  <i class="pi pi-pencil"></i>
-                </button>
-              }
-
-              @if (canCreatePosts && postView() === 'published') {
-                <button
-                  type="button"
-                  class="rounded-md p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
-                  [disabled]="archivingPostId() === post.id"
-                  [attr.aria-label]="'PROJECTPOSTS.ARCHIVE_POST' | translate"
-                  [title]="'PROJECTPOSTS.ARCHIVE_POST' | translate"
-                  (click)="archivePost(post.id)">
-                  @if (archivingPostId() === post.id) {
-                    <span class="text-xs"> {{ 'PROJECTPOSTS.ARCHIVING' | translate }} </span>
-                  } @else {
-                    <i class="pi pi-folder"></i>
-                  }
-                </button>
-              }
-
-              @if (canCreatePosts && postView() === 'archived') {
-                <button
-                  type="button"
-                  class="rounded-md p-1 text-slate-400 transition hover:bg-lime-50 hover:text-lime-600 disabled:cursor-not-allowed disabled:opacity-50"
-                  [disabled]="publishingPostId() === post.id"
-                  [attr.aria-label]="'PROJECTPOSTS.RESTORE_POST' | translate"
-                  [title]="'PROJECTPOSTS.RESTORE_POST' | translate"
-                  (click)="publishPost(post.id)">
-                  @if (publishingPostId() === post.id) {
-                    <span class="text-xs"> {{ 'PROJECTPOSTS.PUBLISHING' | translate }} </span>
-                  } @else {
-                    <i class="pi pi-undo"></i>
-                  }
-                </button>
-              }
               @if (canReportPosts) {
                 <button
                   type="button"
@@ -362,7 +260,10 @@
           </div>
 
           @if (post.contentFormat === 'MARKDOWN') {
-            <div class="mt-4" [innerHTML]="post.content | markdown"></div>
+            <div
+              class="mt-4"
+              [innerHTML]="post.content | markdown">
+            </div>
           } @else {
             <p class="mt-4 whitespace-pre-line text-sm leading-6 text-slate-500">
               {{ post.content }}
