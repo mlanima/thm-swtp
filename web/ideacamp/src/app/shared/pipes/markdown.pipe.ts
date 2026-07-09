@@ -10,9 +10,17 @@ export class MarkdownPipe implements PipeTransform {
       return '';
     }
 
-    const lines = this.escapeHtml(value).split(/\r?\n/);
+    const lines = value.split(/\r?\n/);
     let html = '';
     let isListOpen = false;
+    let isFirstBlock = true;
+    let paragraphLines: string[] = [];
+
+    const topMargin = (base: string) => {
+      const cls = isFirstBlock ? '' : `${base} `;
+      isFirstBlock = false;
+      return cls;
+    };
 
     const closeList = () => {
       if (isListOpen) {
@@ -21,17 +29,30 @@ export class MarkdownPipe implements PipeTransform {
       }
     };
 
+    const flushParagraph = () => {
+      if (paragraphLines.length === 0) {
+        return;
+      }
+
+      const content = paragraphLines.map((paragraphLine) => this.renderInline(paragraphLine)).join('<br>');
+      html += `<p class="${topMargin('mt-3')}text-sm leading-6 text-slate-500">${content}</p>`;
+      paragraphLines = [];
+    };
+
     for (const line of lines) {
       const trimmed = line.trim();
 
       if (!trimmed) {
+        flushParagraph();
         closeList();
         continue;
       }
 
       if (trimmed.startsWith('- ')) {
+        flushParagraph();
+
         if (!isListOpen) {
-          html += '<ul class="mt-3 list-disc space-y-1 pl-5">';
+          html += `<ul class="${topMargin('mt-3')}list-disc space-y-1 pl-5">`;
           isListOpen = true;
         }
 
@@ -42,35 +63,40 @@ export class MarkdownPipe implements PipeTransform {
       closeList();
 
       if (trimmed.startsWith('### ')) {
-        html += `<h4 class="mt-4 text-sm font-semibold text-slate-700">${this.renderInline(trimmed.slice(4))}</h4>`;
+        flushParagraph();
+        html += `<h4 class="${topMargin('mt-4')}text-sm font-semibold text-slate-700">${this.renderInline(trimmed.slice(4))}</h4>`;
         continue;
       }
 
       if (trimmed.startsWith('## ')) {
-        html += `<h3 class="mt-4 text-base font-semibold text-slate-700">${this.renderInline(trimmed.slice(3))}</h3>`;
+        flushParagraph();
+        html += `<h3 class="${topMargin('mt-4')}text-base font-semibold text-slate-700">${this.renderInline(trimmed.slice(3))}</h3>`;
         continue;
       }
 
       if (trimmed.startsWith('# ')) {
-        html += `<h2 class="mt-4 text-lg font-semibold text-slate-700">${this.renderInline(trimmed.slice(2))}</h2>`;
+        flushParagraph();
+        html += `<h2 class="${topMargin('mt-4')}text-lg font-semibold text-slate-700">${this.renderInline(trimmed.slice(2))}</h2>`;
         continue;
       }
 
       if (trimmed.startsWith('> ')) {
-        html += `<blockquote class="mt-3 border-l-4 border-slate-300 pl-3 text-slate-500 italic">${this.renderInline(trimmed.slice(2))}</blockquote>`;
+        flushParagraph();
+        html += `<blockquote class="${topMargin('mt-3')}border-l-4 border-slate-300 pl-3 text-slate-500 italic">${this.renderInline(trimmed.slice(2))}</blockquote>`;
         continue;
       }
 
-      html += `<p class="mt-3 text-sm leading-6 text-slate-500">${this.renderInline(trimmed)}</p>`;
+      paragraphLines.push(trimmed);
     }
 
+    flushParagraph();
     closeList();
 
     return html;
   }
 
   private renderInline(value: string): string {
-    return value
+    return this.escapeHtml(value)
       .replace(/\*\*(.+?)\*\*/g, '<strong class="font-semibold text-slate-700">$1</strong>')
       .replace(/\*(.+?)\*/g, '<em class="italic">$1</em>')
       .replace(

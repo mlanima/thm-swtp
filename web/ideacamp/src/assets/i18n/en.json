@@ -122,6 +122,7 @@
     "UNFOLLOW": "Unfollow",
     "INVITE": "Invite",
     "PROFESSOR_BADGE": "Professor",
+    "MARKDOWN_HINT": "You can use Markdown, e.g. headings, lists, links and emphasis.",
     "DISCORD_SHOW": "Username",
     "DISCORD_COPIED": "Copied!"
   },
@@ -475,6 +476,7 @@
     "DESCRIPTION": "Description",
     "DESCRIPTION_PLACEHOLDER": "Describe your project in detail",
     "NO_DESCRIPTION": "No project description",
+    "MARKDOWN_HINT": "You can use Markdown, e.g. headings, lists, links and emphasis.",
     "PROJECT_URL": "Project URL",
     "PROJECT_URL_LABEL": "Project URL (Your project will be available at /project/your-input)",
     "PROJECT_URL_PLACEHOLDER": "e.g. my-project",

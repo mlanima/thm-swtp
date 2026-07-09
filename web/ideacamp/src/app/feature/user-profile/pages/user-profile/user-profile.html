@@ -48,6 +48,10 @@
                   [(ngModel)]="editForm.about">
                 </textarea>
 
+                <p class="mt-1 text-xs text-slate-400">
+                  {{ 'USERPROFILE.MARKDOWN_HINT' | translate }}
+                </p>
+
                 <div class="mt-6 flex gap-3">
                   <button
                     type="button"
@@ -90,6 +94,10 @@
                   class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
                   [(ngModel)]="editForm.experience">
                 </textarea>
+
+                <p class="mt-1 text-xs text-slate-400">
+                  {{ 'USERPROFILE.MARKDOWN_HINT' | translate }}
+                </p>
 
                 <div class="mt-6 flex gap-3">
                   <button
