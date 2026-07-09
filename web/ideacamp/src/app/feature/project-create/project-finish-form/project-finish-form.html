@@ -32,8 +32,8 @@
 
       <div>
         <p class="font-medium text-slate-600">{{ 'PROJECTCREATE.DESCRIPTION' | translate }}:</p>
-        @if (projectData.description) {
-          <div class="max-h-32 max-w-full overflow-y-auto" [innerHTML]="projectData.description | markdown"></div>
+        @if (projectData().description) {
+          <div class="max-h-32 max-w-full overflow-y-auto" [innerHTML]="projectData().description | markdown"></div>
         } @else {
           <p>{{ 'PROJECTCREATE.NO_DESCRIPTION' | translate }}</p>
         }
