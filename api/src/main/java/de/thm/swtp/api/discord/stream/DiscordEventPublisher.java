@@ -77,13 +77,17 @@ public class DiscordEventPublisher {
     }
 
     public void publishPostDeleted(UUID postId, String discordMsgId) {
-        messageSyncRepository.findByPlatformPostId(postId).ifPresent(sync -> {
-            send("POST_DELETED", Map.of(
-                    "postId", postId.toString(),
-                    "discordMsgId", sync.getDiscordMessageId(),
-                    "channelId", sync.getDiscordChannelId()
-            ));
-        });
+        messageSyncRepository.findByDiscordMessageId(discordMsgId).ifPresentOrElse(
+            sync -> {
+                send("POST_DELETED", Map.of(
+                        "postId", postId.toString(),
+                        "discordMsgId", sync.getDiscordMessageId(),
+                        "channelId", sync.getDiscordChannelId()
+                ));
+                log.info("Discord delete event sent: postId={}, discordMsgId={}", postId, discordMsgId);
+            },
+            () -> log.info("Discord delete skipped — no sync record found: postId={}, discordMsgId={}", postId, discordMsgId)
+        );
     }
 
     public void publishProjectInvite(UUID inviteId, String targetDiscordId, String projectName, String inviterName) {

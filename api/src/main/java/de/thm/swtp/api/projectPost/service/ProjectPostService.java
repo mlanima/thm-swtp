@@ -209,7 +209,10 @@ public class ProjectPostService {
         UUID imageFileId = postEntity.getImageFileId();
 
         discordPostSyncService.getDiscordMessageId(postId).ifPresent(
-                discordMsgId -> discordEventPublisher.publishPostDeleted(postId, discordMsgId));
+                discordMsgId -> {
+                    discordEventPublisher.publishPostDeleted(postId, discordMsgId);
+                    discordPostSyncService.removeSync(postId);
+                });
 
         projectPostRepository.delete(postEntity);
 
