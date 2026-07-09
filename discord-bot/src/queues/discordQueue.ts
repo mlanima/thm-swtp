@@ -29,7 +29,8 @@ export function startDiscordWorker(): Worker {
         case 'editPost':
           return handleEditPost(job);
         case 'deletePost':
-          return handleDeletePost(job);
+          logger.info({ discordMsgId: job.data.discordMsgId }, 'deletePost skipped (temporarily disabled)');
+          return;
         case 'sendInvite':
           return handleSendInvite(job);
         case 'sendEvent':
