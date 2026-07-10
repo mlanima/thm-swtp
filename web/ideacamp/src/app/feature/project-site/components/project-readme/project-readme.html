@@ -1,6 +1,18 @@
 @if (html(); as content) {
-  <div class="rounded-2xl bg-white p-6 shadow-sm">
-    <h2 class="mb-4 text-lg font-semibold text-slate-700">README</h2>
-    <div class="readme-content" [innerHTML]="content"></div>
+  <div class="rounded-2xl bg-white shadow-sm">
+    <button
+      type="button"
+      (click)="toggle()"
+      class="flex w-full items-center justify-between rounded-2xl p-6 text-left"
+      [attr.aria-expanded]="expanded()"
+    >
+      <h2 class="text-lg font-semibold text-slate-700">README</h2>
+      <i class="pi text-slate-400" [class]="expanded() ? 'pi-chevron-up' : 'pi-chevron-down'"></i>
+    </button>
+    <div class="readme-collapsible" [class.expanded]="expanded()">
+      <div class="readme-collapsible-inner px-6 pb-6">
+        <div class="readme-content" [innerHTML]="content"></div>
+      </div>
+    </div>
   </div>
 }

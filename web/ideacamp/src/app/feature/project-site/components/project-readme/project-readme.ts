@@ -24,6 +24,11 @@ export class ProjectReadme implements OnInit {
   projectId = input.required<string>();
 
   readonly html = signal<SafeHtml | null>(null);
+  readonly expanded = signal(true);
+
+  toggle(): void {
+    this.expanded.update((value) => !value);
+  }
 
   ngOnInit(): void {
     if (!isPlatformBrowser(this.platformId)) {
