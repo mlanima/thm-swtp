@@ -3,6 +3,7 @@ import { AuthService } from '../../feature/auth/auth.service';
 import { SidebarService } from './sidebar.service';
 import { ProjectInvitationService } from '../../feature/my-projects/services/project-invitation.service';
 import { UserProfileService } from '../../services/user-profile.service';
+import { MyThesesService } from '../../feature/my-theses/services/my-theses.service';
 import { of } from 'rxjs';
 
 import { SidebarComponent } from './sidebar.component';
@@ -18,9 +19,18 @@ describe('SidebarComponent', () => {
 
     await TestBed.configureTestingModule({
       providers: [
-        { provide: AuthService, useValue: { logout: () => logoutCalls++, waitUntilAuthReady: () => Promise.resolve(), isModerator: () => false } },
+        {
+          provide: AuthService,
+          useValue: {
+            logout: () => logoutCalls++,
+            waitUntilAuthReady: () => Promise.resolve(),
+            isModerator: () => false,
+            username: () => 'test-user',
+          },
+        },
         { provide: ProjectInvitationService, useValue: { getInvitations: () => of([]) } },
         { provide: UserProfileService, useValue: { getMyProfile: () => of({ isProfessor: false }) } },
+        { provide: MyThesesService, useValue: { getMyTheses: () => of([]) } },
       ],
       imports: [SidebarComponent],
     }).compileComponents();
