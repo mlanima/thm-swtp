@@ -54,7 +54,7 @@ public class ThesisService {
 
     @Transactional(readOnly = true)
     public List<Thesis> getThesesByUsername(String username) {
-        return thesisRepository.findBySupervisorUsername(username)
+        return thesisRepository.findBySupervisorUsernameOrStudentUsername(username)
                 .stream()
                 .map(ThesisMapper::toDomain)
                 .toList();

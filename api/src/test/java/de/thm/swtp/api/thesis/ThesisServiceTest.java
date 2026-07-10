@@ -112,6 +112,19 @@ class ThesisServiceTest {
                 .hasMessageContaining(thesisId.toString());
     }
 
+    // --- getThesesByUsername ---
+
+    @Test
+    void getThesesByUsername_returnsThesesWhereUserIsSupervisorOrStudent() {
+        when(thesisRepository.findBySupervisorUsernameOrStudentUsername("student"))
+                .thenReturn(java.util.List.of(thesisEntity));
+
+        java.util.List<Thesis> result = thesisService.getThesesByUsername("student");
+
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst().getId()).isEqualTo(thesisId);
+    }
+
     // --- getByUrl ---
 
     @Test

@@ -23,6 +23,10 @@ public interface ThesisRepository extends JpaRepository<ThesisEntity, UUID> {
     @Query("SELECT t FROM theses t JOIN FETCH t.supervisor WHERE t.supervisor.username = :username")
     List<ThesisEntity> findBySupervisorUsername(@Param("username") String username);
 
+    @Query("SELECT DISTINCT t FROM theses t JOIN FETCH t.supervisor LEFT JOIN t.students s "
+            + "WHERE t.supervisor.username = :username OR s.username = :username")
+    List<ThesisEntity> findBySupervisorUsernameOrStudentUsername(@Param("username") String username);
+
     Optional<ThesisEntity> findByThesisUrl(String thesisUrl);
 
     boolean existsByTitle(String title);
