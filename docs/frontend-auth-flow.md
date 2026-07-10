@@ -1,6 +1,6 @@
 # Frontend Auth Flow
 
-> **Last updated:** 2026-06-23
+> **Last updated:** 2026-07-10
 
 This document describes the authentication and role-based flow in the Angular frontend.
 
@@ -10,13 +10,14 @@ The `AuthService` is the central service for OIDC authentication via Keycloak.
 
 ### Reactive State Signals
 
-| Signal | Type | Description |
-|--------|------|-------------|
-| `isLoggedIn` | `WritableSignal<boolean>` | True when a valid access token is present |
-| `isLoggingOut` | `WritableSignal<boolean>` | True during the logout process |
-| `isModerator` | `WritableSignal<boolean>` | True when the user has the Keycloak realm role `MODERATOR` |
-| `user` | `WritableSignal<User \| null>` | Minimal authenticated user (`username`, `id`) |
-| `username` | `WritableSignal<string>` | Convenience signal for the current username |
+| Signal            | Type                                          | Description |
+|-------------------|-----------------------------------------------|----------|
+| `isLoggedIn`      | `WritableSignal<boolean>`                     | True when a valid access token is present |
+| `isLoggingOut`    | `WritableSignal<boolean>`                     | True during the logout process |
+| `isModerator`     | `WritableSignal<boolean>`                     | True when the user has the Keycloak realm role `MODERATOR` |
+| `user`            | `WritableSignal<User \| null>`                | Minimal authenticated user (`username`, `id`) |
+| `username`        | `WritableSignal<string>`                      | Convenience signal for the current username |
+| `currentBanStatus` | `WriteableSignal<UserBanStatusModel \| null>` | Loads ban status for the current user |
 
 ### Role Detection
 
@@ -49,8 +50,11 @@ export function decodeJwtPayload(token: string): Record<string, unknown> | null 
 Used by routes intended for regular (non-moderator) users.
 
 - Waits for auth to be ready (discovery document loaded, token restored).
-- Redirects to `/impressum` if the user is currently logging out.
+- Redirects to `/landing` if the user is currently logging out.
 - Redirects to the Keycloak login if not authenticated.
+- Stores the originally requested route in `sessionStorage` as `postLoginRedirectUrl`.
+- Loads the current ban status for the authenticated user.
+- Redirects banned users to /account-banned
 - Allows access for authenticated regular users.
    - **Redirects moderators** to `/moderator` — moderators may not access regular user pages.
 
@@ -63,18 +67,33 @@ Used by the `/moderator` route to restrict access to moderators only.
 - Redirects to `/landing` if authenticated but not a moderator (`isModerator()` is `false`).
 - Allows access only if `isModerator()` is `true`.
 
+
+### `bannedAccountGuard` (`banned-account.guard.ts`)
+
+Used by the route `/account-banned` for banned users.
+
+- Waits for auth to be ready.
+- Redirects to Keycloak login if not authenticated.
+- Loads the current ban status.
+- Access only when the user is currently banned.
+- Redirects non-banned users to `/landing`
+
 ## Post-Login Flow (`success.component.ts`)
 
 The `/success` route is the OIDC redirect target after login. The component:
 
 1. Waits for auth to be ready.
-2. Redirects to `/impressum` if authentication failed.
-3. **If the user is a moderator** (`isModerator()` is `true`):
+2. Redirects to `/landing` if authentication failed.
+3. Reads `postLoginRedirectUrl` from `sessionStorage`.
+4. **If the user is a moderator** (`isModerator()` is `true`):
    - Redirects to `/moderator` immediately.
    - Does **not** call `getMyProfile()`, so no `UserProfile` is created for moderators.
-4. **If the user is a regular user**:
+5. **If the user is a regular user**:
    - Calls `getMyProfile()` to create or synchronize the user profile.
-   - The user stays on the success page (the UI shows a welcome message).
+   - Shows onboarding tutorial if not completed yet, otherwise the user will be redirected to `/dashboard`.
+6. **If the user is banned**:
+   - Redirects to `/account-banned` immediately.
+   - All other routes are blocked. The banned user can only log out.
 
 ## Routes
 
