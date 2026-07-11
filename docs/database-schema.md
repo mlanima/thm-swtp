@@ -1,6 +1,9 @@
 # Database Documentation
 ## Overview
 
+## Relationships
+- [Entity Relationships](#entity-relationships)
+
 ## Table overview
 #### User Profile
 - [User profile](#user_profiles)
@@ -41,8 +44,7 @@
 - [Discord channel settings](#discord_channel_settings)
 - [Discord message sync](#discord_message_sync)
 
-## Relationships
-- [Entity Relationships](#entity-relationships)
+
 
 
 
