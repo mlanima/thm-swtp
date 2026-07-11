@@ -1,10 +1,10 @@
 # Database Documentation
 ## Overview
 
-## Relationships
+### Relationships
 - [Entity Relationships](#entity-relationships)
 
-## Table overview
+### Table overview
 #### User Profile
 - [User profile](#user_profiles)
 - [User profile tags](#user_profile_tags)
@@ -25,13 +25,13 @@
 #### Tags
 - [Tags](#tags)
 
-#### Professor
+#### Professor Features
 - [Professor Requests](#professor_requests)
 - [Theses](#theses)
 - [Thesis Tags](#thesis_tags)
 - [Thesis Students](#thesis_students)
 
-#### Moderator
+#### Moderation
 - [Reports](#reports)
 - [Audit Log](#audit_logs)
 
@@ -50,7 +50,7 @@
 
 
 ## Entity Relationships
-````text
+```text
 user_profiles
   |-- 1:N --> projects (owner_keycloak_id)
   |-- N:N --> projects (via project_members)
@@ -81,7 +81,7 @@ projects
 
 linked_channels
   |-- 1:0..1 --> discord_channel_settings
-````
+```
 
 
 
@@ -114,13 +114,7 @@ moderation status, onboarding state and optional Discord account metadata.
 | `discord_avatar`       | varchar(100) | yes  | /                   | Discord-Avatar reference                                             |
 | `discord_connected_at` |     datetime | yes  | /                   | Timestamp when the Discord account was connected                     |
 
-**Business Rules**:
-- Profiles are created or synced from the authenticated Keycloak user.
-- `username` and `email` are synchronized from the JWT data when the profile is loaded / created.
-- Profile text fields are checked by the content moderation service before updating the content.
-- `location` must be paired with a valid `place_id`
-- Banning a user sets the `status`, `ban_reason` and `banned_at`, and writes an audit log entry.
-- Unbanning a user sets the `status` back to `ACTIVE` and clears ban metadata.
+
 
 ### `user_profile_tags`
 
@@ -131,10 +125,7 @@ Join-table for user-profile tags.
 | `user_profile_keycloak_id`   |        UUID |  no  | FK -> `user_profiles.keycloak_id`   | ID of the user profile that uses the tag |
 | `tag_name`                   | varchar(30) |  no  | FK -> `tags.name`                   | Name of the tag                          |
 
-**Business Rules**:
-- Profile can have many tags
-- Tag can be used by many profiles
-- Tags can only be updated or deleted by their owning profile
+
 
 ### `user_profile_links`
 
@@ -151,10 +142,7 @@ Stores external links shown on the user profile (e.g. GitHub, LinkedIn).
 
 Unique Constraint: `UK_user_profile_links_profile_url(user_profile_keycloak_id, url)`.
 
-**Business Rules**:
-- Profiles cannot store the same URL twice
-- Label and URL are trimmed before saving
-- Links can only be updated or deleted by their owning profile
+
 
 ### `user_follows`
 
@@ -164,15 +152,12 @@ Stores follow relationships between user profiles.
 |-------------------------|---------:|:----:|------------------------------------------------|-------------------------------|
 | `id`                    |     UUID |  no  | PK, generated                                  | Follow-ID                     |
 | `follower_keycloak_id`  |     UUID |  no  | FK -> `user_profiles.keycloak_id`, unique pair | User who follows another user |
-| `following_keycloak_id` |     UUID |  no  | FK -> `user_profiles.keycloak_id`, unique pair | User beeing followed          |
+| `following_keycloak_id` |     UUID |  no  | FK -> `user_profiles.keycloak_id`, unique pair | User being followed           |
 | `created_at`            | datetime |  no  | auto on insert                                 | Follow timestamp              |
 
 Unique Constraint: `(follower_keycloak_id, following_keycloak_id)`.
 
-**Business Rules*:
-- Users cannot follow themselves
-- A user can follow another user once
-- Creating increments and deleting decrements `user_profiles.followers`
+
 
 
 ### `projects`
@@ -181,7 +166,7 @@ optional members, posts, links, tags, favorites, views and optional integrations
 
 | Column                 |         Type | Null | Constraints/Default               | Description                             |
 |------------------------|-------------:|:----:|-----------------------------------|-----------------------------------------|
-| `id`                   |       UUID   |  no  | PK                                | Project-ID                              |
+| `id`                   |         UUID |  no  | PK                                | Project-ID                              |
 | `name`                 |  varchar(20) |  no  | unique project name               | Project name                            |
 | `description`          | varchar(500) | yes  | /                                 | Description                             |
 | `short_description`    | varchar(200) | yes  | /                                 | Short description                       |
@@ -194,12 +179,6 @@ optional members, posts, links, tags, favorites, views and optional integrations
 | `created_at`           |     datetime |  no  | auto on insert                    | Creation timestamp                      |
 | `updated_at`           |     datetime |  no  | auto on update                    | Update timestamp                        |
 
-**Business Rules:*
-- Project names and URL slugs are unique
-- Project name, URL slug, description and short description are checked by content moderation
-- Project owners cannot invite themselves to the project
-  - Ownership can only be transferred to a project member
-- 
 
 ### `project_posts`
 
@@ -260,7 +239,7 @@ Favorite projects. Users can add a project as a favorite.
 
 | Column             |     Type | Null | Constraints/Default                            | Description        |
 |--------------------|---------:|:----:|------------------------------------------------|--------------------|
-| `id`               |     UUID |  no  | PK, generated                                  | Favorit-ID         |
+| `id`               |     UUID |  no  | PK, generated                                  | Favorite-ID        |
 | `user_keycloak_id` |     UUID |  no  | FK -> `user_profiles.keycloak_id`, unique pair | ID of the user     |
 | `project_id`       |     UUID |  no  | FK -> `projects.id`, unique pair               | ID of the project  |
 | `created_at`       | datetime |  no  | auto on insert                                 | Creation timestamp |
@@ -438,7 +417,7 @@ Audit-log for moderation purpose.
 
 ### `github_connections`
 
-Ein verbundenes GitHub-Konto pro Keycloak-User. Der Code modelliert keine direkte JPA-Beziehung zu `user_profiles`.
+One connected GitHub account per user profile.
 
 | Column                   |         Type | Null | Constraints/Default                              | Description           |
 |--------------------------|-------------:|:----:|--------------------------------------------------|-----------------------|
