@@ -342,16 +342,16 @@ Views on a project.
 
 Uploaded files of a project.
 
-| Column          |         Type | Null | Constraints/Default | Description                     |
-|-----------------|-------------:|:----:|---------------------|---------------------------------|
-| `id`            |         UUID |  no  | PK, generated       | File-ID                         | 
-| `project_id`    |         UUID |  no  | FK -> `projects.id` | Project-ID                      |
-| `original_name` | varchar(255) |  no  | /                   | Original file name              |
-| `storage_name`  | varchar(255) |  no  | unique              | Name of the file in the storage |
-| `mime_type`     | varchar(100) |  no  | /                   | MIME-Type                       |
-| `size_bytes`    |       bigint |  no  | /                   | File size                       |
-| `created_at`    |     datetime |  no  | auto on insert      | Upload timestamp                |
-| `visibility`    |         enum |  no  | default `PUBLIC`    | `PRIVATE`, `PUBLIC`, `INTERNAL` |
+| Column          |         Type | Null | Constraints/Default   | Description                     |
+|-----------------|-------------:|:----:|-----------------------|---------------------------------|
+| `id`            |         UUID |  no  | PK, generated         | File-ID                         | 
+| `project_id`    |         UUID |  no  | FK -> `projects.id`   | Project-ID                      |
+| `original_name` | varchar(255) |  no  | /                     | Original file name              |
+| `storage_name`  | varchar(255) |  no  | unique                | Name of the file in the storage |
+| `mime_type`     | varchar(100) |  no  | /                     | MIME-Type                       |
+| `size_bytes`    |       bigint |  no  | /                     | File size                       |
+| `created_at`    |     datetime |  no  | set via `@PrePersist` | Upload timestamp                |
+| `visibility`    |         enum |  no  | default `PUBLIC`      | `PRIVATE`, `PUBLIC`, `INTERNAL` |
 
 ### `project_links`
 
@@ -381,6 +381,7 @@ Join-table for project tags.
 
 ### `project_members`
 Join-table for project members.
+
 | Column                     |    Type | Null | Constraints/Default               | Description            |
 |----------------------------|--------:|:----:|-----------------------------------|------------------------|
 | `project_id`               |    UUID |  no  | FK -> `projects.id`               | ID of the project      |
@@ -405,11 +406,11 @@ Request for professor rights.
 |---------------------------|--------------:|:----:|--------------------------------------|----------------------------------------------------------------------------|
 | `id`                      |          UUID |  no  | PK, generated                        | Request-ID                                                                 |
 | `requesting_user_id`      |          UUID |  no  | FK -> `user_profiles.keycloak_id`    | User-ID of the requestor                                                   |
-| `email`                   |  varchar(255) |  no  |                                      | Verification-E-Mail                                                        |
-| `email_verified_at`       |      datetime | yes  |                                      | Verification timestamp                                                     |
-| `verification_expires_at` |      datetime | yes  |                                      | Token expiration timestamp                                                 |
-| `verification_token_hash` |  varchar(255) | yes  |                                      | Hash of the token                                                          |
-| `text`                    | varchar(1000) |  no  |                                      | Reason why the requestor should receive professor rights.                  |
+| `email`                   |  varchar(255) |  no  | /                                    | Verification-E-Mail                                                        |
+| `email_verified_at`       |      datetime | yes  | /                                    | Verification timestamp                                                     |
+| `verification_expires_at` |      datetime | yes  | /                                    | Token expiration timestamp                                                 |
+| `verification_token_hash` |  varchar(255) | yes  | /                                    | Hash of the token                                                          |
+| `text`                    | varchar(1000) |  no  | /                                    | Reason why the requestor should receive professor rights.                  |
 | `created_at`              |      datetime |  no  | set via `@PrePersist`                | Creation timestamp                                                         |
 | `updated_at`              |      datetime |  no  | set via `@PreUpdate`                 | Update timestamp                                                           |
 | `status`                  |          enum |  no  | default `WAITING_EMAIL_VERIFICATION` | `WAITING_EMAIL_VERIFICATION`, `PENDING`, `ACCEPTED`, `REJECTED`, `EXPIRED` |
