@@ -26,6 +26,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -275,7 +276,7 @@ class ThesisServiceTest {
     void addStudent_addsStudent_whenValid() {
         when(thesisRepository.findById(thesisId)).thenReturn(Optional.of(thesisEntity));
         when(userProfileRepository.findById(studentId)).thenReturn(Optional.of(student));
-        when(thesisRepository.save(any())).thenReturn(thesisEntity);
+        when(thesisRepository.saveAndFlush(any())).thenReturn(thesisEntity);
 
         thesisService.addStudent(thesisId, studentId);
 
@@ -324,6 +325,18 @@ class ThesisServiceTest {
         when(thesisRepository.findById(thesisId)).thenReturn(Optional.of(thesisEntity));
         when(userProfileRepository.findById(studentId)).thenReturn(Optional.of(student));
         when(thesisRepository.existsByStudentsKeycloakId(studentId)).thenReturn(true);
+
+        assertThatThrownBy(() -> thesisService.addStudent(thesisId, studentId))
+                .isInstanceOf(ThesisStudentAlreadyAssignedElsewhereException.class);
+    }
+
+    @Test
+    void addStudent_throwsAlreadyAssignedElsewhere_onConcurrentRace() {
+        when(thesisRepository.findById(thesisId)).thenReturn(Optional.of(thesisEntity));
+        when(userProfileRepository.findById(studentId)).thenReturn(Optional.of(student));
+        when(thesisRepository.existsByStudentsKeycloakId(studentId)).thenReturn(false);
+        when(thesisRepository.saveAndFlush(any()))
+                .thenThrow(new DataIntegrityViolationException("unique constraint"));
 
         assertThatThrownBy(() -> thesisService.addStudent(thesisId, studentId))
                 .isInstanceOf(ThesisStudentAlreadyAssignedElsewhereException.class);

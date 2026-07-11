@@ -39,7 +39,7 @@ export class MyThesesPage implements OnInit {
   private markThesisNotificationsAsRead(): void {
     this.thesisNotificationService.markAllRead().subscribe({
       next: () => this.sidebarService.unreadThesisNotificationsCount.set(0),
-      error: () => {},
+      error: () => undefined,
     });
   }
 
