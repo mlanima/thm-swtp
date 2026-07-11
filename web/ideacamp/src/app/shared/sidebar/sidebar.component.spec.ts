@@ -4,6 +4,7 @@ import { SidebarService } from './sidebar.service';
 import { ProjectInvitationService } from '../../feature/my-projects/services/project-invitation.service';
 import { UserProfileService } from '../../services/user-profile.service';
 import { MyThesesService } from '../../feature/my-theses/services/my-theses.service';
+import { ThesisNotificationService } from '../../feature/my-theses/services/thesis-notification.service';
 import { of } from 'rxjs';
 
 import { SidebarComponent } from './sidebar.component';
@@ -31,6 +32,7 @@ describe('SidebarComponent', () => {
         { provide: ProjectInvitationService, useValue: { getInvitations: () => of([]) } },
         { provide: UserProfileService, useValue: { getMyProfile: () => of({ isProfessor: false }) } },
         { provide: MyThesesService, useValue: { getMyTheses: () => of([]) } },
+        { provide: ThesisNotificationService, useValue: { getUnreadCount: () => of({ count: 0 }) } },
       ],
       imports: [SidebarComponent],
     }).compileComponents();

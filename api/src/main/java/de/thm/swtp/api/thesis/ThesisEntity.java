@@ -56,10 +56,16 @@ public class ThesisEntity {
             name = "thesis_students",
             joinColumns = @JoinColumn(name = "thesis_id"),
             inverseJoinColumns = @JoinColumn(name = "user_profile_keycloak_id"),
-            uniqueConstraints = @UniqueConstraint(
-                    name = "UK_thesis_students",
-                    columnNames = {"thesis_id", "user_profile_keycloak_id"}
-            )
+            uniqueConstraints = {
+                    @UniqueConstraint(
+                            name = "UK_thesis_students",
+                            columnNames = {"thesis_id", "user_profile_keycloak_id"}
+                    ),
+                    @UniqueConstraint(
+                            name = "UK_thesis_students_student",
+                            columnNames = {"user_profile_keycloak_id"}
+                    )
+            }
     )
     @Builder.Default
     private Set<UserProfile> students = new HashSet<>();
