@@ -1,6 +1,7 @@
 package de.thm.swtp.api.thesis;
 
 import de.thm.swtp.api.tag.entity.TagEntity;
+import de.thm.swtp.api.thesis.notification.ThesisAssignmentNotificationEntity;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import jakarta.persistence.*;
 import lombok.*;
@@ -69,6 +70,10 @@ public class ThesisEntity {
     )
     @Builder.Default
     private Set<UserProfile> students = new HashSet<>();
+
+    @OneToMany(mappedBy = "thesis", orphanRemoval = true)
+    @Builder.Default
+    private List<ThesisAssignmentNotificationEntity> notifications = new ArrayList<>();
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

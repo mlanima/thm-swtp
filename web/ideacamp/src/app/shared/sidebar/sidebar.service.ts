@@ -6,7 +6,7 @@ import { Injectable, signal } from '@angular/core';
 export class SidebarService {
   isOpen = signal(false);
   pendingInvitationsCount = signal(0);
-  newThesesCount = signal(0);
+  unreadThesisNotificationsCount = signal(0);
 
   open() {
     this.isOpen.set(true);

@@ -1,5 +1,6 @@
 package de.thm.swtp.api.thesis;
 
+import de.thm.swtp.api.notification.event.ThesisStudentAddedEvent;
 import de.thm.swtp.api.tag.entity.TagEntity;
 import de.thm.swtp.api.tag.repository.TagRepository;
 import de.thm.swtp.api.thesis.domain.Thesis;
@@ -279,6 +280,7 @@ class ThesisServiceTest {
         thesisService.addStudent(thesisId, studentId);
 
         assertThat(thesisEntity.getStudents()).contains(student);
+        verify(eventPublisher).publishEvent(new ThesisStudentAddedEvent(thesisId, studentId));
     }
 
     @Test

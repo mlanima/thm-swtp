@@ -56,7 +56,7 @@ export class SidebarComponent {
               next: (theses) => this.hasTheses.set(theses.length > 0),
             });
             this.thesisNotificationService.getUnreadCount().subscribe({
-              next: (response) => this.sidebarService.newThesesCount.set(response.count),
+              next: (response) => this.sidebarService.unreadThesisNotificationsCount.set(response.count),
             });
           },
         });
