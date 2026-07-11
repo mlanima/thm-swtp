@@ -21,7 +21,5 @@ public interface ProjectPostRepository  extends JpaRepository<ProjectPostEntity,
 
     /** Checks if project posts exists for a given project.*/
     boolean existsByIdAndProjectId(UUID id, UUID projectId);
-
-    /** Returns the project post from a given project.*/
-    Optional<ProjectPostEntity> findByIdAndProjectId(UUID postId, UUID projectId);
+    
 }

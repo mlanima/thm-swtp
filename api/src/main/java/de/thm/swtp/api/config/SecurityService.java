@@ -51,6 +51,10 @@ public class SecurityService {
         return isProjectContributor(projectId, authentication) || isPublicProject(projectId);
     }
 
+    public boolean canViewAllProjects(Authentication authentication) {
+        return hasModeratorRole(authentication);
+    }
+
     /** Allowed to see project by url.*/
     public boolean canViewProjectByUrl(String projectUrl, Authentication authentication) {
         if (!hasAuthenticationContext(projectUrl, authentication)) {
