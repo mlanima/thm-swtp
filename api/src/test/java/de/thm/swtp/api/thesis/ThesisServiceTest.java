@@ -26,6 +26,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -110,6 +111,19 @@ class ThesisServiceTest {
         assertThatThrownBy(() -> thesisService.getById(thesisId))
                 .isInstanceOf(ThesisNotFoundByIdException.class)
                 .hasMessageContaining(thesisId.toString());
+    }
+
+    // --- getThesesByUsername ---
+
+    @Test
+    void getThesesByUsername_returnsThesesWhereUserIsSupervisorOrStudent() {
+        when(thesisRepository.findBySupervisorUsernameOrStudentUsername("student"))
+                .thenReturn(List.of(thesisEntity));
+
+        List<Thesis> result = thesisService.getThesesByUsername("student");
+
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst().getId()).isEqualTo(thesisId);
     }
 
     // --- getByUrl ---

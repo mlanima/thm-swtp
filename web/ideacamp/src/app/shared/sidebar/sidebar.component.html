@@ -109,7 +109,7 @@
                }
              </app-menu-link>
             </a>
-            @if (isProfessor()) {
+            @if (isProfessor() || hasTheses()) {
               <a routerLink="/my-theses" (click)="requestClose()">
               <app-menu-link>
                  <i class="pi pi-graduation-cap text-sm text-zinc-400"></i>
