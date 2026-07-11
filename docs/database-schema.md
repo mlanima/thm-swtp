@@ -1,10 +1,18 @@
 # Database Documentation
+
+This documentation describes the database schema including tables, columns, relationships, keys, constraints and defaults.
+The file and image storage is also described here.
 ## Overview
 
-### Relationships
-- [Entity Relationships](#entity-relationships)
+### Entity Relationship Models
+- [Users and Profiles](#users-and-profiles)
+- [Projects and Membership](#projects-and-membership)
+- [Project Content](#project-content)
+- [Theses](#thesis-relationships)
+- [Moderation](#moderation-relationships)
+- [GitHub and Discord Integrations](#github-and-discord-integrations)
 
-### Table overview
+### Tables
 #### User Profile
 - [User profile](#user_profiles)
 - [User profile tags](#user_profile_tags)
@@ -44,43 +52,115 @@
 - [Discord channel settings](#discord_channel_settings)
 - [Discord message sync](#discord_message_sync)
 
+### Storage
+- [Files and image storage](#file-and-image-storage)
 
 
 
+## Entity Relationship Models
 
+The database model is divided into several diagrams to keep individual
+relationships readable.
 
-## Entity Relationships
-```text
-user_profiles
-  |-- 1:N --> projects (owner_keycloak_id)
-  |-- N:N --> projects (via project_members)
-  |-- N:N --> tags (via user_profile_tags)
-  |-- 1:N --> user_profile_links
-  |-- 1:N --> user_follows (as follower)
-  |-- 1:N --> user_follows (as followed user)
-  |-- 1:N --> project_favorites
-  |-- 1:N --> project_views
-  |-- 1:N --> project_posts (author)
-  |-- 1:N --> reports (reporter)
-  |-- 1:N --> professor_requests
-  |-- 1:N --> theses (supervisor)
-  |-- N:N --> theses (via thesis_students)
+Logical references are not enforced through database foreign keys.
+Polymorphic references are documented in the corresponding table sections.
 
-projects
-  |-- N:N --> user_profiles (via project_members)
-  |-- N:N --> tags (via project_tags)
-  |-- 1:N --> project_posts
-  |-- 1:N --> project_invitations
-  |-- 1:N --> project_join_requests
-  |-- 1:N --> project_favorites
-  |-- 1:N --> project_views
-  |-- 1:N --> project_files
-  |-- 1:N --> project_links
-  |-- 1:0..1 --> project_github_repos
-  |-- 1:0..1 --> linked_channels
+### Users and Profiles
 
-linked_channels
-  |-- 1:0..1 --> discord_channel_settings
+```mermaid
+erDiagram
+    USER_PROFILES ||--o{ USER_PROFILE_LINKS : has
+
+    USER_PROFILES ||--o{ USER_PROFILE_TAGS : uses
+    TAGS ||--o{ USER_PROFILE_TAGS : assigned
+
+    USER_PROFILES ||--o{ USER_FOLLOWS : follower
+    USER_PROFILES ||--o{ USER_FOLLOWS : followed
+
+    USER_PROFILES ||--o{ PROFESSOR_REQUESTS : submits
+```
+
+### Projects and Membership
+
+```mermaid
+erDiagram
+    USER_PROFILES ||--o{ PROJECTS : owns
+
+    PROJECTS ||--o{ PROJECT_MEMBERS : has
+    USER_PROFILES ||--o{ PROJECT_MEMBERS : joins
+
+    PROJECTS ||--o{ PROJECT_INVITATIONS : has
+    USER_PROFILES ||--o{ PROJECT_INVITATIONS : receives
+
+    PROJECTS ||--o{ PROJECT_JOIN_REQUESTS : receives
+    USER_PROFILES ||--o{ PROJECT_JOIN_REQUESTS : submits
+
+    PROJECTS ||--o{ PROJECT_FAVORITES : receives
+    USER_PROFILES ||--o{ PROJECT_FAVORITES : creates
+
+    PROJECTS ||--o{ PROJECT_VIEWS : receives
+    USER_PROFILES o|--o{ PROJECT_VIEWS : creates
+```
+
+### Project Content
+
+```mermaid
+erDiagram
+    PROJECTS ||--o{ PROJECT_POSTS : contains
+    USER_PROFILES ||--o{ PROJECT_POSTS : authors
+
+    PROJECTS ||--o{ PROJECT_FILES : contains
+    PROJECTS ||--o{ PROJECT_LINKS : contains
+
+    PROJECTS ||--o{ PROJECT_TAGS : uses
+    TAGS ||--o{ PROJECT_TAGS : assigned
+
+    PROJECT_FILES o|--o| PROJECT_POSTS : "logical image reference"
+```
+
+### Thesis Relationships
+
+```mermaid
+erDiagram
+    USER_PROFILES ||--o{ THESES : supervises
+
+    THESES ||--o{ THESIS_STUDENTS : has
+    USER_PROFILES ||--o{ THESIS_STUDENTS : participates
+
+    THESES ||--o{ THESIS_TAGS : uses
+    TAGS ||--o{ THESIS_TAGS : assigned
+```
+
+### Moderation Relationships
+
+```mermaid
+erDiagram
+    USER_PROFILES ||--o{ REPORTS : submits
+    USER_PROFILES o|--o{ REPORTS : "logical reviewer"
+
+    USER_PROFILES o|--o{ AUDIT_LOGS : "logical actor"
+```
+
+The following polymorphic target references are not shown as direct
+relationships:
+
+- `reports.target_id` is interpreted according to `reports.report_target`.
+- `audit_logs.target_id` is interpreted according to
+  `audit_logs.target_type`.
+
+### GitHub and Discord Integrations
+
+```mermaid
+erDiagram
+    USER_PROFILES ||--o| GITHUB_CONNECTIONS : "logical account"
+
+    PROJECTS ||--o| PROJECT_GITHUB_REPOS : links
+    USER_PROFILES ||--o{ PROJECT_GITHUB_REPOS : "logical linking user"
+
+    PROJECTS ||--o| LINKED_CHANNELS : links
+    LINKED_CHANNELS ||--o| DISCORD_CHANNEL_SETTINGS : configures
+
+    PROJECT_POSTS ||--o{ DISCORD_MESSAGE_SYNC : "logical synchronization"
 ```
 
 
@@ -91,7 +171,7 @@ linked_channels
 Stores the application profile for a keycloak user. The profile contains public profile data,
 moderation status, onboarding state and optional Discord account metadata.
 
-| Column                 |        Type  | Null | Constraints/Default | Description                                                          |
+| Column                 |         Type | Null | Constraints/Default | Description                                                          |
 |------------------------|-------------:|:----:|---------------------|----------------------------------------------------------------------|
 | `keycloak_id`          |         UUID |  no  | PK                  | Keycloak-User-ID                                                     |
 | `username`             | varchar(255) |  no  | unique              | Public username                                                      |
@@ -184,21 +264,21 @@ optional members, posts, links, tags, favorites, views and optional integrations
 
 Posts from a project.
 
-| Column               |         Type | Null | Constraints/Default                 | Description                      |
-|----------------------|-------------:|:----:|-------------------------------------|----------------------------------|
-| `id`                 |         UUID |  no  | PK, generated                       | Post-ID                          |
-| `project_id`         |         UUID |  no  | FK -> `projects.id`                 | Project-ID                       |
-| `author_keycloak_id` |         UUID |  no  | FK -> `user_profiles.keycloak_id`   | Author                           |
-| `title`              | varchar(255) |  no  | /                                   | Title                            |
-| `content`            | varchar(255) |  no  | /                                   | Content                          |
-| `status`             |         enum |  no  | default `DRAFT`                     | `ARCHIVED`, `DRAFT`, `PUBLISHED` |
-| `content_format`     |         enum |  no  | default `PLAIN_TEXT`                | `MARKDOWN`, `PLAIN_TEXT`         |
-| `published_at`       |     datetime | yes  | /                                   | Publish timestamp                |
-| `archived_at`        |     datetime | yes  | /                                   | Archive timestamp                |
-| `created_at`         |     datetime |  no  | auto on insert                      | Creation timestamp               |
-| `updated_at`         |     datetime |  no  | auto on update                      | Update timestamp                 |
-| `image_url`          | varchar(255) | yes  | /                                   | URL of the image                 |
-| `image_file_id`      |         UUID | yes  | logische Ref. -> `project_files.id` | ID of the uploaded file          |
+| Column               |         Type | Null | Constraints/Default                     | Description                      |
+|----------------------|-------------:|:----:|-----------------------------------------|----------------------------------|
+| `id`                 |         UUID |  no  | PK, generated                           | Post-ID                          |
+| `project_id`         |         UUID |  no  | FK -> `projects.id`                     | Project-ID                       |
+| `author_keycloak_id` |         UUID |  no  | FK -> `user_profiles.keycloak_id`       | Author                           |
+| `title`              | varchar(255) |  no  | /                                       | Title                            |
+| `content`            | varchar(255) |  no  | /                                       | Content                          |
+| `status`             |         enum |  no  | default `DRAFT`                         | `ARCHIVED`, `DRAFT`, `PUBLISHED` |
+| `content_format`     |         enum |  no  | default `PLAIN_TEXT`                    | `MARKDOWN`, `PLAIN_TEXT`         |
+| `published_at`       |     datetime | yes  | /                                       | Publish timestamp                |
+| `archived_at`        |     datetime | yes  | /                                       | Archive timestamp                |
+| `created_at`         |     datetime |  no  | auto on insert                          | Creation timestamp               |
+| `updated_at`         |     datetime |  no  | auto on update                          | Update timestamp                 |
+| `image_url`          | varchar(255) | yes  | /                                       | URL of the image                 |
+| `image_file_id`      |         UUID | yes  | logical reference -> `project_files.id` | ID of the uploaded file          |
 
 
 ### `project_invitations`
@@ -314,7 +394,7 @@ Tag table.
 
 | Column   |          Type | Null | Constraints/Default | Description |
 |----------|--------------:|:----:|---------------------|-------------|
-| `name`   | varchar(30)   |  no  | PK                  | Tag-name    |
+| `name`   |   varchar(30) |  no  | PK                  | Tag-name    |
 
 
 ### `professor_requests`
@@ -382,35 +462,36 @@ Reports for moderation purpose.
 | `id`                   |         UUID |  no  | PK, generated                     | Report-ID                                    |
 | `reporter_id`          |         UUID |  no  | FK -> `user_profiles.keycloak_id` | Reporting User-ID                            |
 | `report_target`        |         enum |  no  | length 64                         | `USER`, `PROJECT`, `PROJECT_POST`            |
-| `target_id`            |         UUID |  no  | polymorphe Ref.                   | Target ID for the specified `report_target`  |
+| `target_id`            |         UUID |  no  | polymorphic reference             | Target ID for the specified `report_target`  |
 | `report_reason`        |         enum |  no  | length 64                         | See enum below                               |
 | `message`              |         text | yes  |                                   | Text of the reporting user                   |
 | `report_status`        |         enum |  no  | default `OPEN`, length 32         | `OPEN`, `IN_REVIEW`, `RESOLVED`, `DISMISSED` |
-| `reviewer_keycloak_id` |         UUID | yes  | logische User-Ref.                | Moderator-ID                                 |
+| `reviewer_keycloak_id` |         UUID | yes  | logical user-reference            | Moderator-ID                                 |
 | `reviewer_username`    | varchar(255) | yes  |                                   | Moderator-Username                           |
 | `reviewed_at`          |     datetime | yes  |                                   | Review timestamp                             |
 | `moderator_message`    |         text | yes  |                                   | Internal moderation note                     |
 | `created_at`           |     datetime |  no  | set via `@PrePersist`             | Creation timestamp                           |
 | `updated_at`           |     datetime |  no  | set via `@PreUpdate`              | Update timestamp                             |
 
-`report_reason`: `SPAM`, `HARASSMENT`, `HATE_SPEECH`, `INAPPROPRIATE_CONTENT`, `VIOLENCE_OR_THREATS`, `SELF_HARM_OR_SUICIDE`, `PERSONAL_DATA`, `COPYRIGHT`, `MISINFORMATION`, `FRAUD_OR_IMPERSONATION`, `OTHER`.
+`report_reason`: `SPAM`, `HARASSMENT`, `HATE_SPEECH`, `INAPPROPRIATE_CONTENT`, `VIOLENCE_OR_THREATS`, `SELF_HARM_OR_SUICIDE`, 
+`PERSONAL_DATA`, `COPYRIGHT`, `MISINFORMATION`, `FRAUD_OR_IMPERSONATION`, `OTHER`.
 
 ### `audit_logs`
 
 Audit-log for moderation purpose.
 
-| Column           |          Type | Null | Constraints/Default | Description                     |
-|------------------|--------------:|:----:|---------------------|---------------------------------|
-| `id`             |          UUID |  no  | PK, generated       | Audit-ID                        |
-| `action`         |          enum |  no  | length 80           | Performed action                |
-| `actor_user_id`  |          UUID |  no  | logische User-Ref.  | Performing User-ID              |
-| `actor_username` |  varchar(255) | yes  |                     | Username of the performing user |
-| `actor_email`    |  varchar(255) | yes  |                     | E-mail of the performing user   |
-| `target_type`    |          enum |  no  | length 80           | Target type                     |
-| `target_id`      |          UUID |  no  | polymorphe Ref.     | Target-ID                       |
-| `target_name`    |  varchar(255) | yes  |                     | Target name                     |
-| `details`        | varchar(2000) | yes  |                     | Details                         |
-| `created_at`     |      datetime |  no  | auto on insert      | Creation timestamp              |
+| Column           |          Type | Null | Constraints/Default    | Description                     |
+|------------------|--------------:|:----:|------------------------|---------------------------------|
+| `id`             |          UUID |  no  | PK, generated          | Audit-ID                        |
+| `action`         |          enum |  no  | length 80              | Performed action                |
+| `actor_user_id`  |          UUID |  no  | logical user-reference | Performing User-ID              |
+| `actor_username` |  varchar(255) | yes  |                        | Username of the performing user |
+| `actor_email`    |  varchar(255) | yes  |                        | E-mail of the performing user   |
+| `target_type`    |          enum |  no  | length 80              | Target type                     |
+| `target_id`      |          UUID |  no  | polymorphic reference  | Target-ID                       |
+| `target_name`    |  varchar(255) | yes  |                        | Target name                     |
+| `details`        | varchar(2000) | yes  |                        | Details                         |
+| `created_at`     |      datetime |  no  | auto on insert         | Creation timestamp              |
 
 `action`: `PROJECT_DELETED`, `PROJECT_POST_DELETED`, `USER_BANNED`, `USER_UNBANNED`, `PROFESSOR_REQUEST_ACCEPTED`, `PROFESSOR_REQUEST_REJECTED`.  
 `target_type`: `PROJECT`, `PROJECT_POST`, `USER`, `PROFESSOR_REQUEST`.
@@ -419,33 +500,33 @@ Audit-log for moderation purpose.
 
 One connected GitHub account per user profile.
 
-| Column                   |         Type | Null | Constraints/Default                              | Description           |
-|--------------------------|-------------:|:----:|--------------------------------------------------|-----------------------|
-| `keycloak_id`            |         UUID |  no  | PK, logische Ref. -> `user_profiles.keycloak_id` | User-ID               |
-| `github_user_id`         |       bigint |  no  | /                                                | GitHub-User-ID        |
-| `github_login`           | varchar(100) |  no  | /                                                | GitHub-Login          |
-| `avatar_url`             | varchar(300) | yes  | /                                                | Avatar-URL            |
-| `encrypted_access_token` | varchar(512) |  no  | /                                                | Encrypted OAuth-Token |
-| `scopes`                 | varchar(200) | yes  | /                                                | OAuth-Scopes          |
-| `status`                 |         enum |  no  | default `ACTIVE`                                 | `ACTIVE`, `INVALID`   |
-| `created_at`             |     datetime |  no  | auto on insert                                   | Creation timestamp    |
-| `updated_at`             |     datetime |  no  | auto on update                                   | Update timestamp      |
+| Column                   |         Type | Null | Constraints/Default                                  | Description           |
+|--------------------------|-------------:|:----:|------------------------------------------------------|-----------------------|
+| `keycloak_id`            |         UUID |  no  | PK, logical reference -> `user_profiles.keycloak_id` | User-ID               |
+| `github_user_id`         |       bigint |  no  | /                                                    | GitHub-User-ID        |
+| `github_login`           | varchar(100) |  no  | /                                                    | GitHub-Login          |
+| `avatar_url`             | varchar(300) | yes  | /                                                    | Avatar-URL            |
+| `encrypted_access_token` | varchar(512) |  no  | /                                                    | Encrypted OAuth-Token |
+| `scopes`                 | varchar(200) | yes  | /                                                    | OAuth-Scopes          |
+| `status`                 |         enum |  no  | default `ACTIVE`                                     | `ACTIVE`, `INVALID`   |
+| `created_at`             |     datetime |  no  | auto on insert                                       | Creation timestamp    |
+| `updated_at`             |     datetime |  no  | auto on update                                       | Update timestamp      |
 
 ### `project_github_repos`
 
 GitHub-Repository linking to project.
 
-| Column                      |         Type | Null | Constraints/Default                          | Description                 |
-|-----------------------------|-------------:|:----:|----------------------------------------------|-----------------------------|
-| `id`                        |         UUID |  no  | PK, generated                                | Link-ID                     |
-| `project_id`                |         UUID |  no  | FK -> `projects.id`, unique                  | Project-ID                  |
-| `repo_owner`                | varchar(100) |  no  | /                                            | Repository-Owner            |
-| `repo_name`                 | varchar(150) |  no  | /                                            | Repository-Name             |
-| `linked_by_keycloak_id`     |         UUID |  no  | logische Ref. -> `user_profiles.keycloak_id` | Linking user profile        |
-| `default_branch`            | varchar(255) | yes  | /                                            | Default-Branch              |
-| `show_readme`               |      boolean |  no  | default false                                | Shows README                |
-| `auto_invite_collaborators` |      boolean |  no  | default false                                | Auto-Invite project members |
-| `created_at`                |     datetime |  no  | auto on insert                               | Creation timestamp          |
+| Column                      |         Type | Null | Constraints/Default                              | Description                 |
+|-----------------------------|-------------:|:----:|--------------------------------------------------|-----------------------------|
+| `id`                        |         UUID |  no  | PK, generated                                    | Link-ID                     |
+| `project_id`                |         UUID |  no  | FK -> `projects.id`, unique                      | Project-ID                  |
+| `repo_owner`                | varchar(100) |  no  | /                                                | Repository-Owner            |
+| `repo_name`                 | varchar(150) |  no  | /                                                | Repository-Name             |
+| `linked_by_keycloak_id`     |         UUID |  no  | logical reference -> `user_profiles.keycloak_id` | Linking user profile        |
+| `default_branch`            | varchar(255) | yes  | /                                                | Default-Branch              |
+| `show_readme`               |      boolean |  no  | default false                                    | Shows README                |
+| `auto_invite_collaborators` |      boolean |  no  | default false                                    | Auto-Invite project members |
+| `created_at`                |     datetime |  no  | auto on insert                                   | Creation timestamp          |
 
 ### `linked_channels`
 
@@ -485,9 +566,32 @@ Mapping between project posts and discord messages.
 | Column               |        Type | Null | Constraints/Default                          | Description                                  |
 |----------------------|------------:|:----:|----------------------------------------------|----------------------------------------------|
 | `id`                 |        UUID |  no  | PK, generated                                | Sync-ID                                      |
-| `platform_post_id`   |        UUID |  no  | logische Ref. -> `project_posts.id`          | Project-Post                                 |
+| `platform_post_id`   |        UUID |  no  | logical reference -> `project_posts.id`      | Project-Post                                 |
 | `discord_message_id` | varchar(20) |  no  | unique `UK_discord_message_sync_discord_msg` | Discord-Message-ID                           |
 | `discord_channel_id` | varchar(20) |  no  |                                              | Discord-Channel-ID                           |
 | `discord_guild_id`   | varchar(20) | yes  |                                              | Discord-Guild-ID                             |
 | `direction`          |        enum |  no  | default `PLATFORM_TO_DISCORD`, length 10     | `PLATFORM_TO_DISCORD`, `DISCORD_TO_PLATFORM` |
 | `synced_at`          |    datetime |  no  | auto on insert                               | Sync timestamp                               |
+
+
+
+
+## File and image storage
+Binary files and images are stored on the application server's file system, not
+in the database. The storage directory is configured through
+`app.uploads.dir` and defaults to:
+
+```text
+./uploads
+```
+
+The `project_files` table stores the corresponding metadata. Its
+`storage_name` identifies the binary file inside the configured upload directory:
+
+```text
+${app.uploads.dir}/<storage_name>
+```
+
+Project-post images use the same storage mechanism. Their metadata is stored as
+an `INTERNAL` record in `project_files`, while `project_posts.image_file_id` contains a logical reference to that record.
+`project_posts.image_url` contains the API path used to retrieve the image.
