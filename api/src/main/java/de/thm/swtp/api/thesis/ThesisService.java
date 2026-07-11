@@ -26,6 +26,7 @@ import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -193,7 +194,12 @@ public class ThesisService {
         }
 
         thesis.getStudents().add(student);
-        ThesisEntity saved = thesisRepository.save(thesis);
+        ThesisEntity saved;
+        try {
+            saved = thesisRepository.saveAndFlush(thesis);
+        } catch (DataIntegrityViolationException e) {
+            throw new ThesisStudentAlreadyAssignedElsewhereException(studentKeycloakId);
+        }
         eventPublisher.publishEvent(new ThesisStudentAddedEvent(thesisId, studentKeycloakId));
         TxLogger.afterCommit(log, "Thesis student added: thesis={}, student={}", thesisId, studentKeycloakId);
         return ThesisMapper.toDomain(saved);
