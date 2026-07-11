@@ -5,7 +5,6 @@ import de.thm.swtp.api.projectPost.entity.ProjectPostEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public interface ProjectPostRepository  extends JpaRepository<ProjectPostEntity, UUID> {
@@ -21,5 +20,4 @@ public interface ProjectPostRepository  extends JpaRepository<ProjectPostEntity,
 
     /** Checks if project posts exists for a given project.*/
     boolean existsByIdAndProjectId(UUID id, UUID projectId);
-    
 }
