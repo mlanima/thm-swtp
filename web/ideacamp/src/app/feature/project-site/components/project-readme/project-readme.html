@@ -10,8 +10,8 @@
       <i class="pi text-slate-400" [class]="expanded() ? 'pi-chevron-up' : 'pi-chevron-down'"></i>
     </button>
     <div class="readme-collapsible" [class.expanded]="expanded()">
-      <div class="readme-collapsible-inner px-6 pb-6">
-        <div class="readme-content" [innerHTML]="content"></div>
+      <div class="readme-collapsible-inner">
+        <div class="readme-content px-6 pb-6" [innerHTML]="content"></div>
       </div>
     </div>
   </div>
