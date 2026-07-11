@@ -22,3 +22,7 @@ export interface ThesisStudentResponse {
   username: string;
   email: string;
 }
+
+export interface UnreadThesisNotificationCountResponse {
+  count: number;
+}

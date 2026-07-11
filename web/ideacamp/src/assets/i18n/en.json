@@ -578,6 +578,8 @@
     "SUCCESS_CREATED_STUDENTS_PARTIAL": "Thesis created successfully. Some students could not be added.",
     "SUCCESS_CREATED_STUDENTS_FAILED": "Thesis created successfully. The students could not be added.",
     "ERROR_CREATE_THESIS": "Thesis could not be created. Please try again.",
+    "ERROR_STUDENT_ALREADY_ELSEWHERE": "{{username}} is already assigned to another thesis.",
+    "ERROR_STUDENT_GENERIC": "{{username}} could not be added.",
     "VALIDATION": {
       "TITLE_MIN": "Title must be at least 3 characters long.",
       "TITLE_MAX": "Title must not be longer than 100 characters.",
@@ -1145,6 +1147,7 @@
       "ERROR_LOAD_STUDENTS": "Students could not be loaded. Please try again later.",
       "ERROR_ADD_INVALID": "This user cannot be added as a student: they are a professor, or already the supervisor of this thesis.",
       "ERROR_ADD_DUPLICATE": "This user is already a student on this thesis.",
+      "ERROR_ADD_ALREADY_ELSEWHERE": "This user is already assigned as a student to another thesis.",
       "ERROR_REMOVE_NOT_FOUND": "This user is not a student on this thesis (they may have already been removed)."
     },
     "DANGER": {

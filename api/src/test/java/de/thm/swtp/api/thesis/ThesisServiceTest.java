@@ -10,6 +10,7 @@ import de.thm.swtp.api.thesis.exception.ThesisInvalidStudentAssignmentException;
 import de.thm.swtp.api.thesis.exception.ThesisInvalidUrlException;
 import de.thm.swtp.api.thesis.exception.ThesisNotFoundByIdException;
 import de.thm.swtp.api.thesis.exception.ThesisNotFoundException;
+import de.thm.swtp.api.thesis.exception.ThesisStudentAlreadyAssignedElsewhereException;
 import de.thm.swtp.api.thesis.exception.ThesisStudentAlreadyAssignedException;
 import de.thm.swtp.api.thesis.exception.ThesisStudentNotFoundException;
 import de.thm.swtp.api.thesis.exception.ThesisTitleAlreadyExistsException;
@@ -23,6 +24,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -46,6 +48,8 @@ class ThesisServiceTest {
     private UserProfileRepository userProfileRepository;
     @Mock
     private TagRepository tagRepository;
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
     private ThesisService thesisService;
@@ -311,6 +315,16 @@ class ThesisServiceTest {
 
         assertThatThrownBy(() -> thesisService.addStudent(thesisId, studentId))
                 .isInstanceOf(ThesisStudentAlreadyAssignedException.class);
+    }
+
+    @Test
+    void addStudent_throwsAlreadyAssignedElsewhere_whenStudentInOtherThesis() {
+        when(thesisRepository.findById(thesisId)).thenReturn(Optional.of(thesisEntity));
+        when(userProfileRepository.findById(studentId)).thenReturn(Optional.of(student));
+        when(thesisRepository.existsByStudentsKeycloakId(studentId)).thenReturn(true);
+
+        assertThatThrownBy(() -> thesisService.addStudent(thesisId, studentId))
+                .isInstanceOf(ThesisStudentAlreadyAssignedElsewhereException.class);
     }
 
     @Test

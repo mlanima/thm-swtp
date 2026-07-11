@@ -578,6 +578,8 @@
     "SUCCESS_CREATED_STUDENTS_PARTIAL": "Abschlussarbeit erfolgreich erstellt. Einige Studierende konnten nicht hinzugefügt werden.",
     "SUCCESS_CREATED_STUDENTS_FAILED": "Abschlussarbeit erfolgreich erstellt. Die Studierenden konnten nicht hinzugefügt werden.",
     "ERROR_CREATE_THESIS": "Abschlussarbeit konnte nicht erstellt werden. Bitte versuche es erneut.",
+    "ERROR_STUDENT_ALREADY_ELSEWHERE": "{{username}} ist bereits einer anderen Abschlussarbeit zugewiesen.",
+    "ERROR_STUDENT_GENERIC": "{{username}} konnte nicht hinzugefügt werden.",
     "VALIDATION": {
       "TITLE_MIN": "Titel muss mindestens 3 Zeichen lang sein.",
       "TITLE_MAX": "Titel darf höchstens 100 Zeichen lang sein.",
@@ -1145,6 +1147,7 @@
       "ERROR_LOAD_STUDENTS": "Studierende konnten nicht geladen werden. Bitte versuche es später nochmal.",
       "ERROR_ADD_INVALID": "Dieser Nutzer kann nicht als Studierende:r hinzugefügt werden: er/sie ist Professor:in oder bereits Betreuer:in dieser Abschlussarbeit.",
       "ERROR_ADD_DUPLICATE": "Dieser Nutzer ist bereits Studierende:r dieser Abschlussarbeit.",
+      "ERROR_ADD_ALREADY_ELSEWHERE": "Dieser Nutzer ist bereits einer anderen Abschlussarbeit als Studierende:r zugewiesen.",
       "ERROR_REMOVE_NOT_FOUND": "Dieser Nutzer ist kein:e Studierende:r dieser Abschlussarbeit (evtl. bereits entfernt)."
     },
     "DANGER": {

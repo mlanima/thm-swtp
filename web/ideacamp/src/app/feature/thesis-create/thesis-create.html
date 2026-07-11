@@ -14,6 +14,18 @@
   </div>
 }
 
+@if (failedStudentMessages.length > 0) {
+  <div class="mx-auto max-w-4xl px-6 pt-3">
+    <div class="rounded-xl bg-red-50 border border-red-200 p-4 text-red-700 text-sm">
+      <ul class="list-disc pl-5 space-y-1">
+        @for (message of failedStudentMessages; track message) {
+          <li>{{ message }}</li>
+        }
+      </ul>
+    </div>
+  </div>
+}
+
 @if (isLoading) {
   <div class="flex items-center justify-center py-6">
     <p class="text-slate-500 text-sm">{{ 'THESISCREATE.CREATING' | translate }}</p>
