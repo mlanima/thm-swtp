@@ -198,15 +198,9 @@ export class ThesisCreate {
   }
 
   private resolveSuccessMessageKey(failedStudentCount: number): string {
-    if (this.invitedStudents.length === 0) {
+    if (this.invitedStudents.length === 0 || failedStudentCount > 0) {
       return 'THESISCREATE.SUCCESS_CREATED';
     }
-    if (failedStudentCount === 0) {
-      return 'THESISCREATE.SUCCESS_CREATED_WITH_STUDENTS';
-    }
-    if (failedStudentCount === this.invitedStudents.length) {
-      return 'THESISCREATE.SUCCESS_CREATED_STUDENTS_FAILED';
-    }
-    return 'THESISCREATE.SUCCESS_CREATED_STUDENTS_PARTIAL';
+    return 'THESISCREATE.SUCCESS_CREATED_WITH_STUDENTS';
   }
 }
