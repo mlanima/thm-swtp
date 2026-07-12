@@ -242,6 +242,7 @@ class DiscordEventHandlerTest {
                 postId, "discord-msg-1", "ch-1", "guild-1");
 
         when(messageSyncRepository.existsByDiscordMessageId("discord-msg-1")).thenReturn(false);
+        when(projectPostRepository.existsById(postId)).thenReturn(true);
 
         handler.handleMessageAssigned(payload);
 
@@ -266,6 +267,7 @@ class DiscordEventHandlerTest {
         var payload = new MessageAssignedPayload(postId, "orphan-msg", "ch-1", "guild-1");
 
         when(messageSyncRepository.existsByDiscordMessageId("orphan-msg")).thenReturn(false);
+        when(projectPostRepository.existsById(postId)).thenReturn(true);
 
         handler.handleMessageAssigned(payload);
 
@@ -279,6 +281,19 @@ class DiscordEventHandlerTest {
         assertThat(savedSync.getDirection()).isEqualTo(DiscordMessageSyncEntity.SyncDirection.PLATFORM_TO_DISCORD);
 
         verify(messageSyncRepository, never()).delete(any());
+    }
+
+    @Test
+    void shouldSkipAssignedMessageWhenPostNotFoundInDb() {
+        var payload = new MessageAssignedPayload(postId, "cross-env-msg", "ch-1", "guild-1");
+
+        when(messageSyncRepository.existsByDiscordMessageId("cross-env-msg")).thenReturn(false);
+        when(projectPostRepository.existsById(postId)).thenReturn(false);
+
+        handler.handleMessageAssigned(payload);
+
+        verify(messageSyncRepository, never()).save(any());
+        verify(discordEventPublisher, never()).publishDirectDelete(any(), any(), any());
     }
 
     // ── handleInviteResponse ──

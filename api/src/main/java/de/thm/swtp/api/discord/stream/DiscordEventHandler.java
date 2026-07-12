@@ -135,6 +135,11 @@ public class DiscordEventHandler {
             return;
         }
 
+        if (!projectPostRepository.existsById(postUuid)) {
+            log.warn("Post {} not found in this DB — skipping cross-environment MESSAGE_ASSIGNED", postUuid);
+            return;
+        }
+
         messageSyncRepository.save(DiscordMessageSyncEntity.builder()
                 .platformPostId(postUuid)
                 .discordMessageId(discordMsgId)
