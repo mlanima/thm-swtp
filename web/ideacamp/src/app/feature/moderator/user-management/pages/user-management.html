@@ -249,6 +249,14 @@
         [totalPages]="activeTotalPages()"
         (pageChange)="onActivePageChange($event)"
       />
+      @if (activeUserCount() > 0) {
+        <p class="mt-4 text-center text-sm text-slate-400">
+          {{ activeRangeStart() }}–{{ activeRangeEnd() }}
+          {{ 'MODERATOR.USER_MANAGEMENT.SHOWING_OF' | translate }}
+          {{ activeUserCount() }}
+          {{ 'MODERATOR.USER_MANAGEMENT.TOTAL_USERS' | translate }}
+        </p>
+      }
     }
 
     @if (activeTab() === 'banned') {
@@ -470,6 +478,14 @@
         [totalPages]="bannedTotalPages()"
         (pageChange)="onBannedPageChange($event)"
       />
+      @if (bannedUserCount() > 0) {
+        <p class="mt-4 text-center text-sm text-slate-400">
+          {{ bannedRangeStart() }}–{{ bannedRangeEnd() }}
+          {{ 'MODERATOR.USER_MANAGEMENT.SHOWING_OF' | translate }}
+          {{ bannedUserCount() }}
+          {{ 'MODERATOR.USER_MANAGEMENT.TOTAL_USERS' | translate }}
+        </p>
+      }
     }
   </main>
 </div>

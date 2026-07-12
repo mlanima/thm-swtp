@@ -260,6 +260,8 @@
       "LOADING": "Loading users...",
       "EMPTY_ACTIVE_TITLE": "No active users available.",
       "EMPTY_ACTIVE_DESCRIPTION": "Active users appear here and can be banned if necessary.",
+      "SHOWING_OF": "of",
+      "TOTAL_USERS": "users displayed",
       "MODAL": {
         "TITLE": "Ban user",
         "DESCRIPTION": "The user will be blocked and can no longer use the platform. The account remains in the system.",
@@ -294,8 +296,8 @@
       "CONFIRM_REJECT_TEXT": "Do you really want to reject this professor request?",
       "CANCEL": "Cancel",
       "CONFIRM": "Confirm",
-      "SHOWING_OF": "From",
-      "TOTAL_REQUESTS": "Requests shown"
+      "SHOWING_OF": "of",
+      "TOTAL_REQUESTS": "requests displayed"
     },
     "AUDIT_LOGS_LINK_TITLE": "Audit logs",
     "AUDIT_LOGS_LINK_DESCRIPTION": "Track who performed critical actions.",
@@ -434,8 +436,7 @@
       },
 
       "PAGINATION": {
-        "SHOWING": "{{ shown }} of {{ total }} reports",
-        "PAGE": "Page {{ current }} of {{ total }}"
+        "SHOWING": "{{ start }}–{{ end }} of {{ total }} reports"
       },
 
       "SORT": {
