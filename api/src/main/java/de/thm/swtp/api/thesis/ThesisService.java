@@ -168,6 +168,11 @@ public class ThesisService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public boolean isStudentAlreadyAssigned(UUID studentKeycloakId) {
+        return thesisRepository.existsByStudentsKeycloakId(studentKeycloakId);
+    }
+
     @Transactional
     public Thesis addStudent(UUID thesisId, UUID studentKeycloakId) {
         ThesisEntity thesis = thesisRepository.findById(thesisId)

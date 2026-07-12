@@ -564,6 +564,8 @@
     "STUDENT_DIALOG_SUBTITLE": "Search by username",
     "USER_SEARCH_PLACEHOLDER": "Find user",
     "USER_SEARCH_EMPTY_PREFIX": "No matching users found",
+    "CHECKING_STUDENT_AVAILABILITY": "Checking if this student can be added...",
+    "STUDENT_ALREADY_ASSIGNED_WARNING": "This student is already assigned to another thesis and cannot be added.",
     "FINISH_TITLE": "Finish",
     "FINISH_DESCRIPTION": "Review all entries to complete your thesis.",
     "STEPS": {

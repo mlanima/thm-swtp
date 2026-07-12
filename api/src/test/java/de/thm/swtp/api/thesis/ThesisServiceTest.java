@@ -350,6 +350,22 @@ class ThesisServiceTest {
                 .isInstanceOf(ThesisNotFoundByIdException.class);
     }
 
+    // --- isStudentAlreadyAssigned ---
+
+    @Test
+    void isStudentAlreadyAssigned_returnsTrue_whenStudentInAnyThesis() {
+        when(thesisRepository.existsByStudentsKeycloakId(studentId)).thenReturn(true);
+
+        assertThat(thesisService.isStudentAlreadyAssigned(studentId)).isTrue();
+    }
+
+    @Test
+    void isStudentAlreadyAssigned_returnsFalse_whenStudentUnassigned() {
+        when(thesisRepository.existsByStudentsKeycloakId(studentId)).thenReturn(false);
+
+        assertThat(thesisService.isStudentAlreadyAssigned(studentId)).isFalse();
+    }
+
     // --- removeStudent ---
 
     @Test

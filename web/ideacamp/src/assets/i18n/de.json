@@ -564,6 +564,8 @@
     "STUDENT_DIALOG_SUBTITLE": "Suche nach Nutzername",
     "USER_SEARCH_PLACEHOLDER": "Nutzer finden",
     "USER_SEARCH_EMPTY_PREFIX": "Keine passenden User gefunden",
+    "CHECKING_STUDENT_AVAILABILITY": "Prüfe, ob der Studierende hinzugefügt werden kann...",
+    "STUDENT_ALREADY_ASSIGNED_WARNING": "Dieser Studierende ist bereits einer anderen Abschlussarbeit zugeordnet und kann nicht hinzugefügt werden.",
     "FINISH_TITLE": "Fertigstellen",
     "FINISH_DESCRIPTION": "Prüfe alle Eingaben, um deine Abschlussarbeit fertigzustellen.",
     "STEPS": {
