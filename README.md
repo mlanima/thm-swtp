@@ -111,6 +111,7 @@ thm-swtp/
 - [Keycloak — Setup & Konfiguration](docs/Keycloak%20-%20Setup%20&%20Konfiguration.md)
 - [Rollen & Berechtigungen](docs/ROLLEN.md)
 - [Caching](docs/CACHING.md)
+- [CI/CD & Deployment](docs/CI_CD.md)
 
 ## Mitwirkende
 
