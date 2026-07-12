@@ -118,6 +118,7 @@ thm-swtp/
 - [Tag Moderation](docs/TAG_VALIDATION.md)
 - [Discord Integration](docs/DISCORD_INTEGRATION.md)
 - [GitHub Integration](docs/GITHUB_INTEGRATION.md)
+- [Scrum Dokumentation](docs/SCRUM.md)
 
 
 ## Mitwirkende
