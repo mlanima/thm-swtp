@@ -117,8 +117,12 @@ public class DiscordEventHandler {
 
         messageSyncRepository.findByDiscordMessageId(discordMsgId).ifPresent(sync -> {
             projectPostRepository.findById(sync.getPlatformPostId()).ifPresent(post -> {
-                projectPostRepository.delete(post);
-                log.info("Post deleted from discord sync: postId={}", post.getId());
+                if (post.getStatus() == ProjectPostStatus.ARCHIVED) {
+                    log.debug("Discord message deleted for archived post {} — removing sync only", post.getId());
+                } else {
+                    projectPostRepository.delete(post);
+                    log.info("Post deleted from discord sync: postId={}", post.getId());
+                }
             });
             messageSyncRepository.delete(sync);
         });
