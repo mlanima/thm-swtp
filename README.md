@@ -109,8 +109,16 @@ thm-swtp/
 - [Backend-API](docs/BACKEND_API_DOCUMENTATION.md)
 - [Frontend-Struktur & Auth](docs/FRONTEND_STRUCTURE_AND_AUTH.md)
 - [Keycloak — Setup & Konfiguration](docs/Keycloak%20-%20Setup%20&%20Konfiguration.md)
-- [Rollen & Berechtigungen](docs/ROLLEN.md)
+- [Rollen](docs/ROLLEN.md)
+- [Berechtigungen](docs/permissions.md)
+- [Datenbank Schema](docs/database-schema.md)
 - [Caching](docs/CACHING.md)
+- [CI/CD & Deployment](docs/CI_CD.md)
+- [Inhaltsmoderation](docs/CONTENT_MODERATION.md)
+- [Tag Moderation](docs/TAG_VALIDATION.md)
+- [Discord Integration](docs/DISCORD_INTEGRATION.md)
+- [GitHub Integration](docs/GITHUB_INTEGRATION.md)
+
 
 ## Mitwirkende
 
