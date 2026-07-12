@@ -119,7 +119,7 @@ public class DiscordEventPublisher {
         var link = channelRef.get();
         var settings = settingsRepository.findByLinkedChannelId(link.getId());
 
-        if (settings.isEmpty() || !shouldNotify(eventType, settings.get())) {
+        if (settings.isEmpty() || !settings.get().shouldNotify(eventType)) {
             return;
         }
 

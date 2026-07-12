@@ -47,6 +47,14 @@ public class DiscordChannelSettingsEntity {
     @Builder.Default
     private boolean notifyMemberLeave = false;
 
+    public boolean shouldNotify(String eventType) {
+        return switch (eventType) {
+            case "MEMBER_JOIN" -> notifyMemberJoin;
+            case "MEMBER_LEAVE" -> notifyMemberLeave;
+            default -> true;
+        };
+    }
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
