@@ -32,7 +32,6 @@ export class MyThesesPage implements OnInit {
     this.authService.waitUntilAuthReady().then(() => {
       this.loadTheses();
       this.loadIsProfessor();
-      this.markThesisNotificationsAsRead();
     });
   }
 
@@ -46,7 +45,12 @@ export class MyThesesPage implements OnInit {
 
   private loadIsProfessor(): void {
     this.userProfileService.getMyProfile().subscribe({
-      next: (profile) => this.isProfessor.set(profile.isProfessor),
+      next: (profile) => {
+        this.isProfessor.set(profile.isProfessor);
+        if (!profile.isProfessor) {
+          this.markThesisNotificationsAsRead();
+        }
+      },
     });
   }
 
