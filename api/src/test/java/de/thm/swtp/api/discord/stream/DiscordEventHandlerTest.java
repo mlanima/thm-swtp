@@ -240,13 +240,8 @@ class DiscordEventHandlerTest {
     void shouldCreateSyncFromAssignedMessage() {
         var payload = new MessageAssignedPayload(
                 postId, "discord-msg-1", "ch-1", "guild-1");
-        var postEntity = ProjectPostEntity.builder()
-                .id(postId)
-                .status(ProjectPostStatus.PUBLISHED)
-                .build();
 
         when(messageSyncRepository.existsByDiscordMessageId("discord-msg-1")).thenReturn(false);
-        when(projectPostRepository.findById(postId)).thenReturn(Optional.of(postEntity));
 
         handler.handleMessageAssigned(payload);
 
