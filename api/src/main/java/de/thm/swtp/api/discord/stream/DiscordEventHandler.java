@@ -1,6 +1,5 @@
 package de.thm.swtp.api.discord.stream;
 
-import de.thm.swtp.api.common.TxLogger;
 import de.thm.swtp.api.discord.entity.DiscordMessageSyncEntity;
 import de.thm.swtp.api.discord.entity.LinkedChannelEntity;
 import de.thm.swtp.api.discord.repository.DiscordMessageSyncRepository;
