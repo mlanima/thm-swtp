@@ -123,11 +123,19 @@ public class DiscordAuthService {
         return null;
     }
 
-    private record BotNonce(UUID projectId, UUID userId) {}
+    private record BotNonce(UUID projectId, UUID userId, Instant createdAt) {
+        BotNonce(UUID projectId, UUID userId) {
+            this(projectId, userId, Instant.now());
+        }
+
+        boolean isExpired() {
+            return Duration.between(createdAt, Instant.now()).toMinutes() >= 30;
+        }
+    }
 
     @Scheduled(fixedRate = 300_000)
     public void purgeStaleBotNonces() {
-        pendingBotNonces.clear();
+        pendingBotNonces.values().removeIf(BotNonce::isExpired);
     }
 
     public String getFrontendUrl() {
