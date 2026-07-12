@@ -1,6 +1,7 @@
 package de.thm.swtp.api.discord.service;
 
 import de.thm.swtp.api.discord.client.DiscordOAuthClient;
+import de.thm.swtp.api.discord.config.DiscordProperties;
 import de.thm.swtp.api.discord.exception.DiscordAccountAlreadyLinkedException;
 import de.thm.swtp.api.discord.exception.DiscordConnectionFailedException;
 import de.thm.swtp.api.discord.repository.LinkedChannelRepository;
@@ -45,15 +46,14 @@ public class DiscordAuthService {
                               UserProfileRepository userProfileRepository,
                               LinkedChannelRepository linkedChannelRepository,
                               ProjectRepository projectRepository,
-                              @Value("${DISCORD_CLIENT_ID:}") String clientId,
-                              @Value("${DISCORD_REDIRECT_URI:}") String redirectUri,
+                              DiscordProperties discordProperties,
                               @Value("${app.frontend-url}") String frontendUrl) {
         this.discordOAuthClient = discordOAuthClient;
         this.userProfileRepository = userProfileRepository;
         this.linkedChannelRepository = linkedChannelRepository;
         this.projectRepository = projectRepository;
-        this.clientId = clientId;
-        this.redirectUri = redirectUri;
+        this.clientId = discordProperties.getOauth().getClientId();
+        this.redirectUri = discordProperties.getOauth().getRedirectUri();
         this.frontendUrl = frontendUrl;
         log.info("Discord OAuth configured: clientId={}, redirectUri={}, frontendUrl={}",
                 clientId != null && !clientId.isBlank() ? "present" : "missing",
@@ -92,7 +92,7 @@ public class DiscordAuthService {
                 + "&state=" + state;
     }
 
-    public String createBotAuthUrl(UUID projectId, UUID userId, String permissions, String redirectUri) {
+    public String createBotAuthUrl(UUID projectId, UUID userId, String permissions) {
         String nonce = UUID.randomUUID().toString();
         String state = BOT_PREFIX.prefix() + nonce;
         pendingBotNonces.put(nonce, new BotNonce(projectId, userId));

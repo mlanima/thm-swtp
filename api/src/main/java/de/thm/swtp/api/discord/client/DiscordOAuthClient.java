@@ -3,8 +3,8 @@ package de.thm.swtp.api.discord.client;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.thm.swtp.api.discord.config.DiscordProperties;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
@@ -22,14 +22,11 @@ public class DiscordOAuthClient {
     private final String clientSecret;
     private final String redirectUri;
 
-    public DiscordOAuthClient(RestTemplate discordRestTemplate,
-                              @Value("${DISCORD_CLIENT_ID:}") String clientId,
-                              @Value("${DISCORD_CLIENT_SECRET:}") String clientSecret,
-                              @Value("${DISCORD_REDIRECT_URI:}") String redirectUri) {
+    public DiscordOAuthClient(RestTemplate discordRestTemplate, DiscordProperties discordProperties) {
         this.restTemplate = discordRestTemplate;
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
-        this.redirectUri = redirectUri;
+        this.clientId = discordProperties.getOauth().getClientId();
+        this.clientSecret = discordProperties.getOauth().getClientSecret();
+        this.redirectUri = discordProperties.getOauth().getRedirectUri();
     }
 
     private static final String TOKEN_URL = "https://discord.com/api/oauth2/token";

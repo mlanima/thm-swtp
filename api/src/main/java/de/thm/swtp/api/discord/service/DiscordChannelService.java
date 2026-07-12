@@ -144,8 +144,7 @@ public class DiscordChannelService {
     public String getBotInviteUrl(UUID projectId, UUID userId) {
         return discordAuthService.createBotAuthUrl(
                 projectId, userId,
-                String.valueOf(discordProperties.getBot().getInvitePermissions()),
-                discordAuthService.getRedirectUri());
+                String.valueOf(discordProperties.getBot().getInvitePermissions()));
     }
 
     @Transactional
