@@ -21,6 +21,8 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -234,6 +236,27 @@ public class ProjectFileService {
         }
     }
 
+    @Transactional
+    public void deleteAllProjectFiles(UUID projectId){
+        List<Path> filePaths = projectFileRepository.findAllByProjectId(projectId)
+                .stream()
+                .map(file -> uploadDir.resolve(file.getStorageName()))
+                .toList();
+
+        projectFileRepository.deleteByProjectId(projectId);
+
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(
+                    new TransactionSynchronization() {
+                        @Override
+                        public void afterCommit() {
+                            deletePhysicalFiles(projectId, filePaths);
+                        }
+                    }
+            );
+        }
+    }
+
     private ProjectEntity getProjectOrThrow(UUID projectId) {
         return projectRepository.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException(projectId));
@@ -268,5 +291,21 @@ public class ProjectFileService {
         }
         String ext = filename.substring(dotIndex + 1);
         return ext.matches("[A-Za-z0-9]{1,10}") ? ext : "";
+    }
+
+    private void deletePhysicalFiles(UUID projectId, List<Path> filePaths) {
+        for (Path filePath : filePaths) {
+            try {
+                boolean removed = Files.deleteIfExists(filePath);
+
+                if (!removed) {
+                    log.warn("Project deletion: file missing on disk, project={}, path={}", projectId, filePath.getFileName());
+                }
+
+            } catch (IOException e) {
+                log.error("Project deletion committed, but physical file could not be removed: project={}, path={}", projectId, filePath.getFileName(), e);
+            }
+
+        }
     }
 }

@@ -18,4 +18,8 @@ public interface ProjectFileRepository extends JpaRepository<ProjectFileEntity, 
     long countByProjectId(UUID projectId);
 
     boolean existsByIdAndProjectIdAndVisibility(UUID id, UUID projectId, FileVisibility visibility);
+
+    List<ProjectFileEntity> findAllByProjectId(UUID projectId);
+
+    void deleteByProjectId(UUID projectId);
 }

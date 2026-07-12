@@ -16,4 +16,6 @@ public interface LinkedChannelRepository extends JpaRepository<LinkedChannelEnti
     Optional<LinkedChannelEntity> findByDiscordChannelIdAndIsActiveTrue(String discordChannelId);
 
     List<LinkedChannelEntity> findAllByDiscordGuildIdAndIsActiveTrue(String discordGuildId);
+
+    void deleteByProjectId(UUID projectId);
 }

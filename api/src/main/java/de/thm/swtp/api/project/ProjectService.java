@@ -3,6 +3,8 @@ package de.thm.swtp.api.project;
 
 import de.thm.swtp.api.common.TxLogger;
 import de.thm.swtp.api.discord.entity.LinkedChannelEntity;
+import de.thm.swtp.api.discord.repository.DiscordChannelSettingsRepository;
+import de.thm.swtp.api.discord.repository.DiscordMessageSyncRepository;
 import de.thm.swtp.api.discord.repository.LinkedChannelRepository;
 import de.thm.swtp.api.discord.service.DiscordNotificationService;
 import de.thm.swtp.api.exceptionhandling.exceptions.InvalidProjectManagementSortFieldException;
@@ -11,12 +13,15 @@ import de.thm.swtp.api.moderation.ContentModerationService;
 import de.thm.swtp.api.project.dto.request.*;
 import de.thm.swtp.api.project.dto.response.*;
 import de.thm.swtp.api.project.exception.*;
+import de.thm.swtp.api.projectFiles.service.ProjectFileService;
 import de.thm.swtp.api.projectInvitation.domain.ProjectInviteStatus;
 import de.thm.swtp.api.projectInvitation.repository.ProjectInviteRepository;
 import de.thm.swtp.api.projectInvitation.service.ProjectInviteService;
 import de.thm.swtp.api.projectFavorite.repository.ProjectFavoriteRepository;
 import de.thm.swtp.api.projectGithubRepo.repository.ProjectGithubRepoRepository;
 import de.thm.swtp.api.projectJoinRequest.repository.ProjectJoinRequestRepository;
+import de.thm.swtp.api.projectPost.entity.ProjectPostEntity;
+import de.thm.swtp.api.projectPost.repository.ProjectPostRepository;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.projectView.entity.ProjectViewEntity;
 import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
@@ -45,18 +50,25 @@ public class ProjectService {
 
     private final ProjectRepository projectRepository;
     private final UserProfileRepository userProfileRepository;
-    private final ContentModerationService contentModerationService;
-    private final ProjectInviteService projectInviteService;
     private final ProjectInviteRepository projectInviteRepository;
     private final ProjectJoinRequestRepository projectJoinRequestRepository;
-    private static final String PROJECT_CREATION_INVITE_MESSAGE = "You have been invited to join this project.";
     private final ProjectFavoriteRepository projectFavoriteRepository;
     private final ProjectViewRepository projectViewRepository;
-    private final AuditLogService auditLogService;
     private final LinkedChannelRepository linkedChannelRepository;
-    private final DiscordNotificationService discordNotificationService;
     private final ProjectGithubRepoRepository projectGithubRepoRepository;
+    private final ProjectPostRepository projectPostRepository;
+    private final DiscordMessageSyncRepository discordMessageSyncRepository;
+
+    private final AuditLogService auditLogService;
+    private final DiscordNotificationService discordNotificationService;
+    private final ContentModerationService contentModerationService;
+    private final ProjectInviteService projectInviteService;
+    private final ProjectFileService projectFileService;
+
     private static final Set<String> MANAGED_PROJECT_SORT_FIELDS = Set.of("name", "owner.username", "createdAt", "updatedAt", "isPrivateProject");
+    private static final String PROJECT_CREATION_INVITE_MESSAGE = "You have been invited to join this project.";
+    private final DiscordChannelSettingsRepository discordChannelSettingsRepository;
+
 
     private ProjectResponse toResponse(ProjectEntity project) {
         Set<UUID> memberIds = project.getMembers().stream()
@@ -195,13 +207,42 @@ public class ProjectService {
 
         String projectName = project.getName();
 
-        auditLogService.logProjectDeleted(actor, projectId, projectName);
+        // Discord synchronization entries only contain the post ID. The post mut be retrieved before they are deleted.
+        List<ProjectPostEntity> projectPosts = projectPostRepository.findAllByProjectId(projectId);
 
+        for(ProjectPostEntity post : projectPosts) {
+            discordMessageSyncRepository.deleteByPlatformPostId(post.getId());
+        }
+
+        // Posts have to be deleted before the project because project_posts.project_id references the project.
+        projectPostRepository.deleteByProjectId(projectId);
+
+
+        // Deletes database records inside the transaction and the physical files after a successful commit.
+        projectFileService.deleteAllProjectFiles(projectId);
+
+        // Channel settings reference the linked channel -> settings must be deleted before the linked channel
+        linkedChannelRepository.findByProjectId(projectId).ifPresent(channel ->
+                discordChannelSettingsRepository.deleteByLinkedChannelId(channel.getId()));
+
+        linkedChannelRepository.deleteByProjectId(projectId);
+
+        // Deletes GitHub repo link
+        projectGithubRepoRepository.deleteByProjectId(projectId);
+
+
+        // Deletes remaining project-dependent entities.
         projectFavoriteRepository.deleteByProjectId(projectId);
         projectViewRepository.deleteByProjectId(projectId);
         projectInviteRepository.deleteByProjectId(projectId);
         projectJoinRequestRepository.deleteByProjectId(projectId);
         projectRepository.delete(project);
+
+
+        auditLogService.logProjectDeleted(actor, projectId, projectName);
+
+        // Execute pending statements now -> Entire transaction will roll back if a foreign-key constraint prevents project deletion.
+        projectRepository.flush();
 
         TxLogger.afterCommit(log, "Project deleted: project={}, actor={}", projectId, actor.userId());
         return DeleteProjectResponse.builder()
@@ -209,6 +250,7 @@ public class ProjectService {
                 .message("Projekt erfolgreich gelöscht.")
                 .build();
     }
+
     @Transactional
     public ProjectResponse getProject(UUID projectId, UUID viewerId) {
 
@@ -439,6 +481,8 @@ public class ProjectService {
         TxLogger.afterCommit(log, "Project ownership transferred: project={}, newOwner={}", projectId, newOwnerId);
         return toResponse(saved);
     }
+
+
 
     private void createProjectInvites(ProjectEntity project, UserProfile owner, Set <UUID> invitedUserIds) {
         if (invitedUserIds == null || invitedUserIds.isEmpty()) {
