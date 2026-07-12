@@ -28,7 +28,7 @@ public class ThesisController {
     private final ThesisService thesisService;
 
     @GetMapping
-    @PreAuthorize("@security.hasModeratorRole(authentication)")
+    @PreAuthorize("@security.canViewAllTheses(authentication)")
     public ResponseEntity<Page<ThesisResponse>> getAll(
             @RequestParam(required = false) String title,
             @PageableDefault(size = 20) Pageable pageable) {

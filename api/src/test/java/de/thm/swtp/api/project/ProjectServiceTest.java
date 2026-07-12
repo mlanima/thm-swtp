@@ -14,7 +14,6 @@ import de.thm.swtp.api.project.dto.response.DeleteProjectResponse;
 import de.thm.swtp.api.project.dto.response.ProjectResponse;
 import de.thm.swtp.api.project.exception.ExceptionInvalidProjectUrl;
 import de.thm.swtp.api.project.exception.ExceptionProjectNameAlreadyExists;
-import de.thm.swtp.api.project.exception.ExceptionProjectNotFound;
 import de.thm.swtp.api.project.exception.ExceptionProjectResponse;
 import de.thm.swtp.api.projectFiles.service.ProjectFileService;
 import de.thm.swtp.api.projectGithubRepo.repository.ProjectGithubRepoRepository;

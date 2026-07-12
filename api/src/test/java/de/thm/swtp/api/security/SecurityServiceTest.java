@@ -7,8 +7,6 @@ import de.thm.swtp.api.projectFiles.domain.FileVisibility;
 import de.thm.swtp.api.projectFiles.repository.ProjectFileRepository;
 import de.thm.swtp.api.projectInvitation.repository.ProjectInviteRepository;
 import de.thm.swtp.api.projectJoinRequest.repository.ProjectJoinRequestRepository;
-import de.thm.swtp.api.projectPost.domain.ProjectPostStatus;
-import de.thm.swtp.api.projectPost.entity.ProjectPostEntity;
 import de.thm.swtp.api.projectPost.repository.ProjectPostRepository;
 import de.thm.swtp.api.thesis.ThesisRepository;
 import de.thm.swtp.api.userprofile.domain.UserStatus;
@@ -310,72 +308,145 @@ class SecurityServiceTest {
     }
 
     @Test
-    void canCreateProjectPost_allowsContributor() {
-        when(projectRepository.existsByIdAndMembersKeycloakId(projectId, userId)).thenReturn(true);
+    void canCreateProjectPost_allowsCurrentProjectOwner() {
+        when(projectRepository.existsByIdAndOwnerKeycloakId(projectId, userId))
+                .thenReturn(true);
 
         assertThat(securityService.canCreateProjectPost(
-                projectId, authentication())).isTrue();
+                projectId, authentication()))
+                .isTrue();
     }
 
     @Test
-    void canArchiveProjectPost_allowsPostAuthor() {
-        when(projectPostRepository.existsByIdAndProjectIdAndAuthorKeycloakId(
-                resourceId, projectId, userId)).thenReturn(true);
+    void canCreateProjectPost_deniesProjectMember() {
+        when(projectRepository.existsByIdAndOwnerKeycloakId(projectId, userId))
+                .thenReturn(false);
+
+        assertThat(securityService.canCreateProjectPost(
+                projectId, authentication()))
+                .isFalse();
+    }
+
+    @Test
+    void canArchiveProjectPost_allowsCurrentProjectOwner() {
+        when(projectRepository.existsByIdAndOwnerKeycloakId(projectId, userId))
+                .thenReturn(true);
+        when(projectPostRepository.existsByIdAndProjectId(resourceId, projectId))
+                .thenReturn(true);
 
         assertThat(securityService.canArchiveProjectPost(
-                projectId, resourceId, authentication())).isTrue();
+                projectId, resourceId, authentication()))
+                .isTrue();
     }
 
     @Test
-    void canPublishDraft_allowsOnlyAuthor() {
-        ProjectPostEntity post = ProjectPostEntity.builder()
-                .id(resourceId)
-                .status(ProjectPostStatus.DRAFT)
-                .build();
-        when(projectPostRepository.findByIdAndProjectId(resourceId, projectId))
-                .thenReturn(Optional.of(post));
-        when(projectPostRepository.existsByIdAndProjectIdAndAuthorKeycloakId(
-                resourceId, projectId, userId)).thenReturn(true);
-
-        assertThat(securityService.canPublishProjectPost(
-                projectId, resourceId, authentication())).isTrue();
-    }
-
-    @Test
-    void canPublishDraft_deniesProjectOwnerWhoIsNotAuthor() {
-        ProjectPostEntity post = ProjectPostEntity.builder()
-                .id(resourceId)
-                .status(ProjectPostStatus.DRAFT)
-                .build();
-        when(projectPostRepository.findByIdAndProjectId(resourceId, projectId))
-                .thenReturn(Optional.of(post));
-        lenient().when(projectRepository.existsByIdAndOwnerKeycloakId(projectId, userId))
+    void canPublishProjectPost_allowsCurrentProjectOwner() {
+        when(projectRepository.existsByIdAndOwnerKeycloakId(projectId, userId))
+                .thenReturn(true);
+        when(projectPostRepository.existsByIdAndProjectId(resourceId, projectId))
                 .thenReturn(true);
 
         assertThat(securityService.canPublishProjectPost(
-                projectId, resourceId, authentication())).isFalse();
+                projectId, resourceId, authentication()))
+                .isTrue();
     }
 
     @Test
-    void canPublishArchivedPost_allowsProjectOwner() {
-        ProjectPostEntity post = ProjectPostEntity.builder()
-                .id(resourceId)
-                .status(ProjectPostStatus.ARCHIVED)
-                .build();
-        when(projectPostRepository.findByIdAndProjectId(resourceId, projectId))
-                .thenReturn(Optional.of(post));
-        when(projectRepository.existsByIdAndOwnerKeycloakId(projectId, userId)).thenReturn(true);
+    void canEditProjectPost_allowsCurrentProjectOwner() {
+        when(projectRepository.existsByIdAndOwnerKeycloakId(projectId, userId))
+                .thenReturn(true);
+        when(projectPostRepository.existsByIdAndProjectId(resourceId, projectId))
+                .thenReturn(true);
 
-        assertThat(securityService.canPublishProjectPost(
-                projectId, resourceId, authentication())).isTrue();
+        assertThat(securityService.canEditProjectPost(
+                projectId, resourceId, authentication()))
+                .isTrue();
     }
 
     @Test
-    void canDeleteProjectPost_allowsOwner() {
-        when(projectRepository.existsByIdAndOwnerKeycloakId(projectId, userId)).thenReturn(true);
+    void canDeleteProjectPost_allowsCurrentProjectOwner() {
+        when(projectRepository.existsByIdAndOwnerKeycloakId(projectId, userId))
+                .thenReturn(true);
+        when(projectPostRepository.existsByIdAndProjectId(resourceId, projectId))
+                .thenReturn(true);
 
         assertThat(securityService.canDeleteProjectPost(
-                projectId, resourceId, authentication())).isTrue();
+                projectId, resourceId, authentication()))
+                .isTrue();
+    }
+
+    @Test
+    void projectPostPermissions_denyFormerOwnerAfterOwnershipTransfer() {
+        when(projectRepository.existsByIdAndOwnerKeycloakId(projectId, userId))
+                .thenReturn(false);
+
+        assertThat(securityService.canCreateProjectPost(
+                projectId, authentication()))
+                .isFalse();
+
+        assertThat(securityService.canArchiveProjectPost(
+                projectId, resourceId, authentication()))
+                .isFalse();
+
+        assertThat(securityService.canPublishProjectPost(
+                projectId, resourceId, authentication()))
+                .isFalse();
+
+        assertThat(securityService.canEditProjectPost(
+                projectId, resourceId, authentication()))
+                .isFalse();
+
+        assertThat(securityService.canDeleteProjectPost(
+                projectId, resourceId, authentication()))
+                .isFalse();
+    }
+
+    @Test
+    void projectPostPermissions_denyPostThatDoesNotBelongToProject() {
+        when(projectRepository.existsByIdAndOwnerKeycloakId(projectId, userId))
+                .thenReturn(true);
+        when(projectPostRepository.existsByIdAndProjectId(resourceId, projectId))
+                .thenReturn(false);
+
+        assertThat(securityService.canArchiveProjectPost(
+                projectId, resourceId, authentication()))
+                .isFalse();
+
+        assertThat(securityService.canPublishProjectPost(
+                projectId, resourceId, authentication()))
+                .isFalse();
+
+        assertThat(securityService.canEditProjectPost(
+                projectId, resourceId, authentication()))
+                .isFalse();
+
+        assertThat(securityService.canDeleteProjectPost(
+                projectId, resourceId, authentication()))
+                .isFalse();
+    }
+
+    @Test
+    void canDeleteProjectPost_allowsModerator() {
+        when(projectPostRepository.existsByIdAndProjectId(resourceId, projectId))
+                .thenReturn(true);
+
+        assertThat(securityService.canDeleteProjectPost(
+                projectId,
+                resourceId,
+                authentication("ROLE_MODERATOR")))
+                .isTrue();
+    }
+
+    @Test
+    void canDeleteProjectPost_deniesModeratorForMismatchedProject() {
+        when(projectPostRepository.existsByIdAndProjectId(resourceId, projectId))
+                .thenReturn(false);
+
+        assertThat(securityService.canDeleteProjectPost(
+                projectId,
+                resourceId,
+                authentication("ROLE_MODERATOR")))
+                .isFalse();
     }
 
     @Test

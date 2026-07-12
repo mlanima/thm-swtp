@@ -25,7 +25,7 @@ public class ProjectController {
     private final ProjectService projectService;
 
     @GetMapping
-    @PreAuthorize("@security.hasModeratorRole(authentication)")
+    @PreAuthorize("@security.canViewAllProjects(authentication)")
     public ResponseEntity<PageResponse<ProjectResponse>> getAllProjects(
             @RequestParam(required = false) String name,
             @PageableDefault(size = 20, sort = "name", direction = Sort.Direction.ASC) Pageable pageable) {

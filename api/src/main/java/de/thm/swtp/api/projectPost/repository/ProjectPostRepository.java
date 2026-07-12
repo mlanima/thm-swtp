@@ -5,7 +5,6 @@ import de.thm.swtp.api.projectPost.entity.ProjectPostEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public interface ProjectPostRepository  extends JpaRepository<ProjectPostEntity, UUID> {
@@ -19,14 +18,11 @@ public interface ProjectPostRepository  extends JpaRepository<ProjectPostEntity,
     /** Returns all archived posts belonging to a project. Ordered by archive date. */
     List<ProjectPostEntity> findAllByProjectIdAndStatusOrderByArchivedAtDesc(UUID projectId, ProjectPostStatus status);
 
-    /** Checks if project posts exists for a given project from a given user.*/
-    boolean existsByIdAndProjectIdAndAuthorKeycloakId(UUID postId, UUID projectId, UUID authorKeycloakId);
-
-    /** Returns the project post from a given project.*/
-    Optional<ProjectPostEntity> findByIdAndProjectId(UUID postId, UUID projectId);
-
     /** Returns all posts of a specified project.*/
     List<ProjectPostEntity> findAllByProjectId(UUID projectId);
+
+    /** Checks whether a project post exists in a specified project.*/
+    boolean existsByIdAndProjectId(UUID id, UUID projectId);
 
     /** Deletes all posts of a specified project.*/
     void deleteByProjectId(UUID projectId);
