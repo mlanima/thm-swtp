@@ -260,6 +260,8 @@
       "LOADING": "Loading users...",
       "EMPTY_ACTIVE_TITLE": "No active users available.",
       "EMPTY_ACTIVE_DESCRIPTION": "Active users appear here and can be banned if necessary.",
+      "SHOWING_OF": "of",
+      "TOTAL_USERS": "users displayed",
       "MODAL": {
         "TITLE": "Ban user",
         "DESCRIPTION": "The user will be blocked and can no longer use the platform. The account remains in the system.",

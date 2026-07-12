@@ -249,6 +249,12 @@
         [totalPages]="activeTotalPages()"
         (pageChange)="onActivePageChange($event)"
       />
+      <p class="mt-4 text-center text-sm text-slate-400">
+        {{ activeDisplayedUserCount() }}
+        {{ 'MODERATOR.USER_MANAGEMENT.SHOWING_OF' | translate }}
+        {{ activeUserCount() }}
+        {{ 'MODERATOR.USER_MANAGEMENT.TOTAL_USERS' | translate }}
+      </p>
     }
 
     @if (activeTab() === 'banned') {
@@ -470,6 +476,12 @@
         [totalPages]="bannedTotalPages()"
         (pageChange)="onBannedPageChange($event)"
       />
+      <p class="mt-4 text-center text-sm text-slate-400">
+        {{ bannedDisplayedUserCount() }}
+        {{ 'MODERATOR.USER_MANAGEMENT.SHOWING_OF' | translate }}
+        {{ bannedUserCount() }}
+        {{ 'MODERATOR.USER_MANAGEMENT.TOTAL_USERS' | translate }}
+      </p>
     }
   </main>
 </div>

@@ -1,5 +1,5 @@
 import { DatePipe, isPlatformBrowser } from '@angular/common';
-import { Component, inject, OnInit, PLATFORM_ID, signal } from '@angular/core';
+import { Component, inject, OnInit, PLATFORM_ID, signal, computed } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ManagedUser, ManagedUserSortField, SortDirection } from '../models/managed-user.model';
 import { UserManagementService } from '../service/user-management.service';
@@ -46,6 +46,14 @@ export class UserManagement implements OnInit {
 
   readonly isBanSubmitting = signal(false);
   readonly banErrorMessage = signal<string | null>(null);
+
+  readonly activeDisplayedUserCount = computed(() =>
+    Math.min((this.activeCurrentPage() + 1) * PAGE_SIZE, this.activeUserCount()),
+  );
+
+  readonly bannedDisplayedUserCount = computed(() =>
+    Math.min((this.bannedCurrentPage() + 1) * PAGE_SIZE, this.bannedUserCount()),
+  );
 
   ngOnInit() {
     if (!isPlatformBrowser(this.platformId)) {

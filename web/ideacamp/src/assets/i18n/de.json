@@ -260,6 +260,8 @@
       "LOADING": "Nutzer werden geladen...",
       "EMPTY_ACTIVE_TITLE": "Keine aktiven Nutzer vorhanden.",
       "EMPTY_ACTIVE_DESCRIPTION": "Aktive Nutzer erscheinen hier und können bei Bedarf gebannt werden.",
+      "SHOWING_OF": "von",
+      "TOTAL_USERS": "Nutzern angezeigt",
       "MODAL": {
         "TITLE": "Nutzer bannen",
         "DESCRIPTION": "Der Nutzer wird gesperrt und kann die Plattform nicht mehr nutzen. Der Account bleibt im System erhalten.",
