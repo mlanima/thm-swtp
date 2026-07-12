@@ -42,7 +42,7 @@ export class DangerZoneTab {
     if (!this.deleteEnabled() || this.isDeleting()) return;
     this.isDeleting.set(true);
     this.settingsService.deleteThesis(this.thesisId()).subscribe({
-      next: () => this.router.navigateByUrl('/'),
+      next: () => this.router.navigateByUrl('/dashboard'),
       error: () => {
         this.deleteError.set(this.translateService.instant('THESISSETTINGS.DANGER.ERROR_DELETE_THESIS'));
         this.isDeleting.set(false);
