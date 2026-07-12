@@ -1,6 +1,8 @@
-# Frontend - Folder Structure & Architecture
+# Frontend – Folder Structure & Architecture
 
-A comprehensive guide to the IdeaCamp frontend application built with Angular 21, featuring Keycloak OAuth2 integration and modern Angular patterns.
+Guide zur IdeaCamp-Frontend (Angular 21, Standalone, SSR). Auth via Keycloak/OIDC, i18n via `@ngx-translate`, Markdown-Rendering via `marked` + `dompurify`.
+
+> Stand: Juli 2026 · Angular 21.2 · TypeScript 5.9 · `angular-oauth2-oidc` v20
 
 ---
 
@@ -9,97 +11,87 @@ A comprehensive guide to the IdeaCamp frontend application built with Angular 21
 ```
 web/ideacamp/
 ├── src/
-│   ├── app/                              # Angular Application Root
-│   │   ├── app.ts                        # Root Component
-│   │   ├── app.routes.ts                 # Route Configuration (Standalone)
-│   │   ├── app.config.ts                 # App Configuration (Providers)
-│   │   ├── app.html                      # Root Template
-│   │   ├── app.css                       # Global Styles
-│   │   ├── core/                         # Core Module (Singleton Services)
-│   │   ├── config/                       # Configuration Files
-│   │   ├── enviroments/                  # Environment Configuration
-│   │   │   └── enviroment.dev.ts         # Dev Environment (API URL, OAuth Config)
-│   │   ├── models/                       # Shared Data Models
-│   │   │   ├── project.model.ts          # Project Interface/Type
-│   │   │   └── user-profile.model.ts     # User Profile Interface/Type
-│   │   ├── services/                     # Global Services
-│   │   │   └── user-profile.service.ts   # User Profile API Service
-│   │   ├── shared/                       # Reusable Components & Utilities
-│   │   │   ├── header/                   # Header Component with Auth Panel
-│   │   │   ├── sidebar/                  # Sidebar Navigation Component
-│   │   │   ├── tag/                      # Tag Display Component
-│   │   │   ├── icons/                    # SVG Icon Components
-│   │   │   ├── edit-button/              # Reusable Edit Button
-│   │   │   └── types/                    # Shared TypeScript Types
-│   │   └── feature/                      # Feature Modules (Lazy-loadable)
-│   │       ├── auth/                     # 🔐 Authentication Module
-│   │       │   ├── auth.service.ts       # Keycloak/OIDC Service
-│   │       │   ├── auth.guard.ts         # Route Guard (Requires Login)
-│   │       │   ├── auth.interceptor.ts   # HTTP Interceptor (Adds Auth Tokens)
-│   │       │   ├── success/              # OAuth Callback Handler
-│   │       │   └── auth.service.spec.ts  # Unit Tests
-│   │       ├── user-profile/             # User Profile Feature
-│   │       │   ├── pages/
-│   │       │   │   └── user-profile/     # Main Profile Page
-│   │       │   └── components/           # Profile Sub-components
-│   │       │       ├── profile-banner/
-│   │       │       └── profile-information/
-│   │       ├── project-create/           # Project Creation Wizard
-│   │       │   ├── project-create.ts     # Main Wizard Container
-│   │       │   ├── wizard-layout/        # Wizard Layout Component
-│   │       │   ├── stepper/              # Stepper Control
-│   │       │   ├── project-general-form/ # General Info Form
-│   │       │   ├── project-members-form/ # Members Selection Form
-│   │       │   ├── project-settings-form/# Settings Form
-│   │       │   ├── project-finish-form/  # Summary & Submit
-│   │       │   └── schemas/              # Zod Validation Schemas
-│   │       ├── project-site/             # Project Detail Page
-│   │       │   ├── project-site.ts       # Main Project Container
-│   │       │   ├── project.service.ts    # Project API Service
-│   │       │   ├── services/
-│   │       │   │   └── project-tag.service.ts
-│   │       │   └── components/
-│   │       │       ├── project-header/   # Header with Title & Owner
-│   │       │       ├── project-sidebar/  # Quick Info Sidebar
-│   │       │       ├── info-card/        # Info Cards (Status, Dates, etc)
-│   │       │       ├── member-list/      # Team Members Display
-│   │       │       ├── open-position-card/ # Job Openings
-│   │       │       ├── tech-stack/       # Technology Tags
-│   │       │       ├── tag-list/         # Project Tags
-│   │       │       └── quicklinks/       # Quick Action Links
-│   │       ├── my-projects/              # User's Projects Dashboard
-│   │       │   ├── pages/
-│   │       │   │   └── my-projects-page/
-│   │       │   └── services/
-│   │       │       └── my-projects.service.ts
-│   │       ├── search/                    # Global Search Feature
-│   │       │   ├── pages/
-│   │       │   │   └── search-page/      # Search Results Page
-│   │       │   ├── components/
-│   │       │   │   ├── user-result-card/ # User Search Result
-│   │       │   │   └── project-result-card/ # Project Search Result
-│   │       │   ├── services/
-│   │       │   │   └── search.service.ts
-│   │       │   └── models/
-│   │       │       ├── user-search-result.model.ts
-│   │       │       └── project-search-result.model.ts
-│   │       ├── contact-request/          # Project Invitations/Requests
-│   │       │   ├── pages/
-│   │       │   │   └── contact-requests/ # Invitations Page
-│   │       │   └── components/
-│   │       │       ├── contact-request-box/
-│   │       │       └── contact-request.model.ts
-│   │       └── legal-notice/             # Legal Pages
-│   │           └── pages/
-│   │               └── impressum.ts      # Impressum (Legal Notice)
-│   ├── main.ts                           # Bootstrap Entry Point
-│   ├── index.html                        # Main HTML Template
-│   └── styles.css                        # Global Styles
-├── public/                               # Static Assets
-├── angular.json                          # Angular CLI Configuration
-├── package.json                          # Dependencies
-├── tsconfig.json                         # TypeScript Configuration
-└── README.md                             # Project README
+│   ├── main.ts                           # Bootstrap (browser)
+│   ├── index.html
+│   ├── styles.css                        # Global Styles (Tailwind)
+│   └── app/
+│       ├── app.ts                        # Root Component (Header/Sidebar/Footer/Toast)
+│       ├── app.html · app.css
+│       ├── app.config.ts                 # Browser Providers (Router, HTTP, OAuth, i18n)
+│       ├── app.config.server.ts          # SSR Providers (merge mit app.config)
+│       ├── app.routes.ts                 # Route Configuration (30 Routes)
+│       ├── app.routes.server.ts          # SSR Render-Mode pro Route (Client/Prerender)
+│       ├── app.spec.ts · i18n-keys.spec.ts
+│       ├── enviroments/
+│       │   └── enviroment.dev.ts         # apiUrl, issuer, clientId, googleMapsApiKey
+│       ├── models/                       # Globale Datenmodelle (15 Files)
+│       ├── services/                     # Globale Services (5)
+│       ├── shared/                       # Wiederverwendbare Komponenten & Utils
+│       └── feature/                      # Feature-Module (21+)
+├── public/                               # Statische Assets
+├── assets/i18n/                          # JSON-Locale-Files (de, …)
+├── angular.json
+├── proxy.conf.json                       # Dev-Proxy /api + /uploads → :8080
+├── package.json · tsconfig.json · tsconfig.app.json · tsconfig.spec.json
+├── eslint.config.js · .prettierrc · .postcssrc.json
+├── Dockerfile
+└── FRONTEND_README.md
+```
+
+### `src/app/models/` (globale Modelle)
+`file-visibility.model.ts`, `github-connection.model.ts`, `github-readme.model.ts`, `github-repo-card.model.ts`, `link-visibility.model.ts`, `page-response.model.ts`, `project-file.model.ts`, `project-invite.model.ts`, `project-invite-member.model.ts`, `project-link.model.ts`, `project.model.ts`, `thesis.model.ts`, `user-ban-status.model.ts`, `user-profile-link.model.ts`, `user-profile.model.ts`
+
+### `src/app/services/` (globale Services)
+`language.service.ts` (i18n-Init), `project-favorite.service.ts`, `project-join-request.service.ts`, `user-follow.service.ts`, `user-profile.service.ts`
+
+### `src/app/shared/`
+```
+shared/
+├── header/            # Top-Nav, auth-panel, feature, logo
+├── sidebar/           # Navigation, menu-link, recent, sidebar.service
+├── footer/
+├── toast/             # toast + toast.service
+├── onboarding/
+├── success-modal/
+├── favorite-button/
+├── follow-button/
+├── join-request-button/
+├── link-manager/      # + schema + types
+├── place-autocomplete # Google Places
+├── user-search-pick/
+├── tags/tag-list/
+├── edit-button/
+├── icons/             # followers-icon, location-icon, …
+├── pipes/             # markdown.pipe
+├── utils/             # avatar, github-readme-renderer, relative-time
+└── types/             # user.type
+```
+
+### `src/app/feature/` (Feature-Module)
+```
+feature/
+├── auth/                    # AuthService, Guards, Interceptor, jwt-utils, success/
+├── landing-page/            # Öffentliche Startseite
+├── banned-account/          # Seite für gebannte User
+├── dashboard/               # current-projects, current-theses, recent-posts
+├── search/                  # search-page, project/user-result-card, search-filter-panel, search-input
+├── project-create/         # Wizard: general/members/settings/finish-form + stepper + wizard-layout + schemas
+├── project-site/           # Detailseite: header, sidebar, info-card, member-list, open-position-card, tag-list, github-repo-card, project-files, project-posts, project-readme + services
+├── project-settings/       # Tabs: privacy, members, join-requests, github, discord, danger-zone + store + services + models
+├── my-projects/            # project-card, project-list, project-filter, invitation-card, invitations-section + services
+├── favorites/              # favorites-page
+├── contact-request/        # contact-requests page + contact-request-box
+├── thesis-create/         # Wizard: general/students/settings/finish-form + schemas
+├── thesis-site/            # header, sidebar, info-card, student-list
+├── thesis-settings/        # Tabs: students, danger-zone + services
+├── my-theses/              # thesis-card, thesis-list, services
+├── reports/                # User-Seite: report-dialog, schemas, service, models
+├── professor-request/      # User-Antragsseite + services
+├── github/                 # github-callback page + services
+├── user-profile/          # user-profile page, profile-banner, profile-information, profile-tag-list + services
+├── user-settings/         # Tabs: contact, discord, integrations, impressum, professor-request
+├── moderator/             # mod-only: audit-logs, professor-request, projects, reports, user-management + services + shared/pagination
+└── legal-notice/          # impressum
 ```
 
 ---
@@ -108,179 +100,111 @@ web/ideacamp/
 
 ### Overview
 
-The application uses **Keycloak** as the OAuth2/OIDC identity provider with the Angular OAuth2 library (`angular-oauth2-oidc`) for seamless integration.
+**Keycloak** als OAuth2/OIDC-IdP, integriert über `angular-oauth2-oidc`.
 
-**Key Features:**
-- ✅ Automatic token refresh
-- ✅ Code flow with PKCE
-- ✅ Server-side rendering compatible
-- ✅ Signal-based reactive state management
-- ✅ Type-safe JWT handling
+**Features:**
+- ✅ Authorization Code Flow (response_type `code`)
+- ✅ Automatisches Silent Refresh (`setupAutomaticSilentRefresh`)
+- ✅ SSR-kompatibel (Auth-Bootstrap läuft erst nach `appRef.isStable`, Browser-only via `isPlatformBrowser`)
+- ✅ Signal-basierter reaktiver State
+- ✅ Rollen-Erkennung (`MODERATOR` realm role aus JWT `realm_access.roles`)
+- ✅ Ban-Status-Check beim Route-Guard
 
----
+### Auth Service (`feature/auth/auth.service.ts`)
 
-### Auth Service (`auth.service.ts`)
+**Zentrale Signale:**
 
-**Purpose:** Central authentication service managing OAuth state and UI signals.
-
-**Key Responsibilities:**
-1. Configure OAuth client for Keycloak
-2. Load discovery document & restore login state
-3. Manage login/logout flows
-4. Expose reactive auth state via Angular Signals
-
-**Primary Signals:**
-```typescript
-// Is user authenticated (has valid access token)
-isLoggedIn: WritableSignal<boolean>
-
-// Current authenticated user
-user: WritableSignal<User | null>
-
-// Current username (convenience)
-username: WritableSignal<string>
-
-// Is logout in progress
-isLoggingOut: WritableSignal<boolean>
-```
+| Signal | Typ | Bedeutung |
+|--------|------|-----------|
+| `isLoggedIn` | `WritableSignal<boolean>` | Gültiges Access-Token vorhanden |
+| `isLoggingOut` | `WritableSignal<boolean>` | Logout läuft |
+| `isModerator` | `WritableSignal<boolean>` | User hat realm role `MODERATOR` |
+| `user` | `WritableSignal<User \| null>` | Minimal-User (`username`, `id`) |
+| `username` | `WritableSignal<string>` | Convenience für UI |
+| `currentBanStatus` | `WritableSignal<UserBanStatusModel \| null>` | Letzter Ban-Status |
 
 **Key Methods:**
 
-| Method | Purpose |
-|--------|---------|
-| `login()` | Initiate Keycloak OAuth code flow |
-| `logout()` | Clear auth state & redirect to Keycloak logout |
-| `isAuthenticated()` | Check if valid access token exists |
-| `getAccessToken()` | Get JWT token for API calls |
-| `waitUntilAuthReady()` | Async: Wait for auth initialization (SSR-safe) |
+| Method | Zweck |
+|--------|------|
+| `login()` | Startet Code-Flow (`initCodeFlow`), mit Timeout-Fallback → direkter Redirect zum Keycloak-Auth-Endpoint (`redirectToKeycloakLogin`) |
+| `logout()` | Setzt Signale zurück, `isLoggingOut=true`, `oauthService.logOut()` → Keycloak redirectet zu `postLogoutRedirectUri` (`/landing`) |
+| `isAuthenticated()` | `hasValidAccessToken()` |
+| `getAccessToken()` | JWT für API-Calls (oder `null`) |
+| `waitUntilAuthReady()` | Async: wartet auf Discovery + `loadDiscoveryDocumentAndTryLogin` (idempotent über `initPromise`) |
+| `loadCurrentBanStatus()` | HTTP `GET /v1/users/me/ban-status`, cached in `currentBanStatus` |
 
-**Configuration (from environment):**
-```typescript
-// From enviroment.dev.ts
-{
-  issuer: "https://keycloak.example.com/realms/ideacamp",
-  clientId: "ideacamp-web",
-  scope: "openid profile email",
-  redirectUri: "${ORIGIN}/success"  // Callback URL
-}
-```
+**Bootstrap-Reihenfolge:**
+1. Konstruktor: `OAuthService` injecten, `AuthConfig` konfigurieren (`issuer`, `clientId`, `scope`, `redirectUri = origin/success`, `postLogoutRedirectUri = origin/landing`).
+2. OAuth-Event-Subscription → `updateStateAfterTick`.
+3. Warten auf `appRef.isStable` (SSR-sicher) → `startAuthBootstrap()`.
+4. `loadDiscoveryDocumentAndTryLogin()` → `setupAutomaticSilentRefresh()` → `updateState()`.
 
----
+**`User`-Typ** (`shared/types/user.type.ts`): Zod-Schema `{ username, id }`, exportiert via `z.infer`.
 
-### Auth Guard (`auth.guard.ts`)
+### JWT-Utils (`feature/auth/jwt-utils.ts`)
+`decodeJwtPayload(token)`: base64url → base64 → `atob` → JSON. Genutzt von Interceptor (für `X-User-Id`) und `AuthService.hasModeratorRole`.
 
-**Purpose:** Route protection - ensures only authenticated users can access protected pages.
+### Guards
 
-**Implementation:**
-```typescript
-export const authGuard: CanActivateFn = async () => {
-  // 1. Wait for auth bootstrap (loads discovery doc)
-  await authService.waitUntilAuthReady();
-  
-  // 2. Check if user is logging out
-  if (authService.isLoggingOut()) {
-    return router.createUrlTree(['/impressum']);
-  }
-  
-  // 3. Check if authenticated
-  if (authService.isAuthenticated()) {
-    return true;  // Allow access
-  }
-  
-  // 4. Not authenticated → start login
-  authService.login();
-  return false;  // Deny access (user redirected to OAuth)
-};
-```
+Es gibt **drei Guards**. Alle sind SSR-sicher (frühes `return true` wenn `!isPlatformBrowser`).
 
-**Protected Routes:**
-- `/profile` - User profile
-- `/search` - Global search
-- `/createProject` - Project wizard
-- `/my-projects` - Project dashboard
-- `/contact-requests` - Invitations
-- `/project/:projectUrl` - Project details
+#### `authGuard` (`feature/auth/auth.guard.ts`)
+Schützt alle auth-pflichtigen Routes. Ablauf:
+1. `waitUntilAuthReady()`
+2. `isLoggingOut()` → redirect `/landing`
+3. `isAuthenticated()`?
+   - **Nein** → `state.url` in `sessionStorage.postLoginRedirectUrl`, `login()`, Route blockiert.
+   - **Ja** → `loadCurrentBanStatus()` (mit Fehler-Fallback `banned:false`)
+     - `banned` → redirect `/account-banned`
+     - `isAuthCallbackRoute(url)` (== `/success`) → `true`
+     - `isModerator()` → nur `/project/:url` und `/profiles/:username` sind für Moderatoren lesbar (`moderator-readable-routes.ts`), sonst redirect `/moderator`
+     - sonst `true`
 
-**Public Routes:**
-- `/impressum` - Legal notice (no guard)
-- `/success` - OAuth callback (no guard)
-- `/` - Redirects to `/impressum`
+#### `moderatorGuard` (`feature/auth/moderator.guard.ts`)
+Schützt `/moderator/**`. Auth → Ban-Check (`banned` → `/account-banned`) → `isModerator()` ? `true` : redirect `/landing`.
+
+#### `bannedAccountGuard` (`feature/auth/banned-account.guard.ts`)
+Schützt `/account-banned`. Lässt nur gebannte User zu; nicht-gebannte Moderatoren → `/moderator`, andere → `/landing`.
+
+### Auth Interceptor (`feature/auth/auth.interceptor.ts`)
+Klassischer `HttpInterceptor` (via `HTTP_INTERCEPTORS`-Token, `multi: true`).
+- Token aus `auth.getAccessToken()`.
+- Nur Requests, deren URL mit `environment.apiUrl` beginnt, werden angereichert.
+- Header: `Authorization: Bearer {token}` und `X-User-Id: {sub}` (aus `decodeJwtPayload`).
+- Sonst: Request unverändert weiterreichen.
+
+### OAuth Callback (`feature/auth/success/success.component.ts`)
+Keycloak redirectet nach `{origin}/success?code=…&state=…`. Die `SuccessComponent` mountet; `AuthService` verarbeitet den Callback (`loadDiscoveryDocumentAndTryLogin` tauscht den Code). Guard lässt die Callback-Route passieren (`isAuthCallbackRoute`), danach Redirect zum gespeicherten `postLoginRedirectUrl` oder Dashboard.
 
 ---
 
-### Auth Interceptor (`auth.interceptor.ts`)
+## 🎯 Feature Modules (Detail)
 
-**Purpose:** Automatically attach JWT token to all API requests.
-
-**Functionality:**
-1. Extract access token from auth service
-2. Decode JWT to get `sub` claim (user ID)
-3. Add headers to requests targeting the API:
-   - `Authorization: Bearer {token}`
-   - `X-User-Id: {userId}`
-
-**Smart Behavior:**
-- Only attaches token to API requests (URL filtering)
-- Allows public HTTP requests without modification
-- Decodes JWT claims without calling backend
-
----
-
-### OAuth Callback Component (`success/success.component.ts`)
-
-**Purpose:** Handle OAuth redirect callback from Keycloak.
-
-**Flow:**
-1. User returned from Keycloak with auth code
-2. `success` component mounts
-3. Auth service processes callback (token exchange happens)
-4. Redirect to intended destination or dashboard
-
----
-
-## 🎯 Feature Modules
-
-### Auth Module (`feature/auth/`)
-- Complete OAuth2/OIDC integration
-- Route protection
-- Token management
-- SSR-compatible
-
-### User Profile (`feature/user-profile/`)
-- View & edit user profiles
-- Display user information
-- Manage profile data
-
-### Project Site (`feature/project-site/`)
-- Display project details
-- Show team members
-- List open positions
-- Display technologies & tags
-
-### Project Create (`feature/project-create/`)
-- Multi-step wizard
-- Form validation using Zod
-- General info, members, settings, review
-- Final project submission
-
-### Search (`feature/search/`)
-- Search projects by name/description
-- Search users by username/email
-- Display search results with cards
-
-### My Projects (`feature/my-projects/`)
-- Dashboard of user's projects
-- Quick project access
-- Project management
-
-### Contact Requests (`feature/contact-request/`)
-- Display project invitations
-- Accept/reject invitations
-- Manage team requests
-
-### Legal Notice (`feature/legal-notice/`)
-- Impressum page (required in Germany/EU)
-- Public, no auth required
+| Modul | Zweck |
+|------|--------|
+| **auth** | OAuth2/OIDC, Guards, Interceptor, JWT-Utils, Success-Callback |
+| **landing-page** | Öffentliche Startseite (kein Guard) |
+| **legal-notice** | Impressum (öffentlich) |
+| **banned-account** | Seite für gebannte User (`bannedAccountGuard`) |
+| **user-profile** | Profil-Anzeige/Bearbeitung (`profile-banner`, `profile-information`, `profile-tag-list`) |
+| **user-settings** | Settings mit Tabs: contact, discord, integrations, impressum, professor-request |
+| **dashboard** | Übersicht: current-projects, current-theses, recent-posts |
+| **search** | Projekt-/Usersuche, Filter-Panel, Result-Cards, Input |
+| **project-create** | Wizard (general/members/settings/finish) + stepper + wizard-layout + Zod-schemas |
+| **project-site** | Projektdetail: header, sidebar, info-card, member-list, open-position-card, tag-list, github-repo-card, project-files, project-posts, project-readme |
+| **project-settings** | Settings-Tabs: privacy, members, join-requests, github, discord, danger-zone + `project-settings.store.ts` |
+| **my-projects** | Projekt-Dashboard: cards, list, filter, invitations-section + invitation-card |
+| **favorites** | Favoriten-Seite |
+| **contact-request** | Einladungen: contact-requests page + contact-request-box |
+| **thesis-create** | Wizard (general/students/settings/finish) + schemas |
+| **thesis-site** | Thesen-Detail: header, sidebar, info-card, student-list |
+| **thesis-settings** | Tabs: students, danger-zone + services |
+| **my-theses** | Thesen-Dashboard: thesis-card, thesis-list |
+| **reports** | User-Meldungen: report-dialog, schemas, service |
+| **professor-request** | User-Antrag auf Professor-Rechte + services |
+| **github** | GitHub OAuth-Callback + services |
+| **moderator** | Nur `MODERATOR`: audit-logs, professor-request, projects (+delete-dialog, project-table), reports (+report-table, -detail-dialog, -action-menu), user-management (+ban-user-dialog), shared/pagination, services |
 
 ---
 
@@ -288,26 +212,40 @@ export const authGuard: CanActivateFn = async () => {
 
 ### Shared Components
 
-| Component | Location | Purpose |
-|-----------|----------|---------|
-| **Header** | `shared/header/` | Top navigation, auth panel |
-| **Sidebar** | `shared/sidebar/` | Navigation menu |
-| **Tag** | `shared/tag/` | Display project/profile tags |
-| **Edit Button** | `shared/edit-button/` | Reusable edit action button |
-| **Icons** | `shared/icons/` | SVG icon components |
+| Komponente | Ort | Zweck |
+|-----------|------|-------|
+| Header | `shared/header/` | Top-Nav mit `auth-panel`, `feature`, `logo` |
+| Sidebar | `shared/sidebar/` | Navigation, `menu-link`, `recent` |
+| Footer | `shared/footer/` | Footer |
+| Toast | `shared/toast/` | Toast-Notifications (+ `toast.service`) |
+| Onboarding | `shared/onboarding/` | Onboarding-Overlay |
+| SuccessModal | `shared/success-modal/` | Bestätigungs-Modal |
+| FavoriteButton | `shared/favorite-button/` | Favorit toggeln |
+| FollowButton | `shared/follow-button/` | Follow toggeln |
+| JoinRequestButton | `shared/join-request-button/` | Join-Request senden |
+| LinkManager | `shared/link-manager/` | Link-Liste-Editor (+ schema, types) |
+| PlaceAutocomplete | `shared/place-autocomplete/` | Google Places Location-Autocomplete |
+| UserSearchPick | `shared/user-search-pick/` | User-Auswahl-Picker |
+| TagList | `shared/tags/tag-list/` | Tag-Anzeige |
+| EditButton | `shared/edit-button/` | Bearbeiten-Button |
+| Icons | `shared/icons/` | SVG-Icons (`followers-icon`, `location-icon`, …) |
+
+### Pipes & Utils
+
+| Datei | Zweck |
+|------|-------|
+| `pipes/markdown.pipe.ts` | Markdown → sanitisiertes HTML (via `marked` + `dompurify`) |
+| `utils/avatar.util.ts` | Avatar-Helfer |
+| `utils/github-readme-renderer.ts` | README-Markdown-Renderer |
+| `utils/relative-time.util.ts` | Relative Zeit-Ausgabe |
 
 ### Shared Services
-
-| Service | Location | Purpose |
-|---------|----------|---------|
-| **UserProfileService** | `services/user-profile.service.ts` | User profile API calls |
-| **SidebarService** | `shared/sidebar/sidebar.service.ts` | Sidebar state management |
+- `SidebarService` (`shared/sidebar/sidebar.service.ts`) – Sidebar-State
+- `ToastService` (`shared/toast/toast.service.ts`)
+- `LanguageService` (`services/language.service.ts`) – i18n-Init
 
 ### Shared Types
-
-| Type | Location | Purpose |
-|------|----------|---------|
-| **User** | `shared/types/user.type.ts` | Authenticated user representation |
+- `User` (`shared/types/user.type.ts`) – Zod-Schema `{ username, id }`
 
 ---
 
@@ -315,133 +253,165 @@ export const authGuard: CanActivateFn = async () => {
 
 **File:** `src/app/enviroments/enviroment.dev.ts`
 
-Contains:
-- Keycloak issuer URL
-- OAuth client ID
-- API base URL
-- Scopes
-
 ```typescript
 export const environment = {
-  issuer: 'https://keycloak.example.com/realms/ideacamp',
-  clientId: 'ideacamp-web',
+  apiUrl: 'http://localhost:8080/api',
+  keycloakUrl: 'https://auth.swtp-ss26.de',
+  issuer: 'https://auth.swtp-ss26.de/realms/swtp',
+  clientId: 'swtp-frontend',
   scope: 'openid profile email',
-  apiUrl: 'http://localhost:8080/api'
+  googleMapsApiKey: '',
 };
 ```
 
+> Hinweis: Ordner heißt absichtlich `enviroments` (historischer Tippfehler, beibehalten).
+
+**Dev-Proxy** (`proxy.conf.json`): leitet `/api` und `/uploads` an `http://localhost:8080` weiter (`changeOrigin: true`).
+
 ---
 
-## 🛠️ Technology Stack
+## 📦 Technology Stack
 
-**Framework & Libraries:**
-- Angular 21 (Standalone components)
-- TypeScript 5.9
-- Angular Router (Standalone routes)
-- RxJS (Reactive programming)
-- Angular OAuth2 OIDC (v20)
-- Zod (Form validation)
+**Framework & Libs:**
+- Angular 21.2 (Standalone Components, Signals)
+- TypeScript 5.9 (strict)
+- Angular Router (Standalone Routes)
+- RxJS 7.8
+- `angular-oauth2-oidc` 20.0.2 (Keycloak/OIDC)
+- `@ngx-translate/core` 18 + `@ngx-translate/http-loader` (i18n, `assets/i18n/*.json`, fallback `de`)
+- `zod` 4.4 (Form-/Schema-Validation)
+- `marked` 18 + `marked-gfm-heading-id` + `dompurify` 3.4 (Markdown-Rendering)
+- `primeicons` 7
+- `express` 5 (SSR-Server)
 
 **Styling:**
-- Tailwind CSS 4.1
-- POSTCSS
+- Tailwind CSS 4.1 (`@tailwindcss/postcss`)
+- PostCSS
 
-**Build Tools:**
-- Angular CLI 21
-- Vite/esbuild (dev server)
-- Server-Side Rendering (Angular SSR)
+**Build & Dev:**
+- Angular CLI 21.2 / `@angular/build` 21.2 (esbuild/vite-basiert)
+- Angular SSR (`@angular/ssr` + Express, `serve:ssr:ideacamp`)
 
 **Testing:**
-- Vitest 4.0
-- JSDOM
+- Vitest 4.0 + JSDOM 28
 - Angular Testing Utilities
+- `*.spec.ts` kolokiert mit Sources
 
 **Code Quality:**
-- ESLint (Angular ESLint)
-- Prettier
-- TypeScript strict mode
+- ESLint (`angular-eslint` 21.4 + `typescript-eslint` 8.59)
+- Prettier 3.8
 
 ---
 
 ## 🔄 Data Flow
 
 ### Login Flow
-
 ```
-1. User clicks "Login" → authService.login()
-2. OAuth service initiates code flow → redirect to Keycloak
-3. User enters credentials in Keycloak
-4. Keycloak redirects to /success?code=...&state=...
-5. Auth service exchanges code for token
-6. AuthService signals updated (isLoggedIn=true)
-7. App redirects to requested route
+1. Guard ruft auth.login() (oder User klickt Login)
+2. AuthService.startAuthBootstrap() → initCodeFlow()
+3. Redirect zu Keycloak /protocol/openid-connect/auth (Fallback nach 1,5s)
+4. Keycloak: User authentifiziert → redirect {origin}/success?code=…&state=…
+5. SuccessComponent mountet, loadDiscoveryDocumentAndTryLogin() tauscht Code
+6. updateState() setzt isLoggedIn/isModerator/user/username
+7. Redirect zu sessionStorage.postLoginRedirectUrl (oder Default)
 ```
 
 ### Protected Route Access
-
 ```
-1. User navigates to /profile
-2. authGuard checks authService.isAuthenticated()
-3. If false → authService.login() + block access
-4. If true → allow component load
-5. Components use authService signals for UI
+1. Navigation zu z.B. /dashboard
+2. authGuard: waitUntilAuthReady()
+3. Nicht authentifiziert → login(), Route blockiert
+4. Authentifiziert → loadCurrentBanStatus()
+   - banned  → /account-banned
+   - isModerator() && route nicht lesbar → /moderator
+   - sonst → Komponente laden
 ```
 
 ### API Call with Token
+```
+1. Komponente ruft HttpClient (URL beginnt mit environment.apiUrl)
+2. AuthInterceptor: token = auth.getAccessToken()
+3. decodeJwtPayload(token) → sub
+4. Request cloned mit Authorization: Bearer {token}, X-User-Id: {sub}
+5. Backend validiert JWT
+```
 
-```
-1. Component calls API via HttpClient
-2. AuthInterceptor intercepts request
-3. Extracts token from authService
-4. Adds Authorization header + X-User-Id
-5. Request sent to backend
-6. Backend validates JWT
-```
+### SSR Render-Modi (`app.routes.server.ts`)
+- Auth-geschützte & dynamische Routes → `RenderMode.Client` (`/search`, `/dashboard`, `/project/:projectUrl`, `/moderator/**`, …)
+- `**` (Rest, inkl. Landing/Impressum) → `RenderMode.Prerender`
+- Server-Config wird in `app.config.server.ts` via `mergeApplicationConfig` mit `appConfig` kombiniert.
 
 ---
 
 ## 📝 Routing Summary
 
-| Path | Component | Auth | Purpose |
-|------|-----------|------|---------|
-| `/` | - | ❌ | Redirects to `/impressum` |
-| `/impressum` | Impressum | ❌ | Legal notice |
-| `/success` | SuccessComponent | ❌ | OAuth callback handler |
-| `/profile` | UserProfile | ✅ | User profile page |
-| `/search` | SearchPage | ✅ | Global search |
-| `/createProject` | ProjectCreate | ✅ | Create new project wizard |
-| `/my-projects` | MyProjectsPage | ✅ | User's projects dashboard |
-| `/contact-requests` | ContactRequests | ✅ | Project invitations |
-| `/project/:projectUrl` | ProjectSite | ✅ | Project details page |
+| Path | Component | Guard | Zweck |
+|------|-----------|-------|-------|
+| `/` | – | – | Redirect → `/landing` |
+| `/landing` | LandingPage | – | Öffentliche Startseite |
+| `/impressum` | Impressum | – | Impressum |
+| `/success` | SuccessComponent | `authGuard` | OAuth-Callback |
+| `/github/callback` | GithubCallback | `authGuard` | GitHub OAuth-Callback |
+| `/account-banned` | BannedAccount | `bannedAccountGuard` | Gebannte User |
+| `/profiles/:username` | UserProfile | `authGuard` | Profilseite |
+| `/settings` | UserSettings | `authGuard` | User-Settings (Tabs) |
+| `/professor-request` | – | – | Redirect → `/settings` |
+| `/dashboard` | DashboardPage | `authGuard` | Übersicht |
+| `/search` | SearchPage | `authGuard` | Suche |
+| `/createProject` | ProjectCreate | `authGuard` | Projekt-Wizard |
+| `/createThesis` | ThesisCreate | `authGuard` | Thesen-Wizard |
+| `/my-projects` | MyProjectsPage | `authGuard` | Eigene Projekte |
+| `/my-theses` | MyThesesPage | `authGuard` | Eigene Thesen |
+| `/favorites` | FavoritesPage | `authGuard` | Favoriten |
+| `/contact-requests` | ContactRequests | `authGuard` | Einladungen |
+| `/project/:projectUrl` | ProjectSite | `authGuard` | Projekt-Detail |
+| `/project/:projectUrl/settings` | ProjectSettings | `authGuard` | Projekt-Settings |
+| `/thesis/:thesisUrl` | ThesisSite | `authGuard` | Thesen-Detail |
+| `/thesis/:thesisUrl/settings` | ThesisSettings | `authGuard` | Thesen-Settings |
+| `/moderator` | ModeratorPage | `moderatorGuard` | Moderator-Landing |
+| `/moderator/projects` | ProjectsComponent | `moderatorGuard` | Projekt-Verwaltung |
+| `/moderator/users` | UserManagement | `moderatorGuard` | User-Management (Ban) |
+| `/moderator/professor-requests` | ProfessorRequestComponent | `moderatorGuard` | Anträge verwalten |
+| `/moderator/audit-logs` | AuditLogsComponent | `moderatorGuard` | Audit-Logs |
+| `/moderator/reports` | ReportManagement | `moderatorGuard` | Meldungs-Verwaltung |
+
+> Öffentlich (kein Guard): `/landing`, `/impressum`, `/` (Redirect). `/success` und `/github/callback` tragen `authGuard`, der die Callback-Route passieren lässt.
 
 ---
 
 ## 🧪 Testing
 
-Run tests with:
 ```bash
-npm test
+npm test      # ng test (Vitest + JSDOM)
+npm run lint  # ng lint (ESLint)
 ```
 
-Test files use `.spec.ts` extension and are colocated with source files.
+Test-Files: `*.spec.ts`, kolokiert mit Sources (z. B. `auth.service.spec.ts`, `auth.guard.spec.ts`, `sidebar.service.spec.ts`, `github-readme-renderer.spec.ts`, `i18n-keys.spec.ts`, `app.spec.ts`).
 
 ---
 
 ## 📚 Key Design Patterns
 
-1. **Standalone Components** - Modern Angular pattern (no NgModules)
-2. **Functional Routing** - Routes defined as config objects
-3. **Angular Signals** - Reactive state management (replaces BehaviorSubject)
-4. **Route Guards** - Protect authenticated routes
-5. **HTTP Interceptors** - Attach auth tokens automatically
-6. **Feature-based Structure** - Organized by business features
-7. **SSR-Compatible** - Server-side rendering support
+1. **Standalone Components** – keine NgModules.
+2. **Functional Routing** – Routes als Config-Objekte, drei `CanActivateFn`-Guards.
+3. **Angular Signals** – reaktiver State statt `BehaviorSubject` (AuthService, Store).
+4. **SSR mit Route-Modi** – `RenderMode.Client`/`Prerender` pro Route, Bootstrap erst nach `appRef.isStable`.
+5. **HTTP Interceptor (klassisch)** – via `HTTP_INTERCEPTORS`-Token (`withInterceptorsFromDi`).
+6. **Feature-basierte Struktur** – `feature/` nach Geschäftsfeature, `shared/` für Wiederverwendung.
+7. **Zod-Validation** – Forms + `User`-Typ.
+8. **i18n** – `@ngx-translate`, Keys in `assets/i18n/`, `TranslateService.instant()` statt roher Keys im Template (siehe `web/ideacamp/CLAUDE.md`).
+9. **Markdown** – `MarkdownPipe` + `github-readme-renderer` mit `dompurify`-Sanitizing.
 
 ---
 
 ## 🔗 Related Documentation
 
 - [Backend API Documentation](./BACKEND_API_DOCUMENTATION.md)
-- [Keycloak Integration Guide](./Keycloak%20-%20Integration%20Frontend%20%26%20Backend.md)
+- [Keycloak Integration Frontend & Backend](./Keycloak%20-%20Integration%20Frontend%20%26%20Backend.md)
+- [Keycloak Setup & Konfiguration](./Keycloak%20-%20Setup%20%26%20Konfiguration.md)
+- [Frontend Auth Flow](./frontend-auth-flow.md)
+- Frontend-Conventions: `web/ideacamp/CLAUDE.md`, `web/ideacamp/FRONTEND_README.md`
 
+---
 
+*Struktur und Guards aus `app.routes.ts`, `app.routes.server.ts`, `app.config.ts`, Guard-Quellen, `auth.service.ts` und der tatsächlichen Verzeichnisstruktur extrahiert. Bei Codeänderungen bitte nachpflegen.*
