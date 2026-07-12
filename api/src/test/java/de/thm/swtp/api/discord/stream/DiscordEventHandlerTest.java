@@ -280,7 +280,15 @@ class DiscordEventHandlerTest {
         handler.handleMessageAssigned(payload);
 
         verify(discordEventPublisher).publishDirectDelete(postId, "orphan-msg", "ch-1");
-        verify(messageSyncRepository, never()).save(any());
+
+        var captor = ArgumentCaptor.<DiscordMessageSyncEntity>captor();
+        verify(messageSyncRepository).save(captor.capture());
+        var savedSync = captor.getValue();
+        assertThat(savedSync.getPlatformPostId()).isEqualTo(postId);
+        assertThat(savedSync.getDiscordMessageId()).isEqualTo("orphan-msg");
+        assertThat(savedSync.getDirection()).isEqualTo(DiscordMessageSyncEntity.SyncDirection.PLATFORM_TO_DISCORD);
+
+        verify(messageSyncRepository).delete(savedSync);
     }
 
     // ── handleInviteResponse ──
