@@ -9,6 +9,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+/**
+ * Returns the current Discord integration status for a project
+ * (connection state, bot presence, channel info).
+ */
 @RestController
 @RequestMapping("/api/v1/projects/{projectId}/discord/status")
 @RequiredArgsConstructor

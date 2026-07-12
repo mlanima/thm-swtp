@@ -9,6 +9,10 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * Maps a project to a Discord channel (and optionally a guild).
+ * A project can only have one linked channel.
+ */
 @Entity
 @Table(name = "linked_channels", uniqueConstraints = {
         @UniqueConstraint(name = "UK_linked_channels_project", columnNames = {"project_id"})

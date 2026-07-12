@@ -1,7 +1,6 @@
 package de.thm.swtp.api.projectInvitation.controller;
 
-import de.thm.swtp.api.discord.entity.LinkedChannelEntity;
-import de.thm.swtp.api.discord.repository.LinkedChannelRepository;
+import de.thm.swtp.api.discord.service.DiscordProjectService;
 import de.thm.swtp.api.projectInvitation.dto.CreateProjectInviteRequest;
 import de.thm.swtp.api.projectInvitation.dto.ProjectInviteResponse;
 import de.thm.swtp.api.projectInvitation.dto.UpdateProjectInviteStatusRequest;
@@ -21,13 +20,10 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ProjectInviteController {
     private final ProjectInviteService projectInviteService;
-    private final LinkedChannelRepository linkedChannelRepository;
+    private final DiscordProjectService discordProjectService;
 
     private String getDiscordInviteUrl(UUID projectId) {
-        return linkedChannelRepository.findByProjectId(projectId)
-                .filter(LinkedChannelEntity::isActive)
-                .map(LinkedChannelEntity::getDiscordInviteUrl)
-                .orElse(null);
+        return discordProjectService.getActiveInviteUrl(projectId);
     }
 
     /** Creates invitation to a project. Only the owner can create the invitation.*/

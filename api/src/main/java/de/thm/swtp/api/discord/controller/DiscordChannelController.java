@@ -1,6 +1,6 @@
 package de.thm.swtp.api.discord.controller;
 
-import de.thm.swtp.api.discord.client.BotInternalClient.GuildInfo;
+import de.thm.swtp.api.discord.client.BotOperations.GuildInfo;
 import de.thm.swtp.api.discord.dto.DiscordChannelResponse;
 import de.thm.swtp.api.discord.entity.LinkedChannelEntity;
 import de.thm.swtp.api.discord.service.DiscordChannelService;
@@ -15,6 +15,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Manages the Discord channel connection for a project.
+ * Supports linking, auto-connecting, and updating invite URLs.
+ */
 @RestController
 @RequestMapping("/api/v1/projects/{projectId}/discord")
 @RequiredArgsConstructor
@@ -22,6 +26,7 @@ public class DiscordChannelController {
 
     private final DiscordChannelService discordChannelService;
 
+    /** Links a Discord channel (and optionally a guild) to a project. */
     @PostMapping("/connect")
     @PreAuthorize("@security.canEditProject(#projectId, authentication)")
     public ResponseEntity<DiscordChannelResponse> connect(
@@ -36,6 +41,7 @@ public class DiscordChannelController {
         return ResponseEntity.ok(DiscordChannelResponse.from(link));
     }
 
+    /** Returns the Discord bot invite URL so the user can add the bot to their server. */
     @GetMapping("/bot-invite")
     @PreAuthorize("@security.canEditProject(#projectId, authentication)")
     public ResponseEntity<Map<String, String>> getBotInviteUrl(
@@ -45,12 +51,14 @@ public class DiscordChannelController {
         return ResponseEntity.ok(Map.of("url", discordChannelService.getBotInviteUrl(projectId, userId)));
     }
 
+    /** Lists Discord servers (guilds) the bot has access to for this project. */
     @GetMapping("/guilds")
     @PreAuthorize("@security.canEditProject(#projectId, authentication)")
     public ResponseEntity<List<GuildInfo>> getGuilds(@PathVariable UUID projectId) {
         return ResponseEntity.ok(discordChannelService.getAvailableGuilds(projectId));
     }
 
+    /** Picks a channel automatically from the given or first available guild. */
     @PostMapping("/auto-connect")
     @PreAuthorize("@security.canEditProject(#projectId, authentication)")
     public ResponseEntity<DiscordChannelResponse> autoConnect(
@@ -60,6 +68,7 @@ public class DiscordChannelController {
         return ResponseEntity.ok(discordChannelService.autoConnectChannel(projectId, guildId));
     }
 
+    /** Updates the vanity invite URL shown on the project page. */
     @PatchMapping("/invite")
     @PreAuthorize("@security.canEditProject(#projectId, authentication)")
     public ResponseEntity<DiscordChannelResponse> updateInviteUrl(
@@ -73,6 +82,7 @@ public class DiscordChannelController {
         return ResponseEntity.ok(DiscordChannelResponse.from(link));
     }
 
+    /** Unlinks the Discord channel from the project. */
     @DeleteMapping("/connect")
     @PreAuthorize("@security.canEditProject(#projectId, authentication)")
     public ResponseEntity<Void> disconnect(@PathVariable UUID projectId) {
@@ -80,6 +90,7 @@ public class DiscordChannelController {
         return ResponseEntity.noContent().build();
     }
 
+    /** Returns the currently linked channel for this project, if any. */
     @GetMapping("/connect")
     @PreAuthorize("@security.canViewProject(#projectId, authentication)")
     public ResponseEntity<DiscordChannelResponse> getConnection(@PathVariable UUID projectId) {

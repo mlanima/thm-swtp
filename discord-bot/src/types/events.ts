@@ -1,3 +1,6 @@
+// ── Stream → Bot (platform sends events to the bot) ──
+
+/** Event types the platform can send to the bot via the Redis stream. */
 export enum StreamEventType {
   PostCreated = 'POST_CREATED',
   PostUpdated = 'POST_UPDATED',
@@ -6,6 +9,7 @@ export enum StreamEventType {
   ProjectEvent = 'PROJECT_EVENT',
 }
 
+/** Payload for POST_CREATED — a new forum post was created on the platform. */
 export interface PostCreatedPayload {
   postId: string;
   projectId: string;
@@ -17,6 +21,7 @@ export interface PostCreatedPayload {
   platformUrl: string;
 }
 
+/** Payload for POST_UPDATED — a post's content changed. */
 export interface PostUpdatedPayload {
   postId: string;
   discordMsgId: string;
@@ -24,12 +29,14 @@ export interface PostUpdatedPayload {
   content: string;
 }
 
+/** Payload for POST_DELETED — a post was removed. */
 export interface PostDeletedPayload {
   postId: string;
   discordMsgId: string;
   channelId: string;
 }
 
+/** Payload for PROJECT_INVITE — someone was invited to a project. */
 export interface ProjectInvitePayload {
   inviteId: string;
   targetDiscordId: string;
@@ -37,6 +44,7 @@ export interface ProjectInvitePayload {
   inviterName: string;
 }
 
+/** Payload for PROJECT_EVENT — a project-level notification (milestone, etc.). */
 export interface ProjectEventPayload {
   eventType: string;
   projectId: string;
@@ -45,6 +53,7 @@ export interface ProjectEventPayload {
   message: string;
 }
 
+/** Union of all stream (platform→bot) payloads. */
 export type StreamPayload =
   | PostCreatedPayload
   | PostUpdatedPayload
@@ -52,11 +61,15 @@ export type StreamPayload =
   | ProjectInvitePayload
   | ProjectEventPayload;
 
+/** A full message on the platform-to-bot stream. */
 export interface StreamMessage {
   type: StreamEventType;
   payload: StreamPayload;
 }
 
+// ── Bot → Platform (bot sends events back to the platform) ──
+
+/** Event types the bot can send back to the platform. */
 export enum PlatformEventType {
   DiscordMessageAssigned = 'DISCORD_MESSAGE_ASSIGNED',
   DiscordMessageCreated = 'DISCORD_MESSAGE_CREATED',
@@ -66,6 +79,7 @@ export enum PlatformEventType {
   ChannelDisconnected = 'CHANNEL_DISCONNECTED',
 }
 
+/** Payload for DISCORD_MESSAGE_ASSIGNED — the bot created a Discord message for a post. */
 export interface DiscordMessageAssignedPayload {
   postId: string;
   discordMsgId: string;
@@ -73,6 +87,7 @@ export interface DiscordMessageAssignedPayload {
   guildId?: string;
 }
 
+/** Payload for DISCORD_MESSAGE_CREATED — a user sent a message in a linked channel. */
 export interface DiscordMessageCreatedPayload {
   discordMsgId: string;
   channelId: string;
@@ -82,26 +97,31 @@ export interface DiscordMessageCreatedPayload {
   attachmentUrls?: string[];
 }
 
+/** Payload for DISCORD_MESSAGE_UPDATED — a user edited their message. */
 export interface DiscordMessageUpdatedPayload {
   discordMsgId: string;
   content: string;
 }
 
+/** Payload for DISCORD_MESSAGE_DELETED — a user deleted their message. */
 export interface DiscordMessageDeletedPayload {
   discordMsgId: string;
 }
 
+/** Payload for INVITE_RESPONSE — a user accepted or declined an invite via Discord buttons. */
 export interface InviteResponsePayload {
   inviteId: string;
   response: 'ACCEPTED' | 'DECLINED';
 }
 
+/** Payload for CHANNEL_DISCONNECTED — the bot can no longer access a channel. */
 export interface ChannelDisconnectedPayload {
   channelId: string;
   guildId?: string;
   reason: string;
 }
 
+/** Union of all platform (bot→platform) payloads. */
 export type PlatformPayload =
   | DiscordMessageAssignedPayload
   | DiscordMessageCreatedPayload
@@ -110,6 +130,7 @@ export type PlatformPayload =
   | InviteResponsePayload
   | ChannelDisconnectedPayload;
 
+/** A full message on the bot-to-platform stream. */
 export interface PlatformMessage {
   type: PlatformEventType;
   payload: PlatformPayload;

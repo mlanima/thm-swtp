@@ -3,34 +3,25 @@ package de.thm.swtp.api.discord.stream;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 import de.thm.swtp.api.discord.config.DiscordProperties;
-import de.thm.swtp.api.discord.entity.DiscordMessageSyncEntity;
-import de.thm.swtp.api.discord.entity.LinkedChannelEntity;
-import de.thm.swtp.api.discord.repository.DiscordMessageSyncRepository;
-import de.thm.swtp.api.discord.repository.LinkedChannelRepository;
-import de.thm.swtp.api.project.ProjectEntity;
-import de.thm.swtp.api.projectPost.domain.ProjectPostStatus;
-import de.thm.swtp.api.projectPost.entity.ProjectPostEntity;
-import de.thm.swtp.api.projectPost.repository.ProjectPostRepository;
-import de.thm.swtp.api.userprofile.entity.UserProfile;
-import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
+import de.thm.swtp.api.discord.stream.payload.*;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.redis.connection.stream.*;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
 
+/**
+ * Listens on the inbound Redis stream for events coming from the Discord bot
+ * and dispatches them to the appropriate handler. Runs as a scheduled consumer
+ * with a dedicated consumer group.
+ */
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -38,15 +29,15 @@ public class PlatformSyncConsumer {
 
     private final StringRedisTemplate redis;
     private final DiscordProperties discordProperties;
-    private final DiscordMessageSyncRepository messageSyncRepository;
-    private final LinkedChannelRepository linkedChannelRepository;
-    private final ProjectPostRepository projectPostRepository;
-    private final UserProfileRepository userProfileRepository;
-    private final DiscordEventPublisher discordEventPublisher;
     private final ObjectMapper objectMapper;
+    private final DiscordEventHandler eventHandler;
 
     private String consumerName;
 
+    /**
+     * Sets up the consumer (unique name, consumer group) and logs warnings
+     * if any required Discord config values are missing.
+     */
     @PostConstruct
     public void init() {
         String host;
@@ -57,21 +48,7 @@ public class PlatformSyncConsumer {
         }
         consumerName = "spring-worker-" + host + "-" + ProcessHandle.current().pid();
 
-        try {
-            redis.opsForStream().createGroup(
-                    discordProperties.getStreams().getInbound(),
-                    discordProperties.getStreams().getConsumerGroup()
-            );
-            log.info("Created consumer group {} on stream {}",
-                    discordProperties.getStreams().getConsumerGroup(),
-                    discordProperties.getStreams().getInbound());
-        } catch (Exception e) {
-            if (e.getMessage() != null && e.getMessage().contains("BUSYGROUP")) {
-                log.debug("Consumer group already exists");
-            } else {
-                log.warn("Failed to create consumer group: {}", e.getMessage());
-            }
-        }
+        ensureGroup();
 
         var bot = discordProperties.getBot();
         var oauth = discordProperties.getOauth();
@@ -90,6 +67,57 @@ public class PlatformSyncConsumer {
                 discordProperties.getStreams().getOutbound());
     }
 
+    /** Creates the Redis consumer group if it doesn't exist yet — called once at startup. */
+    private void ensureGroup() {
+        var inbound = discordProperties.getStreams().getInbound();
+        var group = discordProperties.getStreams().getConsumerGroup();
+        try {
+            redis.opsForStream().createGroup(inbound, group);
+            log.info("Created consumer group {} on stream {}", group, inbound);
+        } catch (Exception e) {
+            if (isBusyGroup(e)) {
+                log.debug("Consumer group already exists");
+            } else {
+                log.warn("Failed to create consumer group, trying fallback", e);
+                try {
+                    redis.opsForStream().add(inbound, Map.of("_init", "1"));
+                    redis.opsForStream().createGroup(inbound, group);
+                    log.info("Created consumer group {} on stream {} (stream auto-created)", group, inbound);
+                } catch (Exception e2) {
+                    if (isBusyGroup(e2)) {
+                        log.debug("Consumer group already exists");
+                    } else {
+                        log.error("Failed to create consumer group", e2);
+                    }
+                }
+            }
+        }
+    }
+
+    /** Checks the full exception chain for a given error signal — Spring wraps Redis errors. */
+    private static boolean containsError(Exception e, String errorText) {
+        if (e.getMessage() != null && e.getMessage().contains(errorText)) {
+            return true;
+        }
+        for (Throwable c = e.getCause(); c != null; c = c.getCause()) {
+            if (c.getMessage() != null && c.getMessage().contains(errorText)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Shortcut for BUSYGROUP check. */
+    private static boolean isBusyGroup(Exception e) {
+        return containsError(e, "BUSYGROUP");
+    }
+
+    /** Shortcut for NOGROUP check. */
+    private static boolean isNoGroup(Exception e) {
+        return containsError(e, "NOGROUP");
+    }
+
+    /** Reads new records from the inbound stream, processes them, and acknowledges on success. */
     @Scheduled(fixedDelay = 100)
     public void poll() {
         try {
@@ -117,10 +145,16 @@ public class PlatformSyncConsumer {
                 }
             }
         } catch (Exception e) {
-            log.debug("Stream poll error (expected if empty): {}", e.getMessage());
+            if (isNoGroup(e)) {
+                log.warn("Consumer group missing — attempting to recreate");
+                ensureGroup();
+            } else {
+                log.warn("Stream poll error: {}", e.getMessage());
+            }
         }
     }
 
+    /** Periodic check for unacknowledged messages — keeps the consumer group healthy. */
     @Scheduled(fixedDelay = 30000)
     public void reclaimPending() {
         try {
@@ -136,6 +170,7 @@ public class PlatformSyncConsumer {
         }
     }
 
+    /** Deserialises the event type and payload, then dispatches to the right handler method. */
     private void processRecord(RecordId recordId, Map<String, Object> rawFields) {
         Map<String, String> fields = new java.util.HashMap<>();
         rawFields.forEach((k, v) -> fields.put(k, v != null ? v.toString() : null));
@@ -148,156 +183,25 @@ public class PlatformSyncConsumer {
 
         try {
             Map<String, String> payload = objectMapper.readValue(payloadJson, new TypeReference<>() {});
+            EventType eventType;
 
-            switch (type) {
-                case "DISCORD_MESSAGE_CREATED" -> handleDiscordMessageCreated(payload);
-                case "DISCORD_MESSAGE_UPDATED" -> handleDiscordMessageUpdated(payload);
-                case "DISCORD_MESSAGE_DELETED" -> handleDiscordMessageDeleted(payload);
-                case "DISCORD_MESSAGE_ASSIGNED" -> handleMessageAssigned(payload);
-                case "INVITE_RESPONSE" -> handleInviteResponse(payload);
-                case "CHANNEL_DISCONNECTED" -> handleChannelDisconnected(payload);
-                default -> log.warn("Unknown event type: {}", type);
+            try {
+                eventType = EventType.valueOf(type);
+            } catch (IllegalArgumentException e) {
+                log.warn("Unknown event type: {}", type);
+                return;
+            }
+
+            switch (eventType) {
+                case DISCORD_MESSAGE_CREATED -> eventHandler.handleDiscordMessageCreated(DiscordMessageCreatedPayload.from(payload));
+                case DISCORD_MESSAGE_UPDATED -> eventHandler.handleDiscordMessageUpdated(DiscordMessageUpdatedPayload.from(payload));
+                case DISCORD_MESSAGE_DELETED -> eventHandler.handleDiscordMessageDeleted(DiscordMessageDeletedPayload.from(payload));
+                case DISCORD_MESSAGE_ASSIGNED -> eventHandler.handleMessageAssigned(MessageAssignedPayload.from(payload));
+                case INVITE_RESPONSE -> eventHandler.handleInviteResponse(InviteResponsePayload.from(payload));
+                case CHANNEL_DISCONNECTED -> eventHandler.handleChannelDisconnected(ChannelDisconnectedPayload.from(payload));
             }
         } catch (Exception e) {
             log.error("Error processing event {}: {}", type, e.getMessage());
         }
-    }
-
-    @Transactional
-    public void handleDiscordMessageCreated(Map<String, String> payload) {
-        String discordMsgId = payload.get("discordMsgId");
-        String channelId = payload.get("channelId");
-        String content = payload.get("content");
-        String discordUserId = payload.get("discordUserId");
-        String discordUsername = payload.get("discordUsername");
-
-        if (messageSyncRepository.existsByDiscordMessageId(discordMsgId)) {
-            log.debug("Duplicate discord message {}, skipping", discordMsgId);
-            return;
-        }
-
-        Optional<LinkedChannelEntity> linkOpt = linkedChannelRepository.findByDiscordChannelIdAndIsActiveTrue(channelId);
-        if (linkOpt.isEmpty()) {
-            log.debug("No active linked channel for {}", channelId);
-            return;
-        }
-
-        LinkedChannelEntity link = linkOpt.get();
-        ProjectEntity project = link.getProject();
-
-        UserProfile author = userProfileRepository.findByDiscordId(discordUserId)
-                .orElseGet(() -> {
-                    UserProfile ghost = UserProfile.builder()
-                            .keycloakId(UUID.randomUUID())
-                            .username(discordUsername + "#discord")
-                            .discordId(discordUserId)
-                            .discordUsername(discordUsername)
-                            .build();
-                    return userProfileRepository.save(ghost);
-                });
-
-        ProjectPostEntity post = ProjectPostEntity.builder()
-                .project(project)
-                .author(author)
-                .title("Discord message")
-                .content(content != null ? content : "")
-                .status(ProjectPostStatus.PUBLISHED)
-                .publishedAt(LocalDateTime.now())
-                .build();
-
-        try {
-            ProjectPostEntity saved = projectPostRepository.save(post);
-            DiscordMessageSyncEntity sync = DiscordMessageSyncEntity.builder()
-                    .platformPostId(saved.getId())
-                    .discordMessageId(discordMsgId)
-                    .discordChannelId(channelId)
-                    .direction(DiscordMessageSyncEntity.SyncDirection.DISCORD_TO_PLATFORM)
-                    .build();
-            messageSyncRepository.save(sync);
-            log.info("Discord message synced to platform post: discordMsgId={}, postId={}", discordMsgId, saved.getId());
-        } catch (DataIntegrityViolationException e) {
-            log.warn("Duplicate discord message {} (race condition)", discordMsgId);
-        }
-    }
-
-    @Transactional
-    public void handleDiscordMessageUpdated(Map<String, String> payload) {
-        String discordMsgId = payload.get("discordMsgId");
-        String content = payload.get("content");
-
-        messageSyncRepository.findByDiscordMessageId(discordMsgId).ifPresent(sync -> {
-            projectPostRepository.findById(sync.getPlatformPostId()).ifPresent(post -> {
-                post.setContent(content != null ? content : "");
-                projectPostRepository.save(post);
-                log.info("Post updated from discord: postId={}", post.getId());
-            });
-        });
-    }
-
-    @Transactional
-    public void handleDiscordMessageDeleted(Map<String, String> payload) {
-        String discordMsgId = payload.get("discordMsgId");
-
-        messageSyncRepository.findByDiscordMessageId(discordMsgId).ifPresent(sync -> {
-            projectPostRepository.findById(sync.getPlatformPostId()).ifPresent(post -> {
-                projectPostRepository.delete(post);
-                log.info("Post deleted from discord sync: postId={}", post.getId());
-            });
-            messageSyncRepository.delete(sync);
-        });
-    }
-
-    @Transactional
-    public void handleMessageAssigned(Map<String, String> payload) {
-        String postId = payload.get("postId");
-        String discordMsgId = payload.get("discordMsgId");
-        String channelId = payload.get("channelId");
-        String guildId = payload.get("guildId");
-
-        if (messageSyncRepository.existsByDiscordMessageId(discordMsgId)) {
-            return;
-        }
-
-        UUID postUuid = UUID.fromString(postId);
-        boolean postExistsAndPublished = projectPostRepository.findById(postUuid)
-                .map(post -> post.getStatus() == ProjectPostStatus.PUBLISHED)
-                .orElse(false);
-
-        if (!postExistsAndPublished) {
-            log.warn("Post {} no longer published — deleting orphaned Discord message {}",
-                    postId, discordMsgId);
-            discordEventPublisher.publishDirectDelete(postUuid, discordMsgId, channelId);
-            return;
-        }
-
-        DiscordMessageSyncEntity sync = DiscordMessageSyncEntity.builder()
-                .platformPostId(postUuid)
-                .discordMessageId(discordMsgId)
-                .discordChannelId(channelId)
-                .discordGuildId(guildId)
-                .direction(DiscordMessageSyncEntity.SyncDirection.PLATFORM_TO_DISCORD)
-                .build();
-        messageSyncRepository.save(sync);
-        log.info("Message assigned: postId={}, discordMsgId={}", postId, discordMsgId);
-    }
-
-    @Transactional
-    public void handleInviteResponse(Map<String, String> payload) {
-        String inviteId = payload.get("inviteId");
-        String response = payload.get("response");
-
-        log.info("Invite response received: inviteId={}, response={}", inviteId, response);
-    }
-
-    @Transactional
-    public void handleChannelDisconnected(Map<String, String> payload) {
-        String channelId = payload.get("channelId");
-        String reason = payload.get("reason");
-
-        linkedChannelRepository.findByDiscordChannelId(channelId).ifPresent(link -> {
-            link.setActive(false);
-            linkedChannelRepository.save(link);
-            log.warn("Channel disconnected: channelId={}, reason={}", channelId, reason);
-        });
     }
 }

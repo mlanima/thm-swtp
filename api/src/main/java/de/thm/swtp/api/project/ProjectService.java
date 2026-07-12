@@ -2,11 +2,10 @@ package de.thm.swtp.api.project;
 
 
 import de.thm.swtp.api.common.TxLogger;
-import de.thm.swtp.api.discord.entity.LinkedChannelEntity;
+import de.thm.swtp.api.discord.service.DiscordProjectService;
 import de.thm.swtp.api.discord.repository.DiscordChannelSettingsRepository;
 import de.thm.swtp.api.discord.repository.DiscordMessageSyncRepository;
 import de.thm.swtp.api.discord.repository.LinkedChannelRepository;
-import de.thm.swtp.api.discord.service.DiscordNotificationService;
 import de.thm.swtp.api.exceptionhandling.exceptions.InvalidProjectManagementSortFieldException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectMemberNotFoundException;
 import de.thm.swtp.api.links.repository.ProjectLinkRepository;
@@ -55,14 +54,13 @@ public class ProjectService {
     private final ProjectJoinRequestRepository projectJoinRequestRepository;
     private final ProjectFavoriteRepository projectFavoriteRepository;
     private final ProjectViewRepository projectViewRepository;
+    private final AuditLogService auditLogService;
+    private final DiscordProjectService discordProjectService;
     private final LinkedChannelRepository linkedChannelRepository;
     private final ProjectGithubRepoRepository projectGithubRepoRepository;
     private final ProjectPostRepository projectPostRepository;
     private final DiscordMessageSyncRepository discordMessageSyncRepository;
     private final ProjectLinkRepository projectLinkRepository;
-
-    private final AuditLogService auditLogService;
-    private final DiscordNotificationService discordNotificationService;
     private final ContentModerationService contentModerationService;
     private final ProjectInviteService projectInviteService;
     private final ProjectFileService projectFileService;
@@ -83,7 +81,7 @@ public class ProjectService {
             contributors++;
         }
 
-        LinkedChannelEntity channel = linkedChannelRepository.findByProjectId(project.getId()).orElse(null);
+        var channel = discordProjectService.findChannelByProjectId(project.getId());
 
         boolean isContributor = false;
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -444,7 +442,7 @@ public class ProjectService {
 
         projectEntity.getMembers().remove(member);
         projectRepository.save(projectEntity);
-        discordNotificationService.notifyMemberLeft(projectId, projectEntity.getName(), member.getUsername());
+        discordProjectService.notifyMemberLeft(projectId, projectEntity.getName(), member.getUsername());
         TxLogger.afterCommit(log, "Project member removed: project={}, member={}", projectId, memberId);
     }
 
