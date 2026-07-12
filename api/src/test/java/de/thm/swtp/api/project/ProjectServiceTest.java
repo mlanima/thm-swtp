@@ -5,6 +5,7 @@ import de.thm.swtp.api.auditlog.service.AuditLogService;
 import de.thm.swtp.api.discord.entity.LinkedChannelEntity;
 import de.thm.swtp.api.discord.repository.DiscordChannelSettingsRepository;
 import de.thm.swtp.api.discord.repository.DiscordMessageSyncRepository;
+import de.thm.swtp.api.links.repository.ProjectLinkRepository;
 import de.thm.swtp.api.moderation.ContentModerationService;
 import de.thm.swtp.api.moderation.exception.ContentNotValidException;
 import de.thm.swtp.api.project.dto.request.CreateProjectRequest;
@@ -93,6 +94,9 @@ class ProjectServiceTest {
 
     @Mock
     private AuditLogService auditLogService;
+
+    @Mock
+    private ProjectLinkRepository projectLinkRepository;
 
     @InjectMocks
     private ProjectService projectService;
@@ -604,6 +608,7 @@ class ProjectServiceTest {
                 linkedChannelRepository,
                 discordChannelSettingsRepository,
                 projectGithubRepoRepository,
+                projectLinkRepository,
                 projectFavoriteRepository,
                 projectViewRepository,
                 projectInviteRepository,
@@ -639,6 +644,9 @@ class ProjectServiceTest {
                 .deleteByProjectId(projectId);
 
         order.verify(projectGithubRepoRepository)
+                .deleteByProjectId(projectId);
+
+        order.verify(projectLinkRepository)
                 .deleteByProjectId(projectId);
 
         order.verify(projectFavoriteRepository)

@@ -9,6 +9,7 @@ import de.thm.swtp.api.discord.repository.LinkedChannelRepository;
 import de.thm.swtp.api.discord.service.DiscordNotificationService;
 import de.thm.swtp.api.exceptionhandling.exceptions.InvalidProjectManagementSortFieldException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectMemberNotFoundException;
+import de.thm.swtp.api.links.repository.ProjectLinkRepository;
 import de.thm.swtp.api.moderation.ContentModerationService;
 import de.thm.swtp.api.project.dto.request.*;
 import de.thm.swtp.api.project.dto.response.*;
@@ -58,6 +59,7 @@ public class ProjectService {
     private final ProjectGithubRepoRepository projectGithubRepoRepository;
     private final ProjectPostRepository projectPostRepository;
     private final DiscordMessageSyncRepository discordMessageSyncRepository;
+    private final ProjectLinkRepository projectLinkRepository;
 
     private final AuditLogService auditLogService;
     private final DiscordNotificationService discordNotificationService;
@@ -232,6 +234,7 @@ public class ProjectService {
 
 
         // Deletes remaining project-dependent entities.
+        projectLinkRepository.deleteByProjectId(projectId);
         projectFavoriteRepository.deleteByProjectId(projectId);
         projectViewRepository.deleteByProjectId(projectId);
         projectInviteRepository.deleteByProjectId(projectId);
