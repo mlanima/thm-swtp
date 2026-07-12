@@ -17,12 +17,6 @@ public interface ProjectPostRepository  extends JpaRepository<ProjectPostEntity,
 
     /** Returns all archived posts belonging to a project. Ordered by archive date. */
     List<ProjectPostEntity> findAllByProjectIdAndStatusOrderByArchivedAtDesc(UUID projectId, ProjectPostStatus status);
-  
-    /** Checks if project posts exists for a given project from a given user.*/
-    boolean existsByIdAndProjectIdAndAuthorKeycloakId(UUID postId, UUID projectId, UUID authorKeycloakId);
-
-    /** Returns the project post from a given project.*/
-    Optional<ProjectPostEntity> findByIdAndProjectId(UUID postId, UUID projectId);
 
     /** Returns all posts of a specified project.*/
     List<ProjectPostEntity> findAllByProjectId(UUID projectId);
