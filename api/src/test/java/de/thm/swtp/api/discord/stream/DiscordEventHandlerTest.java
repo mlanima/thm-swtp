@@ -267,19 +267,14 @@ class DiscordEventHandlerTest {
     }
 
     @Test
-    void shouldSendDirectDeleteWhenPostNotPublished() {
+    void shouldSaveSyncWhenPostNotPublished() {
         var payload = new MessageAssignedPayload(postId, "orphan-msg", "ch-1", "guild-1");
-        var archivedPost = ProjectPostEntity.builder()
-                .id(postId)
-                .status(ProjectPostStatus.ARCHIVED)
-                .build();
 
         when(messageSyncRepository.existsByDiscordMessageId("orphan-msg")).thenReturn(false);
-        when(projectPostRepository.findById(postId)).thenReturn(Optional.of(archivedPost));
 
         handler.handleMessageAssigned(payload);
 
-        verify(discordEventPublisher).publishDirectDelete(postId, "orphan-msg", "ch-1");
+        verify(discordEventPublisher, never()).publishDirectDelete(any(), any(), any());
 
         var captor = ArgumentCaptor.<DiscordMessageSyncEntity>captor();
         verify(messageSyncRepository).save(captor.capture());
@@ -288,7 +283,7 @@ class DiscordEventHandlerTest {
         assertThat(savedSync.getDiscordMessageId()).isEqualTo("orphan-msg");
         assertThat(savedSync.getDirection()).isEqualTo(DiscordMessageSyncEntity.SyncDirection.PLATFORM_TO_DISCORD);
 
-        verify(messageSyncRepository).delete(savedSync);
+        verify(messageSyncRepository, never()).delete(any());
     }
 
     // ── handleInviteResponse ──

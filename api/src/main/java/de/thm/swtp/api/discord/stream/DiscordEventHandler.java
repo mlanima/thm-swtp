@@ -125,10 +125,6 @@ public class DiscordEventHandler {
         });
     }
 
-    /**
-     * Links a platform post to its mirrored Discord message.
-     * If the post was unpublished in the meantime, tells the bot to delete the orphan immediately.
-     */
     @Transactional
     public void handleMessageAssigned(MessageAssignedPayload payload) {
         UUID postUuid = payload.postId();
@@ -140,27 +136,13 @@ public class DiscordEventHandler {
             return;
         }
 
-        DiscordMessageSyncEntity sync = DiscordMessageSyncEntity.builder()
+        messageSyncRepository.save(DiscordMessageSyncEntity.builder()
                 .platformPostId(postUuid)
                 .discordMessageId(discordMsgId)
                 .discordChannelId(channelId)
                 .discordGuildId(guildId)
                 .direction(DiscordMessageSyncEntity.SyncDirection.PLATFORM_TO_DISCORD)
-                .build();
-        messageSyncRepository.save(sync);
-
-        boolean postExistsAndPublished = projectPostRepository.findById(postUuid)
-                .map(post -> post.getStatus() == ProjectPostStatus.PUBLISHED)
-                .orElse(false);
-
-        if (!postExistsAndPublished) {
-            log.warn("Post {} no longer published — deleting orphaned Discord message {}",
-                    postUuid, discordMsgId);
-            TxLogger.afterCommit(() -> discordEventPublisher.publishDirectDelete(postUuid, discordMsgId, channelId));
-            messageSyncRepository.delete(sync);
-            return;
-        }
-
+                .build());
         log.info("Message assigned: postId={}, discordMsgId={}", postUuid, discordMsgId);
     }
 

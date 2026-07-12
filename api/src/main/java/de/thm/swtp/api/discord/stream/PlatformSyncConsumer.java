@@ -149,7 +149,7 @@ public class PlatformSyncConsumer {
                 log.warn("Consumer group missing — attempting to recreate");
                 ensureGroup();
             } else {
-                log.debug("Stream poll error: {}", e.getMessage());
+                log.warn("Stream poll error: {}", e.getMessage());
             }
         }
     }
