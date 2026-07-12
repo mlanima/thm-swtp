@@ -3,6 +3,7 @@ package de.thm.swtp.api.discord.stream;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 import de.thm.swtp.api.discord.config.DiscordProperties;
+import de.thm.swtp.api.discord.stream.payload.*;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -155,12 +156,12 @@ public class PlatformSyncConsumer {
             }
 
             switch (eventType) {
-                case DISCORD_MESSAGE_CREATED -> eventHandler.handleDiscordMessageCreated(payload);
-                case DISCORD_MESSAGE_UPDATED -> eventHandler.handleDiscordMessageUpdated(payload);
-                case DISCORD_MESSAGE_DELETED -> eventHandler.handleDiscordMessageDeleted(payload);
-                case DISCORD_MESSAGE_ASSIGNED -> eventHandler.handleMessageAssigned(payload);
-                case INVITE_RESPONSE -> eventHandler.handleInviteResponse(payload);
-                case CHANNEL_DISCONNECTED -> eventHandler.handleChannelDisconnected(payload);
+                case DISCORD_MESSAGE_CREATED -> eventHandler.handleDiscordMessageCreated(DiscordMessageCreatedPayload.from(payload));
+                case DISCORD_MESSAGE_UPDATED -> eventHandler.handleDiscordMessageUpdated(DiscordMessageUpdatedPayload.from(payload));
+                case DISCORD_MESSAGE_DELETED -> eventHandler.handleDiscordMessageDeleted(DiscordMessageDeletedPayload.from(payload));
+                case DISCORD_MESSAGE_ASSIGNED -> eventHandler.handleMessageAssigned(MessageAssignedPayload.from(payload));
+                case INVITE_RESPONSE -> eventHandler.handleInviteResponse(InviteResponsePayload.from(payload));
+                case CHANNEL_DISCONNECTED -> eventHandler.handleChannelDisconnected(ChannelDisconnectedPayload.from(payload));
             }
         } catch (Exception e) {
             log.error("Error processing event {}: {}", type, e.getMessage());

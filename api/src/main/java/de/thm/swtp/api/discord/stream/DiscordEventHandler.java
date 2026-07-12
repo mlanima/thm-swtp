@@ -4,6 +4,7 @@ import de.thm.swtp.api.discord.entity.DiscordMessageSyncEntity;
 import de.thm.swtp.api.discord.entity.LinkedChannelEntity;
 import de.thm.swtp.api.discord.repository.DiscordMessageSyncRepository;
 import de.thm.swtp.api.discord.repository.LinkedChannelRepository;
+import de.thm.swtp.api.discord.stream.payload.*;
 import de.thm.swtp.api.projectPost.domain.ProjectPostStatus;
 import de.thm.swtp.api.projectPost.entity.ProjectPostEntity;
 import de.thm.swtp.api.projectPost.repository.ProjectPostRepository;
@@ -16,8 +17,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 @Component
@@ -32,19 +31,19 @@ public class DiscordEventHandler {
     private final DiscordEventPublisher discordEventPublisher;
 
     @Transactional
-    public void handleDiscordMessageCreated(Map<String, String> payload) {
-        String discordMsgId = payload.get("discordMsgId");
-        String channelId = payload.get("channelId");
-        String content = payload.get("content");
-        String discordUserId = payload.get("discordUserId");
-        String discordUsername = payload.get("discordUsername");
+    public void handleDiscordMessageCreated(DiscordMessageCreatedPayload payload) {
+        String discordMsgId = payload.discordMsgId();
+        String channelId = payload.channelId();
+        String content = payload.content();
+        String discordUserId = payload.discordUserId();
+        String discordUsername = payload.discordUsername();
 
         if (messageSyncRepository.existsByDiscordMessageId(discordMsgId)) {
             log.debug("Duplicate discord message {}, skipping", discordMsgId);
             return;
         }
 
-        Optional<LinkedChannelEntity> linkOpt = linkedChannelRepository.findByDiscordChannelIdAndIsActiveTrue(channelId);
+        var linkOpt = linkedChannelRepository.findByDiscordChannelIdAndIsActiveTrue(channelId);
         if (linkOpt.isEmpty()) {
             log.debug("No active linked channel for {}", channelId);
             return;
@@ -89,9 +88,9 @@ public class DiscordEventHandler {
     }
 
     @Transactional
-    public void handleDiscordMessageUpdated(Map<String, String> payload) {
-        String discordMsgId = payload.get("discordMsgId");
-        String content = payload.get("content");
+    public void handleDiscordMessageUpdated(DiscordMessageUpdatedPayload payload) {
+        String discordMsgId = payload.discordMsgId();
+        String content = payload.content();
 
         messageSyncRepository.findByDiscordMessageId(discordMsgId).ifPresent(sync -> {
             projectPostRepository.findById(sync.getPlatformPostId()).ifPresent(post -> {
@@ -103,8 +102,8 @@ public class DiscordEventHandler {
     }
 
     @Transactional
-    public void handleDiscordMessageDeleted(Map<String, String> payload) {
-        String discordMsgId = payload.get("discordMsgId");
+    public void handleDiscordMessageDeleted(DiscordMessageDeletedPayload payload) {
+        String discordMsgId = payload.discordMsgId();
 
         messageSyncRepository.findByDiscordMessageId(discordMsgId).ifPresent(sync -> {
             projectPostRepository.findById(sync.getPlatformPostId()).ifPresent(post -> {
@@ -116,24 +115,23 @@ public class DiscordEventHandler {
     }
 
     @Transactional
-    public void handleMessageAssigned(Map<String, String> payload) {
-        String postId = payload.get("postId");
-        String discordMsgId = payload.get("discordMsgId");
-        String channelId = payload.get("channelId");
-        String guildId = payload.get("guildId");
+    public void handleMessageAssigned(MessageAssignedPayload payload) {
+        UUID postUuid = payload.postId();
+        String discordMsgId = payload.discordMsgId();
+        String channelId = payload.channelId();
+        String guildId = payload.guildId();
 
         if (messageSyncRepository.existsByDiscordMessageId(discordMsgId)) {
             return;
         }
 
-        UUID postUuid = UUID.fromString(postId);
         boolean postExistsAndPublished = projectPostRepository.findById(postUuid)
                 .map(post -> post.getStatus() == ProjectPostStatus.PUBLISHED)
                 .orElse(false);
 
         if (!postExistsAndPublished) {
             log.warn("Post {} no longer published — deleting orphaned Discord message {}",
-                    postId, discordMsgId);
+                    postUuid, discordMsgId);
             discordEventPublisher.publishDirectDelete(postUuid, discordMsgId, channelId);
             return;
         }
@@ -146,26 +144,22 @@ public class DiscordEventHandler {
                 .direction(DiscordMessageSyncEntity.SyncDirection.PLATFORM_TO_DISCORD)
                 .build();
         messageSyncRepository.save(sync);
-        log.info("Message assigned: postId={}, discordMsgId={}", postId, discordMsgId);
+        log.info("Message assigned: postId={}, discordMsgId={}", postUuid, discordMsgId);
     }
 
     @Transactional
-    public void handleInviteResponse(Map<String, String> payload) {
-        String inviteId = payload.get("inviteId");
-        String response = payload.get("response");
-
-        log.info("Invite response received: inviteId={}, response={}", inviteId, response);
+    public void handleInviteResponse(InviteResponsePayload payload) {
+        log.info("Invite response received: inviteId={}, response={}", payload.inviteId(), payload.response());
     }
 
     @Transactional
-    public void handleChannelDisconnected(Map<String, String> payload) {
-        String channelId = payload.get("channelId");
-        String reason = payload.get("reason");
+    public void handleChannelDisconnected(ChannelDisconnectedPayload payload) {
+        String channelId = payload.channelId();
 
         linkedChannelRepository.findByDiscordChannelId(channelId).ifPresent(link -> {
             link.setActive(false);
             linkedChannelRepository.save(link);
-            log.warn("Channel disconnected: channelId={}, reason={}", channelId, reason);
+            log.warn("Channel disconnected: channelId={}, reason={}", channelId, payload.reason());
         });
     }
 }
