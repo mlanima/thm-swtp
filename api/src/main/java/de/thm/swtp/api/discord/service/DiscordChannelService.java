@@ -14,7 +14,6 @@ import de.thm.swtp.api.project.ProjectRepository;
 import de.thm.swtp.api.project.exception.ProjectNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,9 +33,6 @@ public class DiscordChannelService {
     private final BotInternalClient botInternalClient;
     private final DiscordAuthService discordAuthService;
     private final DiscordProperties discordProperties;
-
-    @Value("${DISCORD_CLIENT_ID:}")
-    private String clientId;
 
     @Transactional
     public LinkedChannelEntity connectChannel(UUID projectId, String discordChannelId) {
