@@ -140,17 +140,6 @@ public class DiscordEventHandler {
             return;
         }
 
-        boolean postExistsAndPublished = projectPostRepository.findById(postUuid)
-                .map(post -> post.getStatus() == ProjectPostStatus.PUBLISHED)
-                .orElse(false);
-
-        if (!postExistsAndPublished) {
-            log.warn("Post {} no longer published — deleting orphaned Discord message {}",
-                    postUuid, discordMsgId);
-            TxLogger.afterCommit(() -> discordEventPublisher.publishDirectDelete(postUuid, discordMsgId, channelId));
-            return;
-        }
-
         DiscordMessageSyncEntity sync = DiscordMessageSyncEntity.builder()
                 .platformPostId(postUuid)
                 .discordMessageId(discordMsgId)
@@ -159,6 +148,19 @@ public class DiscordEventHandler {
                 .direction(DiscordMessageSyncEntity.SyncDirection.PLATFORM_TO_DISCORD)
                 .build();
         messageSyncRepository.save(sync);
+
+        boolean postExistsAndPublished = projectPostRepository.findById(postUuid)
+                .map(post -> post.getStatus() == ProjectPostStatus.PUBLISHED)
+                .orElse(false);
+
+        if (!postExistsAndPublished) {
+            log.warn("Post {} no longer published — deleting orphaned Discord message {}",
+                    postUuid, discordMsgId);
+            TxLogger.afterCommit(() -> discordEventPublisher.publishDirectDelete(postUuid, discordMsgId, channelId));
+            messageSyncRepository.delete(sync);
+            return;
+        }
+
         log.info("Message assigned: postId={}, discordMsgId={}", postUuid, discordMsgId);
     }
 
