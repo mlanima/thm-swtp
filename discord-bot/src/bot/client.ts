@@ -7,6 +7,7 @@ import { registerInteractionCreateHandler } from './handlers/interactionCreate.j
 import { registerChannelDeleteHandler } from './handlers/channelDelete.js';
 import { registerGuildBanAddHandler } from './handlers/guildBanAdd.js';
 
+/** Singleton Discord.js client. Setup with guilds, messages, and DM intents. */
 export const discordClient = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -24,6 +25,7 @@ discordClient.on('error', (err) => {
   logger.error({ err }, 'discord client error');
 });
 
+/** Logs in to Discord and registers all event handlers on the singleton client. */
 export async function startDiscordClient(): Promise<void> {
   const token = process.env.DISCORD_TOKEN;
   if (!token) {
@@ -40,6 +42,7 @@ export async function startDiscordClient(): Promise<void> {
   await discordClient.login(token);
 }
 
+/** Returns a simple string for the WebSocket status — used by the health endpoint. */
 export function getDiscordStatus(): 'ready' | 'reconnecting' | 'disconnected' {
   switch (discordClient.ws.status) {
     case 0:

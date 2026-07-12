@@ -32,44 +32,60 @@ identity via OAuth2 for a profile badge and ownership verification.
 │  └──────────────────────────────────────────────────────────┘   │
 └────────────┬────────────────────────────────────┬────────────────┘
              │                                    │
-             │  ┌─ HTTP (shared secret) ──┐       │  ┌─ spring-data-redis ─┐
-             │  │  /internal/*            │       │  │  (publish/subscribe) │
-             │  │                         │       │  │                      │
-             │  │  Auto-Setup             │       │  │  Discord Sync        │
-             │  │  Channel Connect        │       │  │  (Post erstellt/     │
-             │  │  Create Invite          │       │  │   gelöscht)          │
-             │  │  Leave Guild            │       │  │                      │
-             │  │  Restrict Channel       │       │  │  Platform Sync       │
-             │  │  List Guilds            │       │  │  (Discord-Löschung,  │
-             │  │  Test Connection        │       │  │   Channel-Update)    │
-             │  │  Job Retry              │       │  └──────────────────────┘
+             │  ┌─ HTTP (shared secret) ──┐       │  ┌─ spring-data-redis ──────┐
+             │  │  /internal/*            │       │  │  (Redis Streams)          │
+             │  │                         │       │  │                           │
+             │  │  Auto-Setup             │       │  │  DiscordEventPublisher   │
+             │  │  Channel Connect        │       │  │  → stream:discord:sync   │
+             │  │  Create Invite          │       │  │                           │
+             │  │  Leave Guild            │       │  │  PlatformSyncConsumer    │
+             │  │  Restrict Channel       │       │  │  ← stream:platform:sync  │
+             │  │  List Guilds            │       │  └───────────────────────────┘
+             │  │  Test Connection        │       │
+             │  │  Job Retry              │       │
              │  │  Health                 │       │
              │  └─────────────────────────┘       │
              ▼                                    ▼
-┌────────────────────────┐           ┌────────────────────────────┐
-│     Discord Bot        │           │         Redis             │
-│     (Node.js)          │◄──────────│  (BullMQ queues)          │
-│                        │  BullMQ   │                            │
-│  ┌──────────────────┐  │  consume  │  stream:discord:sync      │
-│  │ internalApi.ts   │  │           │    (API → Bot)            │
-│  │ bot/client.ts    │  ├──────────►│  stream:platform:sync     │
-│  │ streams/*.ts     │  │  BullMQ   │    (Bot → API)            │
-│  │ queues/*.ts      │  │  publish  │                            │
-│  │ handlers/*.ts    │  │           └────────────────────────────┘
-│  └──────────────────┘  │
-└───────────┬────────────┘
-            │
-            │ Discord Gateway (WebSocket) + REST API
-            │ (discord.js)
-            │
-            ▼
-┌────────────────────────┐
-│      Discord.com       │
-│  (Gateway + REST API)  │
-│                        │
-│  api.discord.com       │
-│  gateway.discord.com   │
-└────────────────────────┘
+┌───────────────────────────────┐    ┌──────────────────────────────┐
+│        Discord Bot            │    │         Redis               │
+│        (Node.js)              │◄───│  (Redis Streams)             │
+│                               │    │                              │
+│  ┌─────────────────────────┐  │    │  stream:discord:sync        │
+│  │ http/server.ts          │  │    │    (API → Bot)              │
+│  │ http/routes/*           │──┤────│                              │
+│  │ http/middleware/auth.ts │  │    │  stream:platform:sync       │
+│  ├─────────────────────────┤  │    │    (Bot → API)              │
+│  │ streams/consumer.ts     │◄─┤────│                              │
+│  │ streams/eventHandler.ts │  │    │                              │
+│  │ queues/discordQueue.ts  │  │    │  BullMQ queue:              │
+│  ├─────────────────────────┤  │    │  discord-actions            │
+│  │ streams/producer.ts     │──┤───►│  (5 job types)              │
+│  ├─────────────────────────┤  │    └──────────────────────────────┘
+│  │ bot/client.ts           │  │
+│  │ bot/handlers/*          │  │
+│  │ bot/services/*          │  │
+│  │ bot/utils/*             │  │
+│  │ bot/wrapAsync.ts        │  │
+│  ├─────────────────────────┤  │
+│  │ events/eventRegistry.ts │  │
+│  │ types/events.ts         │  │
+│  │ config/redis.ts         │  │
+│  │ config/logger.ts        │  │
+│  │ metrics/index.ts        │  │
+│  └─────────────────────────┘  │
+└──────────────┬────────────────┘
+               │
+               │ Discord Gateway (WebSocket) + REST API
+               │ (discord.js)
+               │
+               ▼
+┌───────────────────────────────┐
+│        Discord.com            │
+│   (Gateway + REST API)        │
+│                               │
+│   api.discord.com             │
+│   gateway.discord.com         │
+└───────────────────────────────┘
 
 ────────── OAuth2 Flow (Browser-vermittelt) ──────────
 
@@ -158,8 +174,13 @@ identity via OAuth2 for a profile badge and ownership verification.
 
 1. User creates/updates/deletes a post on the platform
 2. API publishes an event to Redis stream `stream:discord:sync`
-3. Bot's BullMQ worker picks up the job (queue `sendPost` / `deletePost`)
-4. Bot sends or deletes an embed message in the linked channel via Discord API
+3. Bot's stream consumer picks up the event, validates it (Zod), and enqueues a BullMQ job
+4. BullMQ worker executes the corresponding handler (`sendPost` / `editPost` / `deletePost`)
+5. Bot sends, edits, or deletes an embed message in the linked channel via Discord API
+
+> **Note:** The platform does not currently implement a post-edit feature for content changes.
+> `POST_UPDATED` is only emitted when a post is **archived** (status change).
+> The `editPost` handler is implemented and tested but unused until content editing is added.
 
 #### Deletion direction (one-way)
 
@@ -314,39 +335,62 @@ rather than `[(ngModel)]="signal"` to avoid reassigning the `WritableSignal` fun
 
 ## Discord Bot (`discord-bot/`)
 
-| File                      | Purpose                                                    |
-| ------------------------- | ---------------------------------------------------------- |
-| `index.ts`                | Entry point, starts Discord client + worker + HTTP server  |
-| `bot/client.ts`           | Discord.js client setup with intents                       |
-| `bot/handlers/`           | Event handlers (channelDelete, messageDelete, etc.)        |
-| `http/internalApi.ts`     | Express: internal API for Spring Boot                      |
-| `streams/consumer.ts`     | BullMQ worker: consumes Redis stream `stream:discord:sync` |
-| `streams/producer.ts`     | BullMQ producer: publishes to `stream:platform:sync`       |
-| `streams/eventHandler.ts` | Maps stream events to Discord actions                      |
-| `streams/validator.ts`    | Zod schemas for event payloads                             |
-| `queues/discordQueue.ts`  | BullMQ queue definitions (`sendPost`, `deletePost`)        |
-| `metrics/index.ts`        | Prometheus metrics endpoint                                |
-| `config/logger.ts`        | Pino logger                                                |
-| `config/redis.ts`         | ioredis connection                                         |
+| File                          | Purpose                                                    |
+| ----------------------------- | ---------------------------------------------------------- |
+| `index.ts`                    | Entry point, validates env, starts all subsystems          |
+| `bot/client.ts`               | Discord.js client setup with intents                       |
+| `bot/wrapAsync.ts`            | Error wrapper for async event handlers (fire-and-forget)   |
+| `bot/handlers/messageCreate.ts` | Forwards user messages from Discord → platform stream    |
+| `bot/handlers/messageUpdate.ts` | Forwards message edits from Discord → platform stream    |
+| `bot/handlers/messageDelete.ts` | Forwards message deletions from Discord → platform stream |
+| `bot/handlers/interactionCreate.ts` | Handles invite Accept / Decline button interactions    |
+| `bot/handlers/channelDelete.ts` | Notifies platform when a linked channel is removed        |
+| `bot/handlers/guildBanAdd.ts` | Disconnects all channels when the bot itself is banned     |
+| `bot/services/channelService.ts` | Channel resolution helpers (resolve by ID, fetch guild) |
+| `bot/utils/truncate.ts`       | Text truncation with ellipsis for Discord embed limits     |
+| `bot/utils/embedBuilder.ts`   | Embed builders for posts, events, and invite DMs           |
+| `http/server.ts`              | Express app assembly, start/stop lifecycle                  |
+| `http/internalApi.ts`         | Thin re-export: `startInternalApi` / `stopInternalApi`     |
+| `http/middleware/auth.ts`     | `x-internal-secret` validation middleware                   |
+| `http/routes/health.ts`       | `GET /health` — Redis + Discord status                     |
+| `http/routes/metrics.ts`      | `GET /metrics` — Prometheus endpoint                       |
+| `http/routes/guilds.ts`       | `GET /internal/guilds` — list joined guilds                |
+| `http/routes/channels.ts`     | Channel: leave, restrict, invite, test-connection          |
+| `http/routes/setup.ts`        | `POST /internal/auto-setup` — find or create `#posts`      |
+| `http/routes/jobs.ts`         | `POST /internal/jobs/:id/retry` — retry failed BullMQ job  |
+| `streams/consumer.ts`         | Redis stream consumer: reads `stream:discord:sync`         |
+| `streams/producer.ts`         | Redis stream producer: writes to `stream:platform:sync`    |
+| `streams/eventHandler.ts`     | Factory-pattern handlers for BullMQ job types              |
+| `streams/validator.ts`        | Zod schemas for stream event payload validation            |
+| `queues/discordQueue.ts`      | BullMQ queue + worker for Discord actions                  |
+| `events/eventRegistry.ts`     | Single source of truth: event type → job name / schema     |
+| `metrics/index.ts`            | Prometheus metrics registry (counters, gauges)             |
+| `config/logger.ts`            | Pino logger with dev pretty-print                          |
+| `config/redis.ts`             | ioredis connection + typed BullMQ connection config        |
+| `types/events.ts`             | TypeScript interfaces for all stream payloads              |
 
-### BullMQ Queues
+### BullMQ Jobs
 
-| Queue        | Purpose                               |
-| ------------ | ------------------------------------- |
-| `sendPost`   | Send embed message to Discord channel |
-| `deletePost` | Delete message from Discord channel   |
+| Job Name      | Handler             | Purpose                                     |
+| ------------- | ------------------- | ------------------------------------------- |
+| `sendPost`    | `handleSendPost`    | Send embed message to Discord channel       |
+| `editPost`    | `handleEditPost`    | Edit embed description (currently unused — platform has no content editing yet) |
+| `deletePost`  | `handleDeletePost`  | Delete embed from Discord channel           |
+| `sendInvite`  | `handleSendInvite`  | Send invite DM with Accept / Decline button |
+| `sendEvent`   | `handleSendEvent`   | Send project event notification embed       |
 
 ---
 
 ## Redis Streams
 
-| Stream                 | Direction | Payload                                          |
-| ---------------------- | --------- | ------------------------------------------------ |
-| `stream:discord:sync`  | API → Bot | Post created/deleted events                      |
-| `stream:platform:sync` | Bot → API | Discord events (message delete, channel updates) |
+| Stream                 | Direction | Payload                                                                  |
+| ---------------------- | --------- | ------------------------------------------------------------------------ |
+| `stream:discord:sync`  | API → Bot | `POST_CREATED`, `POST_UPDATED` (archive only), `POST_DELETED`, `PROJECT_INVITE`, `PROJECT_EVENT` |
+| `stream:platform:sync` | Bot → API | `DISCORD_MESSAGE_ASSIGNED`, `DISCORD_MESSAGE_CREATED`, `DISCORD_MESSAGE_UPDATED`, `DISCORD_MESSAGE_DELETED`, `INVITE_RESPONSE`, `CHANNEL_DISCONNECTED` |
 
-API publishes via `DiscordEventPublisher` (Spring Data Redis). Bot consumes via
-BullMQ for reliable processing with retries.
+API publishes to `stream:discord:sync` via `DiscordEventPublisher` (Spring Data Redis).
+Bot consumes with `streams/consumer.ts` (XREADGROUP loop), validates with Zod schemas,
+and enqueues BullMQ jobs. Bot writes back to `stream:platform:sync` via `streams/producer.ts`.
 
 ---
 
@@ -368,15 +412,15 @@ return `400 Discord OAuth is not configured` — graceful degradation.
 
 ### Bot Environment Variables
 
-| Variable               | Required | Description                                         |
-| ---------------------- | -------- | --------------------------------------------------- |
-| `DISCORD_TOKEN`        | Yes      | Discord bot token                                   |
-| `DISCORD_CLIENT_ID`    | Yes      | Bot application ID                                  |
-| `REDIS_HOST`           | Yes      | Redis host                                          |
-| `REDIS_PORT`           | No       | Redis port (default `6379`)                         |
-| `PLATFORM_API_BASEURL` | Yes      | Spring API base URL                                 |
-| `PLATFORM_API_SECRET`  | Yes      | Shared secret (must match `DISCORD_BOT_API_SECRET`) |
-| `PORT`                 | No       | HTTP server port (default `3001`)                   |
+| Variable              | Required | Default       | Description                                         |
+| --------------------- | -------- | ------------- | --------------------------------------------------- |
+| `DISCORD_TOKEN`       | Yes      | —             | Discord bot token                                   |
+| `PLATFORM_API_SECRET` | Yes      | —             | Shared secret (must match `DISCORD_BOT_API_SECRET`) |
+| `REDIS_HOST`          | No       | `localhost`   | Redis host                                          |
+| `REDIS_PORT`          | No       | `6379`        | Redis port                                          |
+| `PORT`                | No       | `3001`        | HTTP server port for internal API                   |
+| `LOG_LEVEL`           | No       | `info`        | Pino log level (e.g. `debug`, `warn`)               |
+| `NODE_ENV`            | No       | —             | Set to `production` for structured JSON logging     |
 
 ### Local Dev
 

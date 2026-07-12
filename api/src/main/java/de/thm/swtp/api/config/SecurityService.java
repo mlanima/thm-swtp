@@ -51,6 +51,10 @@ public class SecurityService {
         return isProjectContributor(projectId, authentication) || isPublicProject(projectId);
     }
 
+    public boolean canViewAllProjects(Authentication authentication) {
+        return hasModeratorRole(authentication);
+    }
+
     /** Allowed to see project by url.*/
     public boolean canViewProjectByUrl(String projectUrl, Authentication authentication) {
         if (!hasAuthenticationContext(projectUrl, authentication)) {
@@ -223,58 +227,31 @@ public class SecurityService {
         if (!hasAuthenticationContext(projectId, authentication)) {
             return false;
         }
-        return isProjectContributor(projectId, authentication);
+        return isRegularUser(authentication) && isProjectOwner(projectId, authentication);
     }
 
-    /** Allowed to archive posts on a  project.*/
+    /** Allowed to archive posts on a project.*/
     public boolean canArchiveProjectPost(UUID projectId, UUID postId,  Authentication authentication) {
-        if (!hasAuthenticationContext(projectId, authentication) || postId == null || !isRegularUser(authentication)) {
-            return false;
-        }
-        return isProjectOwner(projectId, authentication) || isProjectPostAuthor(projectId, postId, authentication);
+        return canManageProjectPost(projectId, postId, authentication);
     }
 
-    /** Allowed to publish posts on a  project.
-     * Author is allowed to publish a draft.
-     * Archived / published posts may be published by author / owner.
-     */
+    /** Allowed to publish an existing post.*/
     public boolean canPublishProjectPost(UUID projectId, UUID postId, Authentication authentication) {
-        if (!hasAuthenticationContext(projectId, authentication) || postId == null || !isRegularUser(authentication)) {
-            return false;
-        }
-
-        return projectPostRepository.findByIdAndProjectId(postId, projectId)
-                .map(post -> switch (post.getStatus()){
-                    case DRAFT -> isProjectPostAuthor(projectId, postId, authentication);
-                    case ARCHIVED, PUBLISHED -> isProjectOwner(projectId, authentication) || isProjectPostAuthor(projectId, postId, authentication);
-                })
-                .orElse(false);
+        return canManageProjectPost(projectId, postId, authentication);
     }
 
     /** Allowed to edit a post on a project. */
     public boolean canEditProjectPost(UUID projectId, UUID postId, Authentication authentication) {
-        if (!hasAuthenticationContext(projectId, authentication) || postId == null || !isRegularUser(authentication)) {
-            return false;
-        }
-
-        return isProjectOwner(projectId, authentication) || isProjectPostAuthor(projectId, postId, authentication);
+        return canManageProjectPost(projectId, postId, authentication);
     }
 
     /** Allowed to delete a post on a  project.*/
     public boolean canDeleteProjectPost(UUID projectId, UUID postId, Authentication authentication) {
-        if (!hasAuthenticationContext(projectId, authentication) || postId == null) {
+        if (!hasAuthenticationContext(projectId, authentication) || postId == null || !projectPostRepository.existsByIdAndProjectId(postId, projectId)) {
             return false;
         }
 
-        if (hasModeratorRole(authentication)) {
-            return true;
-        }
-
-        if (!isRegularUser(authentication)) {
-            return false;
-        }
-
-        return isProjectOwner(projectId, authentication) || isProjectPostAuthor(projectId, postId, authentication);
+        return hasModeratorRole(authentication) || (isRegularUser(authentication) && isProjectOwner(projectId, authentication));
     }
 
 
@@ -369,6 +346,58 @@ public class SecurityService {
     }
 
 
+    // Thesis permissions
+
+    /** Allowed to view a thesis (any authenticated user). */
+    public boolean canViewThesis(UUID thesisId, Authentication authentication) {
+        return hasAuthenticationContext(thesisId, authentication);
+    }
+
+    /** Allowed to view a thesis by URL (any authenticated user). */
+    public boolean canViewThesisByUrl(String thesisUrl, Authentication authentication) {
+        return hasAuthenticationContext(thesisUrl, authentication);
+    }
+
+    /** Allowed to view all thesis.*/
+    public boolean canViewAllTheses(Authentication authentication) {
+        return hasModeratorRole(authentication);
+    }
+
+    /** Allowed to view theses of a user (own or as moderator). */
+    public boolean canViewUserTheses(String username, Authentication authentication) {
+        if (!hasAuthenticationContext(username, authentication)) {
+            return false;
+        }
+        return hasModeratorRole(authentication) || isProfileOwnerByUsername(username, authentication);
+    }
+
+    /** Allowed to add/remove students on a thesis (supervising professor only). */
+    public boolean canManageThesisStudents(UUID thesisId, Authentication authentication) {
+        return isProfessorUser(authentication) && isThesisSupervisor(thesisId, authentication);
+    }
+
+    /** Allowed to create a thesis (professors only). */
+    public boolean canCreateThesis(Authentication authentication) {
+        return isProfessorUser(authentication);
+    }
+
+    /** Allowed to edit a thesis (only the supervising professor). */
+    public boolean canEditThesis(UUID thesisId, Authentication authentication) {
+        return isProfessorUser(authentication) && isThesisSupervisor(thesisId, authentication);
+    }
+
+    /** Allowed to delete a thesis (supervising professor or moderator). */
+    public boolean canDeleteThesis(UUID thesisId, Authentication authentication) {
+        if (!hasAuthenticationContext(thesisId, authentication)) {
+            return false;
+        }
+        if (hasModeratorRole(authentication)) {
+            return true;
+        }
+        return isProfessorUser(authentication) && isThesisSupervisor(thesisId, authentication);
+    }
+
+
 
     // User-management permissions
 
@@ -426,6 +455,13 @@ public class SecurityService {
         return hasModeratorRole(authentication);
     }
 
+    // Audit log permissions.
+
+    /** Allowed to view audit logs. */
+    public boolean canViewAuditLogs(Authentication authentication) {
+        return hasModeratorRole(authentication);
+    }
+
 
 
     // GitHub integration permissions
@@ -465,13 +501,8 @@ public class SecurityService {
         return object != null && authentication != null && authentication.isAuthenticated();
     }
 
-    public boolean hasModeratorRole(Authentication authentication) {
+    private boolean hasModeratorRole(Authentication authentication) {
         return hasAuthority(authentication, "ROLE_MODERATOR");
-    }
-
-    /** Allowed to view audit logs. */
-    public boolean canViewAuditLogs(Authentication authentication) {
-        return hasModeratorRole(authentication);
     }
 
     private boolean hasUserRole(Authentication authentication) {
@@ -514,14 +545,13 @@ public class SecurityService {
         return projectRepository.existsByIdAndIsPrivateProjectFalse(projectId);
     }
 
-    private boolean isProjectPostAuthor(UUID projectId, UUID postId, Authentication authentication) {
-        if (!hasAuthenticationContext(projectId, authentication)) {
+    private boolean canManageProjectPost(UUID projectId, UUID postId, Authentication authentication) {
+        if (!hasAuthenticationContext(projectId, authentication) || postId == null || !isRegularUser(authentication) || !isProjectOwner(projectId, authentication)) {
             return false;
         }
-        UUID currentUserId = getCurrentUserId(authentication);
-        return projectPostRepository.existsByIdAndProjectIdAndAuthorKeycloakId(postId, projectId, currentUserId);
-    }
 
+        return projectPostRepository.existsByIdAndProjectId(postId, projectId);
+    }
 
     private boolean isProfileOwnerByUsername(String username, Authentication authentication) {
         if (!hasAuthenticationContext(username, authentication) || !isRegularUser(authentication)) {
@@ -537,52 +567,6 @@ public class SecurityService {
         }
         UUID currentUserId = getCurrentUserId(authentication);
         return userId.equals(currentUserId);
-    }
-
-    // Thesis permissions
-
-    /** Allowed to view a thesis (any authenticated user). */
-    public boolean canViewThesis(UUID thesisId, Authentication authentication) {
-        return hasAuthenticationContext(thesisId, authentication);
-    }
-
-    /** Allowed to view a thesis by URL (any authenticated user). */
-    public boolean canViewThesisByUrl(String thesisUrl, Authentication authentication) {
-        return hasAuthenticationContext(thesisUrl, authentication);
-    }
-
-    /** Allowed to view theses of a user (own or as moderator). */
-    public boolean canViewUserTheses(String username, Authentication authentication) {
-        if (!hasAuthenticationContext(username, authentication)) {
-            return false;
-        }
-        return hasModeratorRole(authentication) || isProfileOwnerByUsername(username, authentication);
-    }
-
-    /** Allowed to add/remove students on a thesis (supervising professor only). */
-    public boolean canManageThesisStudents(UUID thesisId, Authentication authentication) {
-        return isProfessorUser(authentication) && isThesisSupervisor(thesisId, authentication);
-    }
-
-    /** Allowed to create a thesis (professors only). */
-    public boolean canCreateThesis(Authentication authentication) {
-        return isProfessorUser(authentication);
-    }
-
-    /** Allowed to edit a thesis (only the supervising professor). */
-    public boolean canEditThesis(UUID thesisId, Authentication authentication) {
-        return isProfessorUser(authentication) && isThesisSupervisor(thesisId, authentication);
-    }
-
-    /** Allowed to delete a thesis (supervising professor or moderator). */
-    public boolean canDeleteThesis(UUID thesisId, Authentication authentication) {
-        if (!hasAuthenticationContext(thesisId, authentication)) {
-            return false;
-        }
-        if (hasModeratorRole(authentication)) {
-            return true;
-        }
-        return isProfessorUser(authentication) && isThesisSupervisor(thesisId, authentication);
     }
 
     private boolean isProfessorUser(Authentication authentication) {

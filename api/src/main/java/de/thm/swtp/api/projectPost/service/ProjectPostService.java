@@ -3,6 +3,8 @@ package de.thm.swtp.api.projectPost.service;
 import de.thm.swtp.api.common.TxLogger;
 import de.thm.swtp.api.discord.service.DiscordPostSyncService;
 import de.thm.swtp.api.discord.stream.DiscordEventPublisher;
+import de.thm.swtp.api.discord.stream.PostCreatedPayload;
+import de.thm.swtp.api.discord.stream.PostUrlBuilder;
 import de.thm.swtp.api.exceptionhandling.exceptions.InvalidProjectPostException;
 import de.thm.swtp.api.exceptionhandling.exceptions.ProjectPostNotFoundException;
 import de.thm.swtp.api.moderation.ContentModerationService;
@@ -48,6 +50,7 @@ public class ProjectPostService {
     private final DiscordPostSyncService discordPostSyncService;
     private final ContentModerationService contentModerationService;
     private final ProjectFileService projectFileService;
+    private final PostUrlBuilder postUrlBuilder;
     @Transactional(readOnly = true)
     public List<ProjectPost> getPublishedPostsForProject(UUID projectId) {
         getProjectOrThrowError(projectId);
@@ -102,7 +105,16 @@ public class ProjectPostService {
 
         ProjectPostEntity saved = projectPostRepository.saveAndFlush(projectPostEntity);
         if (status == ProjectPostStatus.PUBLISHED) {
-            discordEventPublisher.publishPostCreated(saved);
+            var data = new PostCreatedPayload(
+                    saved.getId(),
+                    saved.getProject().getId(),
+                    saved.getContent(),
+                    saved.getTitle(),
+                    saved.getAuthor().getUsername(),
+                    saved.getAuthor().getDiscordAvatar(),
+                    postUrlBuilder.buildPostUrl(saved)
+            );
+            TxLogger.afterCommit(() -> discordEventPublisher.publishPostCreated(data));
         }
         ProjectPost post = ProjectPostMapper.toDomain(saved);
         TxLogger.afterCommit(log, "Post created: project={}, post={}, author={}", projectId, post.getId(), authorId);
@@ -174,7 +186,16 @@ public class ProjectPostService {
         postEntity.setArchivedAt(null);
 
         ProjectPostEntity saved = projectPostRepository.save(postEntity);
-        discordEventPublisher.publishPostCreated(saved);
+        var data = new PostCreatedPayload(
+                saved.getId(),
+                saved.getProject().getId(),
+                saved.getContent(),
+                saved.getTitle(),
+                saved.getAuthor().getUsername(),
+                saved.getAuthor().getDiscordAvatar(),
+                postUrlBuilder.buildPostUrl(saved)
+        );
+        TxLogger.afterCommit(() -> discordEventPublisher.publishPostCreated(data));
         ProjectPost post = ProjectPostMapper.toDomain(saved);
         TxLogger.afterCommit(log, "Post published: project={}, post={}", projectId, postId);
         return post;
@@ -194,9 +215,9 @@ public class ProjectPostService {
         postEntity.setArchivedAt(LocalDateTime.now());
 
         ProjectPostEntity saved = projectPostRepository.save(postEntity);
-        discordPostSyncService.getDiscordMessageId(postId).ifPresent(
-                discordMsgId -> {
-                    discordEventPublisher.publishPostDeleted(postId, discordMsgId);
+        discordPostSyncService.getSyncData(postId).ifPresent(
+                syncData -> {
+                    TxLogger.afterCommit(() -> discordEventPublisher.publishPostDeleted(postId, syncData.discordMessageId(), syncData.discordChannelId()));
                     discordPostSyncService.removeSync(postId);
                 });
         ProjectPost post = ProjectPostMapper.toDomain(saved);
@@ -222,9 +243,9 @@ public class ProjectPostService {
 
         UUID imageFileId = postEntity.getImageFileId();
 
-        discordPostSyncService.getDiscordMessageId(postId).ifPresent(
-                discordMsgId -> {
-                    discordEventPublisher.publishPostDeleted(postId, discordMsgId);
+        discordPostSyncService.getSyncData(postId).ifPresent(
+                syncData -> {
+                    TxLogger.afterCommit(() -> discordEventPublisher.publishPostDeleted(postId, syncData.discordMessageId(), syncData.discordChannelId()));
                     discordPostSyncService.removeSync(postId);
                 });
 
@@ -310,10 +331,19 @@ public class ProjectPostService {
         ProjectPostEntity saved = projectPostRepository.save(postEntity);
 
         if (previousStatus != ProjectPostStatus.PUBLISHED && status == ProjectPostStatus.PUBLISHED) {
-            discordEventPublisher.publishPostCreated(saved);
+            var data = new PostCreatedPayload(
+                    saved.getId(),
+                    saved.getProject().getId(),
+                    saved.getContent(),
+                    saved.getTitle(),
+                    saved.getAuthor().getUsername(),
+                    saved.getAuthor().getDiscordAvatar(),
+                    postUrlBuilder.buildPostUrl(saved)
+            );
+            TxLogger.afterCommit(() -> discordEventPublisher.publishPostCreated(data));
         } else if (status == ProjectPostStatus.PUBLISHED) {
             discordPostSyncService.getDiscordMessageId(postId).ifPresent(
-                    discordMsgId -> discordEventPublisher.publishPostUpdated(saved, discordMsgId));
+                    discordMsgId -> TxLogger.afterCommit(() -> discordEventPublisher.publishPostUpdated(saved, discordMsgId)));
         }
 
         ProjectPost post = ProjectPostMapper.toDomain(saved);

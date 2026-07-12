@@ -8,6 +8,18 @@ import { redis } from './config/redis.js';
 
 const PORT = Number(process.env.PORT ?? 3001);
 
+const REQUIRED_ENV_VARS = ['DISCORD_TOKEN', 'PLATFORM_API_SECRET'];
+
+/** Exits immediately if any required env vars are missing. */
+function validateEnv(): void {
+  const missing = REQUIRED_ENV_VARS.filter((key) => !process.env[key]);
+  if (missing.length > 0) {
+    logger.fatal({ missing }, 'required environment variables not set');
+    process.exit(1);
+  }
+}
+
+/** Graceful shutdown — stops the API, destroys the Discord client, closes the worker, disconnects Redis. */
 async function shutdown(): Promise<void> {
   logger.info('shutting down');
 
@@ -24,7 +36,9 @@ async function shutdown(): Promise<void> {
   logger.info('redis disconnected');
 }
 
+/** Bot entry point — validates env, starts all subsystems, registers shutdown handlers. */
 async function main(): Promise<void> {
+  validateEnv();
   logger.info('starting discord bot');
 
   process.on('SIGTERM', () => shutdown().finally(() => process.exit(0)));
@@ -33,9 +47,22 @@ async function main(): Promise<void> {
   await startDiscordClient();
   logger.info('discord client logged in');
 
+  // Consumer runs on a setImmediate loop, so we don't await it — errors are logged internally
   startStreamConsumer().catch((err) => logger.error({ err }, 'failed to start stream consumer'));
-  startDiscordWorker();
-  startInternalApi(PORT);
+
+  try {
+    startDiscordWorker();
+  } catch (err) {
+    logger.fatal({ err }, 'failed to start discord worker');
+    process.exit(1);
+  }
+
+  try {
+    startInternalApi(PORT);
+  } catch (err) {
+    logger.fatal({ err }, 'failed to start internal API');
+    process.exit(1);
+  }
 }
 
 main().catch((err) => {

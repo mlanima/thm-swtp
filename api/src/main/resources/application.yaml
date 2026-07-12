@@ -132,11 +132,15 @@ discord:
   bot:
     base-url: ${DISCORD_BOT_BASEURL:http://discord.ser.mlanima.org:3001}
     api-secret: ${DISCORD_BOT_API_SECRET:}
+  oauth:
+    client-id: ${DISCORD_CLIENT_ID:}
+    client-secret: ${DISCORD_CLIENT_SECRET:}
+    redirect-uri: ${DISCORD_REDIRECT_URI:}
 
 # --- local overrides (uncomment and fill in for local dev) ---
 # spring.data.redis.host: localhost
 # discord.bot.base-url: http://localhost:3001
 # discord.bot.api-secret: YOUR_SECRET
-# DISCORD_CLIENT_ID: YOUR_CLIENT_ID
-# DISCORD_CLIENT_SECRET: YOUR_CLIENT_SECRET
-# DISCORD_REDIRECT_URI: http://localhost:8080/api/v1/auth/discord/callback
+# discord.oauth.client-id: YOUR_CLIENT_ID
+# discord.oauth.client-secret: YOUR_CLIENT_SECRET
+# discord.oauth.redirect-uri: http://localhost:8080/api/v1/auth/discord/callback

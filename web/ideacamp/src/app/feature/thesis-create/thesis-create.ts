@@ -1,5 +1,6 @@
-import { Component, HostListener, ViewChild, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, ViewChild, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 import {z} from 'zod';
 import {forkJoin, Observable, of} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
@@ -44,6 +45,7 @@ export class ThesisCreate {
   private readonly thesisSettingsService = inject(ThesisSettingsService);
   private readonly router = inject(Router);
   private readonly translateService = inject(TranslateService);
+  private readonly changeDetectorRef = inject(ChangeDetectorRef);
 
   readonly steps = THESIS_STEPS;
 
@@ -52,6 +54,7 @@ export class ThesisCreate {
   isLoading = false;
   errorMessage: string | null = null;
   successMessage: string | null = null;
+  failedStudentMessages: string[] = [];
 
   currentStep = 0;
 
@@ -144,6 +147,7 @@ export class ThesisCreate {
     }
     this.isLoading = true;
     this.errorMessage = null;
+    this.failedStudentMessages = [];
 
     this.thesisService.createThesis({
       title: res.data.title,
@@ -153,46 +157,50 @@ export class ThesisCreate {
       tags: [],
     }).subscribe({
       next: (thesis) => {
-        this.addInvitedStudents(thesis.id).subscribe((failedCount) => {
+        this.addInvitedStudents(thesis.id).subscribe((failedStudentMessages) => {
           this.isLoading = false;
-          this.successMessage = this.translateService.instant(this.resolveSuccessMessageKey(failedCount));
+          this.failedStudentMessages = failedStudentMessages;
+          this.successMessage = this.translateService.instant(this.resolveSuccessMessageKey(failedStudentMessages.length));
+          this.changeDetectorRef.markForCheck();
           setTimeout(() => {
             this.router.navigate(['/thesis', thesis.thesisUrl]);
-          }, 1500);
+          }, failedStudentMessages.length > 0 ? 4000 : 1500);
         });
       },
       error: () => {
         this.isLoading = false;
         this.errorMessage = this.translateService.instant('THESISCREATE.ERROR_CREATE_THESIS');
+        this.changeDetectorRef.markForCheck();
       },
     });
   }
-  
-  private addInvitedStudents(thesisId: string): Observable<number> {
+
+  private addInvitedStudents(thesisId: string): Observable<string[]> {
     if (this.invitedStudents.length === 0) {
-      return of(0);
+      return of([]);
     }
 
     return forkJoin(
       this.invitedStudents.map((student) =>
         this.thesisSettingsService.addStudent(thesisId, student.keycloakId).pipe(
-          map(() => true),
-          catchError(() => of(false)),
+          map(() => null),
+          catchError((error: HttpErrorResponse) => of(this.resolveStudentFailureMessage(student, error))),
         ),
       ),
-    ).pipe(map((results) => results.filter((succeeded) => !succeeded).length));
+    ).pipe(map((results) => results.filter((message): message is string => message !== null)));
+  }
+
+  private resolveStudentFailureMessage(student: ProjectInviteMember, error: HttpErrorResponse): string {
+    const key = error.error?.errorCode === 'STUDENT_ALREADY_ASSIGNED_ELSEWHERE'
+      ? 'THESISCREATE.ERROR_STUDENT_ALREADY_ELSEWHERE'
+      : 'THESISCREATE.ERROR_STUDENT_GENERIC';
+    return this.translateService.instant(key, { username: student.username });
   }
 
   private resolveSuccessMessageKey(failedStudentCount: number): string {
-    if (this.invitedStudents.length === 0) {
+    if (this.invitedStudents.length === 0 || failedStudentCount > 0) {
       return 'THESISCREATE.SUCCESS_CREATED';
     }
-    if (failedStudentCount === 0) {
-      return 'THESISCREATE.SUCCESS_CREATED_WITH_STUDENTS';
-    }
-    if (failedStudentCount === this.invitedStudents.length) {
-      return 'THESISCREATE.SUCCESS_CREATED_STUDENTS_FAILED';
-    }
-    return 'THESISCREATE.SUCCESS_CREATED_STUDENTS_PARTIAL';
+    return 'THESISCREATE.SUCCESS_CREATED_WITH_STUDENTS';
   }
 }

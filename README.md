@@ -113,10 +113,12 @@ thm-swtp/
 - [Berechtigungen](docs/permissions.mde)
 - [Datenbank Schema](docs/database-schema.md)
 - [Caching](docs/CACHING.md)
+- [CI/CD & Deployment](docs/CI_CD.md)
 - [Inhaltsmoderation](docs/CONTENT_MODERATION.md)
 - [Tag Moderation](docs/TAG_VALIDATION.md)
 - [Discord Integration](docs/DISCORD_INTEGRATION.md)
 - [GitHub Integration](docs/GITHUB_INTEGRATION.md)
+
 
 ## Mitwirkende
 

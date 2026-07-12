@@ -10,12 +10,24 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Keeps a mapping between platform post IDs and Discord message IDs
+ * so that edits and deletes can be mirrored across platforms.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class DiscordPostSyncService {
 
     private final DiscordMessageSyncRepository messageSyncRepository;
+
+    public record SyncData(String discordMessageId, String discordChannelId) {}
+
+    @Transactional(readOnly = true)
+    public Optional<SyncData> getSyncData(UUID postId) {
+        return messageSyncRepository.findByPlatformPostId(postId)
+                .map(sync -> new SyncData(sync.getDiscordMessageId(), sync.getDiscordChannelId()));
+    }
 
     @Transactional(readOnly = true)
     public Optional<String> getDiscordMessageId(UUID postId) {

@@ -3,6 +3,7 @@ import { streamProducer } from '../../streams/producer.js';
 import { logger } from '../../config/logger.js';
 import { wrapAsync } from '../wrapAsync.js';
 
+/** Registers the MessageDelete handler — notifies the platform when a message is removed on Discord. */
 export function registerMessageDeleteHandler(client: Client): void {
   client.on(Events.MessageDelete, wrapAsync(async (message: Message | PartialMessage) => {
     if (message.author?.bot) return;

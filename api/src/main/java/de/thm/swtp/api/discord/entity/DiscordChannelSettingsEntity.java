@@ -8,6 +8,10 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * Notification toggles per linked channel.
+ * Controls which events get pushed to Discord.
+ */
 @Entity
 @Table(name = "discord_channel_settings", uniqueConstraints = {
         @UniqueConstraint(name = "UK_discord_channel_settings_link", columnNames = {"linked_channel_id"})
@@ -46,6 +50,15 @@ public class DiscordChannelSettingsEntity {
     @Column(name = "notify_member_leave", nullable = false)
     @Builder.Default
     private boolean notifyMemberLeave = false;
+
+    /** Returns true if the given event type is allowed to fire a Discord notification. */
+    public boolean shouldNotify(String eventType) {
+        return switch (eventType) {
+            case "MEMBER_JOIN" -> notifyMemberJoin;
+            case "MEMBER_LEAVE" -> notifyMemberLeave;
+            default -> true;
+        };
+    }
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

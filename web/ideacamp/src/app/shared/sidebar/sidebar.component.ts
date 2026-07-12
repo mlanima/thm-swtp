@@ -7,6 +7,8 @@ import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ProjectInvitationService } from '../../feature/my-projects/services/project-invitation.service';
 import { UserProfileService } from '../../services/user-profile.service';
+import { MyThesesService } from '../../feature/my-theses/services/my-theses.service';
+import { ThesisNotificationService } from '../../feature/my-theses/services/thesis-notification.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -19,9 +21,12 @@ export class SidebarComponent {
   auth = inject(AuthService);
   private readonly invitationService = inject(ProjectInvitationService);
   private readonly userProfileService = inject(UserProfileService);
+  private readonly myThesesService = inject(MyThesesService);
+  private readonly thesisNotificationService = inject(ThesisNotificationService);
   isRendered = signal(false);
   isClosing = signal(false);
   isProfessor = signal(false);
+  hasTheses = signal(false);
 
   private readonly platformId = inject(PLATFORM_ID);
 
@@ -31,14 +36,30 @@ export class SidebarComponent {
         if (this.auth.isModerator()) {
           return;
         }
-        this.userProfileService.getMyProfile().subscribe({
-          next: (profile) => this.isProfessor.set(profile.isProfessor),
-        });
         this.invitationService.getInvitations().subscribe({
           next: (invitations) =>
             this.sidebarService.pendingInvitationsCount.set(
               invitations.filter((i) => i.status === 'PENDING').length,
             ),
+        });
+        this.userProfileService.getMyProfile().subscribe({
+          next: (profile) => {
+            this.isProfessor.set(profile.isProfessor);
+            if (profile.isProfessor) {
+              return;
+            }
+            const username = this.auth.username();
+            if (!username) {
+              return;
+            }
+            this.myThesesService.getMyTheses(username).subscribe({
+              next: (theses) => this.hasTheses.set(theses.length > 0),
+            });
+            const sequence = this.sidebarService.nextUnreadThesisNotificationsSequence();
+            this.thesisNotificationService.getUnreadCount().subscribe({
+              next: (response) => this.sidebarService.setUnreadThesisNotificationsCount(response.count, sequence),
+            });
+          },
         });
       });
     }

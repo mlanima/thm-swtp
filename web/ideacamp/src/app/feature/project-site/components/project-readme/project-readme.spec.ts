@@ -56,6 +56,38 @@ describe('ProjectReadme', () => {
     expect(fixture.nativeElement.textContent).toContain('Hello World');
   });
 
+  it('is expanded by default and folds/unfolds when the header is clicked', async () => {
+    readmeResponse = {
+      repoOwner: 'mlanima',
+      repoName: 'thm-swtp',
+      defaultBranch: 'main',
+      markdown: '# Hello World',
+      available: true,
+    };
+
+    fixture = TestBed.createComponent(ProjectReadme);
+    fixture.componentRef.setInput('projectId', '00000000-0000-0000-0000-000000000000');
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const header = fixture.nativeElement.querySelector('button') as HTMLButtonElement;
+    const collapsible = fixture.nativeElement.querySelector('.readme-collapsible') as HTMLElement;
+
+    expect(header.getAttribute('aria-expanded')).toBe('true');
+    expect(collapsible.classList.contains('expanded')).toBe(true);
+
+    header.click();
+    fixture.detectChanges();
+    expect(header.getAttribute('aria-expanded')).toBe('false');
+    expect(collapsible.classList.contains('expanded')).toBe(false);
+
+    header.click();
+    fixture.detectChanges();
+    expect(header.getAttribute('aria-expanded')).toBe('true');
+    expect(collapsible.classList.contains('expanded')).toBe(true);
+  });
+
   it('rewrites a same-page anchor so it navigates within the current page, not to the app root', async () => {
     readmeResponse = {
       repoOwner: 'mlanima',

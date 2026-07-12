@@ -1,5 +1,6 @@
 package de.thm.swtp.api.project;
 
+import de.thm.swtp.api.common.PageResponse;
 import de.thm.swtp.api.project.dto.request.*;
 import de.thm.swtp.api.project.dto.response.*;
 import de.thm.swtp.api.auditlog.domain.AuditActor;
@@ -24,11 +25,13 @@ public class ProjectController {
     private final ProjectService projectService;
 
     @GetMapping
-    @PreAuthorize("@security.hasModeratorRole(authentication)")
-    public ResponseEntity<Page<ProjectResponse>> getAllProjects(
+    @PreAuthorize("@security.canViewAllProjects(authentication)")
+    public ResponseEntity<PageResponse<ProjectResponse>> getAllProjects(
             @RequestParam(required = false) String name,
             @PageableDefault(size = 20, sort = "name", direction = Sort.Direction.ASC) Pageable pageable) {
-        return ResponseEntity.ok(projectService.getAllProjects(name, pageable));
+
+        Page<ProjectResponse> projects = projectService.getAllProjects(name, pageable);
+        return ResponseEntity.ok(PageResponse.toResponse(projects));
     }
 
     @PostMapping

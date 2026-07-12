@@ -42,6 +42,11 @@ export const serverRoutes: ServerRoute[] = [
   },
 
   {
+    path: 'my-theses',
+    renderMode: RenderMode.Client,
+  },
+
+  {
     path: 'dashboard',
     renderMode: RenderMode.Client,
   },
