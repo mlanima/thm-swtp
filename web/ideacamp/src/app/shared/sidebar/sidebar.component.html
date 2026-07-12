@@ -114,6 +114,11 @@
               <app-menu-link>
                  <i class="pi pi-graduation-cap text-sm text-zinc-400"></i>
                  <span>{{ 'SIDEBAR.MYTHESES' | translate }}</span>
+                 @if (sidebarService.unreadThesisNotificationsCount() > 0) {
+                   <span class="ml-auto inline-flex items-center gap-1 rounded-full bg-lime-400/15 px-2 py-0.5 text-[10px] font-semibold text-lime-400 ring-1 ring-inset ring-lime-400/30 invitation-pulse">
+                     {{ sidebarService.unreadThesisNotificationsCount() }}
+                   </span>
+                 }
                </app-menu-link>
               </a>
             }

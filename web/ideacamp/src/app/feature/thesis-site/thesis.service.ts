@@ -44,4 +44,8 @@ export class ThesisService {
   thesisUrlExists(thesisUrl: string) {
     return this.http.get<boolean>(`${this.baseUrl}/url-exists/${encodeURIComponent(thesisUrl)}`);
   }
+
+  isStudentAlreadyAssigned(studentKeycloakId: string): Observable<boolean> {
+    return this.http.get<boolean>(`${this.baseUrl}/students/${studentKeycloakId}/already-assigned`);
+  }
 }

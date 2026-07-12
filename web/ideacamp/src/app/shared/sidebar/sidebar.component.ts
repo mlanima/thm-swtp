@@ -8,6 +8,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { ProjectInvitationService } from '../../feature/my-projects/services/project-invitation.service';
 import { UserProfileService } from '../../services/user-profile.service';
 import { MyThesesService } from '../../feature/my-theses/services/my-theses.service';
+import { ThesisNotificationService } from '../../feature/my-theses/services/thesis-notification.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -21,6 +22,7 @@ export class SidebarComponent {
   private readonly invitationService = inject(ProjectInvitationService);
   private readonly userProfileService = inject(UserProfileService);
   private readonly myThesesService = inject(MyThesesService);
+  private readonly thesisNotificationService = inject(ThesisNotificationService);
   isRendered = signal(false);
   isClosing = signal(false);
   isProfessor = signal(false);
@@ -52,6 +54,10 @@ export class SidebarComponent {
             }
             this.myThesesService.getMyTheses(username).subscribe({
               next: (theses) => this.hasTheses.set(theses.length > 0),
+            });
+            const sequence = this.sidebarService.nextUnreadThesisNotificationsSequence();
+            this.thesisNotificationService.getUnreadCount().subscribe({
+              next: (response) => this.sidebarService.setUnreadThesisNotificationsCount(response.count, sequence),
             });
           },
         });

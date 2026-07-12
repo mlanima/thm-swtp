@@ -1,6 +1,7 @@
 package de.thm.swtp.api.thesis;
 
 import de.thm.swtp.api.common.TxLogger;
+import de.thm.swtp.api.notification.event.ThesisStudentAddedEvent;
 import de.thm.swtp.api.project.ProjectUrlUtils;
 import de.thm.swtp.api.tag.entity.TagEntity;
 import de.thm.swtp.api.tag.repository.TagRepository;
@@ -12,6 +13,7 @@ import de.thm.swtp.api.thesis.exception.ThesisInvalidStudentAssignmentException;
 import de.thm.swtp.api.thesis.exception.ThesisInvalidUrlException;
 import de.thm.swtp.api.thesis.exception.ThesisNotFoundByIdException;
 import de.thm.swtp.api.thesis.exception.ThesisNotFoundException;
+import de.thm.swtp.api.thesis.exception.ThesisStudentAlreadyAssignedElsewhereException;
 import de.thm.swtp.api.thesis.exception.ThesisStudentAlreadyAssignedException;
 import de.thm.swtp.api.thesis.exception.ThesisStudentNotFoundException;
 import de.thm.swtp.api.thesis.exception.ThesisTitleAlreadyExistsException;
@@ -23,6 +25,8 @@ import de.thm.swtp.api.userprofile.exception.UserProfileNotFoundException;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +46,7 @@ public class ThesisService {
     private final ThesisRepository thesisRepository;
     private final UserProfileRepository userProfileRepository;
     private final TagRepository tagRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional(readOnly = true)
     public Page<Thesis> getAll(String title, Pageable pageable) {
@@ -163,6 +168,11 @@ public class ThesisService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public boolean isStudentAlreadyAssigned(UUID studentKeycloakId) {
+        return thesisRepository.existsByStudentsKeycloakId(studentKeycloakId);
+    }
+
     @Transactional
     public Thesis addStudent(UUID thesisId, UUID studentKeycloakId) {
         ThesisEntity thesis = thesisRepository.findById(thesisId)
@@ -184,8 +194,18 @@ public class ThesisService {
             throw new ThesisStudentAlreadyAssignedException(studentKeycloakId, thesisId);
         }
 
+        if (thesisRepository.existsByStudentsKeycloakId(studentKeycloakId)) {
+            throw new ThesisStudentAlreadyAssignedElsewhereException(studentKeycloakId);
+        }
+
         thesis.getStudents().add(student);
-        ThesisEntity saved = thesisRepository.save(thesis);
+        ThesisEntity saved;
+        try {
+            saved = thesisRepository.saveAndFlush(thesis);
+        } catch (DataIntegrityViolationException e) {
+            throw new ThesisStudentAlreadyAssignedElsewhereException(studentKeycloakId);
+        }
+        eventPublisher.publishEvent(new ThesisStudentAddedEvent(thesisId, studentKeycloakId));
         TxLogger.afterCommit(log, "Thesis student added: thesis={}, student={}", thesisId, studentKeycloakId);
         return ThesisMapper.toDomain(saved);
     }

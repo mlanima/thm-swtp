@@ -1,5 +1,6 @@
 package de.thm.swtp.api.thesis;
 
+import de.thm.swtp.api.notification.event.ThesisStudentAddedEvent;
 import de.thm.swtp.api.tag.entity.TagEntity;
 import de.thm.swtp.api.tag.repository.TagRepository;
 import de.thm.swtp.api.thesis.domain.Thesis;
@@ -10,6 +11,7 @@ import de.thm.swtp.api.thesis.exception.ThesisInvalidStudentAssignmentException;
 import de.thm.swtp.api.thesis.exception.ThesisInvalidUrlException;
 import de.thm.swtp.api.thesis.exception.ThesisNotFoundByIdException;
 import de.thm.swtp.api.thesis.exception.ThesisNotFoundException;
+import de.thm.swtp.api.thesis.exception.ThesisStudentAlreadyAssignedElsewhereException;
 import de.thm.swtp.api.thesis.exception.ThesisStudentAlreadyAssignedException;
 import de.thm.swtp.api.thesis.exception.ThesisStudentNotFoundException;
 import de.thm.swtp.api.thesis.exception.ThesisTitleAlreadyExistsException;
@@ -23,6 +25,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -46,6 +50,8 @@ class ThesisServiceTest {
     private UserProfileRepository userProfileRepository;
     @Mock
     private TagRepository tagRepository;
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
     private ThesisService thesisService;
@@ -270,11 +276,12 @@ class ThesisServiceTest {
     void addStudent_addsStudent_whenValid() {
         when(thesisRepository.findById(thesisId)).thenReturn(Optional.of(thesisEntity));
         when(userProfileRepository.findById(studentId)).thenReturn(Optional.of(student));
-        when(thesisRepository.save(any())).thenReturn(thesisEntity);
+        when(thesisRepository.saveAndFlush(any())).thenReturn(thesisEntity);
 
         thesisService.addStudent(thesisId, studentId);
 
         assertThat(thesisEntity.getStudents()).contains(student);
+        verify(eventPublisher).publishEvent(new ThesisStudentAddedEvent(thesisId, studentId));
     }
 
     @Test
@@ -314,11 +321,49 @@ class ThesisServiceTest {
     }
 
     @Test
+    void addStudent_throwsAlreadyAssignedElsewhere_whenStudentInOtherThesis() {
+        when(thesisRepository.findById(thesisId)).thenReturn(Optional.of(thesisEntity));
+        when(userProfileRepository.findById(studentId)).thenReturn(Optional.of(student));
+        when(thesisRepository.existsByStudentsKeycloakId(studentId)).thenReturn(true);
+
+        assertThatThrownBy(() -> thesisService.addStudent(thesisId, studentId))
+                .isInstanceOf(ThesisStudentAlreadyAssignedElsewhereException.class);
+    }
+
+    @Test
+    void addStudent_throwsAlreadyAssignedElsewhere_onConcurrentRace() {
+        when(thesisRepository.findById(thesisId)).thenReturn(Optional.of(thesisEntity));
+        when(userProfileRepository.findById(studentId)).thenReturn(Optional.of(student));
+        when(thesisRepository.existsByStudentsKeycloakId(studentId)).thenReturn(false);
+        when(thesisRepository.saveAndFlush(any()))
+                .thenThrow(new DataIntegrityViolationException("unique constraint"));
+
+        assertThatThrownBy(() -> thesisService.addStudent(thesisId, studentId))
+                .isInstanceOf(ThesisStudentAlreadyAssignedElsewhereException.class);
+    }
+
+    @Test
     void addStudent_throwsNotFoundById_whenThesisMissing() {
         when(thesisRepository.findById(thesisId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> thesisService.addStudent(thesisId, studentId))
                 .isInstanceOf(ThesisNotFoundByIdException.class);
+    }
+
+    // --- isStudentAlreadyAssigned ---
+
+    @Test
+    void isStudentAlreadyAssigned_returnsTrue_whenStudentInAnyThesis() {
+        when(thesisRepository.existsByStudentsKeycloakId(studentId)).thenReturn(true);
+
+        assertThat(thesisService.isStudentAlreadyAssigned(studentId)).isTrue();
+    }
+
+    @Test
+    void isStudentAlreadyAssigned_returnsFalse_whenStudentUnassigned() {
+        when(thesisRepository.existsByStudentsKeycloakId(studentId)).thenReturn(false);
+
+        assertThat(thesisService.isStudentAlreadyAssigned(studentId)).isFalse();
     }
 
     // --- removeStudent ---

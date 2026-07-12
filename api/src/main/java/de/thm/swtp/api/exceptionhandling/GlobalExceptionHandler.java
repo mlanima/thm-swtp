@@ -18,6 +18,7 @@ import de.thm.swtp.api.professorRequest.exception.ProfessorRequestAlreadyExistsE
 import de.thm.swtp.api.thesis.exception.ThesisInvalidUrlException;
 import de.thm.swtp.api.thesis.exception.ThesisUrlGenerationFailedException;
 import de.thm.swtp.api.thesis.exception.ThesisNotFoundException;
+import de.thm.swtp.api.thesis.exception.ThesisStudentAlreadyAssignedElsewhereException;
 import de.thm.swtp.api.thesis.exception.ThesisStudentAlreadyAssignedException;
 import de.thm.swtp.api.thesis.exception.ThesisStudentNotFoundException;
 import de.thm.swtp.api.thesis.exception.ThesisTitleAlreadyExistsException;
@@ -602,6 +603,13 @@ public class GlobalExceptionHandler {
         log.debug("Conflict (409): {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ThesisStudentAlreadyAssignedElsewhereException.class)
+    public ResponseEntity<ErrorResponse> handleThesisStudentAlreadyAssignedElsewhere(ThesisStudentAlreadyAssignedElsewhereException ex) {
+        log.debug("Conflict (409): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ErrorResponse.of(409, "Conflict", ex.getMessage(), "STUDENT_ALREADY_ASSIGNED_ELSEWHERE"));
     }
 
     @ExceptionHandler(ThesisStudentNotFoundException.class)

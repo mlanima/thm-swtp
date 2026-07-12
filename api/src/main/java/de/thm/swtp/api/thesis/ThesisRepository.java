@@ -38,4 +38,8 @@ public interface ThesisRepository extends JpaRepository<ThesisEntity, UUID> {
     boolean existsByThesisUrlAndIdNot(String thesisUrl, UUID id);
 
     boolean existsByIdAndSupervisorKeycloakId(UUID id, UUID supervisorKeycloakId);
+
+    @Query("SELECT CASE WHEN COUNT(t) > 0 THEN true ELSE false END "
+            + "FROM theses t JOIN t.students s WHERE s.keycloakId = :studentKeycloakId")
+    boolean existsByStudentsKeycloakId(@Param("studentKeycloakId") UUID studentKeycloakId);
 }
