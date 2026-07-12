@@ -43,7 +43,7 @@ public class ProjectPostEntity {
     private String title;
 
     /** Content of the post.*/
-    @Column(nullable = false)
+    @Column(nullable = false, length = 10000)
     private String content;
 
     /** Status of the Post. See {@link ProjectPostStatus}
