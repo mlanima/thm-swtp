@@ -110,7 +110,7 @@ thm-swtp/
 - [Frontend-Struktur & Auth](docs/FRONTEND_STRUCTURE_AND_AUTH.md)
 - [Keycloak — Setup & Konfiguration](docs/Keycloak%20-%20Setup%20&%20Konfiguration.md)
 - [Rollen](docs/ROLLEN.md)
-- [Berechtigungen](docs/permissions.mde)
+- [Berechtigungen](docs/permissions.md)
 - [Datenbank Schema](docs/database-schema.md)
 - [Caching](docs/CACHING.md)
 - [CI/CD & Deployment](docs/CI_CD.md)
