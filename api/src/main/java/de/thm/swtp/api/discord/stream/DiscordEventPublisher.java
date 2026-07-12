@@ -1,5 +1,6 @@
 package de.thm.swtp.api.discord.stream;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.thm.swtp.api.discord.config.DiscordProperties;
 import de.thm.swtp.api.discord.entity.DiscordChannelSettingsEntity;
 import de.thm.swtp.api.discord.entity.LinkedChannelEntity;
@@ -27,6 +28,7 @@ public class DiscordEventPublisher {
     private final LinkedChannelRepository linkedChannelRepository;
     private final DiscordMessageSyncRepository messageSyncRepository;
     private final DiscordChannelSettingsRepository settingsRepository;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public void publishPostCreated(ProjectPostEntity post) {
         var channelRef = findActiveChannel(post.getProject().getId());
@@ -134,7 +136,7 @@ public class DiscordEventPublisher {
         try {
             redis.opsForStream().add(
                     discordProperties.getStreams().getOutbound(),
-                    Map.of("type", type, "payload", serialize(payload))
+                    Map.of("type", type, "payload", objectMapper.writeValueAsString(payload))
             );
             log.debug("Published {} event to stream {}", type, discordProperties.getStreams().getOutbound());
         } catch (Exception e) {
@@ -153,22 +155,6 @@ public class DiscordEventPublisher {
             case "MEMBER_LEAVE" -> settings.isNotifyMemberLeave();
             default -> true;
         };
-    }
-
-    private String serialize(Map<String, ?> map) {
-        return map.entrySet().stream()
-                .map(e -> "\"" + e.getKey() + "\":\"" + escape(e.getValue() != null ? e.getValue().toString() : "") + "\"")
-                .reduce((a, b) -> a + "," + b)
-                .map(s -> "{" + s + "}")
-                .orElse("{}");
-    }
-
-    private String escape(String value) {
-        return value.replace("\\", "\\\\")
-                .replace("\"", "\\\"")
-                .replace("\n", "\\n")
-                .replace("\r", "\\r")
-                .replace("\t", "\\t");
     }
 
     private String buildPostUrl(ProjectPostEntity post) {

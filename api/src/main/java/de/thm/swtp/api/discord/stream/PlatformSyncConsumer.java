@@ -57,21 +57,7 @@ public class PlatformSyncConsumer {
         }
         consumerName = "spring-worker-" + host + "-" + ProcessHandle.current().pid();
 
-        try {
-            redis.opsForStream().createGroup(
-                    discordProperties.getStreams().getInbound(),
-                    discordProperties.getStreams().getConsumerGroup()
-            );
-            log.info("Created consumer group {} on stream {}",
-                    discordProperties.getStreams().getConsumerGroup(),
-                    discordProperties.getStreams().getInbound());
-        } catch (Exception e) {
-            if (e.getMessage() != null && e.getMessage().contains("BUSYGROUP")) {
-                log.debug("Consumer group already exists");
-            } else {
-                log.warn("Failed to create consumer group: {}", e.getMessage());
-            }
-        }
+        ensureGroup();
 
         var bot = discordProperties.getBot();
         var oauth = discordProperties.getOauth();
@@ -88,6 +74,32 @@ public class PlatformSyncConsumer {
                 bot.getBaseUrl(),
                 discordProperties.getStreams().getInbound(),
                 discordProperties.getStreams().getOutbound());
+    }
+
+    private void ensureGroup() {
+        var inbound = discordProperties.getStreams().getInbound();
+        var group = discordProperties.getStreams().getConsumerGroup();
+        try {
+            redis.opsForStream().createGroup(inbound, group);
+            log.info("Created consumer group {} on stream {}", group, inbound);
+        } catch (Exception e) {
+            if (e.getMessage() != null && e.getMessage().contains("BUSYGROUP")) {
+                log.debug("Consumer group already exists");
+            } else {
+                // Stream doesn't exist yet — seed it, then create the group
+                try {
+                    redis.opsForStream().add(inbound, Map.of("_init", "1"));
+                    redis.opsForStream().createGroup(inbound, group);
+                    log.info("Created consumer group {} on stream {} (stream auto-created)", group, inbound);
+                } catch (Exception e2) {
+                    if (e2.getMessage() != null && e2.getMessage().contains("BUSYGROUP")) {
+                        log.debug("Consumer group already exists");
+                    } else {
+                        log.warn("Failed to create consumer group: {}", e2.getMessage());
+                    }
+                }
+            }
+        }
     }
 
     @Scheduled(fixedDelay = 100)
@@ -117,7 +129,12 @@ public class PlatformSyncConsumer {
                 }
             }
         } catch (Exception e) {
-            log.debug("Stream poll error (expected if empty): {}", e.getMessage());
+            if (e.getMessage() != null && e.getMessage().contains("NOGROUP")) {
+                log.warn("Consumer group missing — attempting to recreate");
+                ensureGroup();
+            } else {
+                log.debug("Stream poll error: {}", e.getMessage());
+            }
         }
     }
 
