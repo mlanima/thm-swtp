@@ -14,11 +14,8 @@ import org.springframework.stereotype.Component;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Map;
-
-import org.springframework.data.redis.core.RedisCallback;
 
 /**
  * Listens on the inbound Redis stream for events coming from the Discord bot
@@ -75,21 +72,24 @@ public class PlatformSyncConsumer {
         var inbound = discordProperties.getStreams().getInbound();
         var group = discordProperties.getStreams().getConsumerGroup();
         try {
-            redis.execute((RedisCallback<Object>) connection -> {
-                connection.streamCommands().xGroupCreate(
-                        inbound.getBytes(StandardCharsets.UTF_8),
-                        group.getBytes(StandardCharsets.UTF_8),
-                        ReadOffset.latest(),
-                        true
-                );
-                return null;
-            });
+            redis.opsForStream().createGroup(inbound, group);
             log.info("Created consumer group {} on stream {}", group, inbound);
         } catch (Exception e) {
             if (e.getMessage() != null && e.getMessage().contains("BUSYGROUP")) {
                 log.debug("Consumer group already exists");
             } else {
-                log.error("Failed to create consumer group on stream {}", inbound, e);
+                log.warn("Failed to create consumer group, trying fallback", e);
+                try {
+                    redis.opsForStream().add(inbound, Map.of("_init", "1"));
+                    redis.opsForStream().createGroup(inbound, group);
+                    log.info("Created consumer group {} on stream {} (stream auto-created)", group, inbound);
+                } catch (Exception e2) {
+                    if (e2.getMessage() != null && e2.getMessage().contains("BUSYGROUP")) {
+                        log.debug("Consumer group already exists");
+                    } else {
+                        log.error("Failed to create consumer group", e2);
+                    }
+                }
             }
         }
     }
