@@ -243,7 +243,6 @@ class DiscordEventHandlerTest {
 
         when(messageSyncRepository.existsByDiscordMessageId("discord-msg-1")).thenReturn(false);
         when(projectPostRepository.existsById(postId)).thenReturn(true);
-        when(messageSyncRepository.findByPlatformPostId(postId)).thenReturn(Optional.empty());
 
         handler.handleMessageAssigned(payload);
 
@@ -269,7 +268,6 @@ class DiscordEventHandlerTest {
 
         when(messageSyncRepository.existsByDiscordMessageId("orphan-msg")).thenReturn(false);
         when(projectPostRepository.existsById(postId)).thenReturn(true);
-        when(messageSyncRepository.findByPlatformPostId(postId)).thenReturn(Optional.empty());
 
         handler.handleMessageAssigned(payload);
 
