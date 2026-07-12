@@ -38,6 +38,7 @@ The file and image storage is also described here.
 - [Theses](#theses)
 - [Thesis Tags](#thesis_tags)
 - [Thesis Students](#thesis_students)
+- [Thesis Assignment Notifications](#thesis_assignment_notifications)
 
 #### Moderation
 - [Reports](#reports)
@@ -125,10 +126,13 @@ erDiagram
     USER_PROFILES ||--o{ THESES : supervises
 
     THESES ||--o{ THESIS_STUDENTS : has
-    USER_PROFILES ||--o{ THESIS_STUDENTS : participates
+    USER_PROFILES ||--o| THESIS_STUDENTS : participates
 
     THESES ||--o{ THESIS_TAGS : uses
     TAGS ||--o{ THESIS_TAGS : assigned
+
+    THESES ||--o{ THESIS_ASSIGNMENT_NOTIFICATIONS : triggers
+    USER_PROFILES ||--o{ THESIS_ASSIGNMENT_NOTIFICATIONS : receives
 ```
 
 ### Moderation Relationships
@@ -247,7 +251,7 @@ optional members, posts, links, tags, favorites, views and optional integrations
 | Column                 |         Type | Null | Constraints/Default               | Description                             |
 |------------------------|-------------:|:----:|-----------------------------------|-----------------------------------------|
 | `id`                   |         UUID |  no  | PK                                | Project-ID                              |
-| `name`                 |  varchar(20) |  no  | unique project name               | Project name                            |
+| `name`                 |  varchar(20) |  no  | unique `UK_projects_name`         | Project name                            |
 | `description`          | varchar(500) | yes  | /                                 | Description                             |
 | `short_description`    | varchar(200) | yes  | /                                 | Short description                       |
 | `project_url`          |  varchar(30) |  no  | unique `UK_projects_project_url`  | URL-Slug                                |
@@ -450,9 +454,21 @@ Join-table for students of a thesis.
 | `thesis_id`                | UUID |  no  | FK -> `theses.id`, unique pair                 | ID of the thesis  |
 | `user_profile_keycloak_id` | UUID |  no  | FK -> `user_profiles.keycloak_id`, unique pair | ID of the student |
 
-Unique Constraint: `UK_thesis_students(thesis_id, user_profile_keycloak_id)`.
+Unique Constraint: 
+`UK_thesis_students(thesis_id, user_profile_keycloak_id)`.
+`UK_thesis_students_student(user_profile_keycloak_id)`.
 
+### `thesis_assignment_notifications`
 
+Stores in-app notifications that inform students when they are assigned to a thesis.
+
+| Column                |     Type | Null | Constraints/Default               | Description                              |
+|-----------------------|---------:|:----:|-----------------------------------|------------------------------------------|
+| `id`                  |     UUID |  no  | PK, generated                     | Notification ID                          |
+| `student_keycloak_id` |     UUID |  no  | FK -> `user_profiles.keycloak_id` | Student receiving the notification       |
+| `thesis_id`           |     UUID |  no  | FK -> `theses.id`                 | Thesis to which the student was assigned |
+| `is_read`             |  boolean |  no  | default `false`                   | Whether the notification has been read   |
+| `created_at`          | datetime |  no  | auto on insert                    | Creation timestamp                       |
 
 ### `reports`
 
@@ -571,7 +587,7 @@ Mapping between project posts and discord messages.
 | `discord_message_id` | varchar(20) |  no  | unique `UK_discord_message_sync_discord_msg` | Discord-Message-ID                           |
 | `discord_channel_id` | varchar(20) |  no  |                                              | Discord-Channel-ID                           |
 | `discord_guild_id`   | varchar(20) | yes  |                                              | Discord-Guild-ID                             |
-| `direction`          |        enum |  no  | default `PLATFORM_TO_DISCORD`, length 10     | `PLATFORM_TO_DISCORD`, `DISCORD_TO_PLATFORM` |
+| `direction`          |        enum |  no  | default `PLATFORM_TO_DISCORD`, length 30     | `PLATFORM_TO_DISCORD`, `DISCORD_TO_PLATFORM` |
 | `synced_at`          |    datetime |  no  | auto on insert                               | Sync timestamp                               |
 
 
