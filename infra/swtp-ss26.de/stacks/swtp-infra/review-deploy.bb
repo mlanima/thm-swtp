@@ -222,6 +222,8 @@
     (let [{:keys [exit err]} (sh ["sudo" "cp" "-r" template dir])]
       (when-not (zero? exit)
         (throw (ex-info (str "Upload dir provisioning FAILED: " err) {:dir dir}))))
+    ;; ponytail: chown to app uid:gid (100:101 = host messagebus:crontab) so the
+    ;; container (runs as app) can write its upload dir without runtime EACCES.
     (let [{:keys [exit err]} (sh ["sudo" "chown" "-R" "100:101" dir])]
       (when-not (zero? exit)
         (throw (ex-info (str "Upload dir chown FAILED: " err) {:dir dir}))))
@@ -244,24 +246,33 @@
 
 (defn- deploy-api
   "Deploys the backend container for this PR (review_net + review.env)."
-  [org db-name]
+  [org db-name openai-api-key]
   (let [container-name (str "swtp-api-pr-" *pr-num*)
         host           (subdomain *pr-num* "api")
-        upload-dir     (provision-upload-dir!)]
+        upload-dir     (provision-upload-dir!)
+        api-extra      (if openai-api-key
+                         ["-e" (str "OPENAI_API_KEY=" openai-api-key)]
+                         [])]
     (deploy-service!
       {:container-name container-name
        :host           host
        :image          (str "ghcr.io/" org "/swtp-api:pr-" *pr-num*)
        :port           8080
-        :extra-opts     ["--network"  "review_net"
-                         "--env-file" "/opt/stacks/swtp-infra/review.env"
-                         "-v"         (str upload-dir ":/app/uploads")
-                         "-e"         (str "SPRING_DATASOURCE_URL=jdbc:mysql://swtp-db:3306/" db-name)
-                         "-e"         (str "APP_FRONTEND_URL=https://" (subdomain *pr-num* nil))
-                         ;; GitHub OAuth: client id/secret + token encryption key come from
-                         ;; review.env (shared across PRs); only the redirect URI is per-PR.
-                         "-e"         (str "GITHUB_OAUTH_REDIRECT_URI=https://" (subdomain *pr-num* nil) "/github/callback")
-                         "-e"         (str "DISCORD_REDIRECT_URI=https://" (subdomain *pr-num* "api") "/api/v1/auth/discord/callback")]})
+       :extra-opts     (into ["--network"  "review_net"
+                              "--env-file" "/opt/stacks/swtp-infra/review.env"
+                              "-v"         (str upload-dir ":/app/uploads")
+                              "-e"         "APP_UPLOADS_DIR=/app/uploads"
+                              "-e"         (str "SPRING_DATASOURCE_URL=jdbc:mysql://swtp-db:3306/" db-name)
+                              "-e"         "SPRING_MAIL_HOST=maildev"
+                              "-e"         "SPRING_MAIL_PORT=1025"
+                              "-e"         "BE_LOG_LEVEL=DEBUG"
+                              "-e"         (str "DISCORD_REDIRECT_URI=https://" (subdomain *pr-num* "api") "/api/v1/auth/discord/callback")
+                              "-e"         (str "APP_FRONTEND_URL=https://" (subdomain *pr-num* nil))
+                              ;; GitHub OAuth: client id/secret + token encryption key come from
+                              ;; review.env (shared across PRs); only the redirect URI is per-PR.
+                              "-e"         (str "GITHUB_OAUTH_REDIRECT_URI=https://" (subdomain *pr-num* nil) "/github/callback")
+                              "-e"         (str "DISCORD_REDIRECT_URI=https://" (subdomain *pr-num* "api") "/api/v1/auth/discord/callback")]
+                             api-extra)})
     (log (str "Backend live -> https://" host))))
 
 (defn- deploy-dozzle
@@ -405,15 +416,13 @@
   (try
     (let [{:keys [pr-num org]} (parse-args args)
           env          (load-env!)
-          ;; Database
           db-root-pw   (env-get env "MYSQL_ROOT_PASSWORD")
           db-app-user  (or (get env "MYSQL_USER") "swtp")
           db-name      (str "swtp_pr_" pr-num)
           template-db  "swtp_template"
-          ;; Keycloak admin (needed to register the PR redirect URI)
           kc-admin     (env-get env "KC_ADMIN")
           kc-admin-pw  (env-get env "KC_ADMIN_PASSWORD")
-          ;; PR-specific URLs
+          openai-key   (or (System/getenv "OPENAI_API_KEY") (get env "OPENAI_API_KEY"))
           pr-origin    (str "https://" (subdomain pr-num nil))]
 
       (binding [*pr-num* pr-num]
@@ -421,7 +430,7 @@
 
         (clone-db! db-name db-app-user template-db db-root-pw)
         (deploy-web org)
-        (deploy-api org db-name)
+        (deploy-api org db-name openai-key)
         (deploy-dozzle)
         (add-pr-redirect! kc-admin kc-admin-pw
                           (str pr-origin "/*") pr-origin)
