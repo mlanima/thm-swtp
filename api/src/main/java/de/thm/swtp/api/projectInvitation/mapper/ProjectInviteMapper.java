@@ -1,7 +1,6 @@
 package de.thm.swtp.api.projectInvitation.mapper;
 
-import de.thm.swtp.api.discord.entity.LinkedChannelEntity;
-import de.thm.swtp.api.discord.repository.LinkedChannelRepository;
+import de.thm.swtp.api.discord.service.DiscordProjectService;
 import de.thm.swtp.api.projectInvitation.domain.ProjectInvite;
 import de.thm.swtp.api.projectInvitation.entity.ProjectInviteEntity;
 import org.springframework.stereotype.Component;
@@ -10,18 +9,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProjectInviteMapper {
 
-    private final LinkedChannelRepository linkedChannelRepository;
+    private final DiscordProjectService discordProjectService;
 
-    public ProjectInviteMapper(LinkedChannelRepository linkedChannelRepository) {
-        this.linkedChannelRepository = linkedChannelRepository;
+    public ProjectInviteMapper(DiscordProjectService discordProjectService) {
+        this.discordProjectService = discordProjectService;
     }
 
     /** Converts a project invitation entity into a domain object.*/
     public ProjectInvite toDomain(ProjectInviteEntity projectInviteEntity) {
-        String discordInviteUrl = linkedChannelRepository.findByProjectId(projectInviteEntity.getProject().getId())
-                .filter(LinkedChannelEntity::isActive)
-                .map(LinkedChannelEntity::getDiscordInviteUrl)
-                .orElse(null);
+        String discordInviteUrl = discordProjectService.getActiveInviteUrl(projectInviteEntity.getProject().getId());
         return ProjectInvite.builder()
                 .id(projectInviteEntity.getId())
                 .projectId(projectInviteEntity.getProject().getId())
