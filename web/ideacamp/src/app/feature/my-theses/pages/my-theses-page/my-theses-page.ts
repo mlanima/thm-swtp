@@ -37,8 +37,9 @@ export class MyThesesPage implements OnInit {
   }
 
   private markThesisNotificationsAsRead(): void {
+    const sequence = this.sidebarService.nextUnreadThesisNotificationsSequence();
     this.thesisNotificationService.markAllRead().subscribe({
-      next: () => this.sidebarService.unreadThesisNotificationsCount.set(0),
+      next: () => this.sidebarService.setUnreadThesisNotificationsCount(0, sequence),
       error: () => undefined,
     });
   }

@@ -55,8 +55,9 @@ export class SidebarComponent {
             this.myThesesService.getMyTheses(username).subscribe({
               next: (theses) => this.hasTheses.set(theses.length > 0),
             });
+            const sequence = this.sidebarService.nextUnreadThesisNotificationsSequence();
             this.thesisNotificationService.getUnreadCount().subscribe({
-              next: (response) => this.sidebarService.unreadThesisNotificationsCount.set(response.count),
+              next: (response) => this.sidebarService.setUnreadThesisNotificationsCount(response.count, sequence),
             });
           },
         });
