@@ -4,6 +4,7 @@ import de.thm.swtp.api.projectPost.entity.ProjectPostEntity;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+/** Builds absolute platform URLs for posts (used in Discord embed links). */
 @Component
 public class PostUrlBuilder {
 
@@ -13,6 +14,7 @@ public class PostUrlBuilder {
         this.frontendUrl = frontendUrl;
     }
 
+    /** Returns the frontend URL pointing to the post's project page. */
     public String buildPostUrl(ProjectPostEntity post) {
         return frontendUrl + "/project/" + post.getProject().getProjectUrl();
     }

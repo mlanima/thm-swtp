@@ -18,6 +18,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Pushes domain events into the outbound Redis stream so the Discord bot
+ * can pick them up and act on them (post messages, delete, notify, etc.).
+ */
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -33,6 +37,7 @@ public class DiscordEventPublisher {
     private final PostUrlBuilder postUrlBuilder;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    /** Fires a POST_CREATED event so the bot sends a Discord message for the new post. */
     public void publishPostCreated(ProjectPostEntity post) {
         var channelRef = findActiveChannel(post.getProject().getId());
         if (channelRef.isEmpty()) {
@@ -59,6 +64,7 @@ public class DiscordEventPublisher {
         send("POST_CREATED", payload);
     }
 
+    /** Fires a POST_UPDATED event so the bot edits the Discord message content. */
     public void publishPostUpdated(ProjectPostEntity post, String discordMsgId) {
         var channelRef = findActiveChannel(post.getProject().getId());
         if (channelRef.isEmpty()) {
@@ -75,6 +81,7 @@ public class DiscordEventPublisher {
         ));
     }
 
+    /** Fires a POST_DELETED event — looks up the sync record first, then tells the bot to delete. */
     public void publishPostDeleted(UUID postId, String discordMsgId) {
         messageSyncRepository.findByDiscordMessageId(discordMsgId).ifPresentOrElse(
             sync -> {
@@ -89,6 +96,7 @@ public class DiscordEventPublisher {
         );
     }
 
+    /** Skips the sync-record lookup and tells the bot to delete directly (used for orphan cleanup). */
     public void publishDirectDelete(UUID postId, String discordMsgId, String channelId) {
         send("POST_DELETED", Map.of(
                 "postId", postId.toString(),
@@ -98,6 +106,7 @@ public class DiscordEventPublisher {
         log.info("Discord direct delete sent: postId={}, discordMsgId={}", postId, discordMsgId);
     }
 
+    /** Fires a PROJECT_INVITE event so the bot DMs the user about the invitation. */
     public void publishProjectInvite(UUID inviteId, String targetDiscordId, String projectName, String inviterName) {
         send("PROJECT_INVITE", Map.of(
                 "inviteId", inviteId.toString(),
@@ -107,6 +116,7 @@ public class DiscordEventPublisher {
         ));
     }
 
+    /** Fires a PROJECT_EVENT only if the channel's notification settings allow this event type. */
     public void publishProjectEvent(UUID projectId, String eventType, String message) {
         var channelRef = findActiveChannel(projectId);
         if (channelRef.isEmpty()) {
@@ -129,6 +139,7 @@ public class DiscordEventPublisher {
         ));
     }
 
+    /** Serialises the payload to JSON and pushes it onto the outbound Redis stream. */
     private void send(String type, Map<String, ?> payload) {
         try {
             redis.opsForStream().add(
@@ -141,11 +152,13 @@ public class DiscordEventPublisher {
         }
     }
 
+    /** Looks up the active channel link for the given project (null-safe). */
     private Optional<LinkedChannelEntity> findActiveChannel(UUID projectId) {
         return linkedChannelRepository.findByProjectId(projectId)
                 .filter(LinkedChannelEntity::isActive);
     }
 
+    /** Cuts text to DISCORD_CONTENT_MAX chars with an ellipsis — Discord has a 4000 char limit. */
     private static String truncate(String text) {
         if (text == null || text.length() <= DISCORD_CONTENT_MAX) {
             return text;

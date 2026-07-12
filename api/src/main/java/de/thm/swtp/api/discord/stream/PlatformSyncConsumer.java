@@ -17,6 +17,11 @@ import java.net.UnknownHostException;
 import java.time.Duration;
 import java.util.Map;
 
+/**
+ * Listens on the inbound Redis stream for events coming from the Discord bot
+ * and dispatches them to the appropriate handler. Runs as a scheduled consumer
+ * with a dedicated consumer group.
+ */
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -29,6 +34,10 @@ public class PlatformSyncConsumer {
 
     private String consumerName;
 
+    /**
+     * Sets up the consumer (unique name, consumer group) and logs warnings
+     * if any required Discord config values are missing.
+     */
     @PostConstruct
     public void init() {
         String host;
@@ -58,6 +67,7 @@ public class PlatformSyncConsumer {
                 discordProperties.getStreams().getOutbound());
     }
 
+    /** Creates the Redis consumer group if it doesn't exist yet — called once at startup. */
     private void ensureGroup() {
         var inbound = discordProperties.getStreams().getInbound();
         var group = discordProperties.getStreams().getConsumerGroup();
@@ -83,6 +93,7 @@ public class PlatformSyncConsumer {
         }
     }
 
+    /** Reads new records from the inbound stream, processes them, and acknowledges on success. */
     @Scheduled(fixedDelay = 100)
     public void poll() {
         try {
@@ -119,6 +130,7 @@ public class PlatformSyncConsumer {
         }
     }
 
+    /** Periodic check for unacknowledged messages — keeps the consumer group healthy. */
     @Scheduled(fixedDelay = 30000)
     public void reclaimPending() {
         try {
@@ -134,6 +146,7 @@ public class PlatformSyncConsumer {
         }
     }
 
+    /** Deserialises the event type and payload, then dispatches to the right handler method. */
     private void processRecord(RecordId recordId, Map<String, Object> rawFields) {
         Map<String, String> fields = new java.util.HashMap<>();
         rawFields.forEach((k, v) -> fields.put(k, v != null ? v.toString() : null));

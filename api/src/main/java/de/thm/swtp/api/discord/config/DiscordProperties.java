@@ -5,6 +5,10 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+/**
+ * Binds {@code discord.*} configuration properties from application.yml.
+ * Groups the config into three nested namespaces: streams, bot, and oauth.
+ */
 @Component
 @ConfigurationProperties(prefix = "discord")
 @Getter
@@ -15,6 +19,9 @@ public class DiscordProperties {
     private Bot bot = new Bot();
     private OAuth oauth = new OAuth();
 
+    /**
+     * Redis stream channel names and consumer tuning for Discord sync.
+     */
     @Getter
     @Setter
     public static class Streams {
@@ -26,6 +33,9 @@ public class DiscordProperties {
         private int pendingTimeoutMs = 30000;
     }
 
+    /**
+     * Internal bot service endpoint and shared secret.
+     */
     @Getter
     @Setter
     public static class Bot {
@@ -34,6 +44,9 @@ public class DiscordProperties {
         private int invitePermissions = 76817;
     }
 
+    /**
+     * Discord app OAuth2 credentials used for the bot add flow.
+     */
     @Getter
     @Setter
     public static class OAuth {

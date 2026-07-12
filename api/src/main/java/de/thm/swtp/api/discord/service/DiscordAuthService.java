@@ -25,6 +25,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import static de.thm.swtp.api.discord.service.DiscordAuthService.StatePrefix.BOT_PREFIX;
 import static de.thm.swtp.api.discord.service.DiscordAuthService.StatePrefix.USER_PREFIX;
 
+/**
+ * Handles the Discord OAuth2 dance for both user-linking and bot-invite flows.
+ * Manages in-memory state nonces, bot guild ownership verification, and
+ * periodic cleanup of stale entries.
+ */
 @Service
 @Slf4j
 public class DiscordAuthService {
@@ -61,6 +66,10 @@ public class DiscordAuthService {
                 frontendUrl);
     }
 
+    /**
+ * Prefixes used to distinguish user-linking OAuth flows from bot-invite flows
+ * in the state parameter.
+ */
     public enum StatePrefix {
         USER_PREFIX("user:"),
         BOT_PREFIX("bot:");
@@ -80,6 +89,11 @@ public class DiscordAuthService {
         return clientId != null && !clientId.isBlank() && redirectUri != null && !redirectUri.isBlank();
     }
 
+    /**
+     * Builds a Discord OAuth URL that lets a user link their Discord account
+     * to their profile. The state parameter stores a nonce tied to the user's
+     * internal ID so we can verify the callback later.
+     */
     public String buildAuthorizationUrl(UUID userId) {
         String nonce = UUID.randomUUID().toString();
         String state = USER_PREFIX.prefix() + nonce;
@@ -92,6 +106,11 @@ public class DiscordAuthService {
                 + "&state=" + state;
     }
 
+    /**
+     * Creates a bot-invite URL so the user can add the IdeaCamp bot to their
+     * Discord server. The nonce tracks which project initiated the request
+     * and which user authorised it.
+     */
     public String createBotAuthUrl(UUID projectId, UUID userId, String permissions) {
         String nonce = UUID.randomUUID().toString();
         String state = BOT_PREFIX.prefix() + nonce;
@@ -105,11 +124,17 @@ public class DiscordAuthService {
                 + "&state=" + state;
     }
 
+    /**
+     * Removes and returns the bot-nonce entry, preventing replay attacks.
+     */
     public BotNonce consumeBotNonce(String nonce) {
         var entry = pendingBotNonces.remove(nonce);
         return entry;
     }
 
+    /**
+     * Strips the {@link StatePrefix} from the state string to recover the raw nonce.
+     */
     public String parseNonceFromState(String state) {
         if (state == null) {
             return null;
@@ -123,6 +148,10 @@ public class DiscordAuthService {
         return null;
     }
 
+    /**
+     * Tracks a pending bot-invite request. Contains the project and user that
+     * initiated it, plus a creation timestamp so stale entries can be purged.
+     */
     private record BotNonce(UUID projectId, UUID userId, Instant createdAt) {
         BotNonce(UUID projectId, UUID userId) {
             this(projectId, userId, Instant.now());
@@ -151,6 +180,10 @@ public class DiscordAuthService {
                 .anyMatch(n -> n.projectId().equals(projectId));
     }
 
+    /**
+     * Handles the case where the bot is already in the guild and only
+     * needs the guild ID stored. Consumes the bot nonce for security.
+     */
     public void handleBotGuildOnly(String nonce, String guildId) {
         BotNonce botNonce = consumeBotNonce(nonce);
         if (botNonce == null) {
@@ -174,6 +207,11 @@ public class DiscordAuthService {
         pendingBotGuilds.values().removeIf(PendingBotGuild::isExpired);
     }
 
+    /**
+     * Completes the bot-invite OAuth flow.
+     * Exchanges the code, then verifies that the guild owner matches
+     * the project owner's linked Discord ID before storing the guild.
+     */
     @Transactional
     public void handleBotCallback(String nonce, String code) {
         BotNonce botNonce = consumeBotNonce(nonce);
@@ -208,6 +246,10 @@ public class DiscordAuthService {
                 projectId, guildId, tokenResp.guild().name());
     }
 
+    /**
+     * Holds a guild ID that was verified via bot token exchange.
+     * Stale entries are cleaned up periodically.
+     */
     private record PendingBotGuild(String guildId, Instant createdAt) {
         PendingBotGuild(String guildId) {
             this(guildId, Instant.now());
@@ -218,6 +260,10 @@ public class DiscordAuthService {
         }
     }
 
+    /**
+     * Builds the CDN URL for a Discord user's avatar.
+     * Returns null when the user has no avatar set.
+     */
     private String buildAvatarUrl(String discordId, Object avatarField) {
         if (avatarField instanceof String hash && !hash.isBlank()) {
             String extension = hash.startsWith("a_") ? "gif" : "png";
@@ -226,6 +272,12 @@ public class DiscordAuthService {
         return null;
     }
 
+    /**
+     * Completes the user-linking OAuth flow.
+     * Validates the state nonce, exchanges the code for a token,
+     * fetches the Discord user profile, then links it to the platform user.
+     * Throws if either side of the link is already taken.
+     */
     @Transactional
     public UserProfile handleCallback(String code, String state) {
         UUID userId = pendingStates.remove(state);
@@ -266,6 +318,9 @@ public class DiscordAuthService {
         return saved;
     }
 
+    /**
+     * Unlinks the Discord account from the user's profile.
+     */
     @Transactional
     public void disconnect(UUID userId) {
         UserProfile profile = userProfileRepository.findById(userId)

@@ -13,6 +13,10 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
 
+/**
+ * Handles the Discord OAuth2 flows — exchanging authorization codes for tokens
+ * and fetching the authenticated user's profile.
+ */
 @Component
 @Slf4j
 public class DiscordOAuthClient {
@@ -42,6 +46,11 @@ public class DiscordOAuthClient {
         public record Guild(String id, String name, @JsonProperty("owner_id") String ownerId) {}
     }
 
+    /**
+     * Exchanges the OAuth2 code from the bot-add flow for a BotTokenResponse.
+     * Parses the raw JSON response manually because Discord returns extra fields
+     * that would trip up automatic deserialization into our record.
+     */
     public BotTokenResponse exchangeBotCode(String code) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -79,6 +88,10 @@ public class DiscordOAuthClient {
         }
     }
 
+    /**
+     * Exchanges a user OAuth2 code for a raw token map.
+     * Used for the standard Discord login flow (not bot installation).
+     */
     @SuppressWarnings({"rawtypes", "unchecked"})
     public Map<String, Object> exchangeCode(String code) {
         HttpHeaders headers = new HttpHeaders();
@@ -102,6 +115,10 @@ public class DiscordOAuthClient {
         return response.getBody();
     }
 
+    /**
+     * Fetches the Discord user profile associated with the given access token.
+     * Returns a raw map with fields like {@code id}, {@code username}, {@code avatar}.
+     */
     @SuppressWarnings({"rawtypes", "unchecked"})
     public Map<String, Object> getUser(String accessToken) {
         HttpHeaders headers = new HttpHeaders();

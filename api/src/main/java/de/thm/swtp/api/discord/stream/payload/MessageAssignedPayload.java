@@ -3,6 +3,7 @@ package de.thm.swtp.api.discord.stream.payload;
 import java.util.Map;
 import java.util.UUID;
 
+/** Carries the mapping between a platform post and its newly mirrored Discord message. */
 public record MessageAssignedPayload(
         UUID postId,
         String discordMsgId,

@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+/**
+ * CRUD for per-project Discord notification settings.
+ */
 @RestController
 @RequestMapping("/api/v1/projects/{projectId}/discord/settings")
 @RequiredArgsConstructor
@@ -17,6 +20,7 @@ public class DiscordSettingsController {
 
     private final DiscordChannelService discordChannelService;
 
+    /** Returns the current Discord notification settings for the project. */
     @GetMapping
     @PreAuthorize("@security.canViewProject(#projectId, authentication)")
     public ResponseEntity<DiscordSettingsResponse> getSettings(@PathVariable UUID projectId) {
@@ -24,6 +28,7 @@ public class DiscordSettingsController {
         return ResponseEntity.ok(DiscordSettingsResponse.from(settings));
     }
 
+    /** Updates which Discord notifications are enabled for this project. */
     @PutMapping
     @PreAuthorize("@security.canEditProject(#projectId, authentication)")
     public ResponseEntity<DiscordSettingsResponse> updateSettings(

@@ -15,6 +15,11 @@ import java.net.URI;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Handles Discord OAuth2 login and bot authorization.
+ * Redirects users through the Discord consent flow and stores
+ * the resulting tokens or guild associations.
+ */
 @RestController
 @RequestMapping("/api/v1/auth/discord")
 @RequiredArgsConstructor
@@ -23,6 +28,10 @@ public class DiscordAuthController {
 
     private final DiscordAuthService discordAuthService;
 
+    /**
+     * Returns the Discord OAuth URL to start the authorization flow.
+     * Checks that OAuth is actually configured before handing out the URL.
+     */
     @GetMapping("/authorize")
     public ResponseEntity<?> authorize(@AuthenticationPrincipal Jwt jwt) {
         if (!discordAuthService.isOAuthConfigured()) {
@@ -33,6 +42,10 @@ public class DiscordAuthController {
         return ResponseEntity.ok(Map.of("url", url));
     }
 
+    /**
+     * Handles the OAuth redirect from Discord.
+     * Dispatches to bot or user flow based on the state prefix.
+     */
     @GetMapping("/callback")
     public ResponseEntity<?> callback(
             @RequestParam(required = false) String code,
@@ -58,6 +71,7 @@ public class DiscordAuthController {
         return redirectToSettings("error");
     }
 
+    /** Routes a bot-specific callback: error, token exchange, or guild-only redirect. */
     private ResponseEntity<?> handleBotCallback(String nonce, String code, String guildId, String error) {
         if (error != null) {
             log.warn("Discord bot authorization denied: {}", error);
@@ -77,6 +91,7 @@ public class DiscordAuthController {
         return closePopupResponse();
     }
 
+    /** Routes a user-account linking callback. Redirects to the frontend settings page. */
     private ResponseEntity<?> handleUserCallback(String nonce, String code, String error) {
         if (error != null) {
             log.warn("Discord OAuth error: {}", error);
@@ -88,6 +103,7 @@ public class DiscordAuthController {
         return handleUserTokenExchange(nonce, code);
     }
 
+    /** Old-style callback where state was just the project UUID. Still supported for existing flows. */
     private ResponseEntity<?> handleLegacyBotCallback(String state, String guildId) {
         try {
             UUID projectId = UUID.fromString(state);
@@ -105,6 +121,7 @@ public class DiscordAuthController {
         return closePopupResponse();
     }
 
+    /** Exchanges the OAuth code for a bot token and stores the guild association. */
     private ResponseEntity<?> handleBotTokenExchange(String nonce, String code) {
         try {
             discordAuthService.handleBotCallback(nonce, code);
@@ -115,6 +132,7 @@ public class DiscordAuthController {
         return closePopupResponse();
     }
 
+    /** Stores the guild ID from a redirect that skipped the code exchange. */
     private ResponseEntity<?> handleBotGuildOnly(String nonce, String guildId) {
         try {
             discordAuthService.handleBotGuildOnly(nonce, guildId);
@@ -125,6 +143,7 @@ public class DiscordAuthController {
         return closePopupResponse();
     }
 
+    /** Exchanges the OAuth code to link the user's Discord account and redirects back to settings. */
     private ResponseEntity<?> handleUserTokenExchange(String nonce, String code) {
         try {
             UserProfile profile = discordAuthService.handleCallback(code, nonce);
@@ -136,12 +155,14 @@ public class DiscordAuthController {
         }
     }
 
+    /** Redirects the user's browser to the frontend settings page with a status indicator. */
     private ResponseEntity<?> redirectToSettings(String status) {
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create(discordAuthService.getFrontendUrl() + "/settings?discord=" + status))
                 .build();
     }
 
+    /** Returns a tiny HTML page that closes the popup window (used for bot auth). */
     private ResponseEntity<?> closePopupResponse() {
         String html = "<!DOCTYPE html><html><body><script>window.close()</script></body></html>";
         return ResponseEntity.ok()
@@ -149,6 +170,7 @@ public class DiscordAuthController {
                 .body(html);
     }
 
+    /** Unlinks the Discord account from the current user. */
     @DeleteMapping("/disconnect")
     public ResponseEntity<Void> disconnect(@AuthenticationPrincipal Jwt jwt) {
         UUID userId = UUID.fromString(jwt.getSubject());

@@ -19,6 +19,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * Handles all inbound events from the Discord bot that arrive via the Redis stream.
+ * Each method maps to one EventType and performs the corresponding action on the platform side.
+ */
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -30,6 +34,10 @@ public class DiscordEventHandler {
     private final UserProfileRepository userProfileRepository;
     private final DiscordEventPublisher discordEventPublisher;
 
+    /**
+     * Imports a Discord message as a new platform post.
+     * Creates a ghost user profile if the Discord user isn't known yet.
+     */
     @Transactional
     public void handleDiscordMessageCreated(DiscordMessageCreatedPayload payload) {
         String discordMsgId = payload.discordMsgId();
@@ -87,6 +95,7 @@ public class DiscordEventHandler {
         }
     }
 
+    /** Syncs edits from Discord back to the platform post content. */
     @Transactional
     public void handleDiscordMessageUpdated(DiscordMessageUpdatedPayload payload) {
         String discordMsgId = payload.discordMsgId();
@@ -101,6 +110,7 @@ public class DiscordEventHandler {
         });
     }
 
+    /** Removes the platform post when the Discord message is deleted. */
     @Transactional
     public void handleDiscordMessageDeleted(DiscordMessageDeletedPayload payload) {
         String discordMsgId = payload.discordMsgId();
@@ -114,6 +124,10 @@ public class DiscordEventHandler {
         });
     }
 
+    /**
+     * Links a platform post to its mirrored Discord message.
+     * If the post was unpublished in the meantime, tells the bot to delete the orphan immediately.
+     */
     @Transactional
     public void handleMessageAssigned(MessageAssignedPayload payload) {
         UUID postUuid = payload.postId();
@@ -147,11 +161,13 @@ public class DiscordEventHandler {
         log.info("Message assigned: postId={}, discordMsgId={}", postUuid, discordMsgId);
     }
 
+    /** Logs the user's response to a project invitation (accept / decline). */
     @Transactional
     public void handleInviteResponse(InviteResponsePayload payload) {
         log.info("Invite response received: inviteId={}, response={}", payload.inviteId(), payload.response());
     }
 
+    /** Marks the channel link as inactive when the bot loses access (kick / ban / channel delete). */
     @Transactional
     public void handleChannelDisconnected(ChannelDisconnectedPayload payload) {
         String channelId = payload.channelId();

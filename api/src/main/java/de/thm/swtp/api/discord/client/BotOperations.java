@@ -4,6 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.List;
 
+/**
+ * Contract for communicating with the internal Discord bot service.
+ * Each method maps to a bot HTTP endpoint for guild/channel management.
+ */
 public interface BotOperations {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -30,6 +34,10 @@ public interface BotOperations {
     @JsonIgnoreProperties(ignoreUnknown = true)
     record RestrictChannelResponse(boolean success, String reason) {}
 
+    /**
+     * Checks whether the bot can reach the given channel.
+     * Guild ID is optional — without it the bot figures it out on its own.
+     */
     TestConnectionResponse testConnection(String channelId);
 
     TestConnectionResponse testConnection(String channelId, String guildId);
@@ -46,5 +54,8 @@ public interface BotOperations {
 
     AutoSetupResponse autoSetup(String ownerDiscordId, String guildId);
 
+    /**
+     * Lists all Discord servers (guilds) the bot is currently invited to.
+     */
     GuildsResponse getGuilds();
 }

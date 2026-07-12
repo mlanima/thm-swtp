@@ -10,6 +10,11 @@ import org.springframework.web.client.RestClient;
 import java.util.Map;
 import java.util.function.Supplier;
 
+/**
+ * REST client that talks to the internal Discord bot service.
+ * Every request is authenticated with a shared secret header and falls back to a
+ * default error response when the bot is unreachable.
+ */
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -30,6 +35,10 @@ public class BotInternalClient implements BotOperations {
         return headers;
     }
 
+    /**
+     * Runs a bot API call and returns the given fallback if anything goes wrong.
+     * This keeps the caller from having to handle transport errors every time.
+     */
     private <T> T callBot(Supplier<T> call, T fallback) {
         try {
             return call.get();
@@ -44,6 +53,9 @@ public class BotInternalClient implements BotOperations {
         return testConnection(channelId, null);
     }
 
+    /**
+     * Pings the bot to verify it can see the specified channel (and optionally guild).
+     */
     @Override
     public TestConnectionResponse testConnection(String channelId, String guildId) {
         var body = guildId != null
@@ -114,6 +126,10 @@ public class BotInternalClient implements BotOperations {
         return autoSetup(ownerDiscordId, null);
     }
 
+    /**
+     * Tells the bot to create a text channel and set it up for the given owner.
+     * Guild ID is optional — without it the bot picks the first guild it can write to.
+     */
     @Override
     public AutoSetupResponse autoSetup(String ownerDiscordId, String guildId) {
         var body = guildId != null

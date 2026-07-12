@@ -10,6 +10,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Keeps a mapping between platform post IDs and Discord message IDs
+ * so that edits and deletes can be mirrored across platforms.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j

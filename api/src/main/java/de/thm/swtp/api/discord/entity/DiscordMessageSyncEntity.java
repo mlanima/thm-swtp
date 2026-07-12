@@ -7,6 +7,10 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * Tracks which platform posts have been mirrored to Discord and vice versa.
+ * Prevents duplicate syncs and logs the sync direction.
+ */
 @Entity
 @Table(name = "discord_message_sync", uniqueConstraints = {
         @UniqueConstraint(name = "UK_discord_message_sync_discord_msg", columnNames = {"discord_message_id"})
@@ -43,6 +47,7 @@ public class DiscordMessageSyncEntity {
     @Column(name = "synced_at", nullable = false, updatable = false)
     private LocalDateTime syncedAt;
 
+    /** Which way a message was synced: from platform to Discord, or the reverse. */
     public enum SyncDirection {
         PLATFORM_TO_DISCORD,
         DISCORD_TO_PLATFORM

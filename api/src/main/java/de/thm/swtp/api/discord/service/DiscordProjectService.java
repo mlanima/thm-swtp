@@ -7,6 +7,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+/**
+ * Convenience layer over Discord notification and channel services.
+ * Provides quick lookups for a project's linked channel.
+ */
 @Service
 @RequiredArgsConstructor
 public class DiscordProjectService {

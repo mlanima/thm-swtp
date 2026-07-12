@@ -3,6 +3,7 @@ import { streamProducer } from '../../streams/producer.js';
 import { logger } from '../../config/logger.js';
 import { wrapAsync } from '../wrapAsync.js';
 
+/** Registers the ChannelDelete handler — notifies the platform when our linked channel is removed. */
 export function registerChannelDeleteHandler(client: Client): void {
   client.on(Events.ChannelDelete, wrapAsync(async (channel: DMChannel | NonThreadGuildBasedChannel) => {
     if (!channel.isTextBased()) return;

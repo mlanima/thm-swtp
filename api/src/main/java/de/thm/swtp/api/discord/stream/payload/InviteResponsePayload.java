@@ -2,6 +2,7 @@ package de.thm.swtp.api.discord.stream.payload;
 
 import java.util.Map;
 
+/** Carries the invite ID and the user's decision (accept / decline) from Discord. */
 public record InviteResponsePayload(
         String inviteId,
         String response
