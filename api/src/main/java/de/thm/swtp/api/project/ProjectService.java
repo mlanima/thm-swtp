@@ -207,7 +207,7 @@ public class ProjectService {
 
         String projectName = project.getName();
 
-        // Discord synchronization entries only contain the post ID. The post mut be retrieved before they are deleted.
+        // Discord synchronization entries only contain the post ID. The post must be retrieved before they are deleted.
         List<ProjectPostEntity> projectPosts = projectPostRepository.findAllByProjectId(projectId);
 
         for (ProjectPostEntity post : projectPosts) {
