@@ -24,6 +24,8 @@ import java.util.UUID;
 @Slf4j
 public class DiscordEventPublisher {
 
+    private static final int DISCORD_CONTENT_MAX = 3900;
+
     private final StringRedisTemplate redis;
     private final DiscordProperties discordProperties;
     private final LinkedChannelRepository linkedChannelRepository;
@@ -41,10 +43,7 @@ public class DiscordEventPublisher {
         }
 
         var link = channelRef.get();
-        String content = post.getContent();
-        if (content.length() > 3900) {
-            content = content.substring(0, 3897) + "...";
-        }
+        var content = truncate(post.getContent());
 
         var payload = new HashMap<String, String>();
         payload.put("postId", post.getId().toString());
@@ -69,10 +68,7 @@ public class DiscordEventPublisher {
             return;
         }
 
-        String content = post.getContent();
-        if (content.length() > 3900) {
-            content = content.substring(0, 3897) + "...";
-        }
+        var content = truncate(post.getContent());
 
         send("POST_UPDATED", Map.of(
                 "postId", post.getId().toString(),
@@ -132,7 +128,7 @@ public class DiscordEventPublisher {
                 "projectId", projectId.toString(),
                 "projectName", link.getProject().getName(),
                 "channelId", link.getDiscordChannelId(),
-                "message", message.length() > 3900 ? message.substring(0, 3897) + "..." : message
+                "message", truncate(message)
         ));
     }
 
@@ -153,12 +149,11 @@ public class DiscordEventPublisher {
                 .filter(LinkedChannelEntity::isActive);
     }
 
-    private boolean shouldNotify(String eventType, DiscordChannelSettingsEntity settings) {
-        return switch (eventType) {
-            case "MEMBER_JOIN" -> settings.isNotifyMemberJoin();
-            case "MEMBER_LEAVE" -> settings.isNotifyMemberLeave();
-            default -> true;
-        };
+    private static String truncate(String text) {
+        if (text == null || text.length() <= DISCORD_CONTENT_MAX) {
+            return text;
+        }
+        return text.substring(0, DISCORD_CONTENT_MAX - 3) + "...";
     }
 
     private String buildPostUrl(ProjectPostEntity post) {
