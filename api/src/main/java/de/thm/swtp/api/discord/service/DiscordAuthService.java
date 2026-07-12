@@ -123,12 +123,7 @@ public class DiscordAuthService {
         return null;
     }
 
-    private record BotNonce(UUID projectId, UUID userId) {
-        BotNonce(UUID projectId, UUID userId) {
-            this.projectId = projectId;
-            this.userId = userId;
-        }
-    }
+    private record BotNonce(UUID projectId, UUID userId) {}
 
     @Scheduled(fixedRate = 300_000)
     public void purgeStaleBotNonces() {
