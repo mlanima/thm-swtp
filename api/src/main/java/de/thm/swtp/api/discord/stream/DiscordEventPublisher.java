@@ -10,7 +10,6 @@ import de.thm.swtp.api.discord.repository.LinkedChannelRepository;
 import de.thm.swtp.api.projectPost.entity.ProjectPostEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -31,10 +30,8 @@ public class DiscordEventPublisher {
     private final LinkedChannelRepository linkedChannelRepository;
     private final DiscordMessageSyncRepository messageSyncRepository;
     private final DiscordChannelSettingsRepository settingsRepository;
+    private final PostUrlBuilder postUrlBuilder;
     private final ObjectMapper objectMapper = new ObjectMapper();
-
-    @Value("${app.frontend-url}")
-    private String frontendUrl;
 
     public void publishPostCreated(ProjectPostEntity post) {
         var channelRef = findActiveChannel(post.getProject().getId());
@@ -52,7 +49,7 @@ public class DiscordEventPublisher {
         payload.put("content", content);
         payload.put("title", post.getTitle());
         payload.put("authorName", post.getAuthor().getUsername());
-        payload.put("platformUrl", buildPostUrl(post));
+        payload.put("platformUrl", postUrlBuilder.buildPostUrl(post));
 
         var authorAvatar = post.getAuthor().getDiscordAvatar();
         if (authorAvatar != null && !authorAvatar.isBlank()) {
@@ -154,9 +151,5 @@ public class DiscordEventPublisher {
             return text;
         }
         return text.substring(0, DISCORD_CONTENT_MAX - 3) + "...";
-    }
-
-    private String buildPostUrl(ProjectPostEntity post) {
-        return frontendUrl + "/project/" + post.getProject().getProjectUrl();
     }
 }
