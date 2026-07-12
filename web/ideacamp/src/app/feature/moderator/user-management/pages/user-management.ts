@@ -48,11 +48,11 @@ export class UserManagement implements OnInit {
   readonly isBanSubmitting = signal(false);
   readonly banErrorMessage = signal<string | null>(null);
 
-  private readonly activePageRange = createPageRange(this.activeUsers, this.activeCurrentPage, PAGE_SIZE,);
+  private readonly activePageRange = createPageRange(this.activeUsers, this.activeCurrentPage, PAGE_SIZE);
   readonly activeRangeStart = this.activePageRange.start;
   readonly activeRangeEnd = this.activePageRange.end;
 
-  private readonly bannedPageRange = createPageRange(this.bannedUsers, this.bannedCurrentPage, PAGE_SIZE,);
+  private readonly bannedPageRange = createPageRange(this.bannedUsers, this.bannedCurrentPage, PAGE_SIZE);
   readonly bannedRangeStart = this.bannedPageRange.start;
   readonly bannedRangeEnd = this.bannedPageRange.end;
 
