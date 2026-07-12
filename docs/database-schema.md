@@ -264,21 +264,21 @@ optional members, posts, links, tags, favorites, views and optional integrations
 
 Posts from a project.
 
-| Column               |         Type | Null | Constraints/Default                     | Description                      |
-|----------------------|-------------:|:----:|-----------------------------------------|----------------------------------|
-| `id`                 |         UUID |  no  | PK, generated                           | Post-ID                          |
-| `project_id`         |         UUID |  no  | FK -> `projects.id`                     | Project-ID                       |
-| `author_keycloak_id` |         UUID |  no  | FK -> `user_profiles.keycloak_id`       | Author                           |
-| `title`              | varchar(255) |  no  | /                                       | Title                            |
-| `content`            | varchar(255) |  no  | /                                       | Content                          |
-| `status`             |         enum |  no  | default `DRAFT`                         | `ARCHIVED`, `DRAFT`, `PUBLISHED` |
-| `content_format`     |         enum |  no  | default `PLAIN_TEXT`                    | `MARKDOWN`, `PLAIN_TEXT`         |
-| `published_at`       |     datetime | yes  | /                                       | Publish timestamp                |
-| `archived_at`        |     datetime | yes  | /                                       | Archive timestamp                |
-| `created_at`         |     datetime |  no  | auto on insert                          | Creation timestamp               |
-| `updated_at`         |     datetime |  no  | auto on update                          | Update timestamp                 |
-| `image_url`          | varchar(255) | yes  | /                                       | URL of the image                 |
-| `image_file_id`      |         UUID | yes  | logical reference -> `project_files.id` | ID of the uploaded file          |
+| Column               |           Type | Null | Constraints/Default                     | Description                      |
+|----------------------|---------------:|:----:|-----------------------------------------|----------------------------------|
+| `id`                 |           UUID |  no  | PK, generated                           | Post-ID                          |
+| `project_id`         |           UUID |  no  | FK -> `projects.id`                     | Project-ID                       |
+| `author_keycloak_id` |           UUID |  no  | FK -> `user_profiles.keycloak_id`       | Author                           |
+| `title`              |   varchar(255) |  no  | /                                       | Title                            |
+| `content`            | varchar(10000) |  no  | /                                       | Content                          |
+| `status`             |           enum |  no  | default `DRAFT`                         | `ARCHIVED`, `DRAFT`, `PUBLISHED` |
+| `content_format`     |           enum |  no  | default `PLAIN_TEXT`                    | `MARKDOWN`, `PLAIN_TEXT`         |
+| `published_at`       |       datetime | yes  | /                                       | Publish timestamp                |
+| `archived_at`        |       datetime | yes  | /                                       | Archive timestamp                |
+| `created_at`         |       datetime |  no  | auto on insert                          | Creation timestamp               |
+| `updated_at`         |       datetime |  no  | auto on update                          | Update timestamp                 |
+| `image_url`          |   varchar(255) | yes  | /                                       | URL of the image                 |
+| `image_file_id`      |           UUID | yes  | logical reference -> `project_files.id` | ID of the uploaded file          |
 
 
 ### `project_invitations`
