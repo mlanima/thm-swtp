@@ -54,8 +54,10 @@
       />
 
       <p class="mt-4 text-center text-sm text-slate-400">
-        {{ projects().length }} {{ 'MODERATOR.PROJECTS.SHOWING_OF' | translate }}
-        {{ totalElements() }} {{ 'MODERATOR.PROJECTS.TOTAL_PROJECTS' | translate }}
+        {{ rangeStart() }}–{{ rangeEnd() }}
+        {{ 'MODERATOR.PROJECTS.SHOWING_OF' | translate }}
+        {{ totalElements() }}
+        {{ 'MODERATOR.PROJECTS.TOTAL_PROJECTS' | translate }}
       </p>
     }
   </div>

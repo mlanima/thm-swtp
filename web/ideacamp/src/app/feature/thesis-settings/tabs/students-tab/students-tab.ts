@@ -76,9 +76,11 @@ export class StudentsTab implements OnInit {
         const key =
           error.status === 422
             ? 'THESISSETTINGS.STUDENTS.ERROR_ADD_INVALID'
-            : error.status === 409
-              ? 'THESISSETTINGS.STUDENTS.ERROR_ADD_DUPLICATE'
-              : 'THESISSETTINGS.STUDENTS.ERROR_ADD_STUDENT';
+            : error.error?.errorCode === 'STUDENT_ALREADY_ASSIGNED_ELSEWHERE'
+              ? 'THESISSETTINGS.STUDENTS.ERROR_ADD_ALREADY_ELSEWHERE'
+              : error.status === 409
+                ? 'THESISSETTINGS.STUDENTS.ERROR_ADD_DUPLICATE'
+                : 'THESISSETTINGS.STUDENTS.ERROR_ADD_STUDENT';
         this.addErrorMessage.set(this.translateService.instant(key));
         this.isAdding.set(false);
       },

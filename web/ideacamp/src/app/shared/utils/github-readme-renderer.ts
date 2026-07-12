@@ -22,6 +22,25 @@ function stripLeadingPathMarkers(path: string): string {
   return path.replace(/^\.\//, '').replace(/^\//, '');
 }
 
+function toRawUrl(path: string, repoOwner: string, repoName: string, branch: string): string {
+  return `https://raw.githubusercontent.com/${repoOwner}/${repoName}/${branch}/${stripLeadingPathMarkers(path)}`;
+}
+
+// A srcset is a comma-separated list of "URL [descriptor]" candidates; each relative URL is
+// rewritten individually, keeping its descriptor (e.g. "2x", "480w") intact.
+function rewriteSrcset(srcset: string, repoOwner: string, repoName: string, branch: string): string {
+  return srcset
+    .split(',')
+    .map((candidate) => candidate.trim())
+    .filter((candidate) => candidate.length > 0)
+    .map((candidate) => {
+      const [url, ...descriptorParts] = candidate.split(/\s+/);
+      const resolved = isRelative(url) ? toRawUrl(url, repoOwner, repoName, branch) : url;
+      return [resolved, ...descriptorParts].join(' ');
+    })
+    .join(', ');
+}
+
 /**
  * Renders a GitHub repo's raw README markdown into safe, displayable HTML:
  * 1. `marked` converts markdown (incl. GFM tables/task-lists) to HTML.
@@ -49,10 +68,17 @@ export function renderGithubReadme(
   doc.querySelectorAll('img[src]').forEach((img) => {
     const src = img.getAttribute('src') ?? '';
     if (isRelative(src)) {
-      img.setAttribute(
-        'src',
-        `https://raw.githubusercontent.com/${repoOwner}/${repoName}/${branch}/${stripLeadingPathMarkers(src)}`,
-      );
+      img.setAttribute('src', toRawUrl(src, repoOwner, repoName, branch));
+    }
+  });
+
+  // Inside a <picture>, a matched <source media="..."> wins over the <img> src and does not
+  // fall back on load error — a relative srcset left pointing at the app origin breaks the
+  // image (typical GitHub READMEs use this for light/dark logo variants).
+  doc.querySelectorAll('img[srcset], source[srcset]').forEach((element) => {
+    const srcset = element.getAttribute('srcset') ?? '';
+    if (srcset) {
+      element.setAttribute('srcset', rewriteSrcset(srcset, repoOwner, repoName, branch));
     }
   });
 

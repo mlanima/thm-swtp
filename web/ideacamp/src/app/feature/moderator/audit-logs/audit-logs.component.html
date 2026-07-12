@@ -89,8 +89,10 @@
       />
 
       <p class="mt-4 text-center text-sm text-slate-400">
-        {{ auditLogs().length }} {{ 'MODERATOR.AUDIT_LOGS.SHOWING_OF' | translate }}
-        {{ totalElements() }} {{ 'MODERATOR.AUDIT_LOGS.TOTAL_LOGS' | translate }}
+        {{ rangeStart() }}–{{ rangeEnd() }}
+        {{ 'MODERATOR.AUDIT_LOGS.SHOWING_OF' | translate }}
+        {{ totalElements() }}
+        {{ 'MODERATOR.AUDIT_LOGS.TOTAL_LOGS' | translate }}
       </p>
     }
   </div>

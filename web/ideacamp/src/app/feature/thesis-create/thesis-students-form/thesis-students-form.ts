@@ -1,10 +1,11 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject, ViewChild } from '@angular/core';
 import {FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ProjectInviteMember } from '../../../models/project-invite-member.model';
 import {UserSearchResult} from '../../search/models/user-search-result.model';
 import { UserSearchPick } from '../../../shared/user-search-pick/user-search-pick';
 import { UserProfileService } from '../../../services/user-profile.service';
+import { ThesisService } from '../../thesis-site/thesis.service';
 
 
 @Component({
@@ -18,6 +19,8 @@ import { UserProfileService } from '../../../services/user-profile.service';
  */
 export class ThesisStudentsForm implements OnChanges {
   private readonly userProfileService = inject(UserProfileService);
+  private readonly thesisService = inject(ThesisService);
+  private readonly changeDetectorRef = inject(ChangeDetectorRef);
 
   @ViewChild('userSearchPick') userSearchPick?: UserSearchPick;
 
@@ -30,6 +33,8 @@ export class ThesisStudentsForm implements OnChanges {
   students: ProjectInviteMember[] = [];
   isStudentDialogOpen = false;
   selectedUser : UserSearchResult | null = null;
+  isCheckingAvailability = false;
+  selectedUserAlreadyAssigned = false;
 
 
   /** Initializes the current user lookup and the user search subscription. */
@@ -54,11 +59,26 @@ export class ThesisStudentsForm implements OnChanges {
   closeDialog() {
     this.isStudentDialogOpen = false;
     this.selectedUser = null;
+    this.selectedUserAlreadyAssigned = false;
   }
 
-  /** Stores the selected user for the confirmation to add the user*/
+  /** Stores the selected user for the confirmation to add the user and checks if they are already assigned elsewhere.*/
   selectUser(user: UserSearchResult){
     this.selectedUser = user;
+    this.selectedUserAlreadyAssigned = false;
+    this.isCheckingAvailability = true;
+
+    this.thesisService.isStudentAlreadyAssigned(user.keycloakId).subscribe({
+      next: (alreadyAssigned) => {
+        this.isCheckingAvailability = false;
+        this.selectedUserAlreadyAssigned = alreadyAssigned;
+        this.changeDetectorRef.markForCheck();
+      },
+      error: () => {
+        this.isCheckingAvailability = false;
+        this.changeDetectorRef.markForCheck();
+      },
+    });
   }
 
   /** Adds the selected user to the student list if not added yet. */

@@ -35,7 +35,7 @@ public class DiscordMessageSyncEntity {
     private String discordGuildId;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "direction", nullable = false, length = 10)
+    @Column(name = "direction", nullable = false, length = 30)
     @Builder.Default
     private SyncDirection direction = SyncDirection.PLATFORM_TO_DISCORD;
 

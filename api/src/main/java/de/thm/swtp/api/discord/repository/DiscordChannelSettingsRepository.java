@@ -9,4 +9,6 @@ import java.util.UUID;
 public interface DiscordChannelSettingsRepository extends JpaRepository<DiscordChannelSettingsEntity, UUID> {
 
     Optional<DiscordChannelSettingsEntity> findByLinkedChannelId(UUID linkedChannelId);
+
+    void deleteByLinkedChannelId(UUID linkedChannelId);
 }

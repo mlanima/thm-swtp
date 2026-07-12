@@ -100,4 +100,10 @@ public class ThesisController {
     public ResponseEntity<Boolean> thesisUrlExists(@PathVariable String thesisUrl) {
         return ResponseEntity.ok(thesisService.thesisUrlExists(thesisUrl));
     }
+
+    @GetMapping("/students/{studentKeycloakId}/already-assigned")
+    @PreAuthorize("@security.canCreateThesis(authentication)")
+    public ResponseEntity<Boolean> isStudentAlreadyAssigned(@PathVariable UUID studentKeycloakId) {
+        return ResponseEntity.ok(thesisService.isStudentAlreadyAssigned(studentKeycloakId));
+    }
 }

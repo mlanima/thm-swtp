@@ -18,4 +18,6 @@ public interface DiscordMessageSyncRepository extends JpaRepository<DiscordMessa
     long countBySyncedAtAfter(LocalDateTime since);
 
     long countByDiscordChannelIdAndSyncedAtAfter(String discordChannelId, LocalDateTime since);
+
+    void deleteByPlatformPostId(UUID platformPostId);
 }

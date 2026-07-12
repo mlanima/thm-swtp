@@ -126,3 +126,20 @@
   border-top: 1px solid #e2e8f0;
   margin: 1.5rem 0;
 }
+
+/* Fold/unfold of the README body. grid-template-rows 0fr -> 1fr (instead of the app's usual
+   max-height trick) because README length is unbounded and a max-height cap would clip it. */
+.readme-collapsible {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.readme-collapsible.expanded {
+  grid-template-rows: 1fr;
+}
+
+.readme-collapsible-inner {
+  overflow: hidden;
+  min-height: 0;
+}
