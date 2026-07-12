@@ -109,6 +109,18 @@
             </p>
           }
 
+          @if (isCheckingAvailability) {
+            <p class="mt-4 text-xs text-slate-500">
+              {{ 'THESISCREATE.CHECKING_STUDENT_AVAILABILITY' | translate }}
+            </p>
+          }
+
+          @if (!isCheckingAvailability && selectedUserAlreadyAssigned) {
+            <p class="mt-4 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-700">
+              {{ 'THESISCREATE.STUDENT_ALREADY_ASSIGNED_WARNING' | translate }}
+            </p>
+          }
+
           <div class="mt-8 flex items-center gap-3">
             <button
               type="button"
@@ -119,9 +131,10 @@
 
             <button
               type="button"
+              [disabled]="isCheckingAvailability || selectedUserAlreadyAssigned"
               (click)="addSelectedUser()"
               (keydown.enter)="addSelectedUser()"
-              class="rounded-lg bg-lime-500 px-4 py-2 text-sm font-semibold text-white hover:bg-lime-600">
+              class="rounded-lg bg-lime-500 px-4 py-2 text-sm font-semibold text-white hover:bg-lime-600 disabled:cursor-not-allowed disabled:opacity-50">
               {{ selectedUser.username }} {{ 'THESISCREATE.ADD' | translate }}
             </button>
           </div>

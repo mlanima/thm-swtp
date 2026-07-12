@@ -13,10 +13,26 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * (prefixed with "Rolled back —") so the failed business event stays traceable
  * alongside the technical exception logged by GlobalExceptionHandler. If no
  * transaction is active, the message is logged immediately so the line is not lost.
+ *
+ * <p>The same after-commit guarantee is available for arbitrary side effects
+ * via {@link #afterCommit(Runnable)}.
  */
 public final class TxLogger {
 
     private TxLogger() {
+    }
+
+    public static void afterCommit(Runnable action) {
+        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+            action.run();
+            return;
+        }
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                action.run();
+            }
+        });
     }
 
     public static void afterCommit(Logger logger, String message, Object... args) {
@@ -33,7 +49,6 @@ public final class TxLogger {
             @Override
             public void afterCompletion(int status) {
                 if (status == TransactionSynchronization.STATUS_ROLLED_BACK) {
-                    // Format lazily — only on the rollback branch, not on every commit.
                     logger.warn("Rolled back — " + MessageFormatter.arrayFormat(message, args).getMessage());
                 }
             }

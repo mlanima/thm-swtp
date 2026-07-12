@@ -11,6 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * Reports the Discord connection status for a project:
+ * whether a channel is linked and how many messages were synced today.
+ */
 @Service
 @RequiredArgsConstructor
 public class DiscordStatusService {
@@ -18,6 +22,9 @@ public class DiscordStatusService {
     private final LinkedChannelRepository linkedChannelRepository;
     private final DiscordMessageSyncRepository messageSyncRepository;
 
+    /**
+     * Returns the current Discord link status and today's sync count.
+     */
     @Transactional(readOnly = true)
     public DiscordStatusResponse getStatus(UUID projectId) {
         var linkOpt = linkedChannelRepository.findByProjectId(projectId);

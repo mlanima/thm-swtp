@@ -7,6 +7,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+/**
+ * Bridges project lifecycle events (member join/leave, status changes)
+ * into Discord notifications via the event publisher.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j

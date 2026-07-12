@@ -260,6 +260,8 @@
       "LOADING": "Nutzer werden geladen...",
       "EMPTY_ACTIVE_TITLE": "Keine aktiven Nutzer vorhanden.",
       "EMPTY_ACTIVE_DESCRIPTION": "Aktive Nutzer erscheinen hier und können bei Bedarf gebannt werden.",
+      "SHOWING_OF": "von",
+      "TOTAL_USERS": "Nutzern angezeigt",
       "MODAL": {
         "TITLE": "Nutzer bannen",
         "DESCRIPTION": "Der Nutzer wird gesperrt und kann die Plattform nicht mehr nutzen. Der Account bleibt im System erhalten.",
@@ -434,8 +436,7 @@
       },
 
       "PAGINATION": {
-        "SHOWING": "{{ shown }} von {{ total }} Reports",
-        "PAGE": "Seite {{ current }} von {{ total }}"
+        "SHOWING": "{{ start }}–{{ end }} von {{ total }} Reports"
       },
 
       "SORT": {
@@ -564,6 +565,8 @@
     "STUDENT_DIALOG_SUBTITLE": "Suche nach Nutzername",
     "USER_SEARCH_PLACEHOLDER": "Nutzer finden",
     "USER_SEARCH_EMPTY_PREFIX": "Keine passenden User gefunden",
+    "CHECKING_STUDENT_AVAILABILITY": "Prüfe, ob der Studierende hinzugefügt werden kann...",
+    "STUDENT_ALREADY_ASSIGNED_WARNING": "Dieser Studierende ist bereits einer anderen Abschlussarbeit zugeordnet und kann nicht hinzugefügt werden.",
     "FINISH_TITLE": "Fertigstellen",
     "FINISH_DESCRIPTION": "Prüfe alle Eingaben, um deine Abschlussarbeit fertigzustellen.",
     "STEPS": {
@@ -575,9 +578,9 @@
     "THESIS_URL_CHECK_ERROR": "Abschlussarbeit-URL konnte nicht geprüft werden.",
     "SUCCESS_CREATED": "Abschlussarbeit erfolgreich erstellt!",
     "SUCCESS_CREATED_WITH_STUDENTS": "Abschlussarbeit erfolgreich erstellt und Studierende hinzugefügt!",
-    "SUCCESS_CREATED_STUDENTS_PARTIAL": "Abschlussarbeit erfolgreich erstellt. Einige Studierende konnten nicht hinzugefügt werden.",
-    "SUCCESS_CREATED_STUDENTS_FAILED": "Abschlussarbeit erfolgreich erstellt. Die Studierenden konnten nicht hinzugefügt werden.",
     "ERROR_CREATE_THESIS": "Abschlussarbeit konnte nicht erstellt werden. Bitte versuche es erneut.",
+    "ERROR_STUDENT_ALREADY_ELSEWHERE": "{{username}} ist bereits einer anderen Abschlussarbeit zugewiesen.",
+    "ERROR_STUDENT_GENERIC": "{{username}} konnte nicht hinzugefügt werden.",
     "VALIDATION": {
       "TITLE_MIN": "Titel muss mindestens 3 Zeichen lang sein.",
       "TITLE_MAX": "Titel darf höchstens 100 Zeichen lang sein.",
@@ -1145,6 +1148,7 @@
       "ERROR_LOAD_STUDENTS": "Studierende konnten nicht geladen werden. Bitte versuche es später nochmal.",
       "ERROR_ADD_INVALID": "Dieser Nutzer kann nicht als Studierende:r hinzugefügt werden: er/sie ist Professor:in oder bereits Betreuer:in dieser Abschlussarbeit.",
       "ERROR_ADD_DUPLICATE": "Dieser Nutzer ist bereits Studierende:r dieser Abschlussarbeit.",
+      "ERROR_ADD_ALREADY_ELSEWHERE": "Dieser Nutzer ist bereits einer anderen Abschlussarbeit als Studierende:r zugewiesen.",
       "ERROR_REMOVE_NOT_FOUND": "Dieser Nutzer ist kein:e Studierende:r dieser Abschlussarbeit (evtl. bereits entfernt)."
     },
     "DANGER": {

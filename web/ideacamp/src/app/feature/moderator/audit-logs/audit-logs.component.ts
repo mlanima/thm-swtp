@@ -4,6 +4,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuditLog } from './models/audit-log.model';
 import { AuditLogsService } from '../services/audit-logs.service';
 import { Pagination } from '../shared/pagination/pagination';
+import { createPageRange } from '../shared/pagination/page-range';
 
 const PAGE_SIZE = 10;
 
@@ -23,6 +24,10 @@ export class AuditLogsComponent implements OnInit {
   readonly currentPage = signal(0);
   readonly totalPages = signal(0);
   readonly totalElements = signal(0);
+
+  private readonly pageRange = createPageRange(this.auditLogs, this.currentPage, PAGE_SIZE);
+  readonly rangeStart = this.pageRange.start;
+  readonly rangeEnd = this.pageRange.end;
 
   ngOnInit(): void {
     this.loadAuditLogs(0);
