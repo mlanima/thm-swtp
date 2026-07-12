@@ -210,7 +210,7 @@ public class ProjectService {
         // Discord synchronization entries only contain the post ID. The post mut be retrieved before they are deleted.
         List<ProjectPostEntity> projectPosts = projectPostRepository.findAllByProjectId(projectId);
 
-        for(ProjectPostEntity post : projectPosts) {
+        for (ProjectPostEntity post : projectPosts) {
             discordMessageSyncRepository.deleteByPlatformPostId(post.getId());
         }
 
