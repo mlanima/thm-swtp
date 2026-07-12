@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.thm.swtp.api.discord.config.DiscordProperties;
 import de.thm.swtp.api.discord.entity.LinkedChannelEntity;
 import de.thm.swtp.api.discord.repository.DiscordChannelSettingsRepository;
-import de.thm.swtp.api.discord.repository.DiscordMessageSyncRepository;
 import de.thm.swtp.api.discord.repository.LinkedChannelRepository;
 import de.thm.swtp.api.projectPost.entity.ProjectPostEntity;
 import lombok.RequiredArgsConstructor;
@@ -31,33 +30,42 @@ public class DiscordEventPublisher {
     private final StringRedisTemplate redis;
     private final DiscordProperties discordProperties;
     private final LinkedChannelRepository linkedChannelRepository;
-    private final DiscordMessageSyncRepository messageSyncRepository;
     private final DiscordChannelSettingsRepository settingsRepository;
     private final PostUrlBuilder postUrlBuilder;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     /** Fires a POST_CREATED event so the bot sends a Discord message for the new post. */
     public void publishPostCreated(ProjectPostEntity post) {
-        var channelRef = findActiveChannel(post.getProject().getId());
+        publishPostCreated(new PostCreatedPayload(
+            post.getId(),
+            post.getProject().getId(),
+            post.getContent(),
+            post.getTitle(),
+            post.getAuthor().getUsername(),
+            post.getAuthor().getDiscordAvatar(),
+            postUrlBuilder.buildPostUrl(post)
+        ));
+    }
+
+    /** Entity-data-safe overload for after-commit use (data extracted eagerly, no lazy access after commit). */
+    public void publishPostCreated(PostCreatedPayload data) {
+        var channelRef = findActiveChannel(data.projectId());
         if (channelRef.isEmpty()) {
             return;
         }
 
         var link = channelRef.get();
-        var content = truncate(post.getContent());
-
         var payload = new HashMap<String, String>();
-        payload.put("postId", post.getId().toString());
-        payload.put("projectId", post.getProject().getId().toString());
+        payload.put("postId", data.postId().toString());
+        payload.put("projectId", data.projectId().toString());
         payload.put("channelId", link.getDiscordChannelId());
-        payload.put("content", content);
-        payload.put("title", post.getTitle());
-        payload.put("authorName", post.getAuthor().getUsername());
-        payload.put("platformUrl", postUrlBuilder.buildPostUrl(post));
+        payload.put("content", truncate(data.content()));
+        payload.put("title", data.title());
+        payload.put("authorName", data.authorName());
+        payload.put("platformUrl", data.platformUrl());
 
-        var authorAvatar = post.getAuthor().getDiscordAvatar();
-        if (authorAvatar != null && !authorAvatar.isBlank()) {
-            payload.put("authorAvatar", authorAvatar);
+        if (data.authorAvatar() != null && !data.authorAvatar().isBlank()) {
+            payload.put("authorAvatar", data.authorAvatar());
         }
 
         send("POST_CREATED", payload);
@@ -80,29 +88,19 @@ public class DiscordEventPublisher {
         ));
     }
 
-    /** Fires a POST_DELETED event — looks up the sync record first, then tells the bot to delete. */
-    public void publishPostDeleted(UUID postId, String discordMsgId) {
-        messageSyncRepository.findByDiscordMessageId(discordMsgId).ifPresentOrElse(
-            sync -> {
-                send("POST_DELETED", Map.of(
-                        "postId", postId.toString(),
-                        "discordMsgId", sync.getDiscordMessageId(),
-                        "channelId", sync.getDiscordChannelId()
-                ));
-                log.info("Discord delete event sent: postId={}, discordMsgId={}", postId, discordMsgId);
-            },
-            () -> log.info("Discord delete skipped — no sync record found: postId={}, discordMsgId={}", postId, discordMsgId)
-        );
-    }
-
-    /** Skips the sync-record lookup and tells the bot to delete directly (used for orphan cleanup). */
-    public void publishDirectDelete(UUID postId, String discordMsgId, String channelId) {
+    /** Fires a POST_DELETED event with the channelId provided directly (no sync-record lookup). */
+    public void publishPostDeleted(UUID postId, String discordMsgId, String channelId) {
         send("POST_DELETED", Map.of(
                 "postId", postId.toString(),
                 "discordMsgId", discordMsgId,
                 "channelId", channelId
         ));
-        log.info("Discord direct delete sent: postId={}, discordMsgId={}", postId, discordMsgId);
+        log.info("Discord delete event sent: postId={}, discordMsgId={}", postId, discordMsgId);
+    }
+
+    /** Tells the bot to delete a Discord message directly (alias for after-commit safety). */
+    public void publishDirectDelete(UUID postId, String discordMsgId, String channelId) {
+        publishPostDeleted(postId, discordMsgId, channelId);
     }
 
     /** Fires a PROJECT_INVITE event so the bot DMs the user about the invitation. */

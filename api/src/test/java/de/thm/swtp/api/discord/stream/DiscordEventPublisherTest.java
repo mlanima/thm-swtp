@@ -1,12 +1,9 @@
 package de.thm.swtp.api.discord.stream;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.thm.swtp.api.discord.config.DiscordProperties;
 import de.thm.swtp.api.discord.entity.DiscordChannelSettingsEntity;
-import de.thm.swtp.api.discord.entity.DiscordMessageSyncEntity;
 import de.thm.swtp.api.discord.entity.LinkedChannelEntity;
 import de.thm.swtp.api.discord.repository.DiscordChannelSettingsRepository;
-import de.thm.swtp.api.discord.repository.DiscordMessageSyncRepository;
 import de.thm.swtp.api.discord.repository.LinkedChannelRepository;
 import de.thm.swtp.api.project.ProjectEntity;
 import de.thm.swtp.api.projectPost.entity.ProjectPostEntity;
@@ -44,9 +41,6 @@ class DiscordEventPublisherTest {
     private LinkedChannelRepository linkedChannelRepository;
 
     @Mock
-    private DiscordMessageSyncRepository messageSyncRepository;
-
-    @Mock
     private DiscordChannelSettingsRepository settingsRepository;
 
     @Mock
@@ -70,7 +64,7 @@ class DiscordEventPublisherTest {
     @BeforeEach
     void setUp() {
         publisher = new DiscordEventPublisher(redis, discordProperties, linkedChannelRepository,
-                messageSyncRepository, settingsRepository, postUrlBuilder);
+                settingsRepository, postUrlBuilder);
 
         projectId = UUID.randomUUID();
         postId = UUID.randomUUID();
@@ -193,28 +187,14 @@ class DiscordEventPublisherTest {
 
     @Test
     void shouldPublishPostDeleted() {
-        var sync = DiscordMessageSyncEntity.builder()
-                .discordMessageId("discord-msg-1")
-                .discordChannelId("ch-1")
-                .build();
-        when(messageSyncRepository.findByDiscordMessageId("discord-msg-1")).thenReturn(Optional.of(sync));
-
-        publisher.publishPostDeleted(postId, "discord-msg-1");
+        publisher.publishPostDeleted(postId, "discord-msg-1", "ch-1");
 
         var captor = ArgumentCaptor.<Map<String, String>>captor();
         verify(streamOps).add(eq("stream:discord:sync"), captor.capture());
 
         var record = captor.getValue();
         assertThat(record).containsEntry("type", "POST_DELETED");
-    }
-
-    @Test
-    void shouldSkipPublishPostDeletedWhenNoSyncRecord() {
-        when(messageSyncRepository.findByDiscordMessageId("unknown-msg")).thenReturn(Optional.empty());
-
-        publisher.publishPostDeleted(postId, "unknown-msg");
-
-        verify(streamOps, never()).add(anyString(), anyMap());
+        assertThat(record.get("payload")).contains("\"channelId\":\"ch-1\"");
     }
 
     // ── publishDirectDelete ──

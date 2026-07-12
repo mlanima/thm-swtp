@@ -1,5 +1,6 @@
 package de.thm.swtp.api.discord.stream;
 
+import de.thm.swtp.api.common.TxLogger;
 import de.thm.swtp.api.discord.entity.DiscordMessageSyncEntity;
 import de.thm.swtp.api.discord.entity.LinkedChannelEntity;
 import de.thm.swtp.api.discord.repository.DiscordMessageSyncRepository;
@@ -146,7 +147,7 @@ public class DiscordEventHandler {
         if (!postExistsAndPublished) {
             log.warn("Post {} no longer published — deleting orphaned Discord message {}",
                     postUuid, discordMsgId);
-            discordEventPublisher.publishDirectDelete(postUuid, discordMsgId, channelId);
+            TxLogger.afterCommit(() -> discordEventPublisher.publishDirectDelete(postUuid, discordMsgId, channelId));
             return;
         }
 
@@ -178,4 +179,5 @@ public class DiscordEventHandler {
             log.warn("Channel disconnected: channelId={}, reason={}", channelId, payload.reason());
         });
     }
+
 }

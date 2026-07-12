@@ -21,6 +21,14 @@ public class DiscordPostSyncService {
 
     private final DiscordMessageSyncRepository messageSyncRepository;
 
+    public record SyncData(String discordMessageId, String discordChannelId) {}
+
+    @Transactional(readOnly = true)
+    public Optional<SyncData> getSyncData(UUID postId) {
+        return messageSyncRepository.findByPlatformPostId(postId)
+                .map(sync -> new SyncData(sync.getDiscordMessageId(), sync.getDiscordChannelId()));
+    }
+
     @Transactional(readOnly = true)
     public Optional<String> getDiscordMessageId(UUID postId) {
         return messageSyncRepository.findByPlatformPostId(postId)
