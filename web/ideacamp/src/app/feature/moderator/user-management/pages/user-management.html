@@ -251,7 +251,7 @@
       />
       @if (activeUserCount() > 0) {
         <p class="mt-4 text-center text-sm text-slate-400">
-          {{ activeUsers().length }}
+          {{ activeRangeStart() }}–{{ activeRangeEnd() }}
           {{ 'MODERATOR.USER_MANAGEMENT.SHOWING_OF' | translate }}
           {{ activeUserCount() }}
           {{ 'MODERATOR.USER_MANAGEMENT.TOTAL_USERS' | translate }}
@@ -480,7 +480,7 @@
       />
       @if (bannedUserCount() > 0) {
         <p class="mt-4 text-center text-sm text-slate-400">
-          {{ bannedUsers().length }}
+          {{ bannedRangeStart() }}–{{ bannedRangeEnd() }}
           {{ 'MODERATOR.USER_MANAGEMENT.SHOWING_OF' | translate }}
           {{ bannedUserCount() }}
           {{ 'MODERATOR.USER_MANAGEMENT.TOTAL_USERS' | translate }}

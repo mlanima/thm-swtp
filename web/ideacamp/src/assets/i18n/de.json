@@ -436,8 +436,7 @@
       },
 
       "PAGINATION": {
-        "SHOWING": "{{ shown }} von {{ total }} Reports",
-        "PAGE": "Seite {{ current }} von {{ total }}"
+        "SHOWING": "{{ start }}–{{ end }} von {{ total }} Reports"
       },
 
       "SORT": {
