@@ -296,8 +296,8 @@
       "CONFIRM_REJECT_TEXT": "Do you really want to reject this professor request?",
       "CANCEL": "Cancel",
       "CONFIRM": "Confirm",
-      "SHOWING_OF": "From",
-      "TOTAL_REQUESTS": "Requests shown"
+      "SHOWING_OF": "of",
+      "TOTAL_REQUESTS": "requests displayed"
     },
     "AUDIT_LOGS_LINK_TITLE": "Audit logs",
     "AUDIT_LOGS_LINK_DESCRIPTION": "Track who performed critical actions.",
