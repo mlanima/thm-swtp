@@ -13,4 +13,6 @@ public interface DiscordChannelSettingsRepository extends JpaRepository<DiscordC
 
     /** Load settings for a specific channel link. */
     Optional<DiscordChannelSettingsEntity> findByLinkedChannelId(UUID linkedChannelId);
+
+    void deleteByLinkedChannelId(UUID linkedChannelId);
 }

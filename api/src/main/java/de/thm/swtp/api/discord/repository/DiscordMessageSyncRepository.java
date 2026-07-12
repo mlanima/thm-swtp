@@ -26,4 +26,6 @@ public interface DiscordMessageSyncRepository extends JpaRepository<DiscordMessa
 
     /** Sync count for a specific channel since a timestamp. */
     long countByDiscordChannelIdAndSyncedAtAfter(String discordChannelId, LocalDateTime since);
+
+    void deleteByPlatformPostId(UUID platformPostId);
 }

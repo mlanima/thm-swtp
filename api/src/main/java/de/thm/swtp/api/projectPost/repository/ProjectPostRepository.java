@@ -24,4 +24,10 @@ public interface ProjectPostRepository  extends JpaRepository<ProjectPostEntity,
 
     /** Returns the project post from a given project.*/
     Optional<ProjectPostEntity> findByIdAndProjectId(UUID postId, UUID projectId);
+
+    /** Returns all posts of a specified project.*/
+    List<ProjectPostEntity> findAllByProjectId(UUID projectId);
+
+    /** Deletes all posts of a specified project.*/
+    void deleteByProjectId(UUID projectId);
 }

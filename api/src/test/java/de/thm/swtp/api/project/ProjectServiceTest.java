@@ -1,15 +1,27 @@
 package de.thm.swtp.api.project;
 
+import de.thm.swtp.api.auditlog.domain.AuditActor;
+import de.thm.swtp.api.auditlog.service.AuditLogService;
+import de.thm.swtp.api.discord.entity.LinkedChannelEntity;
+import de.thm.swtp.api.discord.repository.DiscordChannelSettingsRepository;
+import de.thm.swtp.api.discord.repository.DiscordMessageSyncRepository;
+import de.thm.swtp.api.links.repository.ProjectLinkRepository;
 import de.thm.swtp.api.moderation.ContentModerationService;
 import de.thm.swtp.api.moderation.exception.ContentNotValidException;
 import de.thm.swtp.api.project.dto.request.CreateProjectRequest;
 import de.thm.swtp.api.project.dto.request.UpdateProjectRequest;
+import de.thm.swtp.api.project.dto.response.DeleteProjectResponse;
 import de.thm.swtp.api.project.dto.response.ProjectResponse;
 import de.thm.swtp.api.project.exception.ExceptionInvalidProjectUrl;
 import de.thm.swtp.api.project.exception.ExceptionProjectNameAlreadyExists;
+import de.thm.swtp.api.project.exception.ExceptionProjectNotFound;
 import de.thm.swtp.api.project.exception.ExceptionProjectResponse;
+import de.thm.swtp.api.projectFiles.service.ProjectFileService;
 import de.thm.swtp.api.projectGithubRepo.repository.ProjectGithubRepoRepository;
 import de.thm.swtp.api.projectInvitation.repository.ProjectInviteRepository;
+import de.thm.swtp.api.projectJoinRequest.repository.ProjectJoinRequestRepository;
+import de.thm.swtp.api.projectPost.entity.ProjectPostEntity;
+import de.thm.swtp.api.projectPost.repository.ProjectPostRepository;
 import de.thm.swtp.api.userprofile.entity.UserProfile;
 import de.thm.swtp.api.userprofile.repository.UserProfileRepository;
 import de.thm.swtp.api.discord.repository.LinkedChannelRepository;
@@ -21,15 +33,13 @@ import de.thm.swtp.api.projectView.entity.ProjectViewEntity;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -54,7 +64,7 @@ class ProjectServiceTest {
     private ProjectViewRepository projectViewRepository;
 
     @Mock
-private LinkedChannelRepository linkedChannelRepository;
+    private LinkedChannelRepository linkedChannelRepository;
 
     @Mock
     private DiscordNotificationService discordNotificationService;
@@ -70,6 +80,25 @@ private LinkedChannelRepository linkedChannelRepository;
 
     @Mock
     private DiscordProjectService discordProjectService;
+    private ProjectJoinRequestRepository projectJoinRequestRepository;
+
+    @Mock
+    private ProjectPostRepository  projectPostRepository;
+
+    @Mock
+    private DiscordMessageSyncRepository discordMessageSyncRepository;
+
+    @Mock
+    private ProjectFileService projectFileService;
+
+    @Mock
+    private DiscordChannelSettingsRepository discordChannelSettingsRepository;
+
+    @Mock
+    private AuditLogService auditLogService;
+
+    @Mock
+    private ProjectLinkRepository projectLinkRepository;
 
     @InjectMocks
     private ProjectService projectService;
@@ -523,5 +552,124 @@ private LinkedChannelRepository linkedChannelRepository;
 
         assertThat(project.getOwner()).isEqualTo(newOwner);
         verify(projectGithubRepoRepository).deleteByProjectId(projectId);
+    }
+
+    @Test
+    void deleteProject_shouldDeleteDependenciesInForeignKeySafeOrder() {
+        UUID projectId = UUID.randomUUID();
+        UUID postId1 = UUID.randomUUID();
+        UUID postId2 = UUID.randomUUID();
+        UUID linkedChannelId = UUID.randomUUID();
+
+        AuditActor actor = new AuditActor(
+                UUID.randomUUID(),
+                "moderator",
+                "moderator@mod.de"
+        );
+
+        ProjectEntity project = ProjectEntity.builder()
+                .id(projectId)
+                .name("Project to delete")
+                .projectUrl("project-to-delete")
+                .build();
+
+        ProjectPostEntity firstPost = ProjectPostEntity.builder()
+                .id(postId1)
+                .project(project)
+                .build();
+
+        ProjectPostEntity secondPost = ProjectPostEntity.builder()
+                .id(postId2)
+                .project(project)
+                .build();
+
+        LinkedChannelEntity linkedChannel = LinkedChannelEntity.builder()
+                .id(linkedChannelId)
+                .project(project)
+                .discordChannelId("123456789")
+                .build();
+
+        when(projectRepository.findById(projectId))
+                .thenReturn(Optional.of(project));
+
+        when(projectPostRepository.findAllByProjectId(projectId))
+                .thenReturn(List.of(firstPost, secondPost));
+
+        when(linkedChannelRepository.findByProjectId(projectId))
+                .thenReturn(Optional.of(linkedChannel));
+
+        DeleteProjectResponse response =
+                projectService.deleteProject(projectId, actor);
+
+        assertThat(response.getProjectId()).isEqualTo(projectId);
+
+        InOrder order = inOrder(
+                projectPostRepository,
+                discordMessageSyncRepository,
+                projectFileService,
+                linkedChannelRepository,
+                discordChannelSettingsRepository,
+                projectGithubRepoRepository,
+                projectLinkRepository,
+                projectFavoriteRepository,
+                projectViewRepository,
+                projectInviteRepository,
+                projectJoinRequestRepository,
+                projectRepository,
+                auditLogService
+        );
+
+        // Retrieve posts, then delete the synced posts
+        order.verify(projectPostRepository)
+                .findAllByProjectId(projectId);
+
+        order.verify(discordMessageSyncRepository)
+                .deleteByPlatformPostId(postId1);
+
+        order.verify(discordMessageSyncRepository)
+                .deleteByPlatformPostId(postId2);
+
+        // Delete posts.
+        order.verify(projectPostRepository)
+                .deleteByProjectId(projectId);
+
+        order.verify(projectFileService)
+                .deleteAllProjectFiles(projectId);
+
+        order.verify(linkedChannelRepository)
+                .findByProjectId(projectId);
+
+        order.verify(discordChannelSettingsRepository)
+                .deleteByLinkedChannelId(linkedChannelId);
+
+        order.verify(linkedChannelRepository)
+                .deleteByProjectId(projectId);
+
+        order.verify(projectGithubRepoRepository)
+                .deleteByProjectId(projectId);
+
+        order.verify(projectLinkRepository)
+                .deleteByProjectId(projectId);
+
+        order.verify(projectFavoriteRepository)
+                .deleteByProjectId(projectId);
+
+        order.verify(projectViewRepository)
+                .deleteByProjectId(projectId);
+
+        order.verify(projectInviteRepository)
+                .deleteByProjectId(projectId);
+
+        order.verify(projectJoinRequestRepository)
+                .deleteByProjectId(projectId);
+
+        order.verify(projectRepository)
+                .delete(project);
+
+        order.verify(auditLogService)
+                .logProjectDeleted(actor, projectId, project.getName());
+
+        order.verify(projectRepository)
+                .flush();
     }
 }
