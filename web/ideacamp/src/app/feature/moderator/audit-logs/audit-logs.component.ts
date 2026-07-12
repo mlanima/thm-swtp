@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuditLog } from './models/audit-log.model';
@@ -23,6 +23,14 @@ export class AuditLogsComponent implements OnInit {
   readonly currentPage = signal(0);
   readonly totalPages = signal(0);
   readonly totalElements = signal(0);
+
+  readonly rangeStart = computed(() =>
+    this.auditLogs().length === 0 ? 0 : this.currentPage() * PAGE_SIZE + 1,
+  );
+
+  readonly rangeEnd = computed(() =>
+    this.auditLogs().length === 0 ? 0 : this.rangeStart() + this.auditLogs().length - 1,
+  );
 
   ngOnInit(): void {
     this.loadAuditLogs(0);

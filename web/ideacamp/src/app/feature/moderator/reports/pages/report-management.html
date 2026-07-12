@@ -136,7 +136,11 @@
           <p class="text-sm text-slate-400">
             {{
               'MODERATOR.REPORTS.PAGINATION.SHOWING'
-                | translate: { shown: reports().length, total: totalElements() }
+                | translate: {
+                start: rangeStart(),
+                end: rangeEnd(),
+                total: totalElements()
+              }
             }}
           </p>
 

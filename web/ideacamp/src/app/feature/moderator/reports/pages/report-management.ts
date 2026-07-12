@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Pagination } from '../../shared/pagination/pagination';
@@ -95,6 +95,14 @@ export class ReportManagement implements OnInit {
     'INAPPROPRIATE_CONTENT',
     'OTHER',
   ];
+
+  readonly rangeStart = computed(() =>
+    this.reports().length === 0 ? 0 : this.currentPage() * PAGE_SIZE + 1,
+  );
+
+  readonly rangeEnd = computed(() =>
+    this.reports().length === 0 ? 0 : this.rangeStart() + this.reports().length - 1,
+  );
 
   ngOnInit(): void {
     this.loadReports(0);

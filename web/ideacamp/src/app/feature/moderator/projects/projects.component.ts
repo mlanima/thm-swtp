@@ -49,6 +49,14 @@ export class ProjectsComponent implements OnInit {
   sortField = signal<ManagedProjectSortField>('name');
   sortDirection = signal<SortDirection>('asc');
 
+  readonly rangeStart = computed(() =>
+    this.projects().length === 0 ? 0 : this.currentPage() * PAGE_SIZE + 1,
+  );
+
+  readonly rangeEnd = computed(() =>
+    this.projects().length === 0 ? 0 : this.rangeStart() + this.projects().length - 1,
+  );
+
   ngOnInit(): void {
     const sub = this.searchSubject
       .pipe(debounceTime(300), distinctUntilChanged())
@@ -122,7 +130,12 @@ export class ProjectsComponent implements OnInit {
     this.isLoading.set(true);
     this.errorMessage.set('');
 
-    const params: ProjectSearchParams = { page, size: PAGE_SIZE, sortField: this.sortField(), sortDirection: this.sortDirection() };
+    const params: ProjectSearchParams = {
+      page,
+      size: PAGE_SIZE,
+      sortField: this.sortField(),
+      sortDirection: this.sortDirection(),
+    };
     if (name.trim()) {
       params.name = name.trim();
     }

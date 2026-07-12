@@ -47,6 +47,14 @@ export class ProfessorRequestComponent implements OnInit {
       : 'MODERATOR.PROFESSOR_REQUESTS.CONFIRM_REJECT_TEXT';
   });
 
+  readonly rangeStart = computed(() =>
+    this.requests().length === 0 ? 0 : this.currentPage() * PAGE_SIZE + 1,
+  );
+
+  readonly rangeEnd = computed(() =>
+    this.requests().length === 0 ? 0 : this.rangeStart() + this.requests().length - 1,
+  );
+
   ngOnInit(): void {
     this.loadRequests(0);
   }

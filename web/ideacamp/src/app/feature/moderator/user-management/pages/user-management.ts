@@ -47,11 +47,19 @@ export class UserManagement implements OnInit {
   readonly isBanSubmitting = signal(false);
   readonly banErrorMessage = signal<string | null>(null);
 
-  readonly activeDisplayedUserCount = computed(() =>
+  readonly activeRangeStart = computed(() =>
+    this.activeUserCount() === 0 ? 0 : this.activeCurrentPage() * PAGE_SIZE + 1,
+  );
+
+  readonly activeRangeEnd = computed(() =>
     Math.min((this.activeCurrentPage() + 1) * PAGE_SIZE, this.activeUserCount()),
   );
 
-  readonly bannedDisplayedUserCount = computed(() =>
+  readonly bannedRangeStart = computed(() =>
+    this.bannedUserCount() === 0 ? 0 : this.bannedCurrentPage() * PAGE_SIZE + 1,
+  );
+
+  readonly bannedRangeEnd = computed(() =>
     Math.min((this.bannedCurrentPage() + 1) * PAGE_SIZE, this.bannedUserCount()),
   );
 
