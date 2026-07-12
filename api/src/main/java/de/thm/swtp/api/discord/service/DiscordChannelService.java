@@ -1,7 +1,7 @@
 package de.thm.swtp.api.discord.service;
 
-import de.thm.swtp.api.discord.client.BotInternalClient.GuildInfo;
-import de.thm.swtp.api.discord.client.BotInternalClient;
+import de.thm.swtp.api.discord.client.BotOperations.GuildInfo;
+import de.thm.swtp.api.discord.client.BotOperations;
 import de.thm.swtp.api.discord.config.DiscordProperties;
 import de.thm.swtp.api.discord.entity.DiscordChannelSettingsEntity;
 import de.thm.swtp.api.discord.dto.DiscordChannelResponse;
@@ -30,7 +30,7 @@ public class DiscordChannelService {
     private final LinkedChannelRepository linkedChannelRepository;
     private final DiscordChannelSettingsRepository settingsRepository;
     private final ProjectRepository projectRepository;
-    private final BotInternalClient botInternalClient;
+    private final BotOperations botClient;
     private final DiscordAuthService discordAuthService;
     private final DiscordProperties discordProperties;
 
@@ -78,7 +78,7 @@ public class DiscordChannelService {
                     }
                 });
 
-        BotInternalClient.TestConnectionResponse test = botInternalClient.testConnection(discordChannelId, discordGuildId);
+        var test = botClient.testConnection(discordChannelId, discordGuildId);
         if (!test.success()) {
             throw new DiscordConnectionFailedException(
                     "Bot cannot access channel: " + (test.reason() != null ? test.reason() : "unknown reason"));
@@ -100,7 +100,7 @@ public class DiscordChannelService {
                         .isActive(true)
                         .build());
 
-        BotInternalClient.CreateInviteResponse inviteResp = botInternalClient.createChannelInvite(discordChannelId);
+        var inviteResp = botClient.createChannelInvite(discordChannelId);
         if (inviteResp.success() && inviteResp.inviteUrl() != null) {
             link.setDiscordInviteUrl(inviteResp.inviteUrl());
         }
@@ -123,7 +123,7 @@ public class DiscordChannelService {
         LinkedChannelEntity link = linkedChannelRepository.findByProjectId(projectId)
                 .orElseThrow(() -> new DiscordConnectionFailedException("No Discord channel linked to this project"));
 
-        BotInternalClient.LeaveGuildResponse leaveResp = botInternalClient.leaveGuild(link.getDiscordChannelId());
+        var leaveResp = botClient.leaveGuild(link.getDiscordChannelId());
         if (!leaveResp.success()) {
             log.warn("Bot failed to leave guild for project={}, channelId={}: {}",
                     projectId, link.getDiscordChannelId(), leaveResp.reason());
@@ -160,7 +160,7 @@ public class DiscordChannelService {
     }
 
     public List<GuildInfo> getAvailableGuilds(UUID projectId) {
-        var resp = botInternalClient.getGuilds();
+        var resp = botClient.getGuilds();
         if (!resp.success() || resp.guilds() == null) {
             throw new DiscordConnectionFailedException(
                     "Failed to fetch guilds: " + (resp.reason() != null ? resp.reason() : "unknown error"));
@@ -194,14 +194,14 @@ public class DiscordChannelService {
 
         var effectiveGuildId = guildId != null ? guildId : discordAuthService.consumeBotGuild(projectId);
 
-        BotInternalClient.AutoSetupResponse autoResp = botInternalClient.autoSetup(
+        var autoResp = botClient.autoSetup(
                 project.getOwner().getDiscordId(), effectiveGuildId);
         if (!autoResp.success() || autoResp.channelId() == null) {
             throw new DiscordConnectionFailedException(
                     "Bot could not auto-setup: " + (autoResp.reason() != null ? autoResp.reason() : "unknown error"));
         }
 
-        BotInternalClient.TestConnectionResponse test = botInternalClient.testConnection(
+        var test = botClient.testConnection(
                 autoResp.channelId(), autoResp.guildId());
         if (!test.success()) {
             throw new DiscordConnectionFailedException(

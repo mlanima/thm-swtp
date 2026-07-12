@@ -1,6 +1,6 @@
 package de.thm.swtp.api.discord.controller;
 
-import de.thm.swtp.api.discord.client.BotInternalClient.GuildInfo;
+import de.thm.swtp.api.discord.client.BotOperations.GuildInfo;
 import de.thm.swtp.api.discord.dto.DiscordChannelResponse;
 import de.thm.swtp.api.discord.entity.LinkedChannelEntity;
 import de.thm.swtp.api.discord.service.DiscordChannelService;
