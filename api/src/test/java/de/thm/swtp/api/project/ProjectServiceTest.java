@@ -80,6 +80,8 @@ class ProjectServiceTest {
 
     @Mock
     private DiscordProjectService discordProjectService;
+
+    @Mock
     private ProjectJoinRequestRepository projectJoinRequestRepository;
 
     @Mock

@@ -2,7 +2,6 @@ package de.thm.swtp.api.discord.stream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.thm.swtp.api.discord.config.DiscordProperties;
-import de.thm.swtp.api.discord.entity.DiscordChannelSettingsEntity;
 import de.thm.swtp.api.discord.entity.LinkedChannelEntity;
 import de.thm.swtp.api.discord.repository.DiscordChannelSettingsRepository;
 import de.thm.swtp.api.discord.repository.DiscordMessageSyncRepository;
