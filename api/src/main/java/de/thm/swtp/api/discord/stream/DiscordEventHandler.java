@@ -140,6 +140,9 @@ public class DiscordEventHandler {
             return;
         }
 
+        messageSyncRepository.findByPlatformPostId(postUuid)
+                .ifPresent(sync -> messageSyncRepository.delete(sync));
+
         messageSyncRepository.save(DiscordMessageSyncEntity.builder()
                 .platformPostId(postUuid)
                 .discordMessageId(discordMsgId)
