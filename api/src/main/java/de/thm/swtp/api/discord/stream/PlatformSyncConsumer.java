@@ -75,7 +75,7 @@ public class PlatformSyncConsumer {
             redis.opsForStream().createGroup(inbound, group);
             log.info("Created consumer group {} on stream {}", group, inbound);
         } catch (Exception e) {
-            if (e.getMessage() != null && e.getMessage().contains("BUSYGROUP")) {
+            if (isBusyGroup(e)) {
                 log.debug("Consumer group already exists");
             } else {
                 log.warn("Failed to create consumer group, trying fallback", e);
@@ -84,7 +84,7 @@ public class PlatformSyncConsumer {
                     redis.opsForStream().createGroup(inbound, group);
                     log.info("Created consumer group {} on stream {} (stream auto-created)", group, inbound);
                 } catch (Exception e2) {
-                    if (e2.getMessage() != null && e2.getMessage().contains("BUSYGROUP")) {
+                    if (isBusyGroup(e2)) {
                         log.debug("Consumer group already exists");
                     } else {
                         log.error("Failed to create consumer group", e2);
@@ -92,6 +92,29 @@ public class PlatformSyncConsumer {
                 }
             }
         }
+    }
+
+    /** Checks the full exception chain for a given error signal — Spring wraps Redis errors. */
+    private static boolean containsError(Exception e, String errorText) {
+        if (e.getMessage() != null && e.getMessage().contains(errorText)) {
+            return true;
+        }
+        for (Throwable c = e.getCause(); c != null; c = c.getCause()) {
+            if (c.getMessage() != null && c.getMessage().contains(errorText)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Shortcut for BUSYGROUP check. */
+    private static boolean isBusyGroup(Exception e) {
+        return containsError(e, "BUSYGROUP");
+    }
+
+    /** Shortcut for NOGROUP check. */
+    private static boolean isNoGroup(Exception e) {
+        return containsError(e, "NOGROUP");
     }
 
     /** Reads new records from the inbound stream, processes them, and acknowledges on success. */
@@ -122,7 +145,7 @@ public class PlatformSyncConsumer {
                 }
             }
         } catch (Exception e) {
-            if (e.getMessage() != null && e.getMessage().contains("NOGROUP")) {
+            if (isNoGroup(e)) {
                 log.warn("Consumer group missing — attempting to recreate");
                 ensureGroup();
             } else {
