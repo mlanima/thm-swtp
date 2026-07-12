@@ -19,6 +19,7 @@ import { BanUserDialogComponent, BanUserDialogUser } from '../../user-management
 import { DeleteDialog } from '../../projects/delete-dialog/delete-dialog';
 import { DeleteState } from '../../projects/projects.types';
 import { finalize } from 'rxjs';
+import { createPageRange } from '../../shared/pagination/page-range';
 
 
 const PAGE_SIZE = 20;
@@ -96,13 +97,9 @@ export class ReportManagement implements OnInit {
     'OTHER',
   ];
 
-  readonly rangeStart = computed(() =>
-    this.reports().length === 0 ? 0 : this.currentPage() * PAGE_SIZE + 1,
-  );
-
-  readonly rangeEnd = computed(() =>
-    this.reports().length === 0 ? 0 : this.rangeStart() + this.reports().length - 1,
-  );
+  private readonly pageRange = createPageRange(this.reports, this.currentPage, PAGE_SIZE);
+  readonly rangeStart = this.pageRange.start;
+  readonly rangeEnd = this.pageRange.end;
 
   ngOnInit(): void {
     this.loadReports(0);

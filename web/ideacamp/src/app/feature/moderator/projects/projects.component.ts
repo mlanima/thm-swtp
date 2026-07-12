@@ -11,6 +11,7 @@ import { ProjectView, DeleteState, ManagedProjectSortField, SortDirection } from
 import { ProjectTable } from './project-table/project-table';
 import { Pagination } from '../shared/pagination/pagination';
 import { DeleteDialog } from './delete-dialog/delete-dialog';
+import { createPageRange } from '../shared/pagination/page-range';
 
 const PAGE_SIZE = 10;
 
@@ -49,13 +50,9 @@ export class ProjectsComponent implements OnInit {
   sortField = signal<ManagedProjectSortField>('name');
   sortDirection = signal<SortDirection>('asc');
 
-  readonly rangeStart = computed(() =>
-    this.projects().length === 0 ? 0 : this.currentPage() * PAGE_SIZE + 1,
-  );
-
-  readonly rangeEnd = computed(() =>
-    this.projects().length === 0 ? 0 : this.rangeStart() + this.projects().length - 1,
-  );
+  private readonly pageRange = createPageRange(this.projects, this.currentPage, PAGE_SIZE);
+  readonly rangeStart = this.pageRange.start;
+  readonly rangeEnd = this.pageRange.end;
 
   ngOnInit(): void {
     const sub = this.searchSubject

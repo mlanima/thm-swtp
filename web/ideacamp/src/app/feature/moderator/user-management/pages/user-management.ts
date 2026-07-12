@@ -5,6 +5,7 @@ import { ManagedUser, ManagedUserSortField, SortDirection } from '../models/mana
 import { UserManagementService } from '../service/user-management.service';
 import { Pagination } from '../../shared/pagination/pagination';
 import { BanUserDialogComponent } from '../components/ban-user-dialog/ban-user-dialog.component';
+import { createPageRange } from '../../shared/pagination/page-range';
 
 type ModTab = 'active' | 'banned';
 const PAGE_SIZE = 10;
@@ -47,21 +48,13 @@ export class UserManagement implements OnInit {
   readonly isBanSubmitting = signal(false);
   readonly banErrorMessage = signal<string | null>(null);
 
-  readonly activeRangeStart = computed(() =>
-    this.activeUsers().length === 0 ? 0 : this.activeCurrentPage() * PAGE_SIZE + 1,
-  );
+  private readonly activePageRange = createPageRange(this.activeUsers, this.activeCurrentPage, PAGE_SIZE,);
+  readonly activeRangeStart = this.activePageRange.start;
+  readonly activeRangeEnd = this.activePageRange.end;
 
-  readonly activeRangeEnd = computed(() =>
-    this.activeUsers().length === 0 ? 0 : this.activeRangeStart() + this.activeUsers().length - 1,
-  );
-
-  readonly bannedRangeStart = computed(() =>
-    this.bannedUsers().length === 0 ? 0 : this.bannedCurrentPage() * PAGE_SIZE + 1,
-  );
-
-  readonly bannedRangeEnd = computed(() =>
-    this.bannedUsers().length === 0 ? 0 : this.bannedRangeStart() + this.bannedUsers().length - 1,
-  );
+  private readonly bannedPageRange = createPageRange(this.bannedUsers, this.bannedCurrentPage, PAGE_SIZE,);
+  readonly bannedRangeStart = this.bannedPageRange.start;
+  readonly bannedRangeEnd = this.bannedPageRange.end;
 
   ngOnInit() {
     if (!isPlatformBrowser(this.platformId)) {

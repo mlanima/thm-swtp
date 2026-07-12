@@ -7,6 +7,7 @@ import {
 } from './models/moderator-professor-request.model';
 import { ModeratorProfessorRequestService } from './service/moderator-professor-request.service';
 import { Pagination } from '../shared/pagination/pagination';
+import { createPageRange } from '../shared/pagination/page-range';
 
 type ProfRequestAction = 'accept' | 'reject';
 const PAGE_SIZE = 20;
@@ -47,13 +48,9 @@ export class ProfessorRequestComponent implements OnInit {
       : 'MODERATOR.PROFESSOR_REQUESTS.CONFIRM_REJECT_TEXT';
   });
 
-  readonly rangeStart = computed(() =>
-    this.requests().length === 0 ? 0 : this.currentPage() * PAGE_SIZE + 1,
-  );
-
-  readonly rangeEnd = computed(() =>
-    this.requests().length === 0 ? 0 : this.rangeStart() + this.requests().length - 1,
-  );
+  private readonly pageRange = createPageRange(this.requests, this.currentPage, PAGE_SIZE);
+  readonly rangeStart = this.pageRange.start;
+  readonly rangeEnd = this.pageRange.end;
 
   ngOnInit(): void {
     this.loadRequests(0);
