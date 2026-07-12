@@ -10,6 +10,7 @@ import de.thm.swtp.api.discord.repository.LinkedChannelRepository;
 import de.thm.swtp.api.projectPost.entity.ProjectPostEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -29,6 +30,9 @@ public class DiscordEventPublisher {
     private final DiscordMessageSyncRepository messageSyncRepository;
     private final DiscordChannelSettingsRepository settingsRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Value("${app.frontend-url}")
+    private String frontendUrl;
 
     public void publishPostCreated(ProjectPostEntity post) {
         var channelRef = findActiveChannel(post.getProject().getId());
@@ -158,6 +162,6 @@ public class DiscordEventPublisher {
     }
 
     private String buildPostUrl(ProjectPostEntity post) {
-        return "https://swtp-ss26.de/project/" + post.getProject().getProjectUrl();
+        return frontendUrl + "/project/" + post.getProject().getProjectUrl();
     }
 }
